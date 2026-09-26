@@ -164,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleCensura = document.getElementById("toggle-censura");
   const logrosGrid = document.getElementById("logros-grid");
   const logrosDesbloqueados = document.getElementById("logros-desbloqueados");
+  const logroToast = document.getElementById("logro-toast");
   const experienciaTitulo = document.getElementById("experiencia-titulo");
   const experienciaXp = document.getElementById("experiencia-xp");
   const experienciaProgreso = document.getElementById("experiencia-progreso");
@@ -262,7 +263,24 @@ document.addEventListener("DOMContentLoaded", () => {
       meta: 1,
       medir: () => JSON.parse(localStorage.getItem("mascotas_conocidas") || "[]").includes(id) ? 1 : 0,
     });
+    LOGROS.push({
+      id: `clics-${id}`,
+      icono,
+      nombre: `Fan de ${nombre.replace("Conoce ", "")}`,
+      descripcion: "Dale 100 clics a esta mascota",
+      meta: 100,
+      medir: () => Number(localStorage.getItem(`mascota_clicks_${id}`) || 0),
+    });
   });
+
+  let logroToastTimeout = null;
+  function notificarLogro(logro) {
+    if (!logroToast) return;
+    logroToast.innerHTML = `<span class="logro-toast-icon">${logro.icono}</span><span class="logro-toast-copy"><strong>¡Logro desbloqueado!</strong><span>${logro.nombre}</span></span>`;
+    logroToast.classList.add("visible");
+    if (logroToastTimeout) clearTimeout(logroToastTimeout);
+    logroToastTimeout = setTimeout(() => logroToast.classList.remove("visible"), 4500);
+  }
 
   const NIVELES_EXPERIENCIA = [
     { minimo: 0, nombre: "Novatos 🌱", siguiente: 100, siguienteNombre: "Enamorados 💛" },
@@ -308,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function renderLogros() {
+  function renderLogros({ notificar = false } = {}) {
     if (!logrosGrid) return;
     const clave = `sunadventures_logros_${perfilActual?.id || "local"}`;
     const desbloqueados = JSON.parse(localStorage.getItem(clave) || "{}");
@@ -317,7 +335,11 @@ document.addEventListener("DOMContentLoaded", () => {
     LOGROS.forEach((logro) => {
       const progreso = Math.min(logro.medir(), logro.meta);
       const desbloqueado = progreso >= logro.meta;
-      if (desbloqueado) { desbloqueados[logro.id] = true; total++; }
+      if (desbloqueado) {
+        if (notificar && !desbloqueados[logro.id]) notificarLogro(logro);
+        desbloqueados[logro.id] = true;
+        total++;
+      }
       const tarjeta = document.createElement("article");
       tarjeta.className = `logro-card${desbloqueado ? " desbloqueado" : ""}`;
       const icono = document.createElement("span");
@@ -339,6 +361,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (logrosDesbloqueados) logrosDesbloqueados.textContent = total;
     renderExperiencia();
   }
+
+  window.addEventListener("sunadventures:progress", () => renderLogros({ notificar: true }));
 
   // ============================================
   //  GRUPO PRIVADO Y AMIGOS
@@ -1105,6 +1129,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           cerrarModal();
           await render();
+          window.dispatchEvent(new Event("sunadventures:progress"));
         } catch (err) {
           console.error(err);
           alert("No se pudo actualizar: " + (err.message || err));
@@ -1141,6 +1166,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         cerrarModal();
         await render();
+        window.dispatchEvent(new Event("sunadventures:progress"));
       } catch (err) {
         console.error(err);
         alert("No se pudo subir la foto: " + (err.message || err));
@@ -1493,6 +1519,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         cerrarNotaModal();
         renderNotas();
+        window.dispatchEvent(new Event("sunadventures:progress"));
       } catch (err) {
         console.error(err);
         alert("No se pudo guardar: " + (err.message || err));

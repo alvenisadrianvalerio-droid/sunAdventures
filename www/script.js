@@ -418,7 +418,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       e.stopPropagation();
+      const clicsKey = `mascota_clicks_${mascotaActual}`;
+      const clicsMascota = Number(localStorage.getItem(clicsKey) || 0) + 1;
+      localStorage.setItem(clicsKey, String(clicsMascota));
       localStorage.setItem("mascota_clicks", String(Number(localStorage.getItem("mascota_clicks") || 0) + 1));
+      window.dispatchEvent(new Event("sunadventures:progress"));
 
       const sonido = MASCOTAS[mascotaActual].sonido;
       reproducirSonido(sonido);

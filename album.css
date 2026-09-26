@@ -37,6 +37,11 @@
 .logro-contenido h3 { margin: 0 0 0.25rem; font-size: 1rem; }
 .logro-contenido p { margin: 0 0 0.4rem; font-size: 0.82rem; opacity: 0.8; }
 .logro-contenido small { font-weight: bold; color: #ffd93d; }
+.logro-toast { position: fixed; top: 5.5rem; left: 50%; z-index: 1200; display: flex; align-items: center; gap: 0.7rem; width: min(360px, calc(100vw - 2rem)); padding: 0.9rem 1rem; border: 1px solid rgba(255,217,61,0.6); border-radius: 12px; background: #24201b; color: #fff; box-shadow: 0 12px 30px rgba(0,0,0,0.35); opacity: 0; pointer-events: none; transform: translate(-50%, -12px); transition: opacity 0.25s ease, transform 0.25s ease; }
+.logro-toast.visible { opacity: 1; transform: translate(-50%, 0); }
+.logro-toast-icon { font-size: 1.7rem; }
+.logro-toast-copy { display: flex; flex-direction: column; gap: 0.15rem; }
+.logro-toast-copy strong { color: #ffd93d; }
 .album-header { text-align: center; margin-bottom: 2rem; }
 
 .album-title {
