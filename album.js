@@ -160,6 +160,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const friendSearchResults = document.getElementById("friend-search-results");
   const groupMembersList = document.getElementById("group-members-list");
   const groupInvitesList = document.getElementById("group-invites-list");
+  const logrosGrid = document.getElementById("logros-grid");
+  const logrosDesbloqueados = document.getElementById("logros-desbloqueados");
+  const experienciaTitulo = document.getElementById("experiencia-titulo");
+  const experienciaXp = document.getElementById("experiencia-xp");
+  const experienciaProgreso = document.getElementById("experiencia-progreso");
+  const experienciaSiguiente = document.getElementById("experiencia-siguiente");
 
   // ============================================
   //  ESTADO
@@ -172,6 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let modoRegistro = false;
   let grupoActivo = null;
   let perfilActual = null;
+  let visitasConsecutivas = 0;
 
   let playlists = [];
   let playlistEditando = null;
@@ -192,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let archivosPendientes = [];
   let chatSubscription = null;
-  const CHAT_ROOM = "sunadventures-private";
+  let usuarioActualId = null;
   const PUSH_VAPID_PUBLIC_KEY = "BGFg_T3XTTCpN0aIKRXGq3sBvh0RGWOFmxx25tdpQ5OhNgHmuFDJ7TiXLfmgy4ktdqfE81uODV_PLKFqu_vy7_w";
 
   // Player
@@ -221,6 +228,92 @@ document.addEventListener("DOMContentLoaded", () => {
     loadingScreen.setAttribute("aria-hidden", "true");
   }
 
+  const LOGROS = [
+    { id: "primeros-pasos", icono: "🥇", nombre: "Primeros pasos", descripcion: "Sube tu primera foto", meta: 1, medir: () => fotos.length },
+    { id: "fotografos", icono: "📷", nombre: "Fotógrafos", descripcion: "Guarda 50 fotos", meta: 50, medir: () => fotos.length },
+    { id: "dj", icono: "🎵", nombre: "DJ", descripcion: "Añade 20 canciones", meta: 20, medir: () => playlists.reduce((total, playlist) => total + playlist.canciones.length, 0) },
+    { id: "poetas", icono: "💌", nombre: "Poetas", descripcion: "Escribe 30 notas", meta: 30, medir: () => notas.length },
+    { id: "racha", icono: "🔥", nombre: "Racha de 30 días", descripcion: "Abre la app 30 días seguidos", meta: 30, medir: () => visitasConsecutivas },
+    { id: "trotamundos", icono: "🗺️", nombre: "Trotamundos", descripcion: "Guarda 10 fotos con ubicación", meta: 10, medir: () => fotos.filter((foto) => foto.lat != null && foto.lng != null).length },
+    { id: "fan-girasol", icono: "🌻", nombre: "Fan del girasol", descripcion: "Dale 100 clics a la mascota", meta: 100, medir: () => Number(localStorage.getItem("mascota_clicks") || 0) },
+  ];
+
+  const NIVELES_EXPERIENCIA = [
+    { minimo: 0, nombre: "Novatos 🌱", siguiente: 100, siguienteNombre: "Enamorados 💛" },
+    { minimo: 100, nombre: "Enamorados 💛", siguiente: 500, siguienteNombre: "Compañeros de vida 🔥" },
+    { minimo: 500, nombre: "Compañeros de vida 🔥", siguiente: 1000, siguienteNombre: "Almas gemelas 💫" },
+    { minimo: 1000, nombre: "Almas gemelas 💫", siguiente: 5000, siguienteNombre: "Leyendas 🌻" },
+    { minimo: 5000, nombre: "Leyendas 🌻", siguiente: null, siguienteNombre: "Máximo nivel" },
+  ];
+
+  function calcularExperiencia() {
+    const canciones = playlists.reduce((total, playlist) => total + playlist.canciones.length, 0);
+    return fotos.length * 10 + notas.length * 5 + canciones * 8 + visitasConsecutivas * 20;
+  }
+
+  function renderExperiencia() {
+    const xp = calcularExperiencia();
+    const nivel = [...NIVELES_EXPERIENCIA].reverse().find((item) => xp >= item.minimo) || NIVELES_EXPERIENCIA[0];
+    if (experienciaTitulo) experienciaTitulo.textContent = nivel.nombre;
+    if (experienciaXp) experienciaXp.textContent = `${xp} XP`;
+    if (nivel.siguiente) {
+      const porcentaje = ((xp - nivel.minimo) / (nivel.siguiente - nivel.minimo)) * 100;
+      if (experienciaProgreso) experienciaProgreso.style.width = `${Math.min(100, Math.max(0, porcentaje))}%`;
+      if (experienciaSiguiente) experienciaSiguiente.textContent = `${Math.max(0, nivel.siguiente - xp)} XP para ${nivel.siguienteNombre}`;
+    } else {
+      if (experienciaProgreso) experienciaProgreso.style.width = "100%";
+      if (experienciaSiguiente) experienciaSiguiente.textContent = "Nivel máximo alcanzado 🌻";
+    }
+  }
+
+  function registrarVisita() {
+    const hoy = new Date().toISOString().slice(0, 10);
+    const clave = `sunadventures_visitas_${perfilActual?.id || "local"}`;
+    const dias = JSON.parse(localStorage.getItem(clave) || "[]");
+    if (!dias.includes(hoy)) dias.push(hoy);
+    const ordenados = dias.sort().slice(-60);
+    localStorage.setItem(clave, JSON.stringify(ordenados));
+    visitasConsecutivas = 0;
+    const fechas = new Set(ordenados);
+    const cursor = new Date();
+    while (fechas.has(cursor.toISOString().slice(0, 10))) {
+      visitasConsecutivas++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+  }
+
+  function renderLogros() {
+    if (!logrosGrid) return;
+    const clave = `sunadventures_logros_${perfilActual?.id || "local"}`;
+    const desbloqueados = JSON.parse(localStorage.getItem(clave) || "{}");
+    let total = 0;
+    logrosGrid.innerHTML = "";
+    LOGROS.forEach((logro) => {
+      const progreso = Math.min(logro.medir(), logro.meta);
+      const desbloqueado = progreso >= logro.meta;
+      if (desbloqueado) { desbloqueados[logro.id] = true; total++; }
+      const tarjeta = document.createElement("article");
+      tarjeta.className = `logro-card${desbloqueado ? " desbloqueado" : ""}`;
+      const icono = document.createElement("span");
+      icono.className = "logro-icono";
+      icono.textContent = logro.icono;
+      const contenido = document.createElement("div");
+      contenido.className = "logro-contenido";
+      const nombre = document.createElement("h3");
+      nombre.textContent = logro.nombre;
+      const descripcion = document.createElement("p");
+      descripcion.textContent = logro.descripcion;
+      const progresoTexto = document.createElement("small");
+      progresoTexto.textContent = desbloqueado ? "Desbloqueado" : `${progreso} / ${logro.meta}`;
+      contenido.append(nombre, descripcion, progresoTexto);
+      tarjeta.append(icono, contenido);
+      logrosGrid.appendChild(tarjeta);
+    });
+    localStorage.setItem(clave, JSON.stringify(desbloqueados));
+    if (logrosDesbloqueados) logrosDesbloqueados.textContent = total;
+    renderExperiencia();
+  }
+
   // ============================================
   //  GRUPO PRIVADO Y AMIGOS
   // ============================================
@@ -232,6 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function asegurarGrupoActivo() {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { grupoActivo = null; return null; }
+    usuarioActualId = session.user.id;
 
     const username = usernameDesdeSesion(session);
     const { data: perfil } = await supabase.from("perfiles").upsert(
@@ -729,7 +823,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderMensaje(mensaje) {
     if (!chatMessages) return;
     const item = document.createElement("article");
-    item.className = "chat-message";
+    item.className = `chat-message${mensaje.user_id === usuarioActualId ? " propio" : ""}`;
     const contenido = document.createElement("p");
     contenido.textContent = mensaje.contenido;
     const meta = document.createElement("time");
@@ -743,7 +837,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!chatMessages) return;
     const { data, error } = await supabase.from("mensajes")
       .select("id,user_id,contenido,created_at")
-      .eq("room_id", CHAT_ROOM)
+      .eq("room_id", grupoActivo.id)
       .order("created_at", { ascending: true })
       .limit(100);
     if (error) {
@@ -759,8 +853,8 @@ document.addEventListener("DOMContentLoaded", () => {
   async function iniciarChat() {
     if (!chatMessages || chatSubscription) return;
     await cargarChat();
-    chatSubscription = supabase.channel(CHAT_ROOM)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "mensajes", filter: `room_id=eq.${CHAT_ROOM}` }, ({ new: mensaje }) => renderMensaje(mensaje))
+    chatSubscription = supabase.channel(`chat-${grupoActivo.id}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "mensajes", filter: `room_id=eq.${grupoActivo.id}` }, ({ new: mensaje }) => renderMensaje(mensaje))
       .subscribe((estado) => {
         if (estado === "SUBSCRIBED" && chatStatus) chatStatus.textContent = "Conectado en tiempo real";
       });
@@ -774,7 +868,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!session) { alert("Inicia sesión para escribir en el chat."); return; }
     chatInput.disabled = true;
     const { data: mensaje, error } = await supabase.from("mensajes")
-      .insert({ room_id: CHAT_ROOM, user_id: session.user.id, contenido })
+      .insert({ room_id: grupoActivo.id, grupo_id: grupoActivo.id, user_id: session.user.id, contenido })
       .select("id,user_id,contenido,created_at")
       .single();
     chatInput.disabled = false;
@@ -3078,12 +3172,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (logueado) {
         await asegurarGrupoActivo();
+        registrarVisita();
         await Promise.all([cargarFotos(), cargarNotas(), cargarPlaylists(), cargarEventos()]);
         await Promise.all([
           render(),
           Promise.resolve(renderNotas()),
           Promise.resolve(renderPlaylists()),
           Promise.resolve(renderCalendario()),
+          Promise.resolve(renderLogros()),
         ]);
       } else {
         fotos = []; notas = []; playlists = []; eventos = [];
@@ -3320,7 +3416,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================================
   //  SISTEMA DE VISTAS
   // ============================================
-  const VISTAS = ["inicio", "album", "mapa", "chat", "notas", "playlists", "calendario"];
+  const VISTAS = ["inicio", "album", "mapa", "chat", "logros", "notas", "playlists", "calendario"];
 
   function rutaDesdeHash() {
     const hash = (location.hash || "").replace(/^#/, "").trim();
@@ -3340,6 +3436,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (userDropdown?.classList.contains("open")) cerrarMenuPerfil();
     if (nombre === "chat") iniciarChat();
+    if (nombre === "logros") renderLogros();
+    if (nombre === "inicio") renderExperiencia();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 

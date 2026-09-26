@@ -409,6 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       e.stopPropagation();
+      localStorage.setItem("mascota_clicks", String(Number(localStorage.getItem("mascota_clicks") || 0) + 1));
 
       const sonido = MASCOTAS[mascotaActual].sonido;
       reproducirSonido(sonido);

@@ -35,6 +35,21 @@ create table if not exists public.invitaciones_grupo (
 alter table public.fotos add column if not exists grupo_id uuid references public.grupos(id) on delete cascade;
 alter table public.notas add column if not exists grupo_id uuid references public.grupos(id) on delete cascade;
 alter table public.playlists add column if not exists grupo_id uuid references public.grupos(id) on delete cascade;
+alter table public.mensajes add column if not exists grupo_id uuid references public.grupos(id) on delete cascade;
+
+update public.mensajes m
+set grupo_id = gm.grupo_id,
+    room_id = gm.grupo_id::text
+from public.grupo_miembros gm
+where m.grupo_id is null
+  and gm.user_id = m.user_id
+  and gm.grupo_id = (
+    select gm2.grupo_id
+    from public.grupo_miembros gm2
+    where gm2.user_id = m.user_id
+    order by gm2.grupo_id
+    limit 1
+  );
 
 create index if not exists grupo_miembros_user_idx on public.grupo_miembros(user_id);
 create index if not exists invitaciones_invitado_idx on public.invitaciones_grupo(invitado_id);
@@ -50,6 +65,19 @@ alter table public.perfiles enable row level security;
 alter table public.grupos enable row level security;
 alter table public.grupo_miembros enable row level security;
 alter table public.invitaciones_grupo enable row level security;
+
+drop policy if exists "perfiles visibles para usuarios autenticados" on public.perfiles;
+drop policy if exists "perfil propio editable" on public.perfiles;
+drop policy if exists "perfil propio actualizable" on public.perfiles;
+drop policy if exists "grupos miembros visibles" on public.grupos;
+drop policy if exists "grupo propio visible" on public.grupos;
+drop policy if exists "crear grupo propio" on public.grupos;
+drop policy if exists "miembros visibles" on public.grupo_miembros;
+drop policy if exists "crear membresía del grupo propio" on public.grupo_miembros;
+drop policy if exists "aceptar invitación" on public.grupo_miembros;
+drop policy if exists "invitaciones propias o enviadas" on public.invitaciones_grupo;
+drop policy if exists "crear invitaciones como miembro" on public.invitaciones_grupo;
+drop policy if exists "responder invitaciones" on public.invitaciones_grupo;
 
 create policy "perfiles visibles para usuarios autenticados" on public.perfiles for select using (auth.role() = 'authenticated');
 create policy "perfil propio editable" on public.perfiles for insert with check (auth.uid() = id);
@@ -68,11 +96,24 @@ create policy "responder invitaciones" on public.invitaciones_grupo for update u
 drop policy if exists "fotos propias" on public.fotos;
 drop policy if exists "notas propias" on public.notas;
 drop policy if exists "playlists propias" on public.playlists;
+drop policy if exists "fotos del grupo" on public.fotos;
+drop policy if exists "notas del grupo" on public.notas;
+drop policy if exists "playlists del grupo" on public.playlists;
 create policy "fotos del grupo" on public.fotos for all using (public.es_miembro_grupo(grupo_id) or auth.uid() = user_id) with check (public.es_miembro_grupo(grupo_id) or auth.uid() = user_id);
 create policy "notas del grupo" on public.notas for all using (public.es_miembro_grupo(grupo_id) or auth.uid() = user_id) with check (public.es_miembro_grupo(grupo_id) or auth.uid() = user_id);
 create policy "playlists del grupo" on public.playlists for all using (public.es_miembro_grupo(grupo_id) or auth.uid() = user_id) with check (public.es_miembro_grupo(grupo_id) or auth.uid() = user_id);
 
+drop policy if exists "mensajes autenticados" on public.mensajes;
+drop policy if exists "mensajes propios" on public.mensajes;
+drop policy if exists "mensajes del grupo" on public.mensajes;
+drop policy if exists "mensajes propios del grupo" on public.mensajes;
+create policy "mensajes del grupo" on public.mensajes for select using (public.es_miembro_grupo(grupo_id));
+create policy "mensajes propios del grupo" on public.mensajes for insert with check (auth.uid() = user_id and public.es_miembro_grupo(grupo_id));
+
 -- Permite que un miembro vea solo los archivos vinculados a contenido de su grupo.
+drop policy if exists "fotos del grupo en storage" on storage.objects;
+drop policy if exists "canciones del grupo en storage" on storage.objects;
+
 create policy "fotos del grupo en storage" on storage.objects for select using (
   bucket_id = 'album' and exists (
     select 1 from public.fotos

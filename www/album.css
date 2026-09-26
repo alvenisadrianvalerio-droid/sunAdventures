@@ -17,12 +17,26 @@
 .chat-panel { background: var(--bg-2); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1rem; box-shadow: 0 12px 30px rgba(0,0,0,0.18); }
 .chat-messages { min-height: 360px; max-height: 55vh; overflow-y: auto; display: flex; flex-direction: column; gap: 0.7rem; padding: 0.5rem; }
 .chat-message { align-self: flex-start; max-width: min(80%, 560px); padding: 0.7rem 0.9rem; border-radius: 14px 14px 14px 4px; background: rgba(255,217,61,0.16); color: var(--text); }
+.chat-message.propio { align-self: flex-end; border-radius: 14px 14px 4px 14px; background: #fff; color: #24201b; }
 .chat-message p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .chat-message time { display: block; margin-top: 0.3rem; font-size: 0.7rem; opacity: 0.6; }
 .chat-status { margin: 0.5rem; font-size: 0.8rem; opacity: 0.65; }
 .chat-form { display: grid; grid-template-columns: 1fr auto; gap: 0.7rem; margin-top: 0.7rem; }
 .chat-form input { min-width: 0; font: inherit; padding: 0.75rem 0.9rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: var(--text); }
 .chat-push-btn { margin-top: 0.8rem; }
+.logros-section { padding: 4rem 3rem 6rem; max-width: 1000px; margin: 0 auto; }
+.logros-header { text-align: center; margin-bottom: 1.5rem; }
+.logros-title { font-size: clamp(2rem, 5vw, 3.5rem); color: var(--text); font-weight: bold; margin-bottom: 0.5rem; }
+.logros-subtitle { color: var(--text); opacity: 0.7; font-style: italic; }
+.logros-resumen { display: flex; align-items: baseline; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; color: var(--text); }
+.logros-resumen strong { color: #ffd93d; font-size: 2rem; }
+.logros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem; }
+.logro-card { display: flex; align-items: center; gap: 0.9rem; min-height: 110px; padding: 1rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; background: rgba(255,255,255,0.04); color: var(--text); opacity: 0.55; filter: grayscale(0.7); }
+.logro-card.desbloqueado { opacity: 1; filter: none; border-color: rgba(255,217,61,0.45); background: rgba(255,217,61,0.1); }
+.logro-icono { font-size: 2rem; flex: 0 0 auto; }
+.logro-contenido h3 { margin: 0 0 0.25rem; font-size: 1rem; }
+.logro-contenido p { margin: 0 0 0.4rem; font-size: 0.82rem; opacity: 0.8; }
+.logro-contenido small { font-weight: bold; color: #ffd93d; }
 .album-header { text-align: center; margin-bottom: 2rem; }
 
 .album-title {
@@ -544,6 +558,7 @@ body.light .auth-field input:focus { background: #fff; }
   .album-section,
   .mapa-section,
   .chat-section { padding: 3rem 1.2rem 4rem; }
+  .logros-section { padding: 3rem 1.2rem 4rem; }
   .aventuras-map { min-height: 300px; height: 60vh; }
   .chat-form { grid-template-columns: 1fr; }
   .chat-message { max-width: 92%; }

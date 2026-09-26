@@ -60,6 +60,10 @@
           <span class="nav-link-icon">💬</span>
           <span class="nav-link-text">Chat</span>
         </a>
+        <a href="#logros" class="nav-link" data-view-link="logros">
+          <span class="nav-link-icon">🏆</span>
+          <span class="nav-link-text">Logros</span>
+        </a>
         <a href="#notas" class="nav-link" data-view-link="notas">
           <span class="nav-link-icon">💌</span>
           <span class="nav-link-text">Notitas</span>
@@ -166,6 +170,14 @@
 
         <p class="lobby-subtitle">A.A.V.C</p>
         <p class="lobby-dedicatoria">Un rincón para guardar lo nuestro 🌻</p>
+        <div class="experiencia-card" aria-live="polite">
+          <div class="experiencia-topline">
+            <span id="experiencia-titulo">Novatos 🌱</span>
+            <strong id="experiencia-xp">0 XP</strong>
+          </div>
+          <div class="experiencia-barra"><span id="experiencia-progreso"></span></div>
+          <small id="experiencia-siguiente">100 XP para Enamorados 💛</small>
+        </div>
 
         <nav class="lobby-menu">
           <a href="#album" class="lobby-btn lobby-btn-primary" data-view-link="album">
@@ -174,15 +186,6 @@
               <strong>Nuestras aventuras</strong>
               <small>Ver el álbum de recuerdos</small>
             </span>
-          </a>
-
-          <a href="#mapa" class="user-dropdown-item" data-view-link="mapa">
-            <span class="user-dropdown-icon">🗺️</span>
-            <span>Mapa de aventuras</span>
-          </a>
-          <a href="#chat" class="user-dropdown-item" data-view-link="chat">
-            <span class="user-dropdown-icon">💬</span>
-            <span>Chat privado</span>
           </a>
 
           <a href="#notas" class="lobby-btn" data-view-link="notas">
@@ -247,6 +250,19 @@
     </div>
     <div id="aventuras-map" class="aventuras-map" aria-label="Mapa de recuerdos"></div>
     <p id="mapa-empty" class="mapa-empty">Añade una foto con ubicación para verla aquí.</p>
+  </section>
+
+  <!-- VISTA: LOGROS -->
+  <section id="logros" class="logros-section view" data-view="logros">
+    <div class="logros-header">
+      <h2 class="logros-title">Logros desbloqueables</h2>
+      <p class="logros-subtitle">Cada pequeño recuerdo cuenta 🏆</p>
+    </div>
+    <div class="logros-resumen">
+      <strong id="logros-desbloqueados">0</strong>
+      <span>logros desbloqueados</span>
+    </div>
+    <div id="logros-grid" class="logros-grid"></div>
   </section>
 
   <!-- VISTA: ÁLBUM -->
