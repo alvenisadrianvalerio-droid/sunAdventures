@@ -76,3 +76,26 @@ self.addEventListener("fetch", (event) => {
     })
   );
 });
+
+self.addEventListener("push", (event) => {
+  let datos = { title: "SunAdventures", body: "Tienes una novedad 💛", url: "/#chat" };
+  try { if (event.data) datos = { ...datos, ...event.data.json() }; } catch { /* payload opcional */ }
+  event.waitUntil(
+    self.registration.showNotification(datos.title, {
+      body: datos.body,
+      icon: "./icons/icon-192.png",
+      badge: "./icons/icon-192.png",
+      data: { url: datos.url },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || "/#chat";
+  event.waitUntil(clients.matchAll({ type: "window", includeUncontrolled: true }).then((ventanas) => {
+    const abierta = ventanas.find((ventana) => "focus" in ventana);
+    if (abierta) { abierta.navigate(url); return abierta.focus(); }
+    return clients.openWindow(url);
+  }));
+});

@@ -23,6 +23,7 @@
 
   <link rel="stylesheet" href="styles.css?v=5">
   <link rel="stylesheet" href="album.css?v=11">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
   <meta name="description" content="Un rincón para guardar nuestros recuerdos con girasoles 🌻">
   <meta name="author" content="A.A.V.C">
@@ -50,6 +51,14 @@
         <a href="#album" class="nav-link" data-view-link="album">
           <span class="nav-link-icon">📸</span>
           <span class="nav-link-text">Álbum</span>
+        </a>
+        <a href="#mapa" class="nav-link" data-view-link="mapa">
+          <span class="nav-link-icon">🗺️</span>
+          <span class="nav-link-text">Mapa</span>
+        </a>
+        <a href="#chat" class="nav-link" data-view-link="chat">
+          <span class="nav-link-icon">💬</span>
+          <span class="nav-link-text">Chat</span>
         </a>
         <a href="#notas" class="nav-link" data-view-link="notas">
           <span class="nav-link-icon">💌</span>
@@ -129,6 +138,10 @@
               <span class="user-dropdown-icon">⚙️</span>
               <span>Ajustes</span>
             </button>
+            <button class="user-dropdown-item" type="button" data-action="amigos">
+              <span class="user-dropdown-icon">👥</span>
+              <span>Amigos y grupo</span>
+            </button>
 
             <div class="user-dropdown-divider"></div>
 
@@ -161,6 +174,15 @@
               <strong>Nuestras aventuras</strong>
               <small>Ver el álbum de recuerdos</small>
             </span>
+          </a>
+
+          <a href="#mapa" class="user-dropdown-item" data-view-link="mapa">
+            <span class="user-dropdown-icon">🗺️</span>
+            <span>Mapa de aventuras</span>
+          </a>
+          <a href="#chat" class="user-dropdown-item" data-view-link="chat">
+            <span class="user-dropdown-icon">💬</span>
+            <span>Chat privado</span>
           </a>
 
           <a href="#notas" class="lobby-btn" data-view-link="notas">
@@ -198,6 +220,33 @@
     </div>
 
     <audio id="pop" src="sounds/soundreality-pop-sound-423716.mp3" preload="auto"></audio>
+  </section>
+
+  <!-- VISTA: CHAT -->
+  <section id="chat" class="chat-section view" data-view="chat">
+    <div class="chat-header">
+      <h2 class="chat-title">Chat interno</h2>
+      <p class="chat-subtitle">Un rinconcito para escribirnos en tiempo real 💛</p>
+    </div>
+    <div class="chat-panel">
+      <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+      <p id="chat-status" class="chat-status">Conectando...</p>
+      <form id="chat-form" class="chat-form">
+        <input id="chat-input" maxlength="2000" autocomplete="off" placeholder="Escribe un mensaje..." required>
+        <button type="submit" class="btn-primary">Enviar 💌</button>
+      </form>
+      <button type="button" id="btn-enable-push" class="btn-secondary chat-push-btn">🔔 Activar notificaciones</button>
+    </div>
+  </section>
+
+  <!-- VISTA: MAPA -->
+  <section id="mapa" class="mapa-section view" data-view="mapa">
+    <div class="mapa-header">
+      <h2 class="mapa-title">Mapa de aventuras</h2>
+      <p class="mapa-subtitle">Todos los lugares donde hemos estado 💛</p>
+    </div>
+    <div id="aventuras-map" class="aventuras-map" aria-label="Mapa de recuerdos"></div>
+    <p id="mapa-empty" class="mapa-empty">Añade una foto con ubicación para verla aquí.</p>
   </section>
 
   <!-- VISTA: ÁLBUM -->
@@ -308,6 +357,27 @@
     </div>
   </div>
 
+  <!-- MODAL AMIGOS Y GRUPO -->
+  <div id="friends-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-friends></div>
+    <div class="modal-content friends-modal-content" role="dialog" aria-modal="true" aria-labelledby="friends-modal-title">
+      <h3 id="friends-modal-title" class="modal-title">👥 Amigos y grupo</h3>
+      <p id="friends-group-name" class="friends-group-name"></p>
+      <form id="friend-search-form" class="friend-search-form">
+        <input id="friend-search-input" type="text" maxlength="20" placeholder="Buscar por nombre de usuario" autocomplete="off">
+        <button type="submit" class="btn-primary">Buscar</button>
+      </form>
+      <div id="friend-search-results" class="friend-list"></div>
+      <h4 class="friends-subtitle">Miembros</h4>
+      <div id="group-members-list" class="friend-list"></div>
+      <h4 class="friends-subtitle">Invitaciones recibidas</h4>
+      <div id="group-invites-list" class="friend-list"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" data-close-friends>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL LOGIN -->
   <div id="auth-modal" class="modal auth-modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-auth></div>
@@ -370,6 +440,13 @@
             <label class="form-field">
               <span class="form-label">¿Qué quieres recordar?</span>
               <textarea id="input-note" rows="3" maxlength="200" placeholder="Cuéntame algo bonito de este momento..."></textarea>
+            </label>
+            <label class="form-field form-location-field">
+              <span class="form-label">Ubicación (opcional)</span>
+              <button type="button" id="btn-photo-location" class="btn-secondary">📍 Usar mi ubicación</button>
+              <small id="photo-location-status" class="photo-location-status">No se guardará hasta que tú lo elijas.</small>
+              <input type="hidden" id="input-lat">
+              <input type="hidden" id="input-lng">
             </label>
           </div>
 
@@ -665,6 +742,7 @@ https://youtube.com/watch?v=...</pre>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="script.js"></script>
   <script src="album.js"></script>
 </body>

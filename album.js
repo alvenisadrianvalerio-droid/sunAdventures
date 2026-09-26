@@ -46,6 +46,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const preview = document.getElementById("photo-preview");
   const photoPreviewInfo = document.getElementById("photo-preview-info");
   const submitBtn = form?.querySelector('button[type="submit"]');
+  const btnPhotoLocation = document.getElementById("btn-photo-location");
+  const photoLocationStatus = document.getElementById("photo-location-status");
+  const inputLat = document.getElementById("input-lat");
+  const inputLng = document.getElementById("input-lng");
+  const aventurasMap = document.getElementById("aventuras-map");
+  const mapaEmpty = document.getElementById("mapa-empty");
+  const chatMessages = document.getElementById("chat-messages");
+  const chatStatus = document.getElementById("chat-status");
+  const chatForm = document.getElementById("chat-form");
+  const chatInput = document.getElementById("chat-input");
+  const btnEnablePush = document.getElementById("btn-enable-push");
   let fotoPreviewObjectUrl = null;
 
   // NOTAS
@@ -142,6 +153,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById("logout-btn");
   const userMenuToggle = document.getElementById("user-menu-toggle");
   const userDropdown = document.getElementById("user-dropdown");
+  const friendsModal = document.getElementById("friends-modal");
+  const friendsGroupName = document.getElementById("friends-group-name");
+  const friendSearchForm = document.getElementById("friend-search-form");
+  const friendSearchInput = document.getElementById("friend-search-input");
+  const friendSearchResults = document.getElementById("friend-search-results");
+  const groupMembersList = document.getElementById("group-members-list");
+  const groupInvitesList = document.getElementById("group-invites-list");
 
   // ============================================
   //  ESTADO
@@ -152,6 +170,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let fotoEditando = null;
   let colorSeleccionado = "amarillo";
   let modoRegistro = false;
+  let grupoActivo = null;
+  let perfilActual = null;
 
   let playlists = [];
   let playlistEditando = null;
@@ -171,6 +191,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const DURACION_CACHE_URL = (URL_EXPIRY - 60) * 1000;
 
   let archivosPendientes = [];
+  let chatSubscription = null;
+  const CHAT_ROOM = "sunadventures-private";
+  const PUSH_VAPID_PUBLIC_KEY = "";
 
   // Player
   let colaReproduccion = [];        // array de { titulo, artista, url, playlistId }
@@ -199,6 +222,130 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================================
+  //  GRUPO PRIVADO Y AMIGOS
+  // ============================================
+  function usernameDesdeSesion(session) {
+    return (session?.user?.email?.split("@")[0] || "usuario")
+      .toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0, 20).padEnd(3, "_");
+  }
+
+  async function asegurarGrupoActivo() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { grupoActivo = null; return null; }
+
+    const username = usernameDesdeSesion(session);
+    const { data: perfil } = await supabase.from("perfiles").upsert(
+      { id: session.user.id, username }, { onConflict: "id" }
+    ).select("id,username").single();
+    perfilActual = perfil || { id: session.user.id, username };
+
+    const { data: membresias } = await supabase.from("grupo_miembros")
+      .select("grupo_id, grupos(id,nombre,creado_por)")
+      .eq("user_id", session.user.id).limit(20);
+    let membresia = (membresias || []).find((item) => item.grupo_id === localStorage.getItem("grupo_activo")) || membresias?.[0];
+
+    if (!membresia) {
+      const { data: grupo, error: grupoError } = await supabase
+        .from("grupos").insert({ nombre: "Nuestro grupo de aventuras", creado_por: session.user.id })
+        .select("id,nombre,creado_por").single();
+      if (grupoError) throw grupoError;
+      const { error: miembroError } = await supabase.from("grupo_miembros")
+        .insert({ grupo_id: grupo.id, user_id: session.user.id, rol: "owner" });
+      if (miembroError) throw miembroError;
+      membresia = { grupo_id: grupo.id, grupos: grupo };
+      localStorage.setItem("grupo_activo", grupo.id);
+    }
+
+    grupoActivo = membresia.grupos || { id: membresia.grupo_id, nombre: "Nuestro grupo de aventuras" };
+    await Promise.all(["fotos", "notas", "playlists"].map((tabla) =>
+      supabase.from(tabla).update({ grupo_id: grupoActivo.id }).eq("user_id", session.user.id).is("grupo_id", null)
+    ));
+    return grupoActivo;
+  }
+
+  async function cargarMiembrosGrupo() {
+    if (!grupoActivo || !groupMembersList) return;
+    const { data } = await supabase.from("grupo_miembros").select("user_id,rol").eq("grupo_id", grupoActivo.id);
+    const ids = (data || []).map((miembro) => miembro.user_id);
+    const { data: perfiles } = ids.length ? await supabase.from("perfiles").select("id,username").in("id", ids) : { data: [] };
+    groupMembersList.innerHTML = "";
+    (perfiles || []).forEach((perfil) => {
+      const miembro = data.find((item) => item.user_id === perfil.id);
+      const item = document.createElement("div");
+      item.className = "friend-row";
+      item.textContent = `@${perfil.username}${miembro?.rol === "owner" ? " · propietario" : ""}`;
+      groupMembersList.appendChild(item);
+    });
+  }
+
+  async function cargarInvitaciones() {
+    if (!groupInvitesList) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    const { data: invitaciones } = await supabase.from("invitaciones_grupo")
+      .select("id,grupo_id,invitado_por,grupos(nombre)").eq("invitado_id", session.user.id).eq("estado", "pendiente");
+    groupInvitesList.innerHTML = "";
+    (invitaciones || []).forEach((invitacion) => {
+      const item = document.createElement("div");
+      item.className = "friend-row friend-invite";
+      item.textContent = `Invitación a ${invitacion.grupos?.nombre || "un grupo"}`;
+      const aceptar = document.createElement("button");
+      aceptar.type = "button";
+      aceptar.className = "btn-secondary";
+      aceptar.textContent = "Aceptar";
+      aceptar.addEventListener("click", async () => {
+        await supabase.from("grupo_miembros").insert({ grupo_id: invitacion.grupo_id, user_id: session.user.id, rol: "miembro" });
+        await supabase.from("invitaciones_grupo").update({ estado: "aceptada" }).eq("id", invitacion.id);
+        localStorage.setItem("grupo_activo", invitacion.grupo_id);
+        window.location.reload();
+      });
+      item.appendChild(aceptar);
+      groupInvitesList.appendChild(item);
+    });
+  }
+
+  async function abrirAmigosModal() {
+    if (!friendsModal) return;
+    await asegurarGrupoActivo();
+    friendsModal.classList.add("active");
+    friendsModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    if (friendsGroupName) friendsGroupName.textContent = grupoActivo?.nombre || "Grupo privado";
+    await cargarMiembrosGrupo();
+    await cargarInvitaciones();
+  }
+
+  friendsModal?.querySelectorAll("[data-close-friends]").forEach((elemento) => elemento.addEventListener("click", () => {
+    friendsModal.classList.remove("active");
+    friendsModal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }));
+
+  friendSearchForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const termino = friendSearchInput.value.trim().toLowerCase();
+    if (!termino) return;
+    const { data: perfiles } = await supabase.from("perfiles").select("id,username").ilike("username", `%${termino}%`).limit(10);
+    friendSearchResults.innerHTML = "";
+    (perfiles || []).filter((perfil) => perfil.id !== perfilActual?.id).forEach((perfil) => {
+      const item = document.createElement("div");
+      item.className = "friend-row";
+      const nombre = document.createElement("span");
+      nombre.textContent = `@${perfil.username}`;
+      const invitar = document.createElement("button");
+      invitar.type = "button";
+      invitar.className = "btn-secondary";
+      invitar.textContent = "Invitar";
+      invitar.addEventListener("click", async () => {
+        const { error } = await supabase.from("invitaciones_grupo").insert({ grupo_id: grupoActivo.id, invitado_id: perfil.id, invitado_por: perfilActual.id });
+        invitar.textContent = error ? "No disponible" : "Enviada";
+        invitar.disabled = true;
+      });
+      item.append(nombre, invitar);
+      friendSearchResults.appendChild(item);
+    });
+  });
+
+  // ============================================
   //  FOTOS
   // ============================================
   async function cargarFotos() {
@@ -206,24 +353,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!session) { fotos = []; return; }
 
     const { data, error } = await supabase
-      .from("fotos").select("id,path,fecha,nota")
-      .eq("user_id", session.user.id)
+      .from("fotos").select("id,path,fecha,nota,lat,lng,lugar,grupo_id")
+      .eq("grupo_id", grupoActivo.id)
       .order("created_at", { ascending: false });
 
     if (error) { console.error("Error cargando fotos:", error); fotos = []; return; }
 
     fotos = (data || []).map((f) => ({
       id: f.id, path: f.path, fecha: f.fecha, nota: f.nota,
+      lat: f.lat, lng: f.lng, lugar: f.lugar, grupo_id: f.grupo_id,
     }));
   }
 
-  async function añadirFotoTabla(path, fecha, nota) {
+  async function añadirFotoTabla(path, fecha, nota, lat, lng) {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) throw new Error("No hay sesión");
 
     const { data, error } = await supabase
       .from("fotos")
-      .insert({ user_id: session.user.id, path, fecha: fecha || null, nota: nota || null })
+      .insert({ user_id: session.user.id, grupo_id: grupoActivo.id, path, fecha: fecha || null, nota: nota || null, lat: lat || null, lng: lng || null })
       .select().single();
 
     if (error) throw error;
@@ -235,10 +383,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (error) throw error;
   }
 
-  async function actualizarFotoTabla(id, fecha, nota) {
+  async function actualizarFotoTabla(id, fecha, nota, lat, lng) {
     const { data, error } = await supabase
       .from("fotos")
-      .update({ fecha: fecha || null, nota: nota || null })
+      .update({ fecha: fecha || null, nota: nota || null, lat: lat || null, lng: lng || null })
       .eq("id", id)
       .select().single();
 
@@ -314,6 +462,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const elementos = await Promise.all(promesas);
       elementos.forEach((el) => { if (el) grid.appendChild(el); });
+      renderMapa();
     } finally {
       renderEnCurso = false;
       if (renderPendiente) { renderPendiente = false; render(); }
@@ -478,9 +627,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (fotoParaEditar) {
       if (inputDate) inputDate.value = fotoParaEditar.fecha || "";
       if (inputNote) inputNote.value = fotoParaEditar.nota || "";
+      if (inputLat) inputLat.value = fotoParaEditar.lat || "";
+      if (inputLng) inputLng.value = fotoParaEditar.lng || "";
     } else if (inputDate) {
       inputDate.value = new Date().toISOString().split("T")[0];
     }
+    actualizarEstadoUbicacion();
     if (fotoPreviewObjectUrl) {
       URL.revokeObjectURL(fotoPreviewObjectUrl);
       fotoPreviewObjectUrl = null;
@@ -519,6 +671,144 @@ document.addEventListener("DOMContentLoaded", () => {
       decirMapache("¡Qué bonito recuerdo! 💛", 4000);
     }
   }
+
+  function actualizarEstadoUbicacion() {
+    if (!photoLocationStatus) return;
+    photoLocationStatus.textContent = inputLat?.value && inputLng?.value
+      ? `Ubicación lista: ${Number(inputLat.value).toFixed(4)}, ${Number(inputLng.value).toFixed(4)}`
+      : "No se guardará hasta que tú lo elijas.";
+  }
+
+  btnPhotoLocation?.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      if (photoLocationStatus) photoLocationStatus.textContent = "Tu navegador no permite ubicación.";
+      return;
+    }
+    btnPhotoLocation.disabled = true;
+    if (photoLocationStatus) photoLocationStatus.textContent = "Obteniendo ubicación...";
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        inputLat.value = coords.latitude;
+        inputLng.value = coords.longitude;
+        actualizarEstadoUbicacion();
+        btnPhotoLocation.disabled = false;
+      },
+      () => {
+        if (photoLocationStatus) photoLocationStatus.textContent = "No se pudo obtener la ubicación.";
+        btnPhotoLocation.disabled = false;
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+    );
+  });
+
+  let mapaLeaflet = null;
+  function renderMapa() {
+    if (!aventurasMap || typeof window.L === "undefined") return;
+    const ubicadas = fotos.filter((foto) => Number.isFinite(Number(foto.lat)) && Number.isFinite(Number(foto.lng)));
+    mapaEmpty?.classList.toggle("hidden", ubicadas.length > 0);
+    if (!mapaLeaflet) {
+      mapaLeaflet = L.map(aventurasMap).setView([20, 0], 2);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© OpenStreetMap" }).addTo(mapaLeaflet);
+    }
+    mapaLeaflet.eachLayer((layer) => { if (layer instanceof L.Marker) mapaLeaflet.removeLayer(layer); });
+    ubicadas.forEach((foto) => {
+      const marker = L.marker([foto.lat, foto.lng]).addTo(mapaLeaflet);
+      marker.bindPopup(`<strong>${foto.fecha ? formatearFecha(foto.fecha) : "Recuerdo"}</strong><br>${escapeHtml(foto.nota || "Sin nota")}`);
+    });
+    if (ubicadas.length) mapaLeaflet.fitBounds(L.latLngBounds(ubicadas.map((foto) => [foto.lat, foto.lng])), { padding: [30, 30], maxZoom: 12 });
+    setTimeout(() => mapaLeaflet.invalidateSize(), 100);
+  }
+
+  function escapeHtml(texto) {
+    return String(texto).replace(/[&<>'"]/g, (caracter) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[caracter]));
+  }
+
+  // ============================================
+  //  CHAT PRIVADO + REALTIME
+  // ============================================
+  function renderMensaje(mensaje) {
+    if (!chatMessages) return;
+    const item = document.createElement("article");
+    item.className = "chat-message";
+    const contenido = document.createElement("p");
+    contenido.textContent = mensaje.contenido;
+    const meta = document.createElement("time");
+    meta.textContent = new Date(mensaje.created_at).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" });
+    item.append(contenido, meta);
+    chatMessages.appendChild(item);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  async function cargarChat() {
+    if (!chatMessages) return;
+    const { data, error } = await supabase.from("mensajes")
+      .select("id,user_id,contenido,created_at")
+      .eq("room_id", CHAT_ROOM)
+      .order("created_at", { ascending: true })
+      .limit(100);
+    if (error) {
+      if (chatStatus) chatStatus.textContent = "Ejecuta supabase-features.sql para activar el chat.";
+      console.warn("Chat no disponible:", error.message);
+      return;
+    }
+    chatMessages.innerHTML = "";
+    (data || []).forEach(renderMensaje);
+    if (chatStatus) chatStatus.textContent = "Conectado en tiempo real";
+  }
+
+  async function iniciarChat() {
+    if (!chatMessages || chatSubscription) return;
+    await cargarChat();
+    chatSubscription = supabase.channel(CHAT_ROOM)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "mensajes", filter: `room_id=eq.${CHAT_ROOM}` }, ({ new: mensaje }) => renderMensaje(mensaje))
+      .subscribe((estado) => {
+        if (estado === "SUBSCRIBED" && chatStatus) chatStatus.textContent = "Conectado en tiempo real";
+      });
+  }
+
+  chatForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const contenido = chatInput?.value.trim();
+    if (!contenido) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { alert("Inicia sesión para escribir en el chat."); return; }
+    chatInput.disabled = true;
+    const { data: mensaje, error } = await supabase.from("mensajes")
+      .insert({ room_id: CHAT_ROOM, user_id: session.user.id, contenido })
+      .select("id,user_id,contenido,created_at")
+      .single();
+    chatInput.disabled = false;
+    if (error) { alert("No se pudo enviar el mensaje: " + error.message); return; }
+    chatInput.value = "";
+    chatInput.focus();
+    supabase.functions.invoke("send-push", { body: { message: { ...mensaje, user_id: session.user.id } } })
+      .catch((error) => console.warn("No se pudo enviar push:", error));
+  });
+
+  // ============================================
+  //  WEB PUSH
+  // ============================================
+  function convertirClaveBase64(clave) {
+    const padding = "=".repeat((4 - clave.length % 4) % 4);
+    const base64 = (clave + padding).replace(/-/g, "+").replace(/_/g, "/");
+    return Uint8Array.from(atob(base64), (caracter) => caracter.charCodeAt(0));
+  }
+
+  async function activarPush() {
+    if (!PUSH_VAPID_PUBLIC_KEY) { alert("Configura la clave pública VAPID en album.js para activar Web Push."); return; }
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) { alert("Este navegador no admite notificaciones push."); return; }
+    const permiso = await Notification.requestPermission();
+    if (permiso !== "granted") return;
+    const registro = await navigator.serviceWorker.ready;
+    const subscription = await registro.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: convertirClaveBase64(PUSH_VAPID_PUBLIC_KEY) });
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { alert("Inicia sesión para activar notificaciones."); return; }
+    const { error } = await supabase.from("push_subscriptions").upsert({ user_id: session.user.id, endpoint: subscription.endpoint, subscription: subscription.toJSON() }, { onConflict: "endpoint" });
+    if (error) throw error;
+    if (btnEnablePush) btnEnablePush.textContent = "🔔 Notificaciones activadas";
+  }
+
+  btnEnablePush?.addEventListener("click", () => activarPush().catch((error) => alert("No se pudieron activar: " + error.message)));
 
   if (btnAdd) btnAdd.addEventListener("click", () => abrirModal());
   modal?.querySelectorAll("[data-close-modal]").forEach((el) => {
@@ -629,13 +919,15 @@ document.addEventListener("DOMContentLoaded", () => {
           submitBtn.textContent = "Actualizando...";
         }
         try {
-          const actualizada = await actualizarFotoTabla(fotoEditando.id, fecha, nota);
+          const actualizada = await actualizarFotoTabla(fotoEditando.id, fecha, nota, inputLat?.value, inputLng?.value);
           const indice = fotos.findIndex((foto) => foto.id === fotoEditando.id);
           if (indice !== -1) {
             fotos[indice] = {
               ...fotos[indice],
               fecha: actualizada.fecha,
               nota: actualizada.nota,
+              lat: actualizada.lat,
+              lng: actualizada.lng,
             };
           }
           cerrarModal();
@@ -671,8 +963,8 @@ document.addEventListener("DOMContentLoaded", () => {
           .from(BUCKET_NAME).upload(filePath, blob, { contentType: "image/jpeg" });
         if (uploadError) throw uploadError;
 
-        const nueva = await añadirFotoTabla(filePath, fecha, nota);
-        fotos.unshift({ id: nueva.id, path: nueva.path, fecha: nueva.fecha, nota: nueva.nota });
+        const nueva = await añadirFotoTabla(filePath, fecha, nota, inputLat?.value, inputLng?.value);
+        fotos.unshift({ id: nueva.id, path: nueva.path, fecha: nueva.fecha, nota: nueva.nota, lat: nueva.lat, lng: nueva.lng });
 
         cerrarModal();
         await render();
@@ -719,15 +1011,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!session || !session.user) { notas = []; return; }
 
       const { data, error } = await supabase
-        .from("notas").select("id,titulo,contenido,color,created_at")
-        .eq("user_id", session.user.id)
+        .from("notas").select("id,titulo,contenido,color,created_at,grupo_id")
+        .eq("grupo_id", grupoActivo.id)
         .order("created_at", { ascending: false });
 
       if (error) { console.error("Error cargando notas:", error); notas = []; return; }
 
       notas = (data || []).map((n) => ({
         id: n.id, titulo: n.titulo, contenido: n.contenido,
-        color: n.color || "amarillo", created_at: n.created_at,
+        color: n.color || "amarillo", created_at: n.created_at, grupo_id: n.grupo_id,
       }));
     } catch (err) {
       console.error("💥 Error en cargarNotas:", err);
@@ -742,7 +1034,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const { data, error } = await supabase
       .from("notas")
       .insert({
-        user_id: session.user.id,
+        user_id: session.user.id, grupo_id: grupoActivo.id,
         titulo: titulo || null,
         contenido: contenido,
         color: color || "amarillo",
@@ -1048,8 +1340,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!session || !session.user) { playlists = []; return; }
 
       const { data, error } = await supabase
-        .from("playlists").select("id,nombre,descripcion,emoji,color,canciones,created_at")
-        .eq("user_id", session.user.id)
+        .from("playlists").select("id,nombre,descripcion,emoji,color,canciones,created_at,grupo_id")
+        .eq("grupo_id", grupoActivo.id)
         .order("created_at", { ascending: false });
 
       if (error) { console.error("Error cargando playlists:", error); playlists = []; return; }
@@ -1058,7 +1350,7 @@ document.addEventListener("DOMContentLoaded", () => {
         id: p.id, nombre: p.nombre, descripcion: p.descripcion,
         emoji: p.emoji || "🎵", color: p.color || "amarillo",
         canciones: Array.isArray(p.canciones) ? p.canciones : [],
-        created_at: p.created_at,
+        created_at: p.created_at, grupo_id: p.grupo_id,
       }));
     } catch (err) {
       console.error("💥 Error en cargarPlaylists:", err);
@@ -1073,7 +1365,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const { data, error } = await supabase
       .from("playlists")
       .insert({
-        user_id: session.user.id,
+        user_id: session.user.id, grupo_id: grupoActivo.id,
         nombre, descripcion: descripcion || null,
         emoji: emoji || "🎵", color: color || "amarillo",
         canciones: [],
@@ -2785,6 +3077,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (btnAddNota) btnAddNota.style.display = logueado ? "inline-block" : "none";
 
       if (logueado) {
+        await asegurarGrupoActivo();
         await Promise.all([cargarFotos(), cargarNotas(), cargarPlaylists(), cargarEventos()]);
         await Promise.all([
           render(),
@@ -3017,6 +3310,7 @@ document.addEventListener("DOMContentLoaded", () => {
         case "perfil": alert("👤 Aquí irá tu perfil (próximamente)"); break;
         case "ajustes": alert("⚙️ Aquí irán tus ajustes (próximamente)"); break;
         case "estadisticas": alert("📊 Aquí verás tus estadísticas (próximamente)"); break;
+        case "amigos": abrirAmigosModal(); break;
         case "logout": break;
       }
       cerrarMenuPerfil();
@@ -3026,7 +3320,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================================
   //  SISTEMA DE VISTAS
   // ============================================
-  const VISTAS = ["inicio", "album", "notas", "playlists", "calendario"];
+  const VISTAS = ["inicio", "album", "mapa", "chat", "notas", "playlists", "calendario"];
 
   function rutaDesdeHash() {
     const hash = (location.hash || "").replace(/^#/, "").trim();
@@ -3045,6 +3339,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (userDropdown?.classList.contains("open")) cerrarMenuPerfil();
+    if (nombre === "chat") iniciarChat();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
