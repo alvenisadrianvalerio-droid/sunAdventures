@@ -238,6 +238,29 @@ document.addEventListener("DOMContentLoaded", () => {
     { id: "fan-girasol", icono: "🌻", nombre: "Fan del girasol", descripcion: "Dale 100 clics a la mascota", meta: 100, medir: () => Number(localStorage.getItem("mascota_clicks") || 0) },
   ];
 
+  const LOGROS_MASCOTAS = [
+    ["mapache", "🦝", "Conoce al Mapache"],
+    ["girasol", "🌻", "Conoce al Girasol"],
+    ["gatito", "🐱", "Conoce a Armstrong"],
+    ["hamburguesa", "🍔", "Conoce a Hamburguesa"],
+    ["oveja", "🐑", "Conoce a la Oveja"],
+    ["pollito", "🐤", "Conoce al Pollito"],
+    ["jirafa", "🦒", "Conoce a la Jirafa"],
+    ["unicornio", "🦄", "Conoce al Unicornio"],
+    ["conejo", "🐰", "Conoce al Conejito"],
+  ];
+
+  LOGROS_MASCOTAS.forEach(([id, icono, nombre]) => {
+    LOGROS.push({
+      id: `mascota-${id}`,
+      icono,
+      nombre,
+      descripcion: "Interactúa con esta mascota",
+      meta: 1,
+      medir: () => JSON.parse(localStorage.getItem("mascotas_conocidas") || "[]").includes(id) ? 1 : 0,
+    });
+  });
+
   const NIVELES_EXPERIENCIA = [
     { minimo: 0, nombre: "Novatos 🌱", siguiente: 100, siguienteNombre: "Enamorados 💛" },
     { minimo: 100, nombre: "Enamorados 💛", siguiente: 500, siguienteNombre: "Compañeros de vida 🔥" },

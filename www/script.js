@@ -228,6 +228,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let mascotaActual = localStorage.getItem("mascota_actual") || "mapache";
   let burbujaTimeout = null;
 
+  function registrarMascotaConocida(nombre) {
+    const conocidas = JSON.parse(localStorage.getItem("mascotas_conocidas") || "[]");
+    if (!conocidas.includes(nombre)) {
+      conocidas.push(nombre);
+      localStorage.setItem("mascotas_conocidas", JSON.stringify(conocidas));
+    }
+  }
+
   // ============================================
   //  SINTETIZADOR DE SONIDOS (Web Audio API)
   // ============================================
@@ -359,6 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!datos) return;
 
       mascotaActual = nombre;
+      registrarMascotaConocida(nombre);
       mascotaImg.src = datos.imagen;
       mascotaImg.alt = datos.nombre;
       localStorage.setItem("mascota_actual", nombre);
@@ -467,6 +476,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------- Aplicar mascota guardada al cargar ----------
     mascotaImg.src = MASCOTAS[mascotaActual].imagen;
     mascotaImg.alt = MASCOTAS[mascotaActual].nombre;
+    registrarMascotaConocida(mascotaActual);
     mascota.classList.toggle("conejo-alto", mascotaActual === "conejo");
     mascotaMenu?.querySelectorAll(".mascota-opcion").forEach((op) => {
       op.classList.toggle("activa", op.dataset.mascota === mascotaActual);
