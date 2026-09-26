@@ -852,11 +852,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function iniciarChat() {
     if (!chatMessages || chatSubscription) return;
-    await cargarChat();
+    try {
+      if (!grupoActivo) await asegurarGrupoActivo();
+      if (!grupoActivo) {
+        if (chatStatus) chatStatus.textContent = "Inicia sesión para usar el chat.";
+        return;
+      }
+      await cargarChat();
+    } catch (error) {
+      console.error("No se pudo cargar el chat:", error);
+      if (chatStatus) chatStatus.textContent = "No se pudo conectar al grupo.";
+      return;
+    }
     chatSubscription = supabase.channel(`chat-${grupoActivo.id}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "mensajes", filter: `room_id=eq.${grupoActivo.id}` }, ({ new: mensaje }) => renderMensaje(mensaje))
       .subscribe((estado) => {
         if (estado === "SUBSCRIBED" && chatStatus) chatStatus.textContent = "Conectado en tiempo real";
+        if (estado === "CHANNEL_ERROR" && chatStatus) chatStatus.textContent = "Realtime no está habilitado para mensajes.";
+        if (estado === "TIMED_OUT" && chatStatus) chatStatus.textContent = "La conexión tardó demasiado. Recarga la página.";
       });
   }
 
