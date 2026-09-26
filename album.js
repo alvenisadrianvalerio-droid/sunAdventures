@@ -273,6 +273,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  LOGROS.push({
+    id: "racha-365",
+    icono: "📅",
+    nombre: "Un año de nosotros",
+    descripcion: "Abre la app 365 días seguidos",
+    meta: 365,
+    medir: () => visitasConsecutivas,
+  });
+
+  LOGROS.push({
+    id: "todos-los-logros",
+    icono: "👑",
+    nombre: "Leyenda absoluta",
+    descripcion: "Completa todos los demás logros",
+    meta: 1,
+    esFinal: true,
+    medir: () => LOGROS.filter((logro) => !logro.esFinal).every((logro) => logro.medir() >= logro.meta) ? 1 : 0,
+  });
+
   let logroToastTimeout = null;
   function notificarLogro(logro) {
     if (!logroToast) return;
@@ -315,7 +334,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const clave = `sunadventures_visitas_${perfilActual?.id || "local"}`;
     const dias = JSON.parse(localStorage.getItem(clave) || "[]");
     if (!dias.includes(hoy)) dias.push(hoy);
-    const ordenados = dias.sort().slice(-60);
+    const ordenados = dias.sort().slice(-400);
     localStorage.setItem(clave, JSON.stringify(ordenados));
     visitasConsecutivas = 0;
     const fechas = new Set(ordenados);
