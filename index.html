@@ -266,28 +266,37 @@
   <!-- MODAL AÑADIR NOTA -->
   <div id="nota-modal" class="modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-nota-modal></div>
-    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="nota-modal-title">
+    <div class="modal-content nota-modal-content" role="dialog" aria-modal="true" aria-labelledby="nota-modal-title">
       <h3 id="nota-modal-title" class="modal-title">✨ Nueva notita</h3>
 
       <form id="nota-form" class="modal-form">
-        <label class="form-field">
-          <span class="form-label">Título (opcional)</span>
-          <input type="text" id="nota-titulo" maxlength="50" placeholder="Un titulito...">
-        </label>
+        <div class="nota-editor-layout">
+          <div class="nota-editor-fields">
+            <label class="form-field">
+              <span class="form-label">Título (opcional)</span>
+              <input type="text" id="nota-titulo" maxlength="50" placeholder="Un titulito...">
+            </label>
 
-        <label class="form-field">
-          <span class="form-label">Notita</span>
-          <textarea id="nota-contenido" rows="4" maxlength="300" placeholder="Escribe algo bonito..." required></textarea>
-        </label>
+            <label class="form-field">
+              <span class="form-label">Notita</span>
+              <textarea id="nota-contenido" rows="4" maxlength="300" placeholder="Escribe algo bonito..." required></textarea>
+            </label>
 
-        <div class="form-field">
-          <span class="form-label">Color</span>
-          <div class="color-picker">
-            <button type="button" class="color-option color-amarillo activo" data-color="amarillo" aria-label="Amarillo"></button>
-            <button type="button" class="color-option color-rosa" data-color="rosa" aria-label="Rosa"></button>
-            <button type="button" class="color-option color-lila" data-color="lila" aria-label="Lila"></button>
-            <button type="button" class="color-option color-menta" data-color="menta" aria-label="Menta"></button>
-            <button type="button" class="color-option color-cielo" data-color="cielo" aria-label="Cielo"></button>
+            <div class="form-field">
+              <span class="form-label">Color</span>
+              <div class="color-picker">
+                <button type="button" class="color-option color-amarillo activo" data-color="amarillo" aria-label="Amarillo"></button>
+                <button type="button" class="color-option color-rosa" data-color="rosa" aria-label="Rosa"></button>
+                <button type="button" class="color-option color-lila" data-color="lila" aria-label="Lila"></button>
+                <button type="button" class="color-option color-menta" data-color="menta" aria-label="Menta"></button>
+                <button type="button" class="color-option color-cielo" data-color="cielo" aria-label="Cielo"></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="nota-preview-column">
+            <span class="form-label">Vista previa</span>
+            <div id="nota-preview" class="nota-preview" aria-live="polite" hidden></div>
           </div>
         </div>
 
@@ -342,26 +351,34 @@
   <!-- MODAL AÑADIR FOTO -->
   <div id="photo-modal" class="modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-modal></div>
-    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content photo-modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <h3 id="modal-title" class="modal-title">✨ Nuevo recuerdo</h3>
 
       <form id="photo-form" class="modal-form">
-        <label class="form-field">
-          <span class="form-label">La foto</span>
-          <input type="file" id="input-photo" accept="image/*" required>
-        </label>
+        <div class="photo-editor-layout">
+          <div class="photo-editor-fields">
+            <label class="form-field">
+              <span class="form-label">La foto</span>
+              <input type="file" id="input-photo" accept="image/*" required>
+            </label>
 
-        <label class="form-field">
-          <span class="form-label">¿Cuándo fue?</span>
-          <input type="date" id="input-date">
-        </label>
+            <label class="form-field">
+              <span class="form-label">¿Cuándo fue?</span>
+              <input type="date" id="input-date">
+            </label>
 
-        <label class="form-field">
-          <span class="form-label">¿Qué quieres recordar?</span>
-          <textarea id="input-note" rows="3" maxlength="200" placeholder="Cuéntame algo bonito de este momento..."></textarea>
-        </label>
+            <label class="form-field">
+              <span class="form-label">¿Qué quieres recordar?</span>
+              <textarea id="input-note" rows="3" maxlength="200" placeholder="Cuéntame algo bonito de este momento..."></textarea>
+            </label>
+          </div>
 
-        <div id="photo-preview" class="photo-preview"></div>
+          <div class="photo-preview-column">
+            <span class="form-label">Vista previa</span>
+            <div id="photo-preview" class="photo-preview" aria-live="polite"></div>
+            <p id="photo-preview-info" class="photo-preview-info" hidden></p>
+          </div>
+        </div>
 
         <div class="modal-actions">
           <button type="button" class="btn-secondary" data-close-modal>Mejor luego</button>
@@ -600,6 +617,10 @@ https://youtube.com/watch?v=...</pre>
       <button class="mascota-opcion" data-mascota="unicornio" type="button">
         <span class="mascota-opcion-icono">🦄</span>
         <span class="mascota-opcion-nombre">Unicornio</span>
+      </button>
+      <button class="mascota-opcion" data-mascota="conejo" type="button">
+        <span class="mascota-opcion-icono">🐰</span>
+        <span class="mascota-opcion-nombre">Conejito</span>
       </button>
     </div>
   </div>

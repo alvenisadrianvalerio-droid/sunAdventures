@@ -37,12 +37,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const empty = document.getElementById("album-empty");
   const btnAdd = document.getElementById("btn-add-photo");
   const modal = document.getElementById("photo-modal");
+  const modalTitle = document.getElementById("modal-title");
   const form = document.getElementById("photo-form");
   const inputPhoto = document.getElementById("input-photo");
+  const inputPhotoCampo = inputPhoto?.closest(".form-field");
   const inputDate = document.getElementById("input-date");
   const inputNote = document.getElementById("input-note");
   const preview = document.getElementById("photo-preview");
+  const photoPreviewInfo = document.getElementById("photo-preview-info");
   const submitBtn = form?.querySelector('button[type="submit"]');
+  let fotoPreviewObjectUrl = null;
 
   // NOTAS
   const notasGrid = document.getElementById("notas-grid");
@@ -50,8 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnAddNota = document.getElementById("btn-add-nota");
   const notaModal = document.getElementById("nota-modal");
   const notaForm = document.getElementById("nota-form");
+  const notaModalTitle = document.getElementById("nota-modal-title");
   const notaTitulo = document.getElementById("nota-titulo");
   const notaContenido = document.getElementById("nota-contenido");
+  const notaPreview = document.getElementById("nota-preview");
+  const notaTituloCampo = notaTitulo?.closest(".form-field");
+  const notaColorCampo = document.querySelector("#nota-form .color-picker")?.closest(".form-field");
   const notaSubmitBtn = notaForm?.querySelector('button[type="submit"]');
 
   // PLAYLISTS
@@ -140,6 +148,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================================
   let fotos = [];
   let notas = [];
+  let notaEditando = null;
+  let fotoEditando = null;
   let colorSeleccionado = "amarillo";
   let modoRegistro = false;
 
@@ -157,6 +167,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let renderPendiente = false;
   let subiendoFoto = false;
   let colaSesion = Promise.resolve();
+  const urlsFirmadasCache = new Map();
+  const DURACION_CACHE_URL = (URL_EXPIRY - 60) * 1000;
 
   let archivosPendientes = [];
 
@@ -194,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!session) { fotos = []; return; }
 
     const { data, error } = await supabase
-      .from("fotos").select("*")
+      .from("fotos").select("id,path,fecha,nota")
       .eq("user_id", session.user.id)
       .order("created_at", { ascending: false });
 
@@ -223,11 +235,29 @@ document.addEventListener("DOMContentLoaded", () => {
     if (error) throw error;
   }
 
+  async function actualizarFotoTabla(id, fecha, nota) {
+    const { data, error } = await supabase
+      .from("fotos")
+      .update({ fecha: fecha || null, nota: nota || null })
+      .eq("id", id)
+      .select().single();
+
+    if (error) throw error;
+    return data;
+  }
+
   async function obtenerUrlFirmada(path) {
+    const guardada = urlsFirmadasCache.get(path);
+    if (guardada && guardada.expira > Date.now()) return guardada.url;
+
     const { data, error } = await supabase.storage
       .from(BUCKET_NAME).createSignedUrl(path, URL_EXPIRY);
 
     if (error) { console.error("Error URL firmada:", path, error); return null; }
+    urlsFirmadasCache.set(path, {
+      url: data.signedUrl,
+      expira: Date.now() + DURACION_CACHE_URL,
+    });
     return data.signedUrl;
   }
 
@@ -290,15 +320,113 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function activarPantallaCompleta(elemento, boton) {
+    if (!elemento) return;
+
+    const api = elemento.requestFullscreen ||
+      elemento.webkitRequestFullscreen ||
+      elemento.msRequestFullscreen;
+
+    if (api) {
+      api.call(elemento);
+      if (boton) {
+        boton.setAttribute("aria-pressed", "true");
+      }
+      return;
+    }
+
+    alert("Tu navegador no admite pantalla completa aquí.");
+  }
+
+  function cerrarPantallaCompleta() {
+    const api = document.exitFullscreen ||
+      document.webkitExitFullscreen ||
+      document.msExitFullscreen;
+
+    if (api && document.fullscreenElement) {
+      api.call(document);
+    }
+  }
+
+  function hacerFullscreenInteractivo(article, boton) {
+    article.tabIndex = 0;
+    article.setAttribute("role", "button");
+    article.setAttribute("aria-label", "Abrir en pantalla completa");
+
+    article.addEventListener("click", (e) => {
+      if (e.target.closest("button, input, textarea, a")) return;
+      if (document.fullscreenElement === article) {
+        cerrarPantallaCompleta();
+        return;
+      }
+      activarPantallaCompleta(article, boton);
+    });
+
+    article.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      if (e.target !== article) return;
+      e.preventDefault();
+      activarPantallaCompleta(article, boton);
+    });
+  }
+
   function crearPolaroid(foto, url) {
     const article = document.createElement("article");
     article.className = "polaroid";
+    hacerFullscreenInteractivo(article);
 
     const btnDelete = document.createElement("button");
     btnDelete.className = "polaroid-delete";
-    btnDelete.textContent = "×";
+    btnDelete.innerHTML = "🗑";
     btnDelete.title = "Eliminar";
-    btnDelete.addEventListener("click", () => eliminarFoto(foto.id));
+    btnDelete.setAttribute("aria-label", "Eliminar foto");
+    btnDelete.addEventListener("click", (e) => {
+      e.stopPropagation();
+      eliminarFoto(foto.id);
+    });
+
+    const btnEdit = document.createElement("button");
+    btnEdit.className = "polaroid-edit";
+    btnEdit.type = "button";
+    btnEdit.textContent = "✎";
+    btnEdit.title = "Editar fecha y nota";
+    btnEdit.setAttribute("aria-label", "Editar fecha y nota de la foto");
+    btnEdit.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      abrirModal(foto);
+    });
+
+    const btnFullscreen = document.createElement("button");
+    btnFullscreen.className = "polaroid-fullscreen";
+    btnFullscreen.type = "button";
+    btnFullscreen.textContent = "⛶";
+    btnFullscreen.title = "Pantalla completa";
+    btnFullscreen.setAttribute("aria-label", "Ver en pantalla completa");
+    btnFullscreen.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (document.fullscreenElement === article) {
+        cerrarPantallaCompleta();
+        btnFullscreen.setAttribute("aria-pressed", "false");
+        return;
+      }
+
+      activarPantallaCompleta(article, btnFullscreen);
+    });
+
+    const btnClose = document.createElement("button");
+    btnClose.className = "polaroid-close";
+    btnClose.type = "button";
+    btnClose.textContent = "✕";
+    btnClose.title = "Salir de pantalla completa";
+    btnClose.setAttribute("aria-label", "Salir de pantalla completa");
+    btnClose.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      cerrarPantallaCompleta();
+    });
 
     const img = document.createElement("img");
     img.src = url;
@@ -321,7 +449,12 @@ document.addEventListener("DOMContentLoaded", () => {
       nota.appendChild(p);
     }
 
-    article.append(btnDelete, img, nota);
+    const visual = document.createElement("div");
+    visual.className = "polaroid-visual";
+    visual.appendChild(img);
+    visual.appendChild(nota);
+
+    article.append(btnDelete, btnEdit, btnFullscreen, btnClose, visual);
     return article;
   }
 
@@ -332,19 +465,39 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${String(d.getDate()).padStart(2, "0")} · ${meses[d.getMonth()]} · ${d.getFullYear()}`;
   }
 
-  function abrirModal() {
+  async function abrirModal(fotoParaEditar = null) {
     if (!modal) return;
+    fotoEditando = fotoParaEditar;
     modal.classList.add("active");
     modal.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
 
-    const hoy = new Date().toISOString().split("T")[0];
     form?.reset();
-    if (inputDate) inputDate.value = hoy;
-    if (preview) preview.innerHTML = "";
+    if (inputPhoto) inputPhoto.required = !fotoParaEditar;
+    if (inputPhotoCampo) inputPhotoCampo.hidden = Boolean(fotoParaEditar);
+    if (fotoParaEditar) {
+      if (inputDate) inputDate.value = fotoParaEditar.fecha || "";
+      if (inputNote) inputNote.value = fotoParaEditar.nota || "";
+    } else if (inputDate) {
+      inputDate.value = new Date().toISOString().split("T")[0];
+    }
+    if (fotoPreviewObjectUrl) {
+      URL.revokeObjectURL(fotoPreviewObjectUrl);
+      fotoPreviewObjectUrl = null;
+    }
+    if (preview) {
+      preview.innerHTML = "";
+      if (fotoParaEditar) {
+        const url = await obtenerUrlFirmada(fotoParaEditar.path);
+        mostrarContenidoVistaPrevia(url);
+      } else {
+        mostrarContenidoVistaPrevia(null);
+      }
+    }
+    if (modalTitle) modalTitle.textContent = fotoParaEditar ? "✏️ Editar recuerdo" : "✨ Nuevo recuerdo";
     if (submitBtn) {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Guardar recuerdo 💛";
+      submitBtn.textContent = fotoParaEditar ? "Actualizar recuerdo 💛" : "Guardar recuerdo 💛";
     }
   }
 
@@ -353,31 +506,113 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.classList.remove("active");
     modal.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
+    fotoEditando = null;
+    if (inputPhoto) inputPhoto.required = true;
+    if (inputPhotoCampo) inputPhotoCampo.hidden = false;
+    if (modalTitle) modalTitle.textContent = "✨ Nuevo recuerdo";
+    if (fotoPreviewObjectUrl) {
+      URL.revokeObjectURL(fotoPreviewObjectUrl);
+      fotoPreviewObjectUrl = null;
+    }
 
     if (typeof decirMapache === "function") {
       decirMapache("¡Qué bonito recuerdo! 💛", 4000);
     }
   }
 
-  if (btnAdd) btnAdd.addEventListener("click", abrirModal);
+  if (btnAdd) btnAdd.addEventListener("click", () => abrirModal());
   modal?.querySelectorAll("[data-close-modal]").forEach((el) => {
     el.addEventListener("click", cerrarModal);
   });
 
+  function mostrarVistaPreviaFoto(file) {
+    if (fotoPreviewObjectUrl) URL.revokeObjectURL(fotoPreviewObjectUrl);
+    if (!file) {
+      mostrarContenidoVistaPrevia(null);
+      actualizarVistaPreviaFotoInfo();
+      return;
+    }
+
+    fotoPreviewObjectUrl = URL.createObjectURL(file);
+    mostrarContenidoVistaPrevia(fotoPreviewObjectUrl);
+    actualizarVistaPreviaFotoInfo();
+  }
+
+  function mostrarContenidoVistaPrevia(url) {
+    if (!preview) return;
+    preview.innerHTML = "";
+
+    if (url) {
+      const img = document.createElement("img");
+      img.src = url;
+      img.alt = "Vista previa del recuerdo";
+      preview.appendChild(img);
+    } else {
+      const placeholder = document.createElement("div");
+      placeholder.className = "photo-preview-placeholder";
+      placeholder.textContent = "Selecciona una foto para verla aquí";
+      preview.appendChild(placeholder);
+    }
+
+    const caption = document.createElement("div");
+    caption.className = "photo-preview-caption";
+    const date = document.createElement("span");
+    date.className = "photo-preview-date";
+    const note = document.createElement("p");
+    note.className = "photo-preview-note";
+    caption.append(date, note);
+    preview.appendChild(caption);
+    actualizarContenidoVistaPrevia(date, note);
+  }
+
+  function actualizarContenidoVistaPrevia(date, note) {
+    if (!date || !note) return;
+    date.textContent = inputDate?.value ? formatearFecha(inputDate.value) : "Sin fecha";
+    note.textContent = inputNote?.value.trim() || "Tu nota aparecerá aquí";
+  }
+
+  function actualizarVistaPreviaFotoInfo() {
+    const date = preview?.querySelector(".photo-preview-date");
+    const note = preview?.querySelector(".photo-preview-note");
+    actualizarContenidoVistaPrevia(date, note);
+    if (!photoPreviewInfo) return;
+    const fecha = inputDate?.value || "Sin fecha";
+    const nota = inputNote?.value.trim() || "Sin descripción";
+    photoPreviewInfo.textContent = `${fecha} · ${nota}`;
+    photoPreviewInfo.hidden = !inputPhoto?.files?.length;
+  }
+
   if (inputPhoto) {
     inputPhoto.addEventListener("change", () => {
-      const file = inputPhoto.files[0];
-      if (!preview) return;
-      preview.innerHTML = "";
-      if (!file) return;
-
-      const img = document.createElement("img");
-      img.src = URL.createObjectURL(file);
-      img.classList.add("visible");
-      img.onload = () => URL.revokeObjectURL(img.src);
-      preview.appendChild(img);
+      mostrarVistaPreviaFoto(inputPhoto.files[0]);
     });
   }
+
+  inputDate?.addEventListener("input", actualizarVistaPreviaFotoInfo);
+  inputNote?.addEventListener("input", actualizarVistaPreviaFotoInfo);
+
+  document.addEventListener("paste", (e) => {
+    if (!modal?.classList.contains("active") || !inputPhoto) return;
+
+    const imagen = Array.from(e.clipboardData?.items || [])
+      .find((item) => item.kind === "file" && item.type.startsWith("image/"));
+    if (!imagen) return;
+
+    const file = imagen.getAsFile();
+    if (!file) return;
+
+    e.preventDefault();
+    try {
+      const transferencia = new DataTransfer();
+      transferencia.items.add(file);
+      inputPhoto.files = transferencia.files;
+    } catch (error) {
+      console.warn("No se pudo asignar la imagen pegada al selector:", error);
+      return;
+    }
+
+    mostrarVistaPreviaFoto(file);
+  });
 
   if (form) {
     form.addEventListener("submit", async (e) => {
@@ -385,11 +620,41 @@ document.addEventListener("DOMContentLoaded", () => {
       if (subiendoFoto) return;
       subiendoFoto = true;
 
-      const file = inputPhoto?.files[0];
-      if (!file) { alert("Selecciona una foto primero"); subiendoFoto = false; return; }
-
       const fecha = inputDate?.value || "";
       const nota = inputNote?.value.trim() || "";
+
+      if (fotoEditando) {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Actualizando...";
+        }
+        try {
+          const actualizada = await actualizarFotoTabla(fotoEditando.id, fecha, nota);
+          const indice = fotos.findIndex((foto) => foto.id === fotoEditando.id);
+          if (indice !== -1) {
+            fotos[indice] = {
+              ...fotos[indice],
+              fecha: actualizada.fecha,
+              nota: actualizada.nota,
+            };
+          }
+          cerrarModal();
+          await render();
+        } catch (err) {
+          console.error(err);
+          alert("No se pudo actualizar: " + (err.message || err));
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Actualizar recuerdo 💛";
+          }
+        } finally {
+          subiendoFoto = false;
+        }
+        return;
+      }
+
+      const file = inputPhoto?.files[0];
+      if (!file) { alert("Selecciona una foto primero"); subiendoFoto = false; return; }
 
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -437,6 +702,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       await eliminarFotoTabla(foto.id);
       fotos = fotos.filter((f) => f.id !== id);
+      urlsFirmadasCache.delete(foto.path);
       await render();
     } catch (err) {
       console.error(err);
@@ -453,7 +719,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!session || !session.user) { notas = []; return; }
 
       const { data, error } = await supabase
-        .from("notas").select("*")
+        .from("notas").select("id,titulo,contenido,color,created_at")
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false });
 
@@ -492,6 +758,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (error) throw error;
   }
 
+  async function actualizarNotaTabla(id, titulo, contenido, color) {
+    const { data, error } = await supabase
+      .from("notas")
+      .update({ titulo: titulo || null, contenido, color: color || "amarillo" })
+      .eq("id", id)
+      .select().single();
+
+    if (error) throw error;
+    return data;
+  }
+
   function renderNotas() {
     if (!notasGrid) return;
     notasGrid.innerHTML = "";
@@ -505,13 +782,63 @@ document.addEventListener("DOMContentLoaded", () => {
   function crearNotaPolaroid(nota) {
     const article = document.createElement("article");
     article.className = "nota color-" + (nota.color || "amarillo");
+    hacerFullscreenInteractivo(article);
 
     const btnDelete = document.createElement("button");
     btnDelete.className = "nota-delete";
-    btnDelete.textContent = "×";
+    btnDelete.innerHTML = "🗑";
     btnDelete.title = "Eliminar";
-    btnDelete.addEventListener("click", () => eliminarNota(nota.id));
-    article.appendChild(btnDelete);
+    btnDelete.setAttribute("aria-label", "Eliminar nota");
+    btnDelete.addEventListener("click", (e) => {
+      e.stopPropagation();
+      eliminarNota(nota.id);
+    });
+
+    const btnFullscreen = document.createElement("button");
+    btnFullscreen.className = "nota-fullscreen";
+    btnFullscreen.type = "button";
+    btnFullscreen.textContent = "⛶";
+    btnFullscreen.title = "Pantalla completa";
+    btnFullscreen.setAttribute("aria-label", "Ver nota en pantalla completa");
+    btnFullscreen.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (document.fullscreenElement === article) {
+        cerrarPantallaCompleta();
+        btnFullscreen.setAttribute("aria-pressed", "false");
+        return;
+      }
+
+      activarPantallaCompleta(article, btnFullscreen);
+    });
+
+    const btnClose = document.createElement("button");
+    btnClose.className = "nota-close";
+    btnClose.type = "button";
+    btnClose.textContent = "✕";
+    btnClose.title = "Salir de pantalla completa";
+    btnClose.setAttribute("aria-label", "Salir de pantalla completa");
+    btnClose.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      cerrarPantallaCompleta();
+    });
+
+    article.append(btnDelete, btnFullscreen, btnClose);
+
+    const btnEdit = document.createElement("button");
+    btnEdit.className = "nota-edit";
+    btnEdit.type = "button";
+    btnEdit.textContent = "✎";
+    btnEdit.title = "Editar nota";
+    btnEdit.setAttribute("aria-label", "Editar nota");
+    btnEdit.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      abrirNotaModal(nota);
+    });
+    article.appendChild(btnEdit);
 
     if (nota.titulo) {
       const h3 = document.createElement("h3");
@@ -520,10 +847,39 @@ document.addEventListener("DOMContentLoaded", () => {
       article.appendChild(h3);
     }
 
-    const p = document.createElement("p");
-    p.className = "nota-contenido";
-    p.textContent = nota.contenido;
-    article.appendChild(p);
+    const contenidoWrap = document.createElement("div");
+    contenidoWrap.className = "nota-contenido-wrap";
+
+    const lineas = (nota.contenido || "").split(/\r?\n/);
+    if (lineas.length === 0 || (lineas.length === 1 && lineas[0].trim() === "")) {
+      const p = document.createElement("p");
+      p.className = "nota-contenido";
+      p.textContent = nota.contenido || "";
+      contenidoWrap.appendChild(p);
+    } else {
+      lineas.forEach((linea) => {
+        const lineaWrap = document.createElement("div");
+        lineaWrap.className = "nota-linea";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "nota-check";
+        checkbox.setAttribute("aria-label", "Marcar línea como hecha");
+
+        const texto = document.createElement("span");
+        texto.className = "nota-texto";
+        texto.textContent = linea.trim() || " ";
+
+        checkbox.addEventListener("change", () => {
+          texto.classList.toggle("tachada", checkbox.checked);
+        });
+
+        lineaWrap.append(checkbox, texto);
+        contenidoWrap.appendChild(lineaWrap);
+      });
+    }
+
+    article.appendChild(contenidoWrap);
 
     if (nota.created_at) {
       const fecha = document.createElement("span");
@@ -542,24 +898,53 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${String(d.getDate()).padStart(2, "0")} ${meses[d.getMonth()]} ${d.getFullYear()}`;
   }
 
-  function abrirNotaModal() {
+  function abrirNotaModal(notaParaEditar = null) {
     if (!notaModal) return;
+    notaEditando = notaParaEditar;
     notaModal.classList.add("active");
     notaModal.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
 
     if (notaForm) notaForm.reset();
-    colorSeleccionado = "amarillo";
+    colorSeleccionado = notaParaEditar?.color || "amarillo";
+    if (notaParaEditar) {
+      if (notaTitulo) notaTitulo.value = notaParaEditar.titulo || "";
+      if (notaContenido) notaContenido.value = notaParaEditar.contenido || "";
+    }
+    if (notaTituloCampo) notaTituloCampo.hidden = Boolean(notaParaEditar);
+    if (notaColorCampo) notaColorCampo.hidden = Boolean(notaParaEditar);
+    if (notaModalTitle) {
+      notaModalTitle.textContent = notaParaEditar ? "✏️ Editar texto" : "✨ Nueva notita";
+    }
     document.querySelectorAll(".color-option").forEach((opt) => {
-      opt.classList.toggle("activo", opt.dataset.color === "amarillo");
+      opt.classList.toggle("activo", opt.dataset.color === colorSeleccionado);
     });
 
     if (notaSubmitBtn) {
       notaSubmitBtn.disabled = false;
-      notaSubmitBtn.textContent = "Guardar notita 💌";
+      notaSubmitBtn.textContent = notaParaEditar ? "Actualizar texto 💌" : "Guardar notita 💌";
     }
 
+    actualizarVistaPreviaNota();
     setTimeout(() => notaTitulo?.focus(), 100);
+  }
+
+  function actualizarVistaPreviaNota() {
+    if (!notaPreview) return;
+
+    const titulo = notaTitulo?.value.trim() || "Sin título";
+    const contenido = notaContenido?.value.trim() || "Escribe algo para ver la vista previa...";
+    notaPreview.className = `nota-preview color-${colorSeleccionado}`;
+    notaPreview.innerHTML = "";
+
+    const tituloPreview = document.createElement("strong");
+    tituloPreview.textContent = titulo;
+
+    const contenidoPreview = document.createElement("span");
+    contenidoPreview.textContent = contenido;
+
+    notaPreview.append(tituloPreview, contenidoPreview);
+    notaPreview.hidden = false;
   }
 
   function cerrarNotaModal() {
@@ -567,6 +952,10 @@ document.addEventListener("DOMContentLoaded", () => {
     notaModal.classList.remove("active");
     notaModal.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
+    notaEditando = null;
+    if (notaTituloCampo) notaTituloCampo.hidden = false;
+    if (notaColorCampo) notaColorCampo.hidden = false;
+    if (notaModalTitle) notaModalTitle.textContent = "✨ Nueva notita";
   }
 
   async function eliminarNota(id) {
@@ -581,7 +970,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  if (btnAddNota) btnAddNota.addEventListener("click", abrirNotaModal);
+  if (btnAddNota) btnAddNota.addEventListener("click", () => abrirNotaModal());
 
   notaModal?.querySelectorAll("[data-close-nota-modal]").forEach((el) => {
     el.addEventListener("click", cerrarNotaModal);
@@ -596,10 +985,13 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll(".color-option").forEach((o) => o.classList.remove("activo"));
       opt.classList.add("activo");
       colorSeleccionado = opt.dataset.color;
+      actualizarVistaPreviaNota();
     });
   });
 
   if (notaForm) {
+    notaTitulo?.addEventListener("input", actualizarVistaPreviaNota);
+    notaContenido?.addEventListener("input", actualizarVistaPreviaNota);
     notaForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -613,11 +1005,27 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        const nueva = await añadirNotaTabla(titulo, contenido, colorSeleccionado);
-        notas.unshift({
-          id: nueva.id, titulo: nueva.titulo, contenido: nueva.contenido,
-          color: nueva.color, created_at: nueva.created_at,
-        });
+        if (notaEditando) {
+          const actualizada = await actualizarNotaTabla(
+            notaEditando.id,
+            notaEditando.titulo,
+            contenido,
+            notaEditando.color
+          );
+          const indice = notas.findIndex((nota) => nota.id === notaEditando.id);
+          if (indice !== -1) {
+            notas[indice] = {
+              id: actualizada.id, titulo: actualizada.titulo, contenido: actualizada.contenido,
+              color: actualizada.color, created_at: actualizada.created_at,
+            };
+          }
+        } else {
+          const nueva = await añadirNotaTabla(titulo, contenido, colorSeleccionado);
+          notas.unshift({
+            id: nueva.id, titulo: nueva.titulo, contenido: nueva.contenido,
+            color: nueva.color, created_at: nueva.created_at,
+          });
+        }
         cerrarNotaModal();
         renderNotas();
       } catch (err) {
@@ -625,7 +1033,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("No se pudo guardar: " + (err.message || err));
         if (notaSubmitBtn) {
           notaSubmitBtn.disabled = false;
-          notaSubmitBtn.textContent = "Guardar notita 💌";
+          notaSubmitBtn.textContent = notaEditando ? "Actualizar texto 💌" : "Guardar notita 💌";
         }
       }
     });
@@ -640,7 +1048,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!session || !session.user) { playlists = []; return; }
 
       const { data, error } = await supabase
-        .from("playlists").select("*")
+        .from("playlists").select("id,nombre,descripcion,emoji,color,canciones,created_at")
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false });
 
@@ -1938,7 +2346,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!session || !session.user) { eventos = []; return; }
 
       const { data, error } = await supabase
-        .from("eventos").select("*")
+        .from("eventos").select("id,titulo,descripcion,fecha,color,recordatorio_dias,recurrente")
         .eq("user_id", session.user.id)
         .order("fecha", { ascending: true });
 
@@ -2377,10 +2785,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (btnAddNota) btnAddNota.style.display = logueado ? "inline-block" : "none";
 
       if (logueado) {
-        await cargarFotos(); await render();
-        await cargarNotas(); renderNotas();
-        await cargarPlaylists(); renderPlaylists();
-        await cargarEventos(); renderCalendario();
+        await Promise.all([cargarFotos(), cargarNotas(), cargarPlaylists(), cargarEventos()]);
+        await Promise.all([
+          render(),
+          Promise.resolve(renderNotas()),
+          Promise.resolve(renderPlaylists()),
+          Promise.resolve(renderCalendario()),
+        ]);
       } else {
         fotos = []; notas = []; playlists = []; eventos = [];
 

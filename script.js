@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================================
-  //  MASCOTA VIRTUAL — 8 mascotas
+  //  MASCOTA VIRTUAL — 9 mascotas
   // ============================================
   const mascota = document.getElementById("mascota");
   const mascotaImg = document.getElementById("mascota-img");
@@ -200,11 +200,27 @@ document.addEventListener("DOMContentLoaded", () => {
         "Soy mágico ✨",
         "Ay mis hielitos 🌟",
         "Roaf, roaf 🌈",
-        "¿Un deseo? 🪄",
+        "Tenkiu, tenkiu, tenkiu🪄",
         "Soy tierno y mágico 💜",
         "¡Abracadabra! 🎩",
         "Vengo del arcoíris 🌈",
         "Hago magia a tu lado ✨"
+      ]
+    },
+    conejo: {
+      nombre: "Conejito",
+      imagen: "img/conejito.png",
+      sonido: "hop",
+      frases: [
+        "¡Hola! 🐰",
+        "¿Te apetece dar un salto?",
+        "¡Ay, brinquemos, brinquemos! 💛",
+        "¿Y esa zanahoria? ✨",
+        "Ay unicornio, que bonito cuerno tienes. 🐾",
+        "Me encanta estar contigo ☁️",
+        "¿Nos damos un paseo? 🌼",
+        "Dame un poco de esa zanahoria 🥕",
+        "Abusadol e,e"
       ]
     }
   };
@@ -321,6 +337,12 @@ document.addEventListener("DOMContentLoaded", () => {
           tocarTono(1320, 0.3, "sine", 0.10, 0.3);
           break;
 
+        case "hop":
+          tocarTono(420, 0.08, "triangle", 0.1, 0);
+          tocarTono(620, 0.1, "triangle", 0.1, 0.08);
+          tocarTono(860, 0.12, "triangle", 0.09, 0.16);
+          break;
+
         default:
           tocarTono(600, 0.2, "sine", 0.15, 0);
       }
@@ -340,6 +362,7 @@ document.addEventListener("DOMContentLoaded", () => {
       mascotaImg.src = datos.imagen;
       mascotaImg.alt = datos.nombre;
       localStorage.setItem("mascota_actual", nombre);
+      mascota.classList.toggle("conejo-alto", nombre === "conejo");
 
       mascotaMenu?.querySelectorAll(".mascota-opcion").forEach((op) => {
         op.classList.toggle("activa", op.dataset.mascota === nombre);
@@ -369,9 +392,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // Compatibilidad con el código antiguo
     window.decirMapache = window.decirMascota;
 
+    function cerrarMenuMascota() {
+      mascotaMenu?.classList.remove("open");
+      mascotaMenu?.setAttribute("aria-hidden", "true");
+    }
+
+    function abrirMenuMascota() {
+      mascotaMenu?.classList.add("open");
+      mascotaMenu?.setAttribute("aria-hidden", "false");
+    }
+
     // ---------- Click en la mascota ----------
     mascota.addEventListener("click", (e) => {
-      if (e.target === mascotaSelector || mascotaSelector.contains(e.target)) return;
+      if (e.target === mascotaSelector || mascotaSelector.contains(e.target) || mascotaMenu?.contains(e.target)) {
+        return;
+      }
+
+      e.stopPropagation();
 
       const sonido = MASCOTAS[mascotaActual].sonido;
       reproducirSonido(sonido);
@@ -387,28 +424,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ---------- Abrir/cerrar selector ----------
     mascotaSelector?.addEventListener("click", (e) => {
+      e.preventDefault();
       e.stopPropagation();
-      mascotaMenu?.classList.toggle("open");
+
       const abierto = mascotaMenu?.classList.contains("open");
-      mascotaMenu?.setAttribute("aria-hidden", abierto ? "false" : "true");
+      if (abierto) {
+        cerrarMenuMascota();
+      } else {
+        abrirMenuMascota();
+      }
     });
 
     // ---------- Elegir mascota ✅ FIX: eliminada función duplicada
     mascotaMenu?.querySelectorAll(".mascota-opcion").forEach((op) => {
       op.addEventListener("click", (e) => {
+        e.preventDefault();
         e.stopPropagation();
         cambiarMascota(op.dataset.mascota);
-        mascotaMenu.classList.remove("open");
-        mascotaMenu.setAttribute("aria-hidden", "true");
+        cerrarMenuMascota();
       });
     });
 
     // ---------- Click fuera → cerrar ----------
     document.addEventListener("click", (e) => {
       if (!mascotaMenu?.classList.contains("open")) return;
-      if (!mascotaMenu.contains(e.target) && e.target !== mascotaSelector) {
-        mascotaMenu.classList.remove("open");
-        mascotaMenu.setAttribute("aria-hidden", "true");
+
+      const pulsadoDentro = mascota.contains(e.target) || mascotaSelector.contains(e.target) || mascotaMenu.contains(e.target);
+      if (!pulsadoDentro) {
+        cerrarMenuMascota();
       }
     });
 
@@ -423,6 +466,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------- Aplicar mascota guardada al cargar ----------
     mascotaImg.src = MASCOTAS[mascotaActual].imagen;
     mascotaImg.alt = MASCOTAS[mascotaActual].nombre;
+    mascota.classList.toggle("conejo-alto", mascotaActual === "conejo");
     mascotaMenu?.querySelectorAll(".mascota-opcion").forEach((op) => {
       op.classList.toggle("activa", op.dataset.mascota === mascotaActual);
     });
