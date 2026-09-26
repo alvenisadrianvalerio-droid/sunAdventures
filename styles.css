@@ -819,7 +819,7 @@ body.light .girasol {
   -ms-interpolation-mode: nearest-neighbor;
   user-select: none;
   -webkit-user-drag: none;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .mascota.conejo-alto {
@@ -858,6 +858,7 @@ body.light .girasol {
   box-sizing: border-box;
   position: relative;
   opacity: 0;
+  visibility: hidden;
   transform: translateY(8px);
   transition: opacity 0.3s ease, transform 0.3s ease;
   white-space: normal;
@@ -869,6 +870,8 @@ body.light .girasol {
 
 .mascota-burbuja.visible {
   opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
   transform: translateY(0);
 }
 

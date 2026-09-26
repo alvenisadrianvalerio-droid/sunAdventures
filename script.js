@@ -414,6 +414,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ---------- Click en la mascota ----------
     mascota.addEventListener("click", (e) => {
+      if (e.target !== mascotaImg && e.target !== mascotaSelector) return;
       if (e.target === mascotaSelector || mascotaSelector.contains(e.target) || mascotaMenu?.contains(e.target)) {
         return;
       }

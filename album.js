@@ -303,6 +303,46 @@ document.addEventListener("DOMContentLoaded", () => {
     logroToastTimeout = setTimeout(() => logroToast.classList.remove("visible"), 4500);
   }
 
+  const ICONOS_LOGRO = {
+    "primeros-pasos": "photo",
+    fotografos: "photo",
+    dj: "music",
+    poetas: "note",
+    trotamundos: "map",
+    racha: "trophy",
+    "racha-365": "trophy",
+    "todos-los-logros": "trophy",
+  };
+  const IMAGENES_MASCOTA = {
+    mapache: "img/mapache.png",
+    girasol: "img/mascota-girasol.png",
+    gatito: "img/gatito.png",
+    hamburguesa: "img/hamburguesa.png",
+    oveja: "img/oveja.png",
+    pollito: "img/pollito.png",
+    jirafa: "img/jirafa.png",
+    unicornio: "img/unicornio.png",
+    conejo: "img/conejito.png",
+  };
+
+  function crearIconoLogro(logro) {
+    const mascotaId = Object.keys(IMAGENES_MASCOTA).find((id) => logro.id.endsWith(`-${id}`));
+    if (mascotaId) {
+      const imagen = document.createElement("img");
+      imagen.className = "logro-icono logro-icono-imagen";
+      imagen.src = IMAGENES_MASCOTA[mascotaId];
+      imagen.alt = "";
+      return imagen;
+    }
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.classList.add("ui-icon", "logro-icono-svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    use.setAttribute("href", `icons/ui-icons.svg#${ICONOS_LOGRO[logro.id] || "trophy"}`);
+    svg.appendChild(use);
+    return svg;
+  }
+
   const NIVELES_EXPERIENCIA = [
     { minimo: 0, nombre: "Novatos 🌱", siguiente: 100, siguienteNombre: "Enamorados 💛" },
     { minimo: 100, nombre: "Enamorados 💛", siguiente: 500, siguienteNombre: "Compañeros de vida 🔥" },
@@ -364,9 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       const tarjeta = document.createElement("article");
       tarjeta.className = `logro-card${desbloqueado ? " desbloqueado" : ""}`;
-      const icono = document.createElement("span");
-      icono.className = "logro-icono";
-      icono.textContent = logro.icono;
+      const icono = crearIconoLogro(logro);
       const contenido = document.createElement("div");
       contenido.className = "logro-contenido";
       const nombre = document.createElement("h3");
