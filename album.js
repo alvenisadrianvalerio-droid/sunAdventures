@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let archivosPendientes = [];
   let chatSubscription = null;
   const CHAT_ROOM = "sunadventures-private";
-  const PUSH_VAPID_PUBLIC_KEY = "";
+  const PUSH_VAPID_PUBLIC_KEY = "BGFg_T3XTTCpN0aIKRXGq3sBvh0RGWOFmxx25tdpQ5OhNgHmuFDJ7TiXLfmgy4ktdqfE81uODV_PLKFqu_vy7_w";
 
   // Player
   let colaReproduccion = [];        // array de { titulo, artista, url, playlistId }

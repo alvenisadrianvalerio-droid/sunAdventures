@@ -12,5 +12,8 @@
   "type": "commonjs",
   "dependencies": {
     "@capacitor/android": "^8.5.2"
+  },
+  "devDependencies": {
+    "web-push": "^3.6.7"
   }
 }
