@@ -162,7 +162,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const groupInvitesList = document.getElementById("group-invites-list");
   const settingsModal = document.getElementById("settings-modal");
   const toggleCensura = document.getElementById("toggle-censura");
-  const logrosGrid = document.getElementById("logros-grid");
+  const logrosPersonalesGrid = document.getElementById("logros-personales-grid");
+  const logrosGrupoGrid = document.getElementById("logros-grupo-grid");
   const logrosDesbloqueados = document.getElementById("logros-desbloqueados");
   const logroToast = document.getElementById("logro-toast");
   const experienciaTitulo = document.getElementById("experiencia-titulo");
@@ -233,13 +234,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const LOGROS = [
-    { id: "primeros-pasos", icono: "🥇", nombre: "Primeros pasos", descripcion: "Sube tu primera foto", meta: 1, medir: () => fotos.length },
-    { id: "fotografos", icono: "📷", nombre: "Fotógrafos", descripcion: "Guarda 50 fotos", meta: 50, medir: () => fotos.length },
-    { id: "dj", icono: "🎵", nombre: "DJ", descripcion: "Añade 20 canciones", meta: 20, medir: () => playlists.reduce((total, playlist) => total + playlist.canciones.length, 0) },
-    { id: "poetas", icono: "💌", nombre: "Poetas", descripcion: "Escribe 30 notas", meta: 30, medir: () => notas.length },
+    { id: "primeros-pasos", tipo: "grupo", icono: "🥇", nombre: "Primeros pasos", descripcion: "Guarda la primera foto del grupo", meta: 1, medir: () => fotos.length },
+    { id: "fotografos", tipo: "grupo", icono: "📷", nombre: "Fotógrafos", descripcion: "Guarda 50 fotos del grupo", meta: 50, medir: () => fotos.length },
+    { id: "dj", tipo: "grupo", icono: "🎵", nombre: "DJ", descripcion: "Añade 20 canciones al grupo", meta: 20, medir: () => playlists.reduce((total, playlist) => total + playlist.canciones.length, 0) },
+    { id: "poetas", tipo: "grupo", icono: "💌", nombre: "Poetas", descripcion: "Escribe 30 notas del grupo", meta: 30, medir: () => notas.length },
     { id: "racha", icono: "🔥", nombre: "Racha de 30 días", descripcion: "Abre la app 30 días seguidos", meta: 30, medir: () => visitasConsecutivas },
-    { id: "trotamundos", icono: "🗺️", nombre: "Trotamundos", descripcion: "Guarda 10 fotos con ubicación", meta: 10, medir: () => fotos.filter((foto) => foto.lat != null && foto.lng != null).length },
-    { id: "fan-girasol", icono: "🌻", nombre: "Fan del girasol", descripcion: "Dale 100 clics a la mascota", meta: 100, medir: () => Number(localStorage.getItem("mascota_clicks") || 0) },
+    { id: "trotamundos", tipo: "grupo", icono: "🗺️", nombre: "Trotamundos", descripcion: "Guarda 10 fotos del grupo con ubicación", meta: 10, medir: () => fotos.filter((foto) => foto.lat != null && foto.lng != null).length },
+    { id: "fan-girasol", icono: "🌻", nombre: "Fan del girasol", descripcion: "Dale 100 clics al girasol", meta: 100, medir: () => Number(localStorage.getItem(`mascota_clicks_${perfilActual?.id || "local"}_girasol`) || 0) },
   ];
 
   const LOGROS_MASCOTAS = [
@@ -261,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
       nombre,
       descripcion: "Interactúa con esta mascota",
       meta: 1,
-      medir: () => JSON.parse(localStorage.getItem("mascotas_conocidas") || "[]").includes(id) ? 1 : 0,
+      medir: () => JSON.parse(localStorage.getItem(`mascotas_conocidas_${perfilActual?.id || "local"}`) || "[]").includes(id) ? 1 : 0,
     });
     LOGROS.push({
       id: `clics-${id}`,
@@ -269,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
       nombre: `Fan de ${nombre.replace("Conoce ", "")}`,
       descripcion: "Dale 100 clics a esta mascota",
       meta: 100,
-      medir: () => Number(localStorage.getItem(`mascota_clicks_${id}`) || 0),
+      medir: () => Number(localStorage.getItem(`mascota_clicks_${perfilActual?.id || "local"}_${id}`) || 0),
     });
   });
 
@@ -284,6 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   LOGROS.push({
     id: "todos-los-logros",
+    tipo: "grupo",
     icono: "👑",
     nombre: "Leyenda absoluta",
     descripcion: "Completa todos los demás logros",
@@ -346,12 +348,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderLogros({ notificar = false } = {}) {
-    if (!logrosGrid) return;
-    const clave = `sunadventures_logros_${perfilActual?.id || "local"}`;
-    const desbloqueados = JSON.parse(localStorage.getItem(clave) || "{}");
-    let total = 0;
-    logrosGrid.innerHTML = "";
-    LOGROS.forEach((logro) => {
+    if (!logrosPersonalesGrid || !logrosGrupoGrid) return;
+
+    function pintarColeccion(logros, grid, clave) {
+      const desbloqueados = JSON.parse(localStorage.getItem(clave) || "{}");
+      let total = 0;
+      grid.innerHTML = "";
+      logros.forEach((logro) => {
       const progreso = Math.min(logro.medir(), logro.meta);
       const desbloqueado = progreso >= logro.meta;
       if (desbloqueado) {
@@ -374,10 +377,17 @@ document.addEventListener("DOMContentLoaded", () => {
       progresoTexto.textContent = desbloqueado ? "Desbloqueado" : `${progreso} / ${logro.meta}`;
       contenido.append(nombre, descripcion, progresoTexto);
       tarjeta.append(icono, contenido);
-      logrosGrid.appendChild(tarjeta);
-    });
-    localStorage.setItem(clave, JSON.stringify(desbloqueados));
-    if (logrosDesbloqueados) logrosDesbloqueados.textContent = total;
+      grid.appendChild(tarjeta);
+      });
+      localStorage.setItem(clave, JSON.stringify(desbloqueados));
+      return total;
+    }
+
+    const personales = LOGROS.filter((logro) => logro.tipo !== "grupo");
+    const grupales = LOGROS.filter((logro) => logro.tipo === "grupo");
+    const totalPersonal = pintarColeccion(personales, logrosPersonalesGrid, `sunadventures_logros_${perfilActual?.id || "local"}`);
+    pintarColeccion(grupales, logrosGrupoGrid, `sunadventures_logros_grupo_${grupoActivo?.id || "local"}`);
+    if (logrosDesbloqueados) logrosDesbloqueados.textContent = totalPersonal;
     renderExperiencia();
   }
 
@@ -395,6 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { grupoActivo = null; return null; }
     usuarioActualId = session.user.id;
+    window._sunUserId = session.user.id;
 
     const username = usernameDesdeSesion(session);
     const { data: perfil } = await supabase.from("perfiles").upsert(

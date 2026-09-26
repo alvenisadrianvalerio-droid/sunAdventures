@@ -229,10 +229,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let burbujaTimeout = null;
 
   function registrarMascotaConocida(nombre) {
-    const conocidas = JSON.parse(localStorage.getItem("mascotas_conocidas") || "[]");
+    const clave = `mascotas_conocidas_${window._sunUserId || "local"}`;
+    const conocidas = JSON.parse(localStorage.getItem(clave) || "[]");
     if (!conocidas.includes(nombre)) {
       conocidas.push(nombre);
-      localStorage.setItem("mascotas_conocidas", JSON.stringify(conocidas));
+      localStorage.setItem(clave, JSON.stringify(conocidas));
     }
   }
 
@@ -418,7 +419,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       e.stopPropagation();
-      const clicsKey = `mascota_clicks_${mascotaActual}`;
+      const clicsKey = `mascota_clicks_${window._sunUserId || "local"}_${mascotaActual}`;
       const clicsMascota = Number(localStorage.getItem(clicsKey) || 0) + 1;
       localStorage.setItem(clicsKey, String(clicsMascota));
       localStorage.setItem("mascota_clicks", String(Number(localStorage.getItem("mascota_clicks") || 0) + 1));
