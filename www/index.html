@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SunAdventures · Nuestro rincón</title>
+    <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffd93d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SunAdventures">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="album.css?v=11">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <meta name="description" content="Un rincón para guardar nuestros recuerdos con girasoles 🌻">
+  <meta name="author" content="A.A.V.C">
+
+  <meta property="og:title" content="🌻 Four Sunflowers · Nuestro rincón">
+  <meta property="og:description" content="Un pedacito de nosotros en cada foto. Entra y descubre nuestras aventuras.">
+  <meta property="og:image" content="img/girasol.jpg">
+  <meta property="og:type" content="website">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="🌻 Four Sunflowers">
+  <meta name="twitter:description" content="Un pedacito de nosotros en cada foto.">
+  <meta name="twitter:image" content="img/girasol.jpg">
+</head>
+<body>
+
+  <section id="background-container">
+
+    <header class="nav-container">
+      <nav class="nav-links">
+        <a href="#inicio" class="nav-link" data-view-link="inicio">
+          <span class="nav-link-icon">🏠</span>
+          <span class="nav-link-text">Inicio</span>
+        </a>
+        <a href="#album" class="nav-link" data-view-link="album">
+          <span class="nav-link-icon">📸</span>
+          <span class="nav-link-text">Álbum</span>
+        </a>
+        <a href="#mapa" class="nav-link" data-view-link="mapa">
+          <span class="nav-link-icon">🗺️</span>
+          <span class="nav-link-text">Mapa</span>
+        </a>
+        <a href="#chat" class="nav-link" data-view-link="chat">
+          <span class="nav-link-icon">💬</span>
+          <span class="nav-link-text">Chat</span>
+        </a>
+        <a href="#notas" class="nav-link" data-view-link="notas">
+          <span class="nav-link-icon">💌</span>
+          <span class="nav-link-text">Notitas</span>
+        </a>
+        <a href="#playlists" class="nav-link" data-view-link="playlists">
+          <span class="nav-link-icon">🎵</span>
+          <span class="nav-link-text">Playlists</span>
+        </a>
+      </nav>
+
+      <div class="nav-message">
+        Hecho con <span class="nav-heart">💛</span> para ti
+      </div>
+
+      <div class="nav-actions">
+        <button id="btn-instalar-app" class="btn-auth" style="display: none;">
+          <span class="btn-auth-icon">📲</span>
+          <span class="btn-auth-text">Instalar</span>
+        </button>
+
+        <button id="theme-toggle" class="theme-toggle" title="Cambiar tema" aria-label="Cambiar tema">
+          <span class="theme-icon">🌙</span>
+        </button>
+
+        <button id="btn-open-login" class="btn-auth">
+          <span class="btn-auth-icon">✨</span>
+          <span class="btn-auth-text">Entrar</span>
+        </button>
+
+        <div id="user-info" class="user-info" style="display: none;">
+          <button id="user-menu-toggle" class="user-pill" aria-haspopup="true" aria-expanded="false">
+            <span class="user-avatar">👤</span>
+            <span id="user-email" class="user-email"></span>
+            <span class="user-chevron">▾</span>
+          </button>
+
+          <div id="user-dropdown" class="user-dropdown" role="menu" aria-hidden="true">
+            <div class="user-dropdown-header">
+              <div class="user-dropdown-avatar">👤</div>
+              <div class="user-dropdown-info">
+                <span id="user-dropdown-name" class="user-dropdown-name"></span>
+                <span class="user-dropdown-role">Explorador de aventuras</span>
+              </div>
+            </div>
+
+            <div class="user-dropdown-divider"></div>
+
+            <a href="#inicio" class="user-dropdown-item" data-view-link="inicio">
+              <span class="user-dropdown-icon">🏠</span>
+              <span>Inicio</span>
+            </a>
+
+            <a href="#album" class="user-dropdown-item" data-view-link="album">
+              <span class="user-dropdown-icon">📸</span>
+              <span>Mi álbum de recuerdos</span>
+            </a>
+
+            <a href="#notas" class="user-dropdown-item" data-view-link="notas">
+              <span class="user-dropdown-icon">💌</span>
+              <span>Mis notitas</span>
+            </a>
+
+            <a href="#playlists" class="user-dropdown-item" data-view-link="playlists">
+              <span class="user-dropdown-icon">🎵</span>
+              <span>Mis playlists</span>
+            </a>
+
+            <div class="user-dropdown-divider"></div>
+
+            <button class="user-dropdown-item" type="button" data-action="perfil">
+              <span class="user-dropdown-icon">👤</span>
+              <span>Mi perfil</span>
+            </button>
+
+            <button class="user-dropdown-item" type="button" data-action="ajustes">
+              <span class="user-dropdown-icon">⚙️</span>
+              <span>Ajustes</span>
+            </button>
+            <button class="user-dropdown-item" type="button" data-action="amigos">
+              <span class="user-dropdown-icon">👥</span>
+              <span>Amigos y grupo</span>
+            </button>
+
+            <div class="user-dropdown-divider"></div>
+
+            <button id="logout-btn" class="user-dropdown-item user-dropdown-item-danger" type="button" data-action="logout">
+              <span class="user-dropdown-icon">↪</span>
+              <span>Salir</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- VISTA: INICIO -->
+    <div class="lobby view active" data-view="inicio">
+      <div class="lobby-content">
+        <p class="lobby-eyebrow">🌻 Bienvenido a</p>
+
+        <h1 class="lobby-title">
+          <span class="lobby-title-line">four</span>
+          <span class="lobby-title-line lobby-title-accent">Sunflowers</span>
+        </h1>
+
+        <p class="lobby-subtitle">A.A.V.C</p>
+        <p class="lobby-dedicatoria">Un rincón para guardar lo nuestro 🌻</p>
+
+        <nav class="lobby-menu">
+          <a href="#album" class="lobby-btn lobby-btn-primary" data-view-link="album">
+            <span class="lobby-btn-icon">📸</span>
+            <span class="lobby-btn-text">
+              <strong>Nuestras aventuras</strong>
+              <small>Ver el álbum de recuerdos</small>
+            </span>
+          </a>
+
+          <a href="#mapa" class="user-dropdown-item" data-view-link="mapa">
+            <span class="user-dropdown-icon">🗺️</span>
+            <span>Mapa de aventuras</span>
+          </a>
+          <a href="#chat" class="user-dropdown-item" data-view-link="chat">
+            <span class="user-dropdown-icon">💬</span>
+            <span>Chat privado</span>
+          </a>
+
+          <a href="#notas" class="lobby-btn" data-view-link="notas">
+            <span class="lobby-btn-icon">💌</span>
+            <span class="lobby-btn-text">
+              <strong>Notitas para ti</strong>
+              <small>Pensamientos que quiero guardar</small>
+            </span>
+          </a>
+
+          <a href="#playlists" class="lobby-btn" data-view-link="playlists">
+            <span class="lobby-btn-icon">🎵</span>
+            <span class="lobby-btn-text">
+              <strong>Nuestras Playlists</strong>
+              <small>Las canciones de nosotros</small>
+            </span>
+          </a>
+
+          <button class="lobby-btn" data-action="descargar" type="button">
+            <span class="lobby-btn-icon">📲</span>
+            <span class="lobby-btn-text">
+              <strong>Descargar la App</strong>
+              <small>Android, iOS o escritorio</small>
+            </span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="lobby-art">
+        <div class="girasol-wrapper">
+          <div class="burbuja">Te amo 💜🩵</div>
+          <img class="girasol" src="img/girasol.jpg" alt="girasol">
+        </div>
+      </div>
+    </div>
+
+    <audio id="pop" src="sounds/soundreality-pop-sound-423716.mp3" preload="auto"></audio>
+  </section>
+
+  <!-- VISTA: CHAT -->
+  <section id="chat" class="chat-section view" data-view="chat">
+    <div class="chat-header">
+      <h2 class="chat-title">Chat interno</h2>
+      <p class="chat-subtitle">Un rinconcito para escribirnos en tiempo real 💛</p>
+    </div>
+    <div class="chat-panel">
+      <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+      <p id="chat-status" class="chat-status">Conectando...</p>
+      <form id="chat-form" class="chat-form">
+        <input id="chat-input" maxlength="2000" autocomplete="off" placeholder="Escribe un mensaje..." required>
+        <button type="submit" class="btn-primary">Enviar 💌</button>
+      </form>
+      <button type="button" id="btn-enable-push" class="btn-secondary chat-push-btn">🔔 Activar notificaciones</button>
+    </div>
+  </section>
+
+  <!-- VISTA: MAPA -->
+  <section id="mapa" class="mapa-section view" data-view="mapa">
+    <div class="mapa-header">
+      <h2 class="mapa-title">Mapa de aventuras</h2>
+      <p class="mapa-subtitle">Todos los lugares donde hemos estado 💛</p>
+    </div>
+    <div id="aventuras-map" class="aventuras-map" aria-label="Mapa de recuerdos"></div>
+    <p id="mapa-empty" class="mapa-empty">Añade una foto con ubicación para verla aquí.</p>
+  </section>
+
+  <!-- VISTA: ÁLBUM -->
+  <section id="album" class="album-section view" data-view="album">
+    <div class="album-header">
+      <h2 class="album-title">Nuestro álbum de aventuras</h2>
+      <p class="album-subtitle">Cada foto guarda un momento que no queremos olvidar 💛</p>
+    </div>
+
+    <div class="album-actions">
+      <button id="btn-add-photo" class="btn-primary">
+        <span>+</span> Añadir un recuerdo
+      </button>
+    </div>
+
+    <div id="album-grid" class="album-grid"></div>
+
+    <div id="album-empty" class="album-empty">
+      <p>🌻 Aquí empieza nuestra historia.</p>
+      <p class="album-empty-hint">Aún no hay fotos. Sube la primera y empieza a llenar este rincón.</p>
+    </div>
+  </section>
+
+  <!-- VISTA: NOTITAS -->
+  <section id="notas" class="notas-section view" data-view="notas">
+    <div class="notas-header">
+      <h2 class="notas-title">Notitas para ti</h2>
+      <p class="notas-subtitle">Pensamientos que quiero guardar 💛</p>
+    </div>
+
+    <div class="notas-actions">
+      <button id="btn-add-nota" class="btn-primary">
+        <span>+</span> Añadir notita
+      </button>
+    </div>
+
+    <div id="notas-grid" class="notas-grid"></div>
+
+    <div id="notas-empty" class="notas-empty">
+      <p>💌 Aún no hay notitas guardadas.</p>
+      <p class="notas-empty-hint">Escribe la primera y empieza a llenar este rincón.</p>
+    </div>
+  </section>
+
+  <!-- VISTA: PLAYLISTS -->
+  <section id="playlists" class="playlists-section view" data-view="playlists">
+    <div class="playlists-header">
+      <h2 class="playlists-title">Nuestras playlists</h2>
+      <p class="playlists-subtitle">Las canciones que nos suenan a nosotros 🎵</p>
+    </div>
+
+    <div class="playlists-actions">
+      <button id="btn-add-playlist" class="btn-primary">
+        <span>+</span> Añadir playlist
+      </button>
+    </div>
+
+    <div id="playlists-grid" class="playlists-grid"></div>
+
+    <div id="playlists-empty" class="playlists-empty">
+      <p>🎧 Aún no hay playlists.</p>
+      <p class="playlists-empty-hint">Crea la primera y empieza a llenarla de canciones.</p>
+    </div>
+  </section>
+
+  <!-- MODAL AÑADIR NOTA -->
+  <div id="nota-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-nota-modal></div>
+    <div class="modal-content nota-modal-content" role="dialog" aria-modal="true" aria-labelledby="nota-modal-title">
+      <h3 id="nota-modal-title" class="modal-title">✨ Nueva notita</h3>
+
+      <form id="nota-form" class="modal-form">
+        <div class="nota-editor-layout">
+          <div class="nota-editor-fields">
+            <label class="form-field">
+              <span class="form-label">Título (opcional)</span>
+              <input type="text" id="nota-titulo" maxlength="50" placeholder="Un titulito...">
+            </label>
+
+            <label class="form-field">
+              <span class="form-label">Notita</span>
+              <textarea id="nota-contenido" rows="4" maxlength="300" placeholder="Escribe algo bonito..." required></textarea>
+            </label>
+
+            <div class="form-field">
+              <span class="form-label">Color</span>
+              <div class="color-picker">
+                <button type="button" class="color-option color-amarillo activo" data-color="amarillo" aria-label="Amarillo"></button>
+                <button type="button" class="color-option color-rosa" data-color="rosa" aria-label="Rosa"></button>
+                <button type="button" class="color-option color-lila" data-color="lila" aria-label="Lila"></button>
+                <button type="button" class="color-option color-menta" data-color="menta" aria-label="Menta"></button>
+                <button type="button" class="color-option color-cielo" data-color="cielo" aria-label="Cielo"></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="nota-preview-column">
+            <span class="form-label">Vista previa</span>
+            <div id="nota-preview" class="nota-preview" aria-live="polite" hidden></div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close-nota-modal>Mejor luego</button>
+          <button type="submit" class="btn-primary">Guardar notita 💌</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL AMIGOS Y GRUPO -->
+  <div id="friends-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-friends></div>
+    <div class="modal-content friends-modal-content" role="dialog" aria-modal="true" aria-labelledby="friends-modal-title">
+      <h3 id="friends-modal-title" class="modal-title">👥 Amigos y grupo</h3>
+      <p id="friends-group-name" class="friends-group-name"></p>
+      <form id="friend-search-form" class="friend-search-form">
+        <input id="friend-search-input" type="text" maxlength="20" placeholder="Buscar por nombre de usuario" autocomplete="off">
+        <button type="submit" class="btn-primary">Buscar</button>
+      </form>
+      <div id="friend-search-results" class="friend-list"></div>
+      <h4 class="friends-subtitle">Miembros</h4>
+      <div id="group-members-list" class="friend-list"></div>
+      <h4 class="friends-subtitle">Invitaciones recibidas</h4>
+      <div id="group-invites-list" class="friend-list"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" data-close-friends>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LOGIN -->
+  <div id="auth-modal" class="modal auth-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-auth></div>
+
+    <div class="auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+      <div class="auth-tape"></div>
+      <button class="auth-close" data-close-auth aria-label="Cerrar">×</button>
+      <div class="auth-flower">🌻</div>
+
+      <h2 id="auth-title" class="auth-title">Bienvenido</h2>
+      <p id="auth-subtitle" class="auth-subtitle">Inicia sesión para ver el álbum</p>
+
+      <form id="auth-form" class="auth-form">
+        <label class="auth-field">
+          <span class="auth-label">Usuario</span>
+          <input type="text" id="auth-username" placeholder="tu usuario" autocomplete="username" minlength="3" maxlength="20" required>
+        </label>
+
+        <label class="auth-field">
+          <span class="auth-label">Contraseña</span>
+          <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" autocomplete="current-password" minlength="6">
+        </label>
+
+        <label class="auth-field" id="confirm-password-field" style="display: none;">
+          <span class="auth-label">Repite la contraseña</span>
+          <input type="password" id="auth-password-confirm" placeholder="Repite tu contraseña" minlength="6">
+        </label>
+
+        <p id="auth-error" class="auth-error" style="display: none;"></p>
+
+        <button type="submit" id="auth-submit" class="btn-auth-submit">Entrar</button>
+      </form>
+
+      <p class="auth-toggle">
+        <span id="auth-toggle-text">¿Aún no tienes cuenta?</span>
+        <button type="button" id="auth-toggle-btn" class="auth-link">Crear cuenta</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- MODAL AÑADIR FOTO -->
+  <div id="photo-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-content photo-modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h3 id="modal-title" class="modal-title">✨ Nuevo recuerdo</h3>
+
+      <form id="photo-form" class="modal-form">
+        <div class="photo-editor-layout">
+          <div class="photo-editor-fields">
+            <label class="form-field">
+              <span class="form-label">La foto</span>
+              <input type="file" id="input-photo" accept="image/*" required>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label">¿Cuándo fue?</span>
+              <input type="date" id="input-date">
+            </label>
+
+            <label class="form-field">
+              <span class="form-label">¿Qué quieres recordar?</span>
+              <textarea id="input-note" rows="3" maxlength="200" placeholder="Cuéntame algo bonito de este momento..."></textarea>
+            </label>
+            <label class="form-field form-location-field">
+              <span class="form-label">Ubicación (opcional)</span>
+              <button type="button" id="btn-photo-location" class="btn-secondary">📍 Usar mi ubicación</button>
+              <small id="photo-location-status" class="photo-location-status">No se guardará hasta que tú lo elijas.</small>
+              <input type="hidden" id="input-lat">
+              <input type="hidden" id="input-lng">
+            </label>
+          </div>
+
+          <div class="photo-preview-column">
+            <span class="form-label">Vista previa</span>
+            <div id="photo-preview" class="photo-preview" aria-live="polite"></div>
+            <p id="photo-preview-info" class="photo-preview-info" hidden></p>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close-modal>Mejor luego</button>
+          <button type="submit" class="btn-primary">Guardar recuerdo 💛</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CREAR PLAYLIST -->
+  <div id="playlist-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-playlist-modal></div>
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <h3 class="modal-title">✨ Nueva playlist</h3>
+
+      <form id="playlist-form" class="modal-form">
+        <div class="form-field">
+          <span class="form-label">Emoji</span>
+          <div class="emoji-picker" id="emoji-picker">
+            <button type="button" class="emoji-option activo" data-emoji="🎵">🎵</button>
+            <button type="button" class="emoji-option" data-emoji="🎧">🎧</button>
+            <button type="button" class="emoji-option" data-emoji="💿">💿</button>
+            <button type="button" class="emoji-option" data-emoji="🎸">🎸</button>
+            <button type="button" class="emoji-option" data-emoji="🎤">🎤</button>
+            <button type="button" class="emoji-option" data-emoji="🎹">🎹</button>
+            <button type="button" class="emoji-option" data-emoji="💛">💛</button>
+            <button type="button" class="emoji-option" data-emoji="🌻">🌻</button>
+            <button type="button" class="emoji-option" data-emoji="✨">✨</button>
+            <button type="button" class="emoji-option" data-emoji="🌙">🌙</button>
+          </div>
+        </div>
+
+        <label class="form-field">
+          <span class="form-label">Nombre</span>
+          <input type="text" id="playlist-nombre" maxlength="40" placeholder="Nuestra playlist..." required>
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Descripción (opcional)</span>
+          <input type="text" id="playlist-descripcion" maxlength="80" placeholder="Para cuando...">
+        </label>
+
+        <div class="form-field">
+          <span class="form-label">Color</span>
+          <div class="color-picker">
+            <button type="button" class="color-option color-amarillo activo" data-color="amarillo"></button>
+            <button type="button" class="color-option color-rosa" data-color="rosa"></button>
+            <button type="button" class="color-option color-lila" data-color="lila"></button>
+            <button type="button" class="color-option color-menta" data-color="menta"></button>
+            <button type="button" class="color-option color-cielo" data-color="cielo"></button>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close-playlist-modal>Mejor luego</button>
+          <button type="submit" class="btn-primary">Guardar playlist 🎵</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CANCIONES -->
+  <div id="canciones-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-canciones-modal></div>
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <h3 id="canciones-modal-title" class="modal-title">🎵 Canciones</h3>
+      <p id="canciones-modal-desc" class="canciones-modal-desc"></p>
+
+      <div id="canciones-lista" class="canciones-lista"></div>
+
+      <div class="cancion-tabs" role="tablist">
+        <button type="button" class="cancion-tab active" data-tab="una" role="tab">
+          ➕ Una a una
+        </button>
+        <button type="button" class="cancion-tab" data-tab="pegar" role="tab">
+          📋 Pegar varias
+        </button>
+        <button type="button" class="cancion-tab" data-tab="subir" role="tab">
+          📁 Subir archivos
+        </button>
+      </div>
+
+      <div class="cancion-panel active" data-panel="una">
+        <form id="cancion-form" class="modal-form cancion-form">
+          <div class="cancion-form-row">
+            <input type="text" id="cancion-titulo" placeholder="Título de la canción" maxlength="60" required>
+            <input type="text" id="cancion-artista" placeholder="Artista (opcional)" maxlength="40">
+          </div>
+          <input type="url" id="cancion-url" placeholder="Link (Spotify / YouTube) — opcional">
+          <button type="submit" class="btn-primary">+ Añadir canción</button>
+        </form>
+      </div>
+
+      <div class="cancion-panel" data-panel="pegar">
+        <div class="cancion-pegar">
+          <p class="cancion-pegar-hint">
+            Pega tu lista, o carga un archivo (.txt, .csv, .m3u):
+          </p>
+
+          <pre class="cancion-pegar-ejemplos">Canción - Artista
+Artista - Canción
+1. Canción - Artista
+• Canción - Artista
+Canción (https://open.spotify.com/track/...)
+https://youtube.com/watch?v=...</pre>
+
+          <div class="cancion-pegar-cargar">
+            <input
+              type="file"
+              id="cancion-pegar-archivo"
+              accept=".txt,.csv,.m3u,.m3u8,text/plain"
+              multiple
+              hidden
+            >
+            <button type="button" id="btn-cargar-archivo" class="btn-secondary">
+              📁 Cargar archivo(s)
+            </button>
+            <span class="cancion-pegar-o">o arrastra aquí 👇</span>
+          </div>
+
+          <textarea
+            id="cancion-pegar-texto"
+            class="cancion-pegar-textarea"
+            placeholder="Pega aquí tus canciones, una por línea..."
+            rows="8"
+          ></textarea>
+
+          <div class="cancion-pegar-opciones">
+            <span class="form-label" style="margin: 0;">Orden:</span>
+            <label>
+              <input type="radio" name="pegar-orden" value="titulo-artista" checked>
+              Título - Artista
+            </label>
+            <label>
+              <input type="radio" name="pegar-orden" value="artista-titulo">
+              Artista - Título
+            </label>
+          </div>
+
+          <div id="cancion-pegar-preview" class="cancion-pegar-preview"></div>
+
+          <button type="button" id="btn-importar-canciones" class="btn-primary">
+            📥 Importar todas
+          </button>
+        </div>
+      </div>
+
+      <div class="cancion-panel" data-panel="subir">
+        <div class="cancion-subir">
+          <p class="cancion-pegar-hint">
+            Sube tus canciones (MP3, MP4, M4A, WAV, OGG, FLAC...). Máx. 50 MB por archivo.
+          </p>
+
+          <div class="cancion-subir-dropzone" id="cancion-subir-dropzone">
+            <div class="cancion-subir-icon">🎵</div>
+            <p class="cancion-subir-text">Arrastra aquí tus archivos</p>
+            <p class="cancion-subir-o">o</p>
+            <input
+              type="file"
+              id="cancion-subir-archivo"
+              accept="audio/*,video/mp4,.mp3,.mp4,.m4a,.wav,.ogg,.flac,.aac"
+              multiple
+              hidden
+            >
+            <button type="button" id="btn-seleccionar-archivos" class="btn-secondary">
+              📁 Seleccionar archivos
+            </button>
+          </div>
+
+          <div id="cancion-subir-lista" class="cancion-subir-lista"></div>
+
+          <button type="button" id="btn-subir-canciones" class="btn-primary" disabled>
+            ⬆️ Subir todas
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 1rem;">
+        <button type="button" class="btn-secondary" data-close-canciones-modal>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>Hecho con 💛 por <span class="firma">A.A.V.C</span></p>
+    <p class="site-footer-sub">Cada girasol guarda un pedacito de nosotros 🌻</p>
+  </footer>
+
+  <div id="loading-screen" class="loading-screen" aria-hidden="true">
+    <div class="loading-content">
+      <div class="loading-flower">🌻</div>
+      <p id="loading-text" class="loading-text">Entrando...</p>
+    </div>
+  </div>
+
+  <div id="mascota-wrapper" class="mascota-wrapper">
+    <div id="mascota-burbuja" class="mascota-burbuja"></div>
+
+    <div id="mascota" class="mascota" title="¡Hola! Soy tu mascota 💛">
+      <img id="mascota-img" class="mascota-img" src="img/mapache.png" alt="Mascota">
+
+      <button id="mascota-selector" class="mascota-selector" aria-label="Cambiar mascota" title="Cambiar mascota">
+        🔄
+      </button>
+    </div>
+
+    <div id="mascota-menu" class="mascota-menu" role="menu" aria-hidden="true">
+      <button class="mascota-opcion activa" data-mascota="mapache" type="button">
+        <span class="mascota-opcion-icono">🦝</span>
+        <span class="mascota-opcion-nombre">Mapache</span>
+      </button>
+      <button class="mascota-opcion" data-mascota="girasol" type="button">
+        <span class="mascota-opcion-icono">🌻</span>
+        <span class="mascota-opcion-nombre">Girasol</span>
+      </button>
+      <button class="mascota-opcion" data-mascota="gatito" type="button">
+        <span class="mascota-opcion-icono">🐱</span>
+        <span class="mascota-opcion-nombre">Armstrong</span>
+      </button>
+      <button class="mascota-opcion" data-mascota="hamburguesa" type="button">
+        <span class="mascota-opcion-icono">🍔</span>
+        <span class="mascota-opcion-nombre">Hamburguesa</span>
+      </button>
+      <button class="mascota-opcion" data-mascota="oveja" type="button">
+        <span class="mascota-opcion-icono">🐑</span>
+        <span class="mascota-opcion-nombre">Oveja</span>
+      </button>
+      <button class="mascota-opcion" data-mascota="pollito" type="button">
+        <span class="mascota-opcion-icono">🐤</span>
+        <span class="mascota-opcion-nombre">Pollito</span>
+      </button>
+      <button class="mascota-opcion" data-mascota="jirafa" type="button">
+        <span class="mascota-opcion-icono">🦒</span>
+        <span class="mascota-opcion-nombre">Jirafa</span>
+      </button>
+      <button class="mascota-opcion" data-mascota="unicornio" type="button">
+        <span class="mascota-opcion-icono">🦄</span>
+        <span class="mascota-opcion-nombre">Unicornio</span>
+      </button>
+      <button class="mascota-opcion" data-mascota="conejo" type="button">
+        <span class="mascota-opcion-icono">🐰</span>
+        <span class="mascota-opcion-nombre">Conejito</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================
+       BARRA DE REPRODUCTOR GLOBAL
+       Vive FUERA de las vistas para seguir sonando
+       ============================================ -->
+  <div id="player-bar" class="player-bar" aria-hidden="true">
+    <button id="player-close" class="player-close" title="Cerrar reproductor">×</button>
+
+    <div class="player-info">
+      <div class="player-cover">
+        <span id="player-cover-icon">🎵</span>
+      </div>
+      <div class="player-meta">
+        <span class="player-title" id="player-bar-title">—</span>
+        <span class="player-artist" id="player-bar-artist"></span>
+      </div>
+    </div>
+
+    <div class="player-controls">
+      <button id="player-shuffle" class="player-btn-sm" title="Aleatorio" aria-label="Aleatorio">🔀</button>
+      <button id="player-prev" class="player-btn" title="Anterior" aria-label="Anterior">⏮</button>
+      <button id="player-play" class="player-btn player-btn-play" title="Reproducir" aria-label="Reproducir">▶</button>
+      <button id="player-next" class="player-btn" title="Siguiente" aria-label="Siguiente">⏭</button>
+      <button id="player-repeat" class="player-btn-sm" title="Repetir" aria-label="Repetir">🔁</button>
+    </div>
+
+    <div class="player-progress">
+      <span class="player-time" id="player-current">0:00</span>
+      <input type="range" id="player-seek" class="player-seek" min="0" max="100" value="0" step="0.1">
+      <span class="player-time" id="player-duration">0:00</span>
+    </div>
+
+    <div class="player-volume">
+      <button id="player-volume-btn" class="player-btn-sm" title="Silenciar" aria-label="Silenciar">🔊</button>
+      <input type="range" id="player-volume" class="player-volume-slider" min="0" max="1" step="0.01" value="0.8">
+    </div>
+
+    <audio id="global-audio" preload="metadata"></audio>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+  <script src="album.js"></script>
+</body>
+</html>

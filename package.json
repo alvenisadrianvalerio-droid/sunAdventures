@@ -11,9 +11,12 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@capacitor/android": "^8.5.2"
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
+    "typescript": "^7.0.2",
     "web-push": "^3.6.7"
   }
 }

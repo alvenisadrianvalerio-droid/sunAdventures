@@ -1,2 +1,5 @@
 node_modules/
 .vapid-keys.txt
+android/.gradle/
+android/build/
+android/app/build/
