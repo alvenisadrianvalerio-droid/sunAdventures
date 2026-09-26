@@ -198,8 +198,8 @@ document.addEventListener("DOMContentLoaded", () => {
       frases: [
         "¡Hola! 🦄",
         "Soy mágico ✨",
-        "Mi cuerno brilla 🌟",
-        "Colores pastel por todas partes 🌈",
+        "Ay mis hielitos 🌟",
+        "Roaf, roaf 🌈",
         "¿Un deseo? 🪄",
         "Soy tierno y mágico 💜",
         "¡Abracadabra! 🎩",
