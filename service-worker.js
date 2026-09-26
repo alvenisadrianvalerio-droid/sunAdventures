@@ -2,7 +2,7 @@
    SERVICE WORKER — SunAdventures PWA
    ============================================ */
 
-const CACHE_NAME = "sunadventures-v4";
+const CACHE_NAME = "sunadventures-v5";
 
 const ARCHIVOS_CACHE = [
   "./",
