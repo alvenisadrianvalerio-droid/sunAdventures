@@ -888,8 +888,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (error) { alert("No se pudo enviar el mensaje: " + error.message); return; }
     chatInput.value = "";
     chatInput.focus();
-    supabase.functions.invoke("send-push", { body: { message: { ...mensaje, user_id: session.user.id } } })
-      .catch((error) => console.warn("No se pudo enviar push:", error));
+    const { error: pushError } = await supabase.functions.invoke("send-push", {
+      body: { message: { ...mensaje, user_id: session.user.id } },
+    });
+    if (pushError) {
+      console.warn("No se pudo enviar push:", pushError);
+      if (chatStatus) chatStatus.textContent = "Mensaje enviado; notificaciones pendientes de configurar.";
+    }
   });
 
   // ============================================
