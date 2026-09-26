@@ -1306,3 +1306,4 @@ body.light .user-dropdown-item.active {
   .nav-links { gap: 0.3rem; }
   .nav-link { width: 36px; height: 36px; }
 }
+.ui-icon { width: 1.2em; height: 1.2em; display: block; fill: none; }
