@@ -160,6 +160,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const friendSearchResults = document.getElementById("friend-search-results");
   const groupMembersList = document.getElementById("group-members-list");
   const groupInvitesList = document.getElementById("group-invites-list");
+  const settingsModal = document.getElementById("settings-modal");
+  const toggleCensura = document.getElementById("toggle-censura");
   const logrosGrid = document.getElementById("logros-grid");
   const logrosDesbloqueados = document.getElementById("logros-desbloqueados");
   const experienciaTitulo = document.getElementById("experiencia-titulo");
@@ -178,6 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let modoRegistro = false;
   let grupoActivo = null;
   let perfilActual = null;
+  const CENSURA_STORAGE_KEY = "sunadventures_censura_activa";
   let visitasConsecutivas = 0;
 
   let playlists = [];
@@ -436,6 +439,32 @@ document.addEventListener("DOMContentLoaded", () => {
     friendsModal.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
   }));
+
+  function abrirAjustes() {
+    if (!settingsModal) return;
+    toggleCensura.checked = localStorage.getItem(CENSURA_STORAGE_KEY) === "true";
+    settingsModal.classList.add("active");
+    settingsModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  settingsModal?.querySelectorAll("[data-close-settings]").forEach((elemento) => elemento.addEventListener("click", () => {
+    settingsModal.classList.remove("active");
+    settingsModal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }));
+  toggleCensura?.addEventListener("change", () => {
+    localStorage.setItem(CENSURA_STORAGE_KEY, String(toggleCensura.checked));
+  });
+
+  async function censurarMensaje(texto) {
+    if (localStorage.getItem(CENSURA_STORAGE_KEY) !== "true") return texto;
+    const respuesta = await fetch(`https://www.purgomalum.com/service/json?fill_char=*&text=${encodeURIComponent(texto)}`);
+    if (!respuesta.ok) throw new Error("La API de censura no está disponible");
+    const resultado = await respuesta.json();
+    if (typeof resultado.result !== "string") throw new Error("Respuesta inválida de la API de censura");
+    return resultado.result;
+  }
 
   friendSearchForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -898,11 +927,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   chatForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const contenido = chatInput?.value.trim();
-    if (!contenido) return;
+    const contenidoOriginal = chatInput?.value.trim();
+    if (!contenidoOriginal) return;
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { alert("Inicia sesión para escribir en el chat."); return; }
     chatInput.disabled = true;
+    let contenido;
+    try {
+      contenido = await censurarMensaje(contenidoOriginal);
+    } catch (error) {
+      chatInput.disabled = false;
+      if (chatStatus) chatStatus.textContent = "No se pudo revisar el mensaje. Inténtalo de nuevo.";
+      console.warn("Censura no disponible:", error);
+      return;
+    }
     const { data: mensaje, error } = await supabase.from("mensajes")
       .insert({ room_id: grupoActivo.id, grupo_id: grupoActivo.id, user_id: session.user.id, contenido })
       .select("id,user_id,contenido,created_at")
@@ -3445,7 +3483,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const action = item.dataset.action;
       switch (action) {
         case "perfil": alert("👤 Aquí irá tu perfil (próximamente)"); break;
-        case "ajustes": alert("⚙️ Aquí irán tus ajustes (próximamente)"); break;
+        case "ajustes": abrirAjustes(); break;
         case "estadisticas": alert("📊 Aquí verás tus estadísticas (próximamente)"); break;
         case "amigos": abrirAmigosModal(); break;
         case "logout": break;

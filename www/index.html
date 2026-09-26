@@ -394,6 +394,25 @@
     </div>
   </div>
 
+  <!-- MODAL AJUSTES -->
+  <div id="settings-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-settings></div>
+    <div class="modal-content settings-modal-content" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+      <h3 id="settings-modal-title" class="modal-title">⚙️ Ajustes</h3>
+      <label class="settings-toggle">
+        <input id="toggle-censura" type="checkbox">
+        <span>
+          <strong>Censurar malas palabras</strong>
+          <small>Revisa los mensajes antes de guardarlos en el chat.</small>
+        </span>
+      </label>
+      <p class="settings-note">La revisión solo se aplica a mensajes nuevos.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" data-close-settings>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL LOGIN -->
   <div id="auth-modal" class="modal auth-modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-auth></div>
