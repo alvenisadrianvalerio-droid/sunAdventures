@@ -413,12 +413,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ---------- Click en la mascota ----------
-    mascota.addEventListener("click", (e) => {
-      if (e.target !== mascotaImg && e.target !== mascotaSelector) return;
-      if (e.target === mascotaSelector || mascotaSelector.contains(e.target) || mascotaMenu?.contains(e.target)) {
-        return;
-      }
-
+    mascotaImg.addEventListener("click", (e) => {
       e.stopPropagation();
       const clicsKey = `mascota_clicks_${window._sunUserId || "local"}_${mascotaActual}`;
       const clicsMascota = Number(localStorage.getItem(clicsKey) || 0) + 1;
