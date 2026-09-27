@@ -1,10 +1,9 @@
 /* ============================================
-   SERVICE WORKER — SunAdventures PWA
+   SERVICE WORKER — SunAdventures
    ============================================ */
 
-const CACHE_NAME = "sunadventures-v6";
-
-const ARCHIVOS_CACHE = [
+const CACHE_NAME = "sunadventures-v5";   // ⬅️ subido por cambios de assets
+const ASSETS_ESTATICOS = [
   "./",
   "./index.html",
   "./styles.css",
@@ -12,31 +11,48 @@ const ARCHIVOS_CACHE = [
   "./script.js",
   "./album.js",
   "./manifest.json",
+  // Iconos UI
+  "./icons/ui-icons.svg",
+  "./icons/favicon-32.png",
+  "./icons/favicon-16.png",
+  "./icons/favicon.ico",
+  "./icons/apple-touch-icon.png",
   "./icons/icon-192.png",
-  "./icons/icon-512.png",
+  "./icons/paw.png",
+  // Imágenes clave
+  "./img/girasol.jpg",
   "./img/mapache.png",
-  "./four%20sunflower%20img/girasol.jpg",
+  "./img/mascota-girasol.png",
+  "./img/gatito.png",
+  "./img/hamburguesa.png",
+  "./img/oveja.png",
+  "./img/pollito.png",
+  "./img/jirafa.png",
+  "./img/unicornio.png",
+  "./img/conejito.png",
+  "./img/dragon-bebe.png",
+  "./img/dragon-anciano.png",
 ];
 
 // ---------- INSTALL ----------
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(ARCHIVOS_CACHE))
-      .catch((err) => console.warn("⚠️ Error cacheando:", err))
-  );
   self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.all(
+        ASSETS_ESTATICOS.map((url) =>
+          cache.add(url).catch((err) => console.warn("No se pudo cachear:", url, err))
+        )
+      )
+    )
+  );
 });
 
 // ---------- ACTIVATE ----------
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
-      )
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
     )
   );
   self.clients.claim();
@@ -44,58 +60,58 @@ self.addEventListener("activate", (event) => {
 
 // ---------- FETCH ----------
 self.addEventListener("fetch", (event) => {
-  const { request } = event;
-  if (request.method !== "GET") return;
+  const url = new URL(event.request.url);
 
-  const url = new URL(request.url);
-  if (
-    url.origin.includes("supabase.co") ||
-    url.origin.includes("jsdelivr.net") ||
-    url.origin.includes("unpkg.com")
-  ) {
-    return;   // no cachear Supabase ni CDN
-  }
+  // 🚫 Filtro 1: solo http/https (evita chrome-extension://, data:, etc.)
+  if (url.protocol !== "http:" && url.protocol !== "https:") return;
 
+  // 🚫 Filtro 2: solo GET
+  if (event.request.method !== "GET") return;
+
+  // 🚫 Filtro 3: no interceptar APIs externas
+  if (url.hostname.includes("supabase.co")) return;
+  if (url.hostname.includes("supabase.in")) return;
+  if (url.hostname.includes("unpkg.com")) return;
+  if (url.hostname.includes("jsdelivr.net")) return;
+  if (url.hostname.includes("openstreetmap.org")) return;
+  if (url.hostname.includes("googleapis.com")) return;
+  if (url.hostname.includes("gstatic.com")) return;
+  if (url.hostname.includes("purgomalum.com")) return;
+
+  // ✅ A partir de aquí, gestionamos la caché
   event.respondWith(
-    caches.match(request).then((cached) => {
+    (async () => {
+      const cached = await caches.match(event.request);
+
+      // HTML: red primero (para tener siempre la última versión)
+      if (event.request.destination === "document") {
+        try {
+          const red = await fetch(event.request);
+          if (red && red.status === 200) {
+            const clon = red.clone();
+            caches.open(CACHE_NAME).then((c) => c.put(event.request, clon)).catch(() => {});
+          }
+          return red;
+        } catch {
+          if (cached) return cached;
+          throw new Error("Sin conexión y sin caché");
+        }
+      }
+
+      // Resto: caché primero, red como fallback
       if (cached) return cached;
 
-      return fetch(request)
-        .then((response) => {
-          if (response && response.status === 200 && response.type === "basic") {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-          }
-          return response;
-        })
-        .catch(() => {
-          if (request.destination === "document") {
-            return caches.match("./index.html");
-          }
-        });
-    })
+      try {
+        const red = await fetch(event.request);
+        if (red && red.status === 200 && red.type === "basic") {
+          const clon = red.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(event.request, clon)).catch(() => {});
+        }
+        return red;
+      } catch (err) {
+        if (cached) return cached;
+        throw err;
+      }
+    })()
   );
-});
-
-self.addEventListener("push", (event) => {
-  let datos = { title: "SunAdventures", body: "Tienes una novedad 💛", url: "/#chat" };
-  try { if (event.data) datos = { ...datos, ...event.data.json() }; } catch { /* payload opcional */ }
-  event.waitUntil(
-    self.registration.showNotification(datos.title, {
-      body: datos.body,
-      icon: "./icons/icon-192.png",
-      badge: "./icons/icon-192.png",
-      data: { url: datos.url },
-    })
-  );
-});
-
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-  const url = event.notification.data?.url || "/#chat";
-  event.waitUntil(clients.matchAll({ type: "window", includeUncontrolled: true }).then((ventanas) => {
-    const abierta = ventanas.find((ventana) => "focus" in ventana);
-    if (abierta) { abierta.navigate(url); return abierta.focus(); }
-    return clients.openWindow(url);
-  }));
 });

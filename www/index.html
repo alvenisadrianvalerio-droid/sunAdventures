@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SunAdventures · Nuestro rincón</title>
-    <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
   <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
@@ -21,14 +20,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=5">
-  <link rel="stylesheet" href="album.css?v=11">
+  <link rel="stylesheet" href="styles.css?v=101">
+  <link rel="stylesheet" href="album.css?v=101">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
-  <meta name="description" content="Un rincón para guardar nuestros recuerdos con girasoles 🌻">
+  <meta name="description" content="Un rincón para guardar nuestros recuerdos con girasoles">
   <meta name="author" content="A.A.V.C">
 
-  <meta property="og:title" content="🌻 Four Sunflowers · Nuestro rincón">
+  <meta property="og:title" content=" Four Sunflowers · Nuestro rincón">
   <meta property="og:description" content="Un pedacito de nosotros en cada foto. Entra y descubre nuestras aventuras.">
   <meta property="og:image" content="img/girasol.jpg">
   <meta property="og:type" content="website">
@@ -37,6 +36,15 @@
   <meta name="twitter:title" content="🌻 Four Sunflowers">
   <meta name="twitter:description" content="Un pedacito de nosotros en cada foto.">
   <meta name="twitter:image" content="img/girasol.jpg">
+
+  <style>
+    /* 🛡️ Fail-safe: SVG nunca ocupan toda la pantalla aunque el CSS tarde */
+    svg { max-width: 100%; max-height: 100%; }
+    svg:not([width]):not([height]) { width: 1em; height: 1em; }
+    .nav-link svg, .ui-icon, .lobby-btn-icon svg, .btn-auth-icon svg { width: 1.2em; height: 1.2em; }
+    [data-view]:not(.active) { display: none !important; }
+    #loading-screen:not(.active) { display: none !important; }
+  </style>
 </head>
 <body>
 
@@ -52,57 +60,42 @@
           <svg class="ui-icon nav-link-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons/ui-icons.svg#photo"></use></svg>
           <span class="nav-link-text">Álbum</span>
         </a>
-        <a href="#mapa" class="nav-link" data-view-link="mapa">
-          <svg class="ui-icon nav-link-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons/ui-icons.svg#map"></use></svg>
-          <span class="nav-link-text">Mapa</span>
-        </a>
-        <a href="#chat" class="nav-link" data-view-link="chat">
-          <svg class="ui-icon nav-link-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons/ui-icons.svg#chat"></use></svg>
-          <span class="nav-link-text">Chat</span>
-        </a>
-        <a href="#logros" class="nav-link" data-view-link="logros">
-          <svg class="ui-icon nav-link-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons/ui-icons.svg#trophy"></use></svg>
-          <span class="nav-link-text">Logros</span>
-        </a>
-        <a href="#notas" class="nav-link" data-view-link="notas">
-          <svg class="ui-icon nav-link-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons/ui-icons.svg#note"></use></svg>
-          <span class="nav-link-text">Notitas</span>
-        </a>
-        <a href="#playlists" class="nav-link" data-view-link="playlists">
-          <svg class="ui-icon nav-link-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons/ui-icons.svg#music"></use></svg>
-          <span class="nav-link-text">Playlists</span>
+        <a href="#mascotas" class="nav-link" data-view-link="mascotas">
+          <svg class="ui-icon nav-link-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <circle cx="6" cy="9" r="2"/>
+            <circle cx="10" cy="6" r="2"/>
+            <circle cx="14" cy="6" r="2"/>
+            <circle cx="18" cy="9" r="2"/>
+            <path d="M12 13c-3 0-6 2-6 4 0 2 1.5 3 3 3s2-1 3-1 2 1 3 1 3-1 3-3c0-2-3-4-6-4z"/>
+          </svg>
+          <span class="nav-link-text">Mascotas</span>
         </a>
       </nav>
-
-      <div class="nav-message">
-        Hecho con <span class="nav-heart">💛</span> para ti
-      </div>
-
-      <div class="nav-actions">
-        <button id="btn-instalar-app" class="btn-auth" style="display: none;">
-          <span class="btn-auth-icon">📲</span>
-          <span class="btn-auth-text">Instalar</span>
-        </button>
-
         <button id="theme-toggle" class="theme-toggle" title="Cambiar tema" aria-label="Cambiar tema">
-          <span class="theme-icon">🌙</span>
+          <span class="theme-icon" aria-hidden="true"></span>
         </button>
 
         <button id="btn-open-login" class="btn-auth">
-          <span class="btn-auth-icon">✨</span>
+          <span class="btn-auth-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z"/><path d="M19 3l.7 2.8L22 6.5l-2.3.7L19 10l-.7-2.8L16 6.5l2.3-.7L19 3z" opacity=".7"/></svg>
+          </span>
           <span class="btn-auth-text">Entrar</span>
         </button>
 
         <div id="user-info" class="user-info" style="display: none;">
           <button id="user-menu-toggle" class="user-pill" aria-haspopup="true" aria-expanded="false">
-            <span class="user-avatar">👤</span>
+            <span class="user-avatar">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="width:1rem;height:1rem"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4 0-8 2-8 5v2h16v-2c0-3-4-5-8-5z"/></svg>
+            </span>
             <span id="user-email" class="user-email"></span>
             <span class="user-chevron">▾</span>
           </button>
 
           <div id="user-dropdown" class="user-dropdown" role="menu" aria-hidden="true">
             <div class="user-dropdown-header">
-              <div class="user-dropdown-avatar">👤</div>
+              <div class="user-dropdown-avatar">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="width:1.3rem;height:1.3rem"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4 0-8 2-8 5v2h16v-2c0-3-4-5-8-5z"/></svg>
+              </div>
               <div class="user-dropdown-info">
                 <span id="user-dropdown-name" class="user-dropdown-name"></span>
                 <span class="user-dropdown-role">Explorador de aventuras</span>
@@ -112,45 +105,74 @@
             <div class="user-dropdown-divider"></div>
 
             <a href="#inicio" class="user-dropdown-item" data-view-link="inicio">
-              <span class="user-dropdown-icon">🏠</span>
+              <span class="user-dropdown-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" style="width:1rem;height:1rem"><use href="icons/ui-icons.svg#home"></use></svg></span>
               <span>Inicio</span>
             </a>
 
             <a href="#album" class="user-dropdown-item" data-view-link="album">
-              <span class="user-dropdown-icon">📸</span>
-              <span>Mi álbum de recuerdos</span>
+              <span class="user-dropdown-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" style="width:1rem;height:1rem"><use href="icons/ui-icons.svg#photo"></use></svg></span>
+              <span>Mi álbum</span>
+            </a>
+
+            <a href="#mapa" class="user-dropdown-item" data-view-link="mapa">
+              <span class="user-dropdown-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" style="width:1rem;height:1rem"><use href="icons/ui-icons.svg#map"></use></svg></span>
+              <span>Mapa de aventuras</span>
+            </a>
+
+            <a href="#chat" class="user-dropdown-item" data-view-link="chat">
+              <span class="user-dropdown-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" style="width:1rem;height:1rem"><use href="icons/ui-icons.svg#chat"></use></svg></span>
+              <span>Chat</span>
+            </a>
+
+            <a href="#logros" class="user-dropdown-item" data-view-link="logros">
+              <span class="user-dropdown-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" style="width:1rem;height:1rem"><use href="icons/ui-icons.svg#trophy"></use></svg></span>
+              <span>Logros</span>
             </a>
 
             <a href="#notas" class="user-dropdown-item" data-view-link="notas">
-              <span class="user-dropdown-icon">💌</span>
-              <span>Mis notitas</span>
+              <span class="user-dropdown-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" style="width:1rem;height:1rem"><use href="icons/ui-icons.svg#note"></use></svg></span>
+              <span>Notitas</span>
             </a>
 
             <a href="#playlists" class="user-dropdown-item" data-view-link="playlists">
-              <span class="user-dropdown-icon">🎵</span>
-              <span>Mis playlists</span>
+              <span class="user-dropdown-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" style="width:1rem;height:1rem"><use href="icons/ui-icons.svg#music"></use></svg></span>
+              <span>Playlists</span>
+            </a>
+
+            <a href="#mascotas" class="user-dropdown-item" data-view-link="mascotas">
+              <span class="user-dropdown-icon">
+                <svg class="ui-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="width:1rem;height:1rem">
+                  <circle cx="6" cy="9" r="2"/>
+                  <circle cx="10" cy="6" r="2"/>
+                  <circle cx="14" cy="6" r="2"/>
+                  <circle cx="18" cy="9" r="2"/>
+                  <path d="M12 13c-3 0-6 2-6 4 0 2 1.5 3 3 3s2-1 3-1 2 1 3 1 3-1 3-3c0-2-3-4-6-4z"/>
+                </svg>
+              </span>
+              <span>Mascotas</span>
             </a>
 
             <div class="user-dropdown-divider"></div>
 
             <button class="user-dropdown-item" type="button" data-action="perfil">
-              <span class="user-dropdown-icon">👤</span>
+              <span class="user-dropdown-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="width:1rem;height:1rem"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4 0-8 2-8 5v2h16v-2c0-3-4-5-8-5z"/></svg></span>
               <span>Mi perfil</span>
             </button>
 
             <button class="user-dropdown-item" type="button" data-action="ajustes">
-              <span class="user-dropdown-icon">⚙️</span>
+              <span class="user-dropdown-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1rem;height:1rem"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
               <span>Ajustes</span>
             </button>
+
             <button class="user-dropdown-item" type="button" data-action="amigos">
-              <span class="user-dropdown-icon">👥</span>
+              <span class="user-dropdown-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="width:1rem;height:1rem"><path d="M16 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm-8 0a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3 0-6 1.5-6 4v2h8v-2c0-1 .4-1.9 1-2.7-.9-.2-1.9-.3-3-.3zm8 0c-1.1 0-2.1.1-3 .3.7.7 1 1.6 1 2.7v2h8v-2c0-2.5-3-4-6-4z"/></svg></span>
               <span>Amigos y grupo</span>
             </button>
 
             <div class="user-dropdown-divider"></div>
 
             <button id="logout-btn" class="user-dropdown-item user-dropdown-item-danger" type="button" data-action="logout">
-              <span class="user-dropdown-icon">↪</span>
+              <span class="user-dropdown-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:1rem;height:1rem"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></span>
               <span>Salir</span>
             </button>
           </div>
@@ -161,7 +183,20 @@
     <!-- VISTA: INICIO -->
     <div class="lobby view active" data-view="inicio">
       <div class="lobby-content">
-        <p class="lobby-eyebrow">🌻 Bienvenido a</p>
+        <p class="lobby-eyebrow">
+          <svg class="ui-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <circle cx="12" cy="12" r="2.5"/>
+            <ellipse cx="12" cy="5.5" rx="1.7" ry="2.4"/>
+            <ellipse cx="12" cy="18.5" rx="1.7" ry="2.4"/>
+            <ellipse cx="5.5" cy="12" rx="2.4" ry="1.7"/>
+            <ellipse cx="18.5" cy="12" rx="2.4" ry="1.7"/>
+            <ellipse cx="7.4" cy="7.4" rx="1.7" ry="2.4" transform="rotate(-45 7.4 7.4)"/>
+            <ellipse cx="16.6" cy="7.4" rx="1.7" ry="2.4" transform="rotate(45 16.6 7.4)"/>
+            <ellipse cx="7.4" cy="16.6" rx="1.7" ry="2.4" transform="rotate(45 7.4 16.6)"/>
+            <ellipse cx="16.6" cy="16.6" rx="1.7" ry="2.4" transform="rotate(-45 16.6 16.6)"/>
+          </svg>
+          Bienvenido a
+        </p>
 
         <h1 class="lobby-title">
           <span class="lobby-title-line">four</span>
@@ -169,14 +204,28 @@
         </h1>
 
         <p class="lobby-subtitle">A.A.V.C</p>
-        <p class="lobby-dedicatoria">Un rincón para guardar lo nuestro 🌻</p>
+        <p class="lobby-dedicatoria">
+          Un rincón para guardar lo nuestro
+          <svg class="ui-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <circle cx="12" cy="12" r="2.5"/>
+            <ellipse cx="12" cy="5.5" rx="1.7" ry="2.4"/>
+            <ellipse cx="12" cy="18.5" rx="1.7" ry="2.4"/>
+            <ellipse cx="5.5" cy="12" rx="2.4" ry="1.7"/>
+            <ellipse cx="18.5" cy="12" rx="2.4" ry="1.7"/>
+            <ellipse cx="7.4" cy="7.4" rx="1.7" ry="2.4" transform="rotate(-45 7.4 7.4)"/>
+            <ellipse cx="16.6" cy="7.4" rx="1.7" ry="2.4" transform="rotate(45 16.6 7.4)"/>
+            <ellipse cx="7.4" cy="16.6" rx="1.7" ry="2.4" transform="rotate(45 7.4 16.6)"/>
+            <ellipse cx="16.6" cy="16.6" rx="1.7" ry="2.4" transform="rotate(-45 16.6 16.6)"/>
+          </svg>
+        </p>
+
         <div class="experiencia-card" aria-live="polite">
           <div class="experiencia-topline">
             <span id="experiencia-titulo">Novatos 🌱</span>
             <strong id="experiencia-xp">0 XP</strong>
           </div>
           <div class="experiencia-barra"><span id="experiencia-progreso"></span></div>
-          <small id="experiencia-siguiente">100 XP para Enamorados 💛</small>
+          <small id="experiencia-siguiente">100 XP para Enamorados.</small>
         </div>
 
         <nav class="lobby-menu">
@@ -204,6 +253,22 @@
             </span>
           </a>
 
+          <a href="#mascotas" class="lobby-btn" data-view-link="mascotas">
+            <span class="lobby-btn-icon">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <circle cx="6" cy="9" r="2"/>
+                <circle cx="10" cy="6" r="2"/>
+                <circle cx="14" cy="6" r="2"/>
+                <circle cx="18" cy="9" r="2"/>
+                <path d="M12 13c-3 0-6 2-6 4 0 2 1.5 3 3 3s2-1 3-1 2 1 3 1 3-1 3-3c0-2-3-4-6-4z"/>
+              </svg>
+            </span>
+            <span class="lobby-btn-text">
+              <strong>Nuestras mascotas</strong>
+              <small>Las compañeras de nuestra historia</small>
+            </span>
+          </a>
+
           <button class="lobby-btn" data-action="descargar" type="button">
             <span class="lobby-btn-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons/ui-icons.svg#download"></use></svg></span>
             <span class="lobby-btn-text">
@@ -216,7 +281,7 @@
 
       <div class="lobby-art">
         <div class="girasol-wrapper">
-          <div class="burbuja">Te amo 💜🩵</div>
+          <div class="burbuja">Te amo.</div>
           <img class="girasol" src="img/girasol.jpg" alt="girasol">
         </div>
       </div>
@@ -229,16 +294,16 @@
   <section id="chat" class="chat-section view" data-view="chat">
     <div class="chat-header">
       <h2 class="chat-title">Chat interno</h2>
-      <p class="chat-subtitle">Un rinconcito para escribirnos en tiempo real 💛</p>
+      <p class="chat-subtitle">Un rinconcito para escribirnos en tiempo real</p>
     </div>
     <div class="chat-panel">
       <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
       <p id="chat-status" class="chat-status">Conectando...</p>
       <form id="chat-form" class="chat-form">
         <input id="chat-input" maxlength="2000" autocomplete="off" placeholder="Escribe un mensaje..." required>
-        <button type="submit" class="btn-primary">Enviar 💌</button>
+        <button type="submit" class="btn-primary">Enviar</button>
       </form>
-      <button type="button" id="btn-enable-push" class="btn-secondary chat-push-btn">🔔 Activar notificaciones</button>
+      <button type="button" id="btn-enable-push" class="btn-secondary chat-push-btn">Activar notificaciones</button>
     </div>
   </section>
 
@@ -246,7 +311,7 @@
   <section id="mapa" class="mapa-section view" data-view="mapa">
     <div class="mapa-header">
       <h2 class="mapa-title">Mapa de aventuras</h2>
-      <p class="mapa-subtitle">Todos los lugares donde hemos estado 💛</p>
+      <p class="mapa-subtitle">Todos los lugares donde hemos estado</p>
     </div>
     <div id="aventuras-map" class="aventuras-map" aria-label="Mapa de recuerdos"></div>
     <p id="mapa-empty" class="mapa-empty">Añade una foto con ubicación para verla aquí.</p>
@@ -256,7 +321,7 @@
   <section id="logros" class="logros-section view" data-view="logros">
     <div class="logros-header">
       <h2 class="logros-title">Logros desbloqueables</h2>
-      <p class="logros-subtitle">Cada pequeño recuerdo cuenta 🏆</p>
+      <p class="logros-subtitle">Cada pequeño recuerdo cuenta</p>
     </div>
     <div class="logros-resumen">
       <strong id="logros-desbloqueados">0</strong>
@@ -272,7 +337,7 @@
   <section id="album" class="album-section view" data-view="album">
     <div class="album-header">
       <h2 class="album-title">Nuestro álbum de aventuras</h2>
-      <p class="album-subtitle">Cada foto guarda un momento que no queremos olvidar 💛</p>
+      <p class="album-subtitle">Cada foto guarda un momento que no queremos olvidar.</p>
     </div>
 
     <div class="album-actions">
@@ -326,8 +391,23 @@
     <div id="playlists-grid" class="playlists-grid"></div>
 
     <div id="playlists-empty" class="playlists-empty">
-      <p>🎧 Aún no hay playlists.</p>
+      <p>Aún no hay playlists.</p>
       <p class="playlists-empty-hint">Crea la primera y empieza a llenarla de canciones.</p>
+    </div>
+  </section>
+
+  <!-- VISTA: MASCOTAS -->
+  <section id="mascotas" class="mascotas-section view" data-view="mascotas">
+    <div class="mascotas-header">
+      <h2 class="mascotas-title">Mis mascotas</h2>
+      <p class="mascotas-subtitle">Cada una guarda un pedacito de nuestra historia.</p>
+    </div>
+
+    <div class="mascotas-grid" id="mascotas-grid"></div>
+
+    <div id="mascotas-empty" class="mascotas-empty hidden">
+      <p>Aún no has desbloqueado ninguna mascota.</p>
+      <p class="mascotas-empty-hint">Gana XP, sube fotos y completa logros para desbloquear más.</p>
     </div>
   </section>
 
@@ -335,7 +415,7 @@
   <div id="nota-modal" class="modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-nota-modal></div>
     <div class="modal-content nota-modal-content" role="dialog" aria-modal="true" aria-labelledby="nota-modal-title">
-      <h3 id="nota-modal-title" class="modal-title">✨ Nueva notita</h3>
+      <h3 id="nota-modal-title" class="modal-title">Nueva notita</h3>
 
       <form id="nota-form" class="modal-form">
         <div class="nota-editor-layout">
@@ -370,7 +450,7 @@
 
         <div class="modal-actions">
           <button type="button" class="btn-secondary" data-close-nota-modal>Mejor luego</button>
-          <button type="submit" class="btn-primary">Guardar notita 💌</button>
+          <button type="submit" class="btn-primary">Guardar notita</button>
         </div>
       </form>
     </div>
@@ -380,7 +460,7 @@
   <div id="friends-modal" class="modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-friends></div>
     <div class="modal-content friends-modal-content" role="dialog" aria-modal="true" aria-labelledby="friends-modal-title">
-      <h3 id="friends-modal-title" class="modal-title">👥 Amigos y grupo</h3>
+      <h3 id="friends-modal-title" class="modal-title">Amigos y grupo</h3>
       <p id="friends-group-name" class="friends-group-name"></p>
       <form id="friend-search-form" class="friend-search-form">
         <input id="friend-search-input" type="text" maxlength="20" placeholder="Buscar por nombre de usuario" autocomplete="off">
@@ -401,7 +481,7 @@
   <div id="settings-modal" class="modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-settings></div>
     <div class="modal-content settings-modal-content" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
-      <h3 id="settings-modal-title" class="modal-title">⚙️ Ajustes</h3>
+      <h3 id="settings-modal-title" class="modal-title">Ajustes</h3>
       <label class="settings-toggle">
         <input id="toggle-censura" type="checkbox">
         <span>
@@ -423,7 +503,7 @@
     <div class="auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
       <div class="auth-tape"></div>
       <button class="auth-close" data-close-auth aria-label="Cerrar">×</button>
-      <div class="auth-flower">🌻</div>
+      <div class="auth-flower"></div>
 
       <h2 id="auth-title" class="auth-title">Bienvenido</h2>
       <p id="auth-subtitle" class="auth-subtitle">Inicia sesión para ver el álbum</p>
@@ -513,16 +593,12 @@
         <div class="form-field">
           <span class="form-label">Emoji</span>
           <div class="emoji-picker" id="emoji-picker">
-            <button type="button" class="emoji-option activo" data-emoji="🎵">🎵</button>
-            <button type="button" class="emoji-option" data-emoji="🎧">🎧</button>
-            <button type="button" class="emoji-option" data-emoji="💿">💿</button>
-            <button type="button" class="emoji-option" data-emoji="🎸">🎸</button>
-            <button type="button" class="emoji-option" data-emoji="🎤">🎤</button>
-            <button type="button" class="emoji-option" data-emoji="🎹">🎹</button>
-            <button type="button" class="emoji-option" data-emoji="💛">💛</button>
-            <button type="button" class="emoji-option" data-emoji="🌻">🌻</button>
-            <button type="button" class="emoji-option" data-emoji="✨">✨</button>
-            <button type="button" class="emoji-option" data-emoji="🌙">🌙</button>
+            <button type="button" class="emoji-option activo" data-emoji="music" aria-label="Música">♪</button>
+            <button type="button" class="emoji-option" data-emoji="note" aria-label="Nota">♫</button>
+            <button type="button" class="emoji-option" data-emoji="sparkle" aria-label="Brillo">✦</button>
+            <button type="button" class="emoji-option" data-emoji="sunflower" aria-label="Girasol">✿</button>
+            <button type="button" class="emoji-option" data-emoji="heart" aria-label="Corazón">♥</button>
+            <button type="button" class="emoji-option" data-emoji="calendar" aria-label="Calendario">▦</button>
           </div>
         </div>
 
@@ -565,15 +641,9 @@
       <div id="canciones-lista" class="canciones-lista"></div>
 
       <div class="cancion-tabs" role="tablist">
-        <button type="button" class="cancion-tab active" data-tab="una" role="tab">
-          ➕ Una a una
-        </button>
-        <button type="button" class="cancion-tab" data-tab="pegar" role="tab">
-          📋 Pegar varias
-        </button>
-        <button type="button" class="cancion-tab" data-tab="subir" role="tab">
-          📁 Subir archivos
-        </button>
+        <button type="button" class="cancion-tab active" data-tab="una" role="tab">➕ Una a una</button>
+        <button type="button" class="cancion-tab" data-tab="pegar" role="tab">📋 Pegar varias</button>
+        <button type="button" class="cancion-tab" data-tab="subir" role="tab">📁 Subir archivos</button>
       </div>
 
       <div class="cancion-panel active" data-panel="una">
@@ -589,9 +659,7 @@
 
       <div class="cancion-panel" data-panel="pegar">
         <div class="cancion-pegar">
-          <p class="cancion-pegar-hint">
-            Pega tu lista, o carga un archivo (.txt, .csv, .m3u):
-          </p>
+          <p class="cancion-pegar-hint">Pega tu lista, o carga un archivo (.txt, .csv, .m3u):</p>
 
           <pre class="cancion-pegar-ejemplos">Canción - Artista
 Artista - Canción
@@ -601,25 +669,12 @@ Canción (https://open.spotify.com/track/...)
 https://youtube.com/watch?v=...</pre>
 
           <div class="cancion-pegar-cargar">
-            <input
-              type="file"
-              id="cancion-pegar-archivo"
-              accept=".txt,.csv,.m3u,.m3u8,text/plain"
-              multiple
-              hidden
-            >
-            <button type="button" id="btn-cargar-archivo" class="btn-secondary">
-              📁 Cargar archivo(s)
-            </button>
+            <input type="file" id="cancion-pegar-archivo" accept=".txt,.csv,.m3u,.m3u8,text/plain" multiple hidden>
+            <button type="button" id="btn-cargar-archivo" class="btn-secondary">📁 Cargar archivo(s)</button>
             <span class="cancion-pegar-o">o arrastra aquí 👇</span>
           </div>
 
-          <textarea
-            id="cancion-pegar-texto"
-            class="cancion-pegar-textarea"
-            placeholder="Pega aquí tus canciones, una por línea..."
-            rows="8"
-          ></textarea>
+          <textarea id="cancion-pegar-texto" class="cancion-pegar-textarea" placeholder="Pega aquí tus canciones, una por línea..." rows="8"></textarea>
 
           <div class="cancion-pegar-opciones">
             <span class="form-label" style="margin: 0;">Orden:</span>
@@ -635,39 +690,25 @@ https://youtube.com/watch?v=...</pre>
 
           <div id="cancion-pegar-preview" class="cancion-pegar-preview"></div>
 
-          <button type="button" id="btn-importar-canciones" class="btn-primary">
-            📥 Importar todas
-          </button>
+          <button type="button" id="btn-importar-canciones" class="btn-primary">📥 Importar todas</button>
         </div>
       </div>
 
       <div class="cancion-panel" data-panel="subir">
         <div class="cancion-subir">
-          <p class="cancion-pegar-hint">
-            Sube tus canciones (MP3, MP4, M4A, WAV, OGG, FLAC...). Máx. 50 MB por archivo.
-          </p>
+          <p class="cancion-pegar-hint">Sube tus canciones (MP3, MP4, M4A, WAV, OGG, FLAC...). Máx. 50 MB por archivo.</p>
 
           <div class="cancion-subir-dropzone" id="cancion-subir-dropzone">
             <div class="cancion-subir-icon">🎵</div>
             <p class="cancion-subir-text">Arrastra aquí tus archivos</p>
             <p class="cancion-subir-o">o</p>
-            <input
-              type="file"
-              id="cancion-subir-archivo"
-              accept="audio/*,video/mp4,.mp3,.mp4,.m4a,.wav,.ogg,.flac,.aac"
-              multiple
-              hidden
-            >
-            <button type="button" id="btn-seleccionar-archivos" class="btn-secondary">
-              📁 Seleccionar archivos
-            </button>
+            <input type="file" id="cancion-subir-archivo" accept="audio/*,video/mp4,.mp3,.mp4,.m4a,.wav,.ogg,.flac,.aac" multiple hidden>
+            <button type="button" id="btn-seleccionar-archivos" class="btn-secondary">📁 Seleccionar archivos</button>
           </div>
 
           <div id="cancion-subir-lista" class="cancion-subir-lista"></div>
 
-          <button type="button" id="btn-subir-canciones" class="btn-primary" disabled>
-            ⬆️ Subir todas
-          </button>
+          <button type="button" id="btn-subir-canciones" class="btn-primary" disabled>⬆️ Subir todas</button>
         </div>
       </div>
 
@@ -678,73 +719,28 @@ https://youtube.com/watch?v=...</pre>
   </div>
 
   <footer class="site-footer">
-    <p>Hecho con 💛 por <span class="firma">A.A.V.C</span></p>
-    <p class="site-footer-sub">Cada girasol guarda un pedacito de nosotros 🌻</p>
+    <p>Hecho con
+      <span class="nav-heart" aria-label="amor">
+        <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </span>
+      por <span class="firma">A.A.V.C</span>
+    </p>
+    <p class="site-footer-sub">Cada girasol guarda un pedacito de nosotros
+      <svg class="ui-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="2.5"/><ellipse cx="12" cy="5.5" rx="1.7" ry="2.4"/><ellipse cx="12" cy="18.5" rx="1.7" ry="2.4"/><ellipse cx="5.5" cy="12" rx="2.4" ry="1.7"/><ellipse cx="18.5" cy="12" rx="2.4" ry="1.7"/><ellipse cx="7.4" cy="7.4" rx="1.7" ry="2.4" transform="rotate(-45 7.4 7.4)"/><ellipse cx="16.6" cy="7.4" rx="1.7" ry="2.4" transform="rotate(45 16.6 7.4)"/><ellipse cx="7.4" cy="16.6" rx="1.7" ry="2.4" transform="rotate(45 7.4 16.6)"/><ellipse cx="16.6" cy="16.6" rx="1.7" ry="2.4" transform="rotate(-45 16.6 16.6)"/></svg>
+    </p>
   </footer>
 
   <div id="loading-screen" class="loading-screen" aria-hidden="true">
     <div class="loading-content">
-      <div class="loading-flower">🌻</div>
+      <div class="loading-flower">
+        <img src="img/girasol-loading.png" alt="" aria-hidden="true">
+      </div>
       <p id="loading-text" class="loading-text">Entrando...</p>
-    </div>
-  </div>
-
-  <div id="logro-toast" class="logro-toast" role="status" aria-live="polite" aria-atomic="true"></div>
-
-  <div id="mascota-wrapper" class="mascota-wrapper">
-    <div id="mascota-burbuja" class="mascota-burbuja"></div>
-
-    <div id="mascota" class="mascota" title="¡Hola! Soy tu mascota 💛">
-      <img id="mascota-img" class="mascota-img" src="img/mapache.png" alt="Mascota">
-
-      <button id="mascota-selector" class="mascota-selector" aria-label="Cambiar mascota" title="Cambiar mascota">
-        🔄
-      </button>
-    </div>
-
-    <div id="mascota-menu" class="mascota-menu" role="menu" aria-hidden="true">
-      <button class="mascota-opcion activa" data-mascota="mapache" type="button">
-        <span class="mascota-opcion-icono">🦝</span>
-        <span class="mascota-opcion-nombre">Mapache</span>
-      </button>
-      <button class="mascota-opcion" data-mascota="girasol" type="button">
-        <span class="mascota-opcion-icono">🌻</span>
-        <span class="mascota-opcion-nombre">Girasol</span>
-      </button>
-      <button class="mascota-opcion" data-mascota="gatito" type="button">
-        <span class="mascota-opcion-icono">🐱</span>
-        <span class="mascota-opcion-nombre">Armstrong</span>
-      </button>
-      <button class="mascota-opcion" data-mascota="hamburguesa" type="button">
-        <span class="mascota-opcion-icono">🍔</span>
-        <span class="mascota-opcion-nombre">Hamburguesa</span>
-      </button>
-      <button class="mascota-opcion" data-mascota="oveja" type="button">
-        <span class="mascota-opcion-icono">🐑</span>
-        <span class="mascota-opcion-nombre">Oveja</span>
-      </button>
-      <button class="mascota-opcion" data-mascota="pollito" type="button">
-        <span class="mascota-opcion-icono">🐤</span>
-        <span class="mascota-opcion-nombre">Pollito</span>
-      </button>
-      <button class="mascota-opcion" data-mascota="jirafa" type="button">
-        <span class="mascota-opcion-icono">🦒</span>
-        <span class="mascota-opcion-nombre">Jirafa</span>
-      </button>
-      <button class="mascota-opcion" data-mascota="unicornio" type="button">
-        <span class="mascota-opcion-icono">🦄</span>
-        <span class="mascota-opcion-nombre">Unicornio</span>
-      </button>
-      <button class="mascota-opcion" data-mascota="conejo" type="button">
-        <span class="mascota-opcion-icono">🐰</span>
-        <span class="mascota-opcion-nombre">Conejito</span>
-      </button>
     </div>
   </div>
 
   <!-- ============================================
        BARRA DE REPRODUCTOR GLOBAL
-       Vive FUERA de las vistas para seguir sonando
        ============================================ -->
   <div id="player-bar" class="player-bar" aria-hidden="true">
     <button id="player-close" class="player-close" title="Cerrar reproductor">×</button>
@@ -781,6 +777,19 @@ https://youtube.com/watch?v=...</pre>
     <audio id="global-audio" preload="metadata"></audio>
   </div>
 
+  <!-- ============================================
+       MASCOTA VIRTUAL FLOTANTE (ÚNICA)
+       ============================================ -->
+  <div class="mascota-wrapper" id="mascota-wrapper">
+    <div class="mascota" id="mascota" role="img" aria-label="Tu mascota">
+      <img class="mascota-img" id="mascota-img" src="img/mapache.png" alt="Mapache">
+      <div class="mascota-burbuja" id="mascota-burbuja" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <!-- ============================================
+       SCRIPTS
+       ============================================ -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="script.js"></script>
