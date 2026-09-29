@@ -85,10 +85,22 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     } catch { return { atkBonus: 0, defBonus: 0, hpBonus: 0 }; }
   };
 
-  /* ---------- Fórmulas de combate ---------- */
-  const hpMax        = () => 80 + state.nivel * 20 + (statsLoot().hpBonus  || 0);
-  const atkTotal     = () => state.statsBase.atk + state.nivel * 3 + (statsLoot().atkBonus || 0);
-  const defTotal     = () => state.statsBase.def + state.nivel * 2 + (statsLoot().defBonus || 0);
+  /* ---------- Bonus de skins de la tienda ---------- */
+  function bonusSkins() {
+    try { return window._getBonusActivos ? window._getBonusActivos() : []; } catch(e) { return []; }
+  }
+  function getBonusTipo(tipo) {
+    const b = bonusSkins().find(function(x) { return x.tipo === tipo; });
+    return b ? b.val : 0;
+  }
+  function tieneBonusTipo(tipo) {
+    return bonusSkins().some(function(x) { return x.tipo === tipo; });
+  }
+
+  /* ---------- Formulas de combate ---------- */
+  const hpMax        = () => 80 + state.nivel * 20 + (statsLoot().hpBonus  || 0) + getBonusTipo("hp_max");
+  const atkTotal     = () => state.statsBase.atk + state.nivel * 3 + (statsLoot().atkBonus || 0) + getBonusTipo("atk_fijo");
+  const defTotal     = () => state.statsBase.def + state.nivel * 2 + (statsLoot().defBonus || 0) + getBonusTipo("def_fijo");
   const xpParaSubir  = () => state.nivel * 100;
 
   /* ---------- Variables mutables ---------- */
@@ -351,18 +363,41 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     turnoJugador = false;
     deshabilitarAcciones(true);
 
-    const critico = Math.random() < 0.15;
+    // Critico base + bonus de gafas/monoculo/gafas3d
+    const critBase = 0.15 + getBonusTipo("crit_pct") / 100;
+    const critico = Math.random() < critBase;
     let daño = atkTotal() - rnd(2, 6);
     if (critico) daño = Math.round(daño * 1.8);
-    daño = Math.max(1, daño);
 
+    // Bonus sombrero: +20% daño a jefes
+    if (enemigo.jefe && tieneBonusTipo("crit_jefe")) {
+      daño = Math.round(daño * (1 + getBonusTipo("crit_jefe") / 100));
+    }
+
+    // Fondo fuego: daño extra de quemadura
+    const fuego = getBonusTipo("fuego_atk");
+    if (fuego > 0) daño += rnd(0, fuego);
+
+    daño = Math.max(1, daño);
     enemigo.hp = Math.max(0, enemigo.hp - daño);
     SND(critico ? "victoria" : "atrapado");
-    log(`${critico ? "¡CRÍTICO! " : ""}Atacas por ${daño} daño.`, critico ? "critico" : "daño");
-    floatDamage("#sprite-enemigo", `-${daño}`, critico ? "critico" : "daño");
+    log((critico ? "¡CRÍTICO! " : "") + "Atacas por " + daño + " daño." + (fuego > 0 ? " 🔥" : ""), critico ? "critico" : "daño");
+    floatDamage("#sprite-enemigo", "-" + daño, critico ? "critico" : "daño");
     qs("#sprite-enemigo")?.classList.add("golpeado");
     setTimeout(() => qs("#sprite-enemigo")?.classList.remove("golpeado"), 350);
     actualizarHPs();
+
+    // Chispas: stun al enemigo (salta su siguiente turno)
+    if (getBonusTipo("stun_pct") > 0 && Math.random() < getBonusTipo("stun_pct") / 100) {
+      log("⚡ ¡Enemigo aturdido! Pierde su turno.", "critico");
+      if (enemigo.hp > 0) {
+        setTimeout(function() {
+          turnoJugador = true;
+          deshabilitarAcciones(false);
+        }, 600);
+        return;
+      }
+    }
 
     if (enemigo.hp <= 0) { setTimeout(victoria, 500); return; }
     setTimeout(turnoEnemigo, 800);
@@ -370,13 +405,35 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
   function turnoEnemigo() {
     if (!enemigo) return;
+
+    // Regen de la diadema al inicio del turno enemigo (antes de recibir daño)
+    const regen = getBonusTipo("regen_turno");
+    if (regen > 0) {
+      const antes = state.hp;
+      state.hp = Math.min(hpMax(), state.hp + regen);
+      const curado = Math.round(state.hp - antes);
+      if (curado > 0) log("💚 Regeneras " + curado + " HP.", "curar");
+    }
+
+    // Gafas: esquivar el ataque
+    const esquivar = getBonusTipo("esquivar") / 100;
+    if (esquivar > 0 && Math.random() < esquivar) {
+      log("😎 ¡Esquivaste el ataque!", "curar");
+      floatDamage("#sprite-heroe", "¡ESQUIVA!", "curar");
+      guardar(state);
+      actualizarHPs();
+      turnoJugador = true;
+      deshabilitarAcciones(false);
+      return;
+    }
+
     const daño = Math.max(1, enemigo.atk - defTotal() + rnd(-3, 3));
     state.hp = Math.max(0, state.hp - daño);
     guardar(state);
 
     SND("derrota");
-    log(`${enemigo.nombre} te ataca por ${daño} daño.`, "daño");
-    floatDamage("#sprite-heroe", `-${daño}`, "daño");
+    log(enemigo.nombre + " te ataca por " + daño + " daño.", "daño");
+    floatDamage("#sprite-heroe", "-" + daño, "daño");
     qs("#sprite-heroe")?.classList.add("golpeado");
     setTimeout(() => qs("#sprite-heroe")?.classList.remove("golpeado"), 350);
     actualizarHPs();
@@ -386,86 +443,133 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     deshabilitarAcciones(false);
   }
 
-  function toggleObjetos() {
-    if (!turnoJugador) return;
-    overlayObjetos = !overlayObjetos;
-    const wrap = $("rpg-objetos-wrap");
-    if (!wrap) return;
+ function toggleObjetos() {
+  if (!turnoJugador) return;
+  overlayObjetos = !overlayObjetos;
+  const wrap = $("rpg-objetos-wrap");
+  if (!wrap) return;
 
-    if (!overlayObjetos) { wrap.innerHTML = ""; return; }
+  if (!overlayObjetos) { wrap.innerHTML = ""; return; }
 
-    const inv = cargarInv();
-    const lista = Object.entries(COMIDAS).filter(([id]) => (inv[id] || 0) > 0);
+  const inv       = cargarInv();
+  const comidas   = Object.entries(COMIDAS).filter(([id]) => (inv[id] || 0) > 0);
+  const RpgLoot   = window.RpgLoot;
+  const consum    = RpgLoot?.getConsumibles?.() || [];
+  const lootInv   = RpgLoot?.cargarLoot?.() || {};
 
-    if (!lista.length) {
-      wrap.innerHTML = `<div class="rpg-objetos"><div style="grid-column:1/-1;text-align:center;opacity:.6;font-style:italic;padding:.5rem;">No tienes objetos</div></div>`;
-      return;
-    }
+  if (!comidas.length && !consum.length) {
+    wrap.innerHTML = `<div class="rpg-objetos">
+      <div style="grid-column:1/-1;text-align:center;opacity:.6;font-style:italic;padding:.5rem;">
+        No tienes objetos
+      </div></div>`;
+    return;
+  }
 
-    wrap.innerHTML = `
-      <div class="rpg-objetos">
-        ${lista.map(([id, c]) => `
-          <button type="button" class="rpg-objeto" data-comida="${id}" title="${c.nombre}">
-            <span class="rpg-objeto-icono">${ICONO[c.icono] || ""}</span>
+  wrap.innerHTML = `
+    <div class="rpg-objetos">
+      ${comidas.map(([id, c]) => {
+        let iconoHtml = ICONO[c.icono] || "";
+        if (Array.isArray(c.sprite) && c.sprite.length === 2) {
+          const posX = (c.sprite[0] / 4) * 100;
+          const posY = (c.sprite[1] / 4) * 100;
+          iconoHtml = `<div class="tienda-item-sprite" style="width:28px;height:28px;background-position:${posX}% ${posY}%"></div>`;
+        }
+        return `
+          <button type="button" class="rpg-objeto" data-tipo="comida" data-id="${id}" title="${c.nombre}">
+            <span class="rpg-objeto-icono">${iconoHtml}</span>
             <span class="rpg-objeto-cantidad">${inv[id]}</span>
           </button>
-        `).join("")}
-      </div>
-    `;
-    if (typeof window.hidratarIconos === "function") window.hidratarIconos(wrap);
-    qsa(".rpg-objeto", wrap).forEach(b => b.addEventListener("click", () => usarObjeto(b.dataset.comida)));
-  }
+        `;
+      }).join("")}
+      ${consum.map(item => {
+        const cant = lootInv[item.id] || 0;
+        const iconHtml = RpgLoot?.renderIcono ? RpgLoot.renderIcono(item, "30px") : `<span class="loot-icono" data-icono="${item.icono}"></span>`;
+        return `
+          <button type="button" class="rpg-objeto rar-${item.rar}"
+                  data-tipo="loot" data-id="${item.id}" title="${item.nombre}">
+            <span class="rpg-objeto-icono">${iconHtml}</span>
+            <span class="rpg-objeto-cantidad">${cant}</span>
+          </button>
+        `;
+      }).join("")}
+    </div>
+  `;
 
-  function usarObjeto(id) {
-    if (!turnoJugador || !enemigo) return;
-    const inv = cargarInv();
-    if (!inv[id] || inv[id] <= 0) return;
-    const c = COMIDAS[id];
-    if (!c) return;
+  if (typeof window.hidratarIconos === "function") window.hidratarIconos(wrap);
 
-    inv[id]--; guardarInv(inv);
+  qsa(".rpg-objeto", wrap).forEach(b => b.addEventListener("click", () => {
+    if (b.dataset.tipo === "comida") usarObjeto(b.dataset.id);
+    else usarLootConsumible(b.dataset.id);
+  }));
+}
 
-    const curacion = Math.round((c.efecto.hambre + c.efecto.felicidad / 2) * (1 + state.nivel * 0.05));
-    state.hp = clamp(state.hp + curacion, 0, hpMax());
+function usarLootConsumible(id) {
+  if (!turnoJugador || !enemigo) return;
+  const RpgLoot = window.RpgLoot;
+  if (!RpgLoot?.usarConsumible) return;
+
+  const item = RpgLoot.POOL.find(p => p.id === id);
+  if (!item) return;
+
+  const ok = RpgLoot.usarConsumible(id);
+  if (!ok) return;
+
+  let consumido = true;
+
+  if (item.tipo === "hp") {
+    const antes = state.hp;
+    state.hp = clamp(state.hp + item.val, 0, hpMax());
     guardar(state);
     SND("comer");
-    log(`Usas ${c.nombre}. +${curacion} HP.`, "curar");
-    floatDamage("#sprite-heroe", `+${curacion}`, "curar");
+    log(`Usas ${item.nombre}. +${Math.round(state.hp - antes)} HP.`, "curar");
+    floatDamage("#sprite-heroe", `+${Math.round(state.hp - antes)}`, "curar");
     actualizarHPs();
-
-    overlayObjetos = false;
-    const wrap = $("rpg-objetos-wrap"); if (wrap) wrap.innerHTML = "";
-    turnoJugador = false;
-    deshabilitarAcciones(true);
-    setTimeout(turnoEnemigo, 700);
+  } else if (item.tipo === "atk") {
+    enemigo.hp = Math.max(0, enemigo.hp - item.val);
+    SND("sparkle");
+    log(`¡Lanzas ${item.nombre}! ${item.val} de daño.`, "critico");
+    floatDamage("#sprite-enemigo", `-${item.val}`, "critico");
+    actualizarHPs();
+  } else if (item.tipo === "def") {
+    const antes = state.hp;
+    state.hp = clamp(state.hp + item.val * 3, 0, hpMax());
+    guardar(state);
+    SND("comer");
+    log(`Usas ${item.nombre}. +${Math.round(state.hp - antes)} HP.`, "curar");
+    floatDamage("#sprite-heroe", `+${Math.round(state.hp - antes)}`, "curar");
+    actualizarHPs();
   }
 
-  function huir() {
-    if (!turnoJugador) return;
-    const exito = Math.random() < (enemigo.jefe ? 0.25 : 0.7);
-    if (exito) {
-      SND("blip");
-      log("Escapas del combate.", "info");
-      setTimeout(() => { enemigo = null; render(); }, 600);
-    } else {
-      SND("derrota");
-      log("¡No pudiste escapar!", "daño");
-      turnoJugador = false;
-      deshabilitarAcciones(true);
-      setTimeout(turnoEnemigo, 700);
-    }
-  }
+  overlayObjetos = false;
+  const w = $("rpg-objetos-wrap"); if (w) w.innerHTML = "";
+  turnoJugador = false;
+  deshabilitarAcciones(true);
 
+  if (enemigo.hp <= 0) setTimeout(victoria, 500);
+  else setTimeout(turnoEnemigo, 700);
+}
   /* ============================================================
      VICTORIA / DERROTA
      ============================================================ */
   function victoria() {
     if (!enemigo) return;
-    const { xp, monedas, jefe: eraJefe, nombre: nombreE } = enemigo;
+    const eraJefe = enemigo.jefe;
+    const nombreE = enemigo.nombre;
+    let xp = enemigo.xp;
+    let monedas = enemigo.monedas;
+
+    // Bonus de skins: XP extra
+    const xpBonusPct = getBonusTipo("xp_extra") / 100;
+    if (xpBonusPct > 0) xp = Math.round(xp * (1 + xpBonusPct));
+
+    // Bonus de skins: monedas extra
+    monedas += getBonusTipo("monedas_victoria");
 
     // Disparar evento ANTES de resetear (rpg-loot.js lo escucha)
+    // Collar: doble probabilidad de loot
+    const lootExtra = tieneBonusTipo("loot_extra");
     window.dispatchEvent(new CustomEvent("rpg:victoria", {
-      detail: { enemigo: { ...enemigo, zona: state.zonaActual } }
+      detail: { enemigo: Object.assign({}, enemigo, { zona: state.zonaActual, xp: xp, monedas: monedas, lootExtra: lootExtra }) }
     }));
 
     state.enemigosDerrotados++;
@@ -474,7 +578,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       state.jefesDerrotados.push(state.zonaActual);
     }
 
-    // Subir niveles (puede subir varios de golpe)
+    // Subir niveles
     let subio = 0;
     while (state.xp >= xpParaSubir()) {
       state.xp -= xpParaSubir();
@@ -483,20 +587,29 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       subio++;
     }
 
+    // Bonus de skins: curar tras victoria
+    const curacionVict = getBonusTipo("curar_victoria");
+    if (curacionVict > 0) {
+      state.hp = Math.min(hpMax(), state.hp + curacionVict);
+      log("💚 +" + curacionVict + " HP por victoria.", "curar");
+    }
+
     setMonedas(getMonedas() + monedas);
     SND("victoria");
-    try { window._darPremio?.(0, 10, "¡Victoria!"); } catch {}
-    try { notifMascota?.("¡Victoria!", `+${monedas} monedas · +${xp} XP`); } catch {}
+    try { window._darPremio?.(0, 10, "¡Victoria!"); } catch(e) {}
+    try { if (typeof notifMascota === "function") notifMascota("¡Victoria!", "+" + monedas + " monedas · +" + xp + " XP"); } catch(e) {}
 
     guardar(state);
 
     const batalla = $("rpg-batalla");
     batalla?.classList.add("ganada");
 
-    log(`¡${nombreE} derrotado! +${xp} XP, +${monedas} monedas.`, "info");
-    if (subio > 0) log(`¡Subiste a nivel ${state.nivel}!`, "critico");
+    let logTxt = "¡" + nombreE + " derrotado! +" + xp + " XP, +" + monedas + " monedas.";
+    if (xpBonusPct > 0) logTxt += " 📚 XP bonus!";
+    log(logTxt, "info");
+    if (subio > 0) log("¡Subiste a nivel " + state.nivel + "!", "critico");
 
-    setTimeout(() => { enemigo = null; render(); }, 1500);
+    setTimeout(function() { enemigo = null; render(); }, 1500);
   }
 
   function derrota() {

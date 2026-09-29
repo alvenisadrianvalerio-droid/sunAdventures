@@ -471,6 +471,12 @@ body.light .tienda-item-sprite {
   width: 86%;
   height: 86%;
 }
+.tienda-item-sprite-skin {
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.45));
+}
+.tienda-item:hover .tienda-item-sprite-skin {
+  transform: scale(1.15) rotate(4deg);
+}
 /* ============================================================
    TOAST DE NOTIFICACIÓN DE LA MASCOTA
    ============================================================ */

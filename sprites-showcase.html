@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✨ Galería de Sprites Pixel Art — SunAdventures</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0d14;
+      --bg-panel: #131722;
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 217, 61, 0.2);
+      --accent: #ffd93d;
+      --accent-glow: rgba(255, 217, 61, 0.35);
+      --text: #f0f3fa;
+      --text-muted: #8c96ab;
+      --comun: #c9c9c9;
+      --raro: #4da3ff;
+      --epico: #a970ff;
+      --legendario: #ffd700;
+      --zoom: 3;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 1.5rem 1.2rem 4rem;
+      background-image: 
+        radial-gradient(ellipse at 20% 0%, rgba(255, 217, 61, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 10%, rgba(169, 112, 255, 0.06) 0%, transparent 50%);
+    }
+
+    /* Header */
+    header {
+      max-width: 1200px;
+      margin: 0 auto 2rem;
+      text-align: center;
+      position: relative;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 217, 61, 0.12);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 900;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+    h1 span.title-accent {
+      color: var(--accent);
+      text-shadow: 0 0 20px var(--accent-glow);
+    }
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-top: 0.4rem;
+    }
+    .nav-actions {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-nav {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 0.5rem 1.1rem;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+    .btn-nav:hover {
+      background: var(--accent);
+      color: #1a1505;
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px var(--accent-glow);
+    }
+
+    /* Controls Bar */
+    .controls {
+      max-width: 1200px;
+      margin: 0 auto 1.8rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+    .controls-row-top {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .search-wrap {
+      flex: 1;
+      min-width: 240px;
+      position: relative;
+    }
+    .search-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 0.65rem 1rem 0.65rem 2.4rem;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .search-icon {
+      position: absolute;
+      left: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.5;
+      font-size: 0.9rem;
+    }
+
+    /* Zoom Switcher */
+    .zoom-group {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.3rem 0.5rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .zoom-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-right: 0.3rem;
+    }
+    .zoom-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-weight: 800;
+      font-size: 0.8rem;
+      padding: 0.3rem 0.65rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .zoom-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+    .zoom-btn.active {
+      background: var(--accent);
+      color: #1b1606;
+    }
+
+    /* Filter Pills */
+    .filter-pills {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .pill:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .pill.active {
+      background: var(--accent);
+      color: #1b1606;
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+    .pill .count {
+      font-size: 0.72rem;
+      opacity: 0.7;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 0.1rem 0.4rem;
+      border-radius: 999px;
+    }
+    .pill.active .count {
+      background: rgba(0, 0, 0, 0.2);
+      color: #1b1606;
+    }
+
+    /* Stats bar */
+    .stats-info {
+      max-width: 1200px;
+      margin: 0 auto 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      padding: 0 0.5rem;
+    }
+    .stats-info strong { color: var(--accent); }
+
+    /* Grid of Sprites */
+    .grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.1rem;
+    }
+
+    /* Card */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 1.1rem 0.9rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      backdrop-filter: blur(8px);
+    }
+    .card:hover {
+      transform: translateY(-6px) scale(1.02);
+      background: rgba(255, 255, 255, 0.07);
+      border-color: var(--card-color, var(--accent));
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 20px var(--card-glow, var(--accent-glow));
+    }
+    .card.rar-comun     { --card-color: var(--comun); --card-glow: rgba(201,201,201,0.25); }
+    .card.rar-raro      { --card-color: var(--raro); --card-glow: rgba(77,163,255,0.35); }
+    .card.rar-epico     { --card-color: var(--epico); --card-glow: rgba(169,112,255,0.4); }
+    .card.rar-legendario{ --card-color: var(--legendario); --card-glow: rgba(255,215,0,0.5); }
+
+    /* Sprite Display */
+    .sprite-box {
+      width: calc(24px * var(--zoom));
+      height: calc(24px * var(--zoom));
+      display: grid;
+      place-items: center;
+      margin-bottom: 0.9rem;
+      border-radius: 12px;
+      position: relative;
+      background: radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.06), transparent 70%);
+      transition: width 0.2s, height 0.2s;
+    }
+    .sprite-img {
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+      transition: transform 0.25s ease;
+      user-select: none;
+    }
+    .card:hover .sprite-img {
+      transform: scale(1.12);
+    }
+
+    .card-rarity {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--card-color, var(--accent));
+      margin-bottom: 0.25rem;
+    }
+    .card-name {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #fff;
+      margin-bottom: 0.35rem;
+      line-height: 1.2;
+    }
+    .card-stat {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--card-color, var(--accent));
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      margin-bottom: 0.5rem;
+    }
+    .card-meta {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-family: monospace;
+      opacity: 0.8;
+    }
+
+    /* Sheets Preview Section */
+    .sheets-section {
+      max-width: 1200px;
+      margin: 4rem auto 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 2.5rem;
+    }
+    .sheets-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .sheets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    .sheet-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.2rem;
+    }
+    .sheet-card h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+    .sheet-card p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.9rem;
+    }
+    .sheet-view {
+      background: #000;
+      border: 1px dashed rgba(255, 217, 61, 0.3);
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: auto;
+    }
+    .sheet-img {
+      image-rendering: pixelated;
+      transform: scale(2);
+      transform-origin: center;
+      margin: 2rem 0;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: #111420;
+      border: 2px solid var(--modal-color, var(--accent));
+      border-radius: 24px;
+      padding: 2rem 1.8rem;
+      width: min(440px, 94vw);
+      text-align: center;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px var(--modal-glow, var(--accent-glow));
+      animation: popIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s;
+    }
+    .modal-close:hover {
+      background: #ff4757;
+      border-color: #ff4757;
+      transform: rotate(90deg);
+    }
+    .modal-sprite-wrap {
+      width: 144px;
+      height: 144px;
+      margin: 0 auto 1.2rem;
+      border-radius: 20px;
+      background: radial-gradient(circle at 35% 35%, var(--modal-color, var(--accent)), rgba(0, 0, 0, 0.4));
+      border: 2px solid var(--modal-color, var(--accent));
+      box-shadow: 0 0 25px var(--modal-glow, var(--accent-glow));
+      display: grid;
+      place-items: center;
+    }
+    .modal-sprite-wrap img {
+      width: 96px;
+      height: 96px;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6));
+    }
+    .modal-rarity {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--modal-color, var(--accent));
+      margin-bottom: 0.3rem;
+    }
+    .modal-name {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    .modal-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+      line-height: 1.4;
+    }
+    .modal-details {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      padding: 0.8rem;
+      margin-bottom: 1.2rem;
+      font-family: monospace;
+      font-size: 0.8rem;
+      text-align: left;
+      line-height: 1.6;
+    }
+    .modal-details strong { color: var(--accent); }
+    .modal-btns {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: center;
+    }
+    .btn-action {
+      background: linear-gradient(135deg, var(--accent), #ff9f1a);
+      color: #1b1606;
+      border: none;
+      padding: 0.65rem 1.2rem;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px var(--accent-glow);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="badge">🎨 Pixel Art Asset Gallery</div>
+    <h1>Galeria de Sprites <span class="title-accent">SunAdventures</span></h1>
+    <p class="subtitle">Explora, inspecciona con zoom y visualiza los 55 sprites generados para Aventura y Tienda</p>
+    <div class="nav-actions">
+      <a href="index.html#rpg" class="btn-nav">🗡️ Ir a Aventura RPG</a>
+      <a href="index.html#tienda" class="btn-nav">🛍️ Ir a la Tienda</a>
+      <a href="index.html" class="btn-nav">🏠 Inicio</a>
+    </div>
+  </header>
+
+  <!-- Controls -->
+  <section class="controls">
+    <div class="controls-row-top">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" class="search-input" placeholder="Buscar por nombre, tipo, rareza o ID...">
+      </div>
+
+      <div class="zoom-group">
+        <span class="zoom-label">Zoom:</span>
+        <button class="zoom-btn" data-z="1">1×</button>
+        <button class="zoom-btn" data-z="2">2×</button>
+        <button class="zoom-btn active" data-z="3">3×</button>
+        <button class="zoom-btn" data-z="4">4×</button>
+        <button class="zoom-btn" data-z="5">5×</button>
+      </div>
+    </div>
+
+    <div class="filter-pills">
+      <button class="pill active" data-cat="all">Todos <span class="count" id="count-all">0</span></button>
+      <button class="pill" data-cat="rpg">🗡️ Aventura Botín <span class="count" id="count-rpg">0</span></button>
+      <button class="pill" data-cat="tienda-cabeza">👑 Cabeza <span class="count" id="count-cabeza">0</span></button>
+      <button class="pill" data-cat="tienda-cuello">🧣 Cuello <span class="count" id="count-cuello">0</span></button>
+      <button class="pill" data-cat="tienda-ojos">🕶️ Ojos <span class="count" id="count-ojos">0</span></button>
+      <button class="pill" data-cat="tienda-fondos">🌌 Fondos <span class="count" id="count-fondos">0</span></button>
+      <button class="pill" data-cat="tienda-efectos">✨ Efectos <span class="count" id="count-efectos">0</span></button>
+      <button class="pill" data-cat="legendario">⭐ Legendarios <span class="count" id="count-leg">0</span></button>
+      <button class="pill" data-cat="epico">🔮 Épicos <span class="count" id="count-epi">0</span></button>
+      <button class="pill" data-cat="raro">💎 Raros <span class="count" id="count-rar">0</span></button>
+      <button class="pill" data-cat="comun">⚪ Comunes <span class="count" id="count-com">0</span></button>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <div class="stats-info">
+    <span>Mostrando <strong id="shown-count">0</strong> de <strong id="total-count">0</strong> sprites</span>
+    <span>💡 Haz clic sobre cualquier sprite para ver detalles y exportar</span>
+  </div>
+
+  <!-- Grid -->
+  <main id="grid" class="grid"></main>
+
+  <!-- Sheets Section -->
+  <section class="sheets-section">
+    <h2 class="sheets-title">📜 Sprite Sheets Completos</h2>
+    <div class="sheets-grid">
+      <div class="sheet-card">
+        <h3>🗡️ Aventura RPG Sheet (6×5)</h3>
+        <p>img/rpg/rpg-loot-sheet.png · 144×120px · 30 celdas de 24×24px</p>
+        <div class="sheet-view">
+          <img src="img/rpg/rpg-loot-sheet.png" class="sheet-img" alt="RPG Loot Sheet">
+        </div>
+      </div>
+      <div class="sheet-card">
+        <h3>🛍️ Tienda Cosméticos Sheet (5×5)</h3>
+        <p>img/tienda/tienda-sheet.png · 120×120px · 25 celdas de 24×24px</p>
+        <div class="sheet-view">
+          <img src="img/tienda/tienda-sheet.png" class="sheet-img" alt="Tienda Sheet">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal -->
+  <div id="modal" class="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close" id="modal-close">×</button>
+      <div class="modal-sprite-wrap">
+        <img id="modal-img" src="" alt="">
+      </div>
+      <div id="modal-rarity" class="modal-rarity"></div>
+      <h3 id="modal-name" class="modal-name"></h3>
+      <p id="modal-desc" class="modal-desc"></p>
+      <div id="modal-details" class="modal-details"></div>
+      <div class="modal-btns">
+        <button id="modal-copy-coords" class="btn-action">📋 Copiar Coords</button>
+        <a id="modal-download" download="" href="" class="btn-action" style="text-decoration:none;">💾 Descargar PNG</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ITEMS = [
+      /* --- AVENTURA RPG (27 items + 3 bonus) --- */
+      { id:"hoja-verde",    nombre:"Hoja de rocío",   cat:"rpg", tipo:"hp",  val:"+8 HP",  rar:"comun",     desc:"Hoja tierna con gotas de rocío que brillan al amanecer. Restaura vida en combate o en el inventario.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[0,0], file:"img/rpg/items/hoja-verde.png" },
+      { id:"flor-roja",     nombre:"Flor de brasa",   cat:"rpg", tipo:"hp",  val:"+12 HP", rar:"comun",     desc:"Flor cálida nacida cerca de manantiales volcánicos. Desprende un reconfortante aroma.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[1,0], file:"img/rpg/items/flor-roja.png" },
+      { id:"hongo",         nombre:"Hongo lunar",     cat:"rpg", tipo:"hp",  val:"+18 HP", rar:"raro",      desc:"Seta nocturna con bioluminiscencia celestial azulada. Muy apreciada por alquimistas.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[2,0], file:"img/rpg/items/hongo.png" },
+      { id:"pocion-roja",   nombre:"Poción menor",    cat:"rpg", tipo:"hp",  val:"+25 HP", rar:"comun",     desc:"Frasco de vidrio templado con líquido curativo carmesí efervescente.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[3,0], file:"img/rpg/items/pocion-roja.png" },
+      { id:"pocion-azul",   nombre:"Poción arcana",   cat:"rpg", tipo:"atk", val:"+10 ATK",rar:"raro",      desc:"Destilado de energía arcana que al lanzarse contra un rival causa daño fulminante.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[4,0], file:"img/rpg/items/pocion-azul.png" },
+      { id:"pocion-morada", nombre:"Elixir arcano",   cat:"rpg", tipo:"hp",  val:"+40 HP", rar:"epico",     desc:"Antigua fórmula de brujo que repara tejidos y revitaliza el espíritu.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[5,0], file:"img/rpg/items/pocion-morada.png" },
+      { id:"pocion-dorada", nombre:"Elixir de héroe", cat:"rpg", tipo:"hp",  val:"+60 HP", rar:"epico",     desc:"Elixir dorado con alas de plata que emite luz solar viviente. Curación monumental.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[0,1], file:"img/rpg/items/pocion-dorada.png" },
+      { id:"libro-verde",   nombre:"Tomo olvidado",   cat:"rpg", tipo:"atk", val:"+2 ATK", rar:"raro",      desc:"Grimorio vegetal con runas grabadas. Sube permanentemente el ataque del héroe.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[1,1], file:"img/rpg/items/libro-verde.png" },
+      { id:"libro-rojo",    nombre:"Grimorio ígneo",  cat:"rpg", tipo:"atk", val:"+3 ATK", rar:"epico",     desc:"Encuadernado en escamas de dragón rojo con cantos chamuscados de fuego eterno.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[2,1], file:"img/rpg/items/libro-rojo.png" },
+      { id:"libro-azul",    nombre:"Códice de hielo", cat:"rpg", tipo:"def", val:"+2 DEF", rar:"epico",     desc:"Encuadernación de cristal glacial que resiste el frío más desgarrador.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[3,1], file:"img/rpg/items/libro-azul.png" },
+      { id:"gema-verde",    nombre:"Jade menuda",     cat:"rpg", tipo:"def", val:"+1 DEF", rar:"comun",     desc:"Piedra preciosa pulida con reflejos de bosque profundo.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[4,1], file:"img/rpg/items/gema-verde.png" },
+      { id:"gema-azul",     nombre:"Zafiro",          cat:"rpg", tipo:"def", val:"+2 DEF", rar:"raro",      desc:"Gema imperial de corte brillante que calma la mente y protege el corazón.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[5,1], file:"img/rpg/items/gema-azul.png" },
+      { id:"gema-roja",     nombre:"Rubí",            cat:"rpg", tipo:"atk", val:"+2 ATK", rar:"raro",      desc:"Cristal ardiente con brillo estelar. Aumenta la furia en combate.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[0,2], file:"img/rpg/items/gema-roja.png" },
+      { id:"gema-morada",   nombre:"Amatista",        cat:"rpg", tipo:"atk", val:"+3 ATK", rar:"epico",     desc:"Racimo de amatista pura cargado con vibraciones arcanas de poder.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[1,2], file:"img/rpg/items/gema-morada.png" },
+      { id:"gema-dorada",   nombre:"Topacio real",    cat:"rpg", tipo:"hp",  val:"+30 HP", rar:"epico",     desc:"Joya de corte gota ámbar que bendice al portador con salud perpetua.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[2,2], file:"img/rpg/items/gema-dorada.png" },
+      { id:"daga",          nombre:"Daga oxidada",    cat:"rpg", tipo:"atk", val:"+1 ATK", rar:"comun",     desc:"Daga de explorador veterano con marcas de óxido y filo afilado.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[3,2], file:"img/rpg/items/daga.png" },
+      { id:"espada",        nombre:"Espada de acero", icono:"espada", cat:"rpg", tipo:"atk", val:"+3 ATK", rar:"raro", desc:"Espada templada con guarda dorada y pomo engarzado con zafiro.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[4,2], file:"img/rpg/items/espada.png" },
+      { id:"hacha",         nombre:"Hacha doble",     cat:"rpg", tipo:"atk", val:"+4 ATK", rar:"epico",     desc:"Arma pesada de batalla con hojas de media luna y mango de roble.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[5,2], file:"img/rpg/items/hacha.png" },
+      { id:"baston",        nombre:"Bastón antiguo",  cat:"rpg", tipo:"atk", val:"+5 ATK", rar:"epico",     desc:"Madera nudosa que sostiene un orbe de luz celestial inagotable.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[0,3], file:"img/rpg/items/baston.png" },
+      { id:"espada-legend", nombre:"Filo del alba",   cat:"rpg", tipo:"atk", val:"+8 ATK", rar:"legendario",desc:"La espada mítica de los primeros guerreros del sol. Destellos divinos dorados.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[1,3], file:"img/rpg/items/espada-legend.png" },
+      { id:"moneda-oro",    nombre:"Moneda antigua",  cat:"rpg", tipo:"hp",  val:"+15 HP", rar:"comun",     desc:"Antigua moneda acuñada con el sagrado girasol en relieve.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[2,3], file:"img/rpg/items/moneda-oro.png" },
+      { id:"cofre-madera",  nombre:"Cofre pequeño",   cat:"rpg", tipo:"hp",  val:"+25 HP", rar:"raro",      desc:"Cofre clásico de madera curada con cerradura de latón brillante.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[3,3], file:"img/rpg/items/cofre-madera.png" },
+      { id:"cofre-dorado",  nombre:"Cofre del alba",  cat:"rpg", tipo:"hp",  val:"+50 HP", rar:"legendario",desc:"Arcón real de oro puro engalanado con rubíes y zafiros imperiales.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[4,3], file:"img/rpg/items/cofre-dorado.png" },
+      { id:"corona-plata",  nombre:"Corona de plata", cat:"rpg", tipo:"def", val:"+3 DEF", rar:"epico",     desc:"Tiara de plata pulida con tres picos y zafiros de la corte.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[5,3], file:"img/rpg/items/corona-plata.png" },
+      { id:"corona-oro",    nombre:"Corona dorada",   cat:"rpg", tipo:"def", val:"+5 DEF", rar:"legendario",desc:"Corona imperial dorada con casquete de terciopelo escarlata y gran rubí.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[0,4], file:"img/rpg/items/corona-oro.png" },
+      { id:"llave-antigua", nombre:"Llave antigua",   cat:"rpg", tipo:"hp",  val:"+20 HP", rar:"raro",      desc:"Llave forjada en latón antiguo con mango en forma de trébol secreto.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[1,4], file:"img/rpg/items/llave-antigua.png" },
+      { id:"reliquia",      nombre:"Reliquia perdida",cat:"rpg", tipo:"def", val:"+4 DEF", rar:"legendario",desc:"Talismán solar sagrado con centro de gema palpitante y rayos de luz.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[2,4], file:"img/rpg/items/reliquia.png" },
+      { id:"anillo-poder",  nombre:"Anillo del Dragón",cat:"rpg", tipo:"bonus",val:"Especial",rar:"epico",   desc:"Sortija de oro fino con gema de ojo de dragón en llamas.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[3,4], file:"img/rpg/items/anillo-poder.png" },
+      { id:"escudo-alba",   nombre:"Escudo del Alba",  cat:"rpg", tipo:"bonus",val:"Especial",rar:"epico",   desc:"Escudo de caballero con emblema de cruz de luz purificadora.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[4,4], file:"img/rpg/items/escudo-alba.png" },
+      { id:"caliz-estelar", nombre:"Cáliz Estelar",   cat:"rpg", tipo:"bonus",val:"Especial",rar:"legendario",desc:"Cáliz sagrado que mana néctar de las constelaciones.", sheet:"img/rpg/rpg-loot-sheet.png", sprite:[5,4], file:"img/rpg/items/caliz-estelar.png" },
+
+      /* --- TIENDA: COSMÉTICOS (24 items + 1 bonus) --- */
+      // Cabeza
+      { id:"corona",    nombre:"Corona",          cat:"tienda-cabeza", tipo:"cabeza", val:"80 🪙",  rar:"epico",     desc:"Corona imperial dorada con gemas preciosas. Para la realeza.", sheet:"img/tienda/tienda-sheet.png", sprite:[0,0], file:"img/tienda/items/corona.png" },
+      { id:"gorro",     nombre:"Chistera",        cat:"tienda-cabeza", tipo:"cabeza", val:"60 🪙",  rar:"raro",      desc:"Sombrero de copa victoriano de seda negra con lazo carmesí.", sheet:"img/tienda/tienda-sheet.png", sprite:[1,0], file:"img/tienda/items/gorro.png" },
+      { id:"birrete",   nombre:"Birrete",         cat:"tienda-cabeza", tipo:"cabeza", val:"100 🪙", rar:"epico",     desc:"Gorro de graduación con borla de oro. Sabio oficial del reino.", sheet:"img/tienda/tienda-sheet.png", sprite:[2,0], file:"img/tienda/items/birrete.png" },
+      { id:"hongo",     nombre:"Honguito",        cat:"tienda-cabeza", tipo:"cabeza", val:"40 🪙",  rar:"comun",     desc:"Gorro de seta rojo con motas blancas. Totalmente adorable.", sheet:"img/tienda/tienda-sheet.png", sprite:[3,0], file:"img/tienda/items/hongo.png" },
+      { id:"laurel",    nombre:"Laurel",          cat:"tienda-cabeza", tipo:"cabeza", val:"120 🪙", rar:"legendario",desc:"Corona de laureles dorados. Reservada únicamente para campeones.", sheet:"img/tienda/tienda-sheet.png", sprite:[4,0], file:"img/tienda/items/laurel.png" },
+      { id:"santa",     nombre:"Gorro Navidad",   cat:"tienda-cabeza", tipo:"cabeza", val:"70 🪙",  rar:"raro",      desc:"Gorro festivo de lana roja con pompón blanco esponjoso.", sheet:"img/tienda/tienda-sheet.png", sprite:[0,1], file:"img/tienda/items/santa.png" },
+      { id:"casco",     nombre:"Casco vikingo",   cat:"tienda-cabeza", tipo:"cabeza", val:"150 🪙", rar:"epico",     desc:"Casco de hierro de guerrero nórdico con dos cuernos curvos.", sheet:"img/tienda/tienda-sheet.png", sprite:[1,1], file:"img/tienda/items/casco.png" },
+      { id:"sombrero",  nombre:"Sombrero mágico", cat:"tienda-cabeza", tipo:"cabeza", val:"180 🪙", rar:"legendario",desc:"Sombrero puntiagudo púrpura con lazo dorado y luna mística.", sheet:"img/tienda/tienda-sheet.png", sprite:[2,1], file:"img/tienda/items/sombrero.png" },
+      { id:"diadema",   nombre:"Diadema",         cat:"tienda-cabeza", tipo:"cabeza", val:"90 🪙",  rar:"epico",     desc:"Diadema de plata fina con corazón de rubí rosa brillante.", sheet:"img/tienda/tienda-sheet.png", sprite:[3,1], file:"img/tienda/items/diadema.png" },
+      // Cuello
+      { id:"pajarita",  nombre:"Pajarita",        cat:"tienda-cuello", tipo:"cuello", val:"50 🪙",  rar:"comun",     desc:"Lazo rojo de satén con nudo perfecto. Máxima elegancia.", sheet:"img/tienda/tienda-sheet.png", sprite:[4,1], file:"img/tienda/items/pajarita.png" },
+      { id:"corbata",   nombre:"Corbata",         cat:"tienda-cuello", tipo:"cuello", val:"45 🪙",  rar:"comun",     desc:"Corbata formal azul marino con rayas de oro diagonales.", sheet:"img/tienda/tienda-sheet.png", sprite:[0,2], file:"img/tienda/items/corbata.png" },
+      { id:"collar",    nombre:"Collar",          cat:"tienda-cuello", tipo:"cuello", val:"55 🪙",  rar:"raro",      desc:"Collar de perlas blancas con dije de esmeralda resplandeciente.", sheet:"img/tienda/tienda-sheet.png", sprite:[1,2], file:"img/tienda/items/collar.png" },
+      { id:"bufanda",   nombre:"Bufanda",         cat:"tienda-cuello", tipo:"cuello", val:"65 🪙",  rar:"raro",      desc:"Bufanda de lana gruesa en tonos rojos para días de invierno.", sheet:"img/tienda/tienda-sheet.png", sprite:[2,2], file:"img/tienda/items/bufanda.png" },
+      { id:"medallon",  nombre:"Medallón",        cat:"tienda-cuello", tipo:"cuello", val:"110 🪙", rar:"epico",     desc:"Medalla pesada de oro macizo grabada con un girasol radiante.", sheet:"img/tienda/tienda-sheet.png", sprite:[3,2], file:"img/tienda/items/medallon.png" },
+      // Ojos
+      { id:"gafas",     nombre:"Gafas de sol",    cat:"tienda-ojos",   tipo:"ojos",   val:"65 🪙",  rar:"raro",      desc:"Gafas de sol negras clásicas con reflejo blanco. Cool total.", sheet:"img/tienda/tienda-sheet.png", sprite:[4,2], file:"img/tienda/items/gafas.png" },
+      { id:"monóculo",  nombre:"Monóculo",        cat:"tienda-ojos",   tipo:"ojos",   val:"90 🪙",  rar:"epico",     desc:"Lente de oro con cadena colgante. Para caballeros distinguidos.", sheet:"img/tienda/tienda-sheet.png", sprite:[0,3], file:"img/tienda/items/monóculo.png" },
+      { id:"antifaz",   nombre:"Antifaz",         cat:"tienda-ojos",   tipo:"ojos",   val:"75 🪙",  rar:"raro",      desc:"Máscara de héroe nocturno o ninja con acabado negro sombra.", sheet:"img/tienda/tienda-sheet.png", sprite:[1,3], file:"img/tienda/items/antifaz.png" },
+      { id:"gafas3d",   nombre:"Gafas 3D",        cat:"tienda-ojos",   tipo:"ojos",   val:"100 🪙", rar:"epico",     desc:"Gafas retro de cartón blanco con lentes cian y rojo.", sheet:"img/tienda/tienda-sheet.png", sprite:[2,3], file:"img/tienda/items/gafas3d.png" },
+      // Fondos
+      { id:"noche",     nombre:"Fondo Noche",     cat:"tienda-fondos", tipo:"fondo",  val:"200 🪙", rar:"legendario",desc:"Paisaje nocturno azul profundo con luna creciente y estrellas.", sheet:"img/tienda/tienda-sheet.png", sprite:[3,3], file:"img/tienda/items/noche.png" },
+      { id:"arcoiris",  nombre:"Fondo Arcoíris",  cat:"tienda-fondos", tipo:"fondo",  val:"250 🪙", rar:"legendario",desc:"Arco de colores vivos sobre una nube esponjosa de algodón.", sheet:"img/tienda/tienda-sheet.png", sprite:[4,3], file:"img/tienda/items/arcoiris.png" },
+      { id:"fuego",     nombre:"Fondo Fuego",     cat:"tienda-fondos", tipo:"fondo",  val:"300 🪙", rar:"legendario",desc:"Hoguera ardiente con llamas cálidas y chispas flotantes.", sheet:"img/tienda/tienda-sheet.png", sprite:[0,4], file:"img/tienda/items/fuego.png" },
+      // Efectos
+      { id:"chispas",   nombre:"Chispas",         cat:"tienda-efectos",tipo:"efecto", val:"150 🪙", rar:"epico",     desc:"Destellos eléctricos amarillos y naranjas que saltan con cada clic.", sheet:"img/tienda/tienda-sheet.png", sprite:[1,4], file:"img/tienda/items/chispas.png" },
+      { id:"corazones", nombre:"Corazones",       cat:"tienda-efectos",tipo:"efecto", val:"180 🪙", rar:"epico",     desc:"Tiernos corazones pixel que flotan suavemente alrededor de la mascota.", sheet:"img/tienda/tienda-sheet.png", sprite:[2,4], file:"img/tienda/items/corazones.png" },
+      { id:"estrellas", nombre:"Estrellas",       cat:"tienda-efectos",tipo:"efecto", val:"220 🪙", rar:"legendario",desc:"Lluvia de estrellas doradas brillantes que descienden del cielo.", sheet:"img/tienda/tienda-sheet.png", sprite:[3,4], file:"img/tienda/items/estrellas.png" },
+      { id:"trebol",    nombre:"Trébol",          cat:"tienda-efectos",tipo:"efecto", val:"Bonus",  rar:"epico",     desc:"Trébol esmeralda de 4 hojas de la buena fortuna.", sheet:"img/tienda/tienda-sheet.png", sprite:[4,4], file:"img/tienda/items/trebol.png" }
+    ];
+
+    let currentFilter = 'all';
+    let searchQuery = '';
+    let currentZoom = 3;
+
+    // Elements
+    const grid = document.getElementById('grid');
+    const searchInput = document.getElementById('search');
+    const shownCount = document.getElementById('shown-count');
+    const totalCount = document.getElementById('total-count');
+    const modal = document.getElementById('modal');
+    const modalClose = document.getElementById('modal-close');
+    let activeModalItem = null;
+
+    totalCount.textContent = ITEMS.length;
+
+    // Update Category Counts
+    document.getElementById('count-all').textContent = ITEMS.length;
+    document.getElementById('count-rpg').textContent = ITEMS.filter(i => i.cat === 'rpg').length;
+    document.getElementById('count-cabeza').textContent = ITEMS.filter(i => i.cat === 'tienda-cabeza').length;
+    document.getElementById('count-cuello').textContent = ITEMS.filter(i => i.cat === 'tienda-cuello').length;
+    document.getElementById('count-ojos').textContent = ITEMS.filter(i => i.cat === 'tienda-ojos').length;
+    document.getElementById('count-fondos').textContent = ITEMS.filter(i => i.cat === 'tienda-fondos').length;
+    document.getElementById('count-efectos').textContent = ITEMS.filter(i => i.cat === 'tienda-efectos').length;
+    document.getElementById('count-leg').textContent = ITEMS.filter(i => i.rar === 'legendario').length;
+    document.getElementById('count-epi').textContent = ITEMS.filter(i => i.rar === 'epico').length;
+    document.getElementById('count-rar').textContent = ITEMS.filter(i => i.rar === 'raro').length;
+    document.getElementById('count-com').textContent = ITEMS.filter(i => i.rar === 'comun').length;
+
+    function render() {
+      const q = searchQuery.toLowerCase().trim();
+      const filtered = ITEMS.filter(item => {
+        const matchesCat = (currentFilter === 'all')
+          || (currentFilter === item.cat)
+          || (currentFilter === item.rar);
+        const matchesQuery = !q
+          || item.nombre.toLowerCase().includes(q)
+          || item.id.toLowerCase().includes(q)
+          || item.desc.toLowerCase().includes(q)
+          || item.rar.toLowerCase().includes(q)
+          || item.tipo.toLowerCase().includes(q);
+        return matchesCat && matchesQuery;
+      });
+
+      shownCount.textContent = filtered.length;
+
+      if (!filtered.length) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);font-style:italic;">No se encontraron sprites con los filtros actuales.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(item => `
+        <div class="card rar-${item.rar}" data-id="${item.id}">
+          <div class="sprite-box">
+            <img src="${item.file}" class="sprite-img" alt="${item.nombre}" loading="lazy">
+          </div>
+          <span class="card-rarity">${item.rar}</span>
+          <h3 class="card-name">${item.nombre}</h3>
+          <span class="card-stat">${item.val}</span>
+          <span class="card-meta">[${item.sprite[0]}, ${item.sprite[1]}]</span>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', () => {
+          const item = ITEMS.find(i => i.id === card.dataset.id);
+          if (item) openModal(item);
+        });
+      });
+    }
+
+    // Modal
+    function openModal(item) {
+      activeModalItem = item;
+      const cardClass = `rar-${item.rar}`;
+      modal.className = `modal-overlay active ${cardClass}`;
+      document.getElementById('modal-img').src = item.file;
+      document.getElementById('modal-name').textContent = item.nombre;
+      document.getElementById('modal-rarity').textContent = `${item.rar.toUpperCase()} · ${item.cat.replace('-', ' ').toUpperCase()}`;
+      document.getElementById('modal-desc').textContent = item.desc;
+      document.getElementById('modal-details').innerHTML = `
+        <strong>ID:</strong> ${item.id}<br>
+        <strong>Valor / Stats:</strong> ${item.val}<br>
+        <strong>Sprite Sheet:</strong> ${item.sheet}<br>
+        <strong>Coordenadas:</strong> col: ${item.sprite[0]}, fila: ${item.sprite[1]}<br>
+        <strong>Archivo PNG:</strong> ${item.file}
+      `;
+      const dl = document.getElementById('modal-download');
+      dl.href = item.file;
+      dl.download = `${item.id}.png`;
+
+      modal.style.setProperty('--modal-color', getComputedStyle(document.querySelector(`.card.${cardClass}`)).getPropertyValue('--card-color'));
+      modal.style.setProperty('--modal-glow', getComputedStyle(document.querySelector(`.card.${cardClass}`)).getPropertyValue('--card-glow'));
+    }
+
+    modalClose.addEventListener('click', () => modal.classList.remove('active'));
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('active');
+    });
+
+    document.getElementById('modal-copy-coords').addEventListener('click', () => {
+      if (!activeModalItem) return;
+      const text = `sprite: [${activeModalItem.sprite[0]}, ${activeModalItem.sprite[1]}]`;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('modal-copy-coords');
+        const old = btn.textContent;
+        btn.textContent = '✅ ¡Copiado!';
+        setTimeout(() => btn.textContent = old, 1500);
+      });
+    });
+
+    // Zoom controls
+    document.querySelectorAll('.zoom-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.zoom-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentZoom = parseInt(btn.dataset.z);
+        document.documentElement.style.setProperty('--zoom', currentZoom);
+      });
+    });
+
+    // Filter pills
+    document.querySelectorAll('.pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.cat;
+        render();
+      });
+    });
+
+    // Search input
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      render();
+    });
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>

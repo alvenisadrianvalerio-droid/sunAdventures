@@ -114,38 +114,38 @@ document.addEventListener("DOMContentLoaded", () => {
   helado:       { nombre:"Helado",       precio:10, icono:"helado",    sprite:[4,4], efecto:{hambre:12, felicidad:30} },
 },
     cabeza: {
-      corona:{nombre:"Corona",precio:80,icono:"corona",desc:"Para la realeza"},
-      gorro:{nombre:"Chistera",precio:60,icono:"tienda",desc:"Muy elegante"},
-      birrete:{nombre:"Birrete",precio:100,icono:"medalla",desc:"Sabio oficial"},
-      hongo:{nombre:"Honguito",precio:40,icono:"girasol",desc:"Adorable"},
-      laurel:{nombre:"Laurel",precio:120,icono:"trofeo",desc:"Solo campeones"},
-      santa:{nombre:"Gorro Navidad",precio:70,icono:"regalo",desc:"Festivo"},
-      casco:{nombre:"Casco vikingo",precio:150,icono:"escudo",desc:"¡A la batalla!"},
-      sombrero:{nombre:"Sombrero mágico",precio:180,icono:"varita",desc:"De un mago"},
-      diadema:{nombre:"Diadema",precio:90,icono:"estrella",desc:"Princesa total"}
+      corona:   { nombre:"Corona",          precio:80,  icono:"corona",        sheet:"tienda", sprite:[0,0], desc:"Para la realeza",   bonus:{ tipo:"monedas_victoria", val:10, desc:"+10 monedas al vencer" } },
+      gorro:    { nombre:"Chistera",        precio:60,  icono:"tienda",        sheet:"tienda", sprite:[1,0], desc:"Muy elegante",      bonus:{ tipo:"xp_extra",         val:15, desc:"+15% XP por victoria" } },
+      birrete:  { nombre:"Birrete",         precio:100, icono:"medalla",       sheet:"tienda", sprite:[2,0], desc:"Sabio oficial",     bonus:{ tipo:"xp_extra",         val:25, desc:"+25% XP por victoria" } },
+      hongo:    { nombre:"Honguito",        precio:40,  icono:"girasol",       sheet:"tienda", sprite:[3,0], desc:"Adorable",          bonus:{ tipo:"nada",             val:0,  desc:"Solo estilo" } },
+      laurel:   { nombre:"Laurel",          precio:120, icono:"trofeo",        sheet:"tienda", sprite:[4,0], desc:"Solo campeones",   bonus:{ tipo:"monedas_victoria", val:25, desc:"+25 monedas al vencer" } },
+      santa:    { nombre:"Gorro Navidad",   precio:70,  icono:"regalo",        sheet:"tienda", sprite:[0,1], desc:"Festivo",           bonus:{ tipo:"curar_victoria",   val:10, desc:"Cura 10 HP tras vencer" } },
+      casco:    { nombre:"Casco vikingo",   precio:150, icono:"escudo",        sheet:"tienda", sprite:[1,1], desc:"A la batalla",     bonus:{ tipo:"atk_fijo",         val:5,  desc:"+5 ATK en combate" } },
+      sombrero: { nombre:"Sombrero m\u00e1gico", precio:180, icono:"varita",    sheet:"tienda", sprite:[2,1], desc:"De un mago",       bonus:{ tipo:"crit_jefe",        val:20, desc:"+20% da\u00f1o a jefes" } },
+      diadema:  { nombre:"Diadema",         precio:90,  icono:"estrella",      sheet:"tienda", sprite:[3,1], desc:"Princesa total",   bonus:{ tipo:"regen_turno",      val:5,  desc:"+5 HP al inicio de turno" } }
     },
     cuello: {
-      pajarita:{nombre:"Pajarita",precio:50,icono:"estrella",desc:"Elegante"},
-      corbata:{nombre:"Corbata",precio:45,icono:"tienda",desc:"Formal"},
-      collar:{nombre:"Collar",precio:55,icono:"llave",desc:"Mágico"},
-      bufanda:{nombre:"Bufanda",precio:65,icono:"nube",desc:"Calentita"},
-      medallon:{nombre:"Medallón",precio:110,icono:"llaveDorada",desc:"Reliquia antigua"}
+      pajarita: { nombre:"Pajarita",        precio:50,  icono:"estrella",      sheet:"tienda", sprite:[4,1], desc:"Elegante",          bonus:{ tipo:"monedas_victoria", val:5,  desc:"+5 monedas al vencer" } },
+      corbata:  { nombre:"Corbata",         precio:45,  icono:"tienda",        sheet:"tienda", sprite:[0,2], desc:"Formal",            bonus:{ tipo:"descuento_tienda", val:15, desc:"15% descuento en tienda" } },
+      collar:   { nombre:"Collar",          precio:55,  icono:"llave",         sheet:"tienda", sprite:[1,2], desc:"M\u00e1gico",          bonus:{ tipo:"loot_extra",       val:1,  desc:"Doble prob. de loot" } },
+      bufanda:  { nombre:"Bufanda",         precio:65,  icono:"nube",          sheet:"tienda", sprite:[2,2], desc:"Calentita",         bonus:{ tipo:"def_fijo",         val:4,  desc:"+4 DEF en combate" } },
+      medallon: { nombre:"Medall\u00f3n",   precio:110, icono:"llaveDorada",   sheet:"tienda", sprite:[3,2], desc:"Reliquia antigua",  bonus:{ tipo:"hp_max",           val:30, desc:"+30 HP m\u00e1ximo" } }
     },
     ojos: {
-      gafas:{nombre:"Gafas sol",precio:65,icono:"globo",desc:"Cool total"},
-      monóculo:{nombre:"Monóculo",precio:90,icono:"ajustes",desc:"Distinguido"},
-      antifaz:{nombre:"Antifaz",precio:75,icono:"candado",desc:"Misterioso"},
-      gafas3d:{nombre:"Gafas 3D",precio:100,icono:"cubo",desc:"Cine retro"}
+      gafas:    { nombre:"Gafas sol",       precio:65,  icono:"globo",         sheet:"tienda", sprite:[4,2], desc:"Cool total",        bonus:{ tipo:"esquivar",         val:10, desc:"10% prob. de esquivar" } },
+      monoculo: { nombre:"Mon\u00f3culo",    precio:90,  icono:"ajustes",       sheet:"tienda", sprite:[0,3], desc:"Distinguido",       bonus:{ tipo:"crit_pct",         val:15, desc:"+15% golpe cr\u00edtico" } },
+      antifaz:  { nombre:"Antifaz",         precio:75,  icono:"candado",       sheet:"tienda", sprite:[1,3], desc:"Misterioso",        bonus:{ tipo:"escape_seguro",    val:1,  desc:"Escape garantizado" } },
+      gafas3d:  { nombre:"Gafas 3D",        precio:100, icono:"cubo",          sheet:"tienda", sprite:[2,3], desc:"Cine retro",        bonus:{ tipo:"crit_pct",         val:10, desc:"+10% golpe cr\u00edtico" } }
     },
     fondos: {
-      noche:{nombre:"Fondo noche",precio:200,icono:"luna",desc:"Estrellas brillantes"},
-      arcoiris:{nombre:"Fondo arcoíris",precio:250,icono:"arcoiris",desc:"Colores vivos"},
-      fuego:{nombre:"Fondo fuego",precio:300,icono:"fuego",desc:"Intenso y cálido"}
+      noche:    { nombre:"Fondo noche",     precio:200, icono:"luna",          sheet:"tienda", sprite:[3,3], desc:"Estrellas brillantes", bonus:{ tipo:"nada",            val:0,  desc:"Ambiente estelar" } },
+      arcoiris: { nombre:"Fondo arco\u00edris", precio:250, icono:"arcoiris",   sheet:"tienda", sprite:[4,3], desc:"Colores vivos",     bonus:{ tipo:"xp_extra",         val:10, desc:"+10% XP por victoria" } },
+      fuego:    { nombre:"Fondo fuego",     precio:300, icono:"fuego",         sheet:"tienda", sprite:[0,4], desc:"Intenso y c\u00e1lido", bonus:{ tipo:"fuego_atk",       val:8,  desc:"Ataques queman al enemigo" } }
     },
     efectos: {
-      chispas:{nombre:"Chispas",precio:150,icono:"rayoDoble",desc:"Al hacer clic"},
-      corazones:{nombre:"Corazones",precio:180,icono:"corazon",desc:"Vuelan alrededor"},
-      estrellas:{nombre:"Estrellas",precio:220,icono:"estrellaDoble",desc:"Caen del cielo"}
+      chispas:   { nombre:"Chispas",        precio:150, icono:"rayoDoble",     sheet:"tienda", sprite:[1,4], desc:"Al hacer clic",     bonus:{ tipo:"stun_pct",         val:8,  desc:"8% aturdimiento en ataque" } },
+      corazones: { nombre:"Corazones",      precio:180, icono:"corazon",       sheet:"tienda", sprite:[2,4], desc:"Vuelan alrededor",  bonus:{ tipo:"curar_victoria",   val:20, desc:"Cura 20 HP tras vencer" } },
+      estrellas: { nombre:"Estrellas",      precio:220, icono:"estrellaDoble", sheet:"tienda", sprite:[3,4], desc:"Caen del cielo",    bonus:{ tipo:"monedas_victoria", val:15, desc:"+15 monedas al vencer" } }
     }
   };
   const COMIDAS = TIENDA_ITEMS.comida;
@@ -452,7 +452,13 @@ if (av) {
         b.className = "comida-item" + (cant===0?" vacia":"") + (fav===id?" favorita":"");
         b.title = `${co.nombre} · ${cant} uds.`;
         b.dataset.comida = id;
-        b.innerHTML = `<span class="comida-item-icono">${ICONO[co.icono]||""}</span><span class="comida-item-cantidad">${cant}</span>`;
+        let iconoHtml = ICONO[co.icono] || "";
+        if (Array.isArray(co.sprite) && co.sprite.length === 2) {
+          const posX = (co.sprite[0] / 4) * 100;
+          const posY = (co.sprite[1] / 4) * 100;
+          iconoHtml = `<div class="tienda-item-sprite" style="width:75%;height:75%;background-position:${posX}% ${posY}%"></div>`;
+        }
+        b.innerHTML = `<span class="comida-item-icono">${iconoHtml}</span><span class="comida-item-cantidad">${cant}</span>`;
         if (cant > 0) {
           b.draggable = true;
           b.addEventListener("click", e=>{e.stopPropagation();darComida(id)});
@@ -1207,6 +1213,27 @@ im.src = info.imagen;
   window._COMIDAS  = COMIDAS;
   window._SKINS    = SKINS;
   window._TIENDA_ITEMS = TIENDA_ITEMS;
+
+  /* ---- Helper de bonus activos (usado por rpg.js) ---- */
+  function getBonusActivos() {
+    try {
+      const userId = getUserId();
+      const mascotaActual = localStorage.getItem("mascota_actual") || "mapache";
+      const key = "sa_skins_e_" + userId + "_" + mascotaActual;
+      const eq = JSON.parse(localStorage.getItem(key) || "{}");
+      const SKINS_LOCAL = {
+        ...TIENDA_ITEMS.cabeza, ...TIENDA_ITEMS.cuello,
+        ...TIENDA_ITEMS.ojos, ...TIENDA_ITEMS.fondos, ...TIENDA_ITEMS.efectos
+      };
+      const activos = [];
+      Object.values(eq).forEach(function(skinId) {
+        const s = SKINS_LOCAL[skinId];
+        if (s && s.bonus) activos.push(s.bonus);
+      });
+      return activos;
+    } catch(e) { return []; }
+  }
+  window._getBonusActivos = getBonusActivos;
   window._darPremio = darPremio;
   window._snd = snd;
   window._setMonedas = setMonedas;

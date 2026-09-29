@@ -56,28 +56,35 @@
   }
 
   /* ============================================================
-     SPRITE SHEET DE COMIDA
+     SPRITE SHEETS DE LA TIENDA (Comida + Cosméticos)
      ------------------------------------------------------------
-     La hoja tiene 5 columnas x 5 filas.
-     El item define: sprite: [col, row]  (0-indexado)
-     · background-size: 500% 500%
-     · background-position: (col * 25)% (row * 25)%
+     comida: 5 cols x 5 rows ("img/tienda/comida-sheet.png")
+     tienda: 5 cols x 5 rows ("img/tienda/tienda-sheet.png")
      ============================================================ */
-  const SPRITE_SHEET = {
-    url: "img/tienda/comida-sheet.png",
-    cols: 5,
-    rows: 5
+  const SPRITE_SHEETS = {
+    comida: {
+      url: "img/tienda/comida-sheet.png",
+      cols: 5,
+      rows: 5
+    },
+    tienda: {
+      url: "img/tienda/tienda-sheet.png",
+      cols: 5,
+      rows: 5
+    }
   };
 
   function construirPreview(item, esComida) {
     const iconoSVG = ICONO[item.icono] || ICONO.estrella || "";
 
-    // Si es comida y tiene coordenadas de sprite → usamos el PNG
-    if (esComida && Array.isArray(item.sprite) && item.sprite.length === 2) {
+    // Si tiene coordenadas de sprite → renderizar sprite pixel art
+    if (Array.isArray(item.sprite) && item.sprite.length === 2) {
+      const sheetKey = item.sheet || (esComida ? "comida" : "tienda");
+      const sheet = SPRITE_SHEETS[sheetKey] || SPRITE_SHEETS.tienda;
       const [col, row] = item.sprite;
-      const posX = (col / (SPRITE_SHEET.cols - 1)) * 100;
-      const posY = (row / (SPRITE_SHEET.rows - 1)) * 100;
-      return `<div class="tienda-item-preview"><div class="tienda-item-sprite" style="background-position:${posX}% ${posY}%"></div></div>`;
+      const posX = sheet.cols > 1 ? (col / (sheet.cols - 1)) * 100 : 50;
+      const posY = sheet.rows > 1 ? (row / (sheet.rows - 1)) * 100 : 50;
+      return `<div class="tienda-item-preview"><div class="tienda-item-sprite ${sheetKey === "tienda" ? "tienda-item-sprite-skin" : ""}" style="background-image:url('${sheet.url}');background-size:${sheet.cols * 100}% ${sheet.rows * 100}%;background-position:${posX}% ${posY}%"></div></div>`;
     }
 
     // Fallback: SVG dorado de siempre
@@ -224,12 +231,33 @@
       ? `<span class="tienda-item-desc">+${item.efecto.hambre} <span data-icono="comida"></span> +${item.efecto.felicidad} <span data-icono="corazon"></span></span>`
       : `<span class="tienda-item-desc">${item.desc || "Adorno"}</span>`;
 
+    // Calcula precio con descuento si hay corbata equipada
+    let precioFinal = item.precio;
+    if (!esComida) {
+      try {
+        const bonusActivos = typeof window._getBonusActivos === "function" ? window._getBonusActivos() : [];
+        const tieneDescuento = bonusActivos.some(function(b) { return b.tipo === "descuento_tienda"; });
+        if (tieneDescuento) precioFinal = Math.round(item.precio * 0.85);
+      } catch(e) {}
+    }
+    const puedeComprar = getMonedas() >= precioFinal;
+    const precioHtml = precioFinal < item.precio
+      ? `<span class="tienda-item-precio ${puedeComprar ? "" : "no-alcanza"}">
+           ${ICONO.moneda || ""} <s style="opacity:.5;font-size:.8em">${item.precio}</s> ${precioFinal}
+         </span>`
+      : `<span class="tienda-item-precio ${puede ? "" : "no-alcanza"}">${ICONO.moneda || ""} ${item.precio}</span>`;
+
+    const bonusBadge = (!esComida && item.bonus && item.bonus.desc)
+      ? `<span class="tienda-item-efecto">\u26a1 ${item.bonus.desc}</span>`
+      : "";
+
     it.innerHTML = `
       <button type="button" class="tienda-fav ${esFav ? "activo" : ""}" title="Favorito">★</button>
       ${previewHTML}
       <span class="tienda-item-nombre">${item.nombre}</span>
       ${desc}
-      <span class="tienda-item-precio ${puede ? "" : "no-alcanza"}">${ICONO.moneda || ""} ${item.precio}</span>
+      ${bonusBadge}
+      ${precioHtml}
     `;
 
     qs(".tienda-fav", it).addEventListener("click", (e) => {

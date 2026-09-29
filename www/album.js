@@ -6,9 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const URL_EXPIRY = 3600, URL_EXPIRY_CANCIONES = 14400, DURACION_CACHE_URL = (URL_EXPIRY - 60) * 1000;
   const CENSURA_KEY = "sunadventures_censura_activa";
   const PUSH_VAPID_PUBLIC_KEY = "BGFg_T3XTTCpN0aIKRXGq3sBvh0RGWOFmxx25tdpQ5OhNgHmuFDJ7TiXLfmgy4ktdqfE81uODV_PLKFqu_vy7_w";
-  const AUDIO_EXTS = ["mp3","m4a","wav","ogg","flac","aac","opus"], VIDEO_EXTS = ["mp4","webm","mov","mkv"];
-  const MESES_LARGOS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-  const MESES_CORTOS = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+  const AUDIO_EXTS = ["mp3", "m4a", "wav", "ogg", "flac", "aac", "opus"], VIDEO_EXTS = ["mp4", "webm", "mov", "mkv"];
+  const MESES_LARGOS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const MESES_CORTOS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
   if (typeof window.supabase === "undefined") {
     document.getElementById("loading-screen")?.classList.remove("active");
@@ -22,139 +22,139 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 10000);
 
   const SVG = {
-    trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>',
-    edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>',
-    expand:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>',
-    close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
-    play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
-    pause:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>',
-    repeat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
-    repeatOne:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/><path d="M11 10h1v4"/></svg>',
-    volHigh:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>',
-    volLow:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>',
-    volMute:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12a4.5 4.5 0 0 0-2.5-4v2.1l2.4 2.4c.06-.16.1-.33.1-.5zM19 12c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.8 8.8 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>',
-    external:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>',
-    camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
-    music:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
-    note:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>',
-    trophy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4a2 2 0 0 1-2-2V6h4"/><path d="M18 9h2a2 2 0 0 0 2-2V6h-4"/><path d="M6 4h12v6a6 6 0 0 1-12 0z"/><path d="M12 16v4"/><path d="M8 20h8"/></svg>',
-    calendar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
-    crown:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18l-1.5-9-4.5 4L12 5 9 13 4.5 9 3 18z"/></svg>',
-    fire:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c0 3 3 4 3 8 0 1.5-1 3-3 3s-3-1.5-3-3c0-1 1-2 1-3 0-1-1-2-1-3 2 0 3-1 3-2z"/><path d="M11 19c-3 0-6-2-6-6 0-1 1-3 2-4 0 2 1 3 2 3 0-2 1-3 2-4-1 3 3 5 3 8 0 2-1 3-3 3z"/></svg>',
-    medal:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="15" r="6"/><path d="M9 3l3 6 3-6" stroke="currentColor" stroke-width="2" fill="none"/></svg>',
-    globe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>',
-    image:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
-    sparkle:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z"/><path d="M19 3l.7 2.8L22 6.5l-2.3.7L19 10l-.7-2.8L16 6.5l2.3-.7L19 3z" opacity=".7"/></svg>',
-    sunflower:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2.5"/><ellipse cx="12" cy="5.5" rx="1.7" ry="2.4"/><ellipse cx="12" cy="18.5" rx="1.7" ry="2.4"/><ellipse cx="5.5" cy="12" rx="2.4" ry="1.7"/><ellipse cx="18.5" cy="12" rx="2.4" ry="1.7"/><ellipse cx="7.4" cy="7.4" rx="1.7" ry="2.4" transform="rotate(-45 7.4 7.4)"/><ellipse cx="16.6" cy="7.4" rx="1.7" ry="2.4" transform="rotate(45 16.6 7.4)"/><ellipse cx="7.4" cy="16.6" rx="1.7" ry="2.4" transform="rotate(45 7.4 16.6)"/><ellipse cx="16.6" cy="16.6" rx="1.7" ry="2.4" transform="rotate(-45 16.6 16.6)"/></svg>',
-    heart:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
-    tap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v7"/><path d="M13 13V9a2 2 0 0 1 4 0v6"/><path d="M17 12a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6h-3a6 6 0 0 1-6-6v-3a2 2 0 0 1 4 0"/></svg>'
+    trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>',
+    edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>',
+    expand: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>',
+    close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+    play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+    pause: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>',
+    repeat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
+    repeatOne: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/><path d="M11 10h1v4"/></svg>',
+    volHigh: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>',
+    volLow: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>',
+    volMute: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12a4.5 4.5 0 0 0-2.5-4v2.1l2.4 2.4c.06-.16.1-.33.1-.5zM19 12c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.8 8.8 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>',
+    external: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>',
+    camera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+    music: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+    note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>',
+    trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4a2 2 0 0 1-2-2V6h4"/><path d="M18 9h2a2 2 0 0 0 2-2V6h-4"/><path d="M6 4h12v6a6 6 0 0 1-12 0z"/><path d="M12 16v4"/><path d="M8 20h8"/></svg>',
+    calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+    crown: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18l-1.5-9-4.5 4L12 5 9 13 4.5 9 3 18z"/></svg>',
+    fire: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c0 3 3 4 3 8 0 1.5-1 3-3 3s-3-1.5-3-3c0-1 1-2 1-3 0-1-1-2-1-3 2 0 3-1 3-2z"/><path d="M11 19c-3 0-6-2-6-6 0-1 1-3 2-4 0 2 1 3 2 3 0-2 1-3 2-4-1 3 3 5 3 8 0 2-1 3-3 3z"/></svg>',
+    medal: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="15" r="6"/><path d="M9 3l3 6 3-6" stroke="currentColor" stroke-width="2" fill="none"/></svg>',
+    globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>',
+    image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
+    sparkle: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z"/><path d="M19 3l.7 2.8L22 6.5l-2.3.7L19 10l-.7-2.8L16 6.5l2.3-.7L19 3z" opacity=".7"/></svg>',
+    sunflower: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2.5"/><ellipse cx="12" cy="5.5" rx="1.7" ry="2.4"/><ellipse cx="12" cy="18.5" rx="1.7" ry="2.4"/><ellipse cx="5.5" cy="12" rx="2.4" ry="1.7"/><ellipse cx="18.5" cy="12" rx="2.4" ry="1.7"/><ellipse cx="7.4" cy="7.4" rx="1.7" ry="2.4" transform="rotate(-45 7.4 7.4)"/><ellipse cx="16.6" cy="7.4" rx="1.7" ry="2.4" transform="rotate(45 16.6 7.4)"/><ellipse cx="7.4" cy="16.6" rx="1.7" ry="2.4" transform="rotate(45 7.4 16.6)"/><ellipse cx="16.6" cy="16.6" rx="1.7" ry="2.4" transform="rotate(-45 16.6 16.6)"/></svg>',
+    heart: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
+    tap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v7"/><path d="M13 13V9a2 2 0 0 1 4 0v6"/><path d="M17 12a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6h-3a6 6 0 0 1-6-6v-3a2 2 0 0 1 4 0"/></svg>'
   };
 
   const $ = (id) => document.getElementById(id);
   const getUserIdSafe = () => window._sunUserId || localStorage.getItem("sunadventures_uid") || "local";
   window._getUserIdSafe = getUserIdSafe;
   const parseCoord = (v) => (v === null || v === undefined || v === "") ? null : (Number.isFinite(Number(v)) ? Number(v) : null);
-  const escapeHtml = (t) => String(t).replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+  const escapeHtml = (t) => String(t).replace(/[&<>'"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[c]));
   const extensionDe = (n) => (n.split(".").pop() || "").toLowerCase();
   const esAudio = (ext) => AUDIO_EXTS.includes(ext);
   const esVideo = (ext) => VIDEO_EXTS.includes(ext);
-  const formatearFecha = (iso) => { const d = new Date(iso + "T00:00:00"); return isNaN(d) ? iso : `${String(d.getDate()).padStart(2,"0")} · ${MESES_CORTOS[d.getMonth()]} · ${d.getFullYear()}`; };
-  const formatearFechaNota = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : `${String(d.getDate()).padStart(2,"0")} ${MESES_CORTOS[d.getMonth()]} ${d.getFullYear()}`; };
-  const formatearTiempo = (seg) => (!isFinite(seg) || seg < 0) ? "0:00" : `${Math.floor(seg/60)}:${String(Math.floor(seg%60)).padStart(2,"0")}`;
-  const formatearTamano = (b) => b < 1024 ? b + " B" : b < 1048576 ? (b/1024).toFixed(1) + " KB" : (b/1048576).toFixed(1) + " MB";
-  const fechaISO = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  const formatearFecha = (iso) => { const d = new Date(iso + "T00:00:00"); return isNaN(d) ? iso : `${String(d.getDate()).padStart(2, "0")} · ${MESES_CORTOS[d.getMonth()]} · ${d.getFullYear()}`; };
+  const formatearFechaNota = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : `${String(d.getDate()).padStart(2, "0")} ${MESES_CORTOS[d.getMonth()]} ${d.getFullYear()}`; };
+  const formatearTiempo = (seg) => (!isFinite(seg) || seg < 0) ? "0:00" : `${Math.floor(seg / 60)}:${String(Math.floor(seg % 60)).padStart(2, "0")}`;
+  const formatearTamano = (b) => b < 1024 ? b + " B" : b < 1048576 ? (b / 1024).toFixed(1) + " KB" : (b / 1048576).toFixed(1) + " MB";
+  const fechaISO = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const hoyISO = () => fechaISO(new Date());
 
-  const grid=$("album-grid"), empty=$("album-empty"), btnAdd=$("btn-add-photo"), modal=$("photo-modal"), modalTitle=$("modal-title"), form=$("photo-form");
-  const inputPhoto=$("input-photo"), inputPhotoCampo=inputPhoto?.closest(".form-field"), inputDate=$("input-date"), inputNote=$("input-note");
-  const preview=$("photo-preview"), photoPreviewInfo=$("photo-preview-info"), submitBtn=form?.querySelector('button[type="submit"]');
-  const btnPhotoLocation=$("btn-photo-location"), photoLocationStatus=$("photo-location-status"), inputLat=$("input-lat"), inputLng=$("input-lng");
-  const aventurasMap=$("aventuras-map"), mapaEmpty=$("mapa-empty"), chatMessages=$("chat-messages"), chatStatus=$("chat-status"), chatForm=$("chat-form"), chatInput=$("chat-input"), btnEnablePush=$("btn-enable-push");
+  const grid = $("album-grid"), empty = $("album-empty"), btnAdd = $("btn-add-photo"), modal = $("photo-modal"), modalTitle = $("modal-title"), form = $("photo-form");
+  const inputPhoto = $("input-photo"), inputPhotoCampo = inputPhoto?.closest(".form-field"), inputDate = $("input-date"), inputNote = $("input-note");
+  const preview = $("photo-preview"), photoPreviewInfo = $("photo-preview-info"), submitBtn = form?.querySelector('button[type="submit"]');
+  const btnPhotoLocation = $("btn-photo-location"), photoLocationStatus = $("photo-location-status"), inputLat = $("input-lat"), inputLng = $("input-lng");
+  const aventurasMap = $("aventuras-map"), mapaEmpty = $("mapa-empty"), chatMessages = $("chat-messages"), chatStatus = $("chat-status"), chatForm = $("chat-form"), chatInput = $("chat-input"), btnEnablePush = $("btn-enable-push");
   let fotoPreviewObjectUrl = null;
-  const notasGrid=$("notas-grid"), notasEmpty=$("notas-empty"), btnAddNota=$("btn-add-nota"), notaModal=$("nota-modal"), notaForm=$("nota-form"), notaModalTitle=$("nota-modal-title");
-  const notaTitulo=$("nota-titulo"), notaContenido=$("nota-contenido"), notaPreview=$("nota-preview");
-  const notaTituloCampo=notaTitulo?.closest(".form-field"), notaColorCampo=document.querySelector("#nota-form .color-picker")?.closest(".form-field"), notaSubmitBtn=notaForm?.querySelector('button[type="submit"]');
-  const playlistsGrid=$("playlists-grid"), playlistsEmpty=$("playlists-empty"), btnAddPlaylist=$("btn-add-playlist"), playlistModal=$("playlist-modal"), playlistForm=$("playlist-form");
-  const playlistNombre=$("playlist-nombre"), playlistDescripcion=$("playlist-descripcion"), playlistSubmitBtn=playlistForm?.querySelector('button[type="submit"]');
-  const cancionesModal=$("canciones-modal"), cancionesModalTitle=$("canciones-modal-title"), cancionesModalDesc=$("canciones-modal-desc"), cancionesLista=$("canciones-lista"), cancionForm=$("cancion-form");
-  const cancionTitulo=$("cancion-titulo"), cancionArtista=$("cancion-artista"), cancionUrl=$("cancion-url");
-  const calGrid=$("cal-grid"), calMesActual=$("cal-mes-actual"), calPrev=$("cal-prev"), calNext=$("cal-next"), calProximos=$("cal-proximos"), calProximosVacio=$("cal-proximos-vacio"), calendarioEmpty=$("calendario-empty");
-  const btnAddEvento=$("btn-add-evento"), btnNotifPermiso=$("btn-notif-permiso"), eventoModal=$("evento-modal"), eventoForm=$("evento-form");
-  const eventoTitulo=$("evento-titulo"), eventoDescripcion=$("evento-descripcion"), eventoFecha=$("evento-fecha"), eventoRecordatorio=$("evento-recordatorio"), eventoRecurrente=$("evento-recurrente"), eventoSubmitBtn=eventoForm?.querySelector('button[type="submit"]');
-  const playerBar=$("player-bar"), playerBarTitle=$("player-bar-title"), playerBarArtist=$("player-bar-artist"), playerCoverIcon=$("player-cover-icon"), playerPlay=$("player-play");
-  const playerNext=$("player-next"), playerPrev=$("player-prev"), playerShuffle=$("player-shuffle"), playerRepeat=$("player-repeat"), playerSeek=$("player-seek");
-  const playerCurrent=$("player-current"), playerDuration=$("player-duration"), playerVolumeBtn=$("player-volume-btn"), playerVolume=$("player-volume"), playerClose=$("player-close"), globalAudio=$("global-audio");
-  const loadingScreen=$("loading-screen"), loadingText=$("loading-text");
-  const authModal=$("auth-modal"), btnOpenLogin=$("btn-open-login"), authForm=$("auth-form"), authUsername=$("auth-username"), authPassword=$("auth-password"), authPasswordConfirm=$("auth-password-confirm");
-  const confirmField=$("confirm-password-field"), authSubmit=$("auth-submit"), authTitle=$("auth-title"), authSubtitle=$("auth-subtitle"), authToggleText=$("auth-toggle-text"), authToggleBtn=$("auth-toggle-btn"), authError=$("auth-error");
-  const userInfo=$("user-info"), userEmail=$("user-email"), logoutBtn=$("logout-btn"), userMenuToggle=$("user-menu-toggle"), userDropdown=$("user-dropdown");
-  const friendsModal=$("friends-modal"), friendsGroupName=$("friends-group-name"), friendSearchForm=$("friend-search-form"), friendSearchInput=$("friend-search-input"), friendSearchResults=$("friend-search-results");
-  const groupMembersList=$("group-members-list"), groupInvitesList=$("group-invites-list"), settingsModal=$("settings-modal"), toggleCensura=$("toggle-censura");
-  const logrosPersonalesGrid=$("logros-personales-grid"), logrosGrupoGrid=$("logros-grupo-grid"), logrosDesbloqueados=$("logros-desbloqueados"), logroToast=$("logro-toast");
-  const experienciaTitulo=$("experiencia-titulo"), experienciaXp=$("experiencia-xp"), experienciaProgreso=$("experiencia-progreso"), experienciaSiguiente=$("experiencia-siguiente");
+  const notasGrid = $("notas-grid"), notasEmpty = $("notas-empty"), btnAddNota = $("btn-add-nota"), notaModal = $("nota-modal"), notaForm = $("nota-form"), notaModalTitle = $("nota-modal-title");
+  const notaTitulo = $("nota-titulo"), notaContenido = $("nota-contenido"), notaPreview = $("nota-preview");
+  const notaTituloCampo = notaTitulo?.closest(".form-field"), notaColorCampo = document.querySelector("#nota-form .color-picker")?.closest(".form-field"), notaSubmitBtn = notaForm?.querySelector('button[type="submit"]');
+  const playlistsGrid = $("playlists-grid"), playlistsEmpty = $("playlists-empty"), btnAddPlaylist = $("btn-add-playlist"), playlistModal = $("playlist-modal"), playlistForm = $("playlist-form");
+  const playlistNombre = $("playlist-nombre"), playlistDescripcion = $("playlist-descripcion"), playlistSubmitBtn = playlistForm?.querySelector('button[type="submit"]');
+  const cancionesModal = $("canciones-modal"), cancionesModalTitle = $("canciones-modal-title"), cancionesModalDesc = $("canciones-modal-desc"), cancionesLista = $("canciones-lista"), cancionForm = $("cancion-form");
+  const cancionTitulo = $("cancion-titulo"), cancionArtista = $("cancion-artista"), cancionUrl = $("cancion-url");
+  const calGrid = $("cal-grid"), calMesActual = $("cal-mes-actual"), calPrev = $("cal-prev"), calNext = $("cal-next"), calProximos = $("cal-proximos"), calProximosVacio = $("cal-proximos-vacio"), calendarioEmpty = $("calendario-empty");
+  const btnAddEvento = $("btn-add-evento"), btnNotifPermiso = $("btn-notif-permiso"), eventoModal = $("evento-modal"), eventoForm = $("evento-form");
+  const eventoTitulo = $("evento-titulo"), eventoDescripcion = $("evento-descripcion"), eventoFecha = $("evento-fecha"), eventoRecordatorio = $("evento-recordatorio"), eventoRecurrente = $("evento-recurrente"), eventoSubmitBtn = eventoForm?.querySelector('button[type="submit"]');
+  const playerBar = $("player-bar"), playerBarTitle = $("player-bar-title"), playerBarArtist = $("player-bar-artist"), playerCoverIcon = $("player-cover-icon"), playerPlay = $("player-play");
+  const playerNext = $("player-next"), playerPrev = $("player-prev"), playerShuffle = $("player-shuffle"), playerRepeat = $("player-repeat"), playerSeek = $("player-seek");
+  const playerCurrent = $("player-current"), playerDuration = $("player-duration"), playerVolumeBtn = $("player-volume-btn"), playerVolume = $("player-volume"), playerClose = $("player-close"), globalAudio = $("global-audio");
+  const loadingScreen = $("loading-screen"), loadingText = $("loading-text");
+  const authModal = $("auth-modal"), btnOpenLogin = $("btn-open-login"), authForm = $("auth-form"), authUsername = $("auth-username"), authPassword = $("auth-password"), authPasswordConfirm = $("auth-password-confirm");
+  const confirmField = $("confirm-password-field"), authSubmit = $("auth-submit"), authTitle = $("auth-title"), authSubtitle = $("auth-subtitle"), authToggleText = $("auth-toggle-text"), authToggleBtn = $("auth-toggle-btn"), authError = $("auth-error");
+  const userInfo = $("user-info"), userEmail = $("user-email"), logoutBtn = $("logout-btn"), userMenuToggle = $("user-menu-toggle"), userDropdown = $("user-dropdown");
+  const friendsModal = $("friends-modal"), friendsGroupName = $("friends-group-name"), friendSearchForm = $("friend-search-form"), friendSearchInput = $("friend-search-input"), friendSearchResults = $("friend-search-results");
+  const groupMembersList = $("group-members-list"), groupInvitesList = $("group-invites-list"), settingsModal = $("settings-modal"), toggleCensura = $("toggle-censura");
+  const logrosPersonalesGrid = $("logros-personales-grid"), logrosGrupoGrid = $("logros-grupo-grid"), logrosDesbloqueados = $("logros-desbloqueados"), logroToast = $("logro-toast");
+  const experienciaTitulo = $("experiencia-titulo"), experienciaXp = $("experiencia-xp"), experienciaProgreso = $("experiencia-progreso"), experienciaSiguiente = $("experiencia-siguiente");
 
-  let fotos=[], notas=[], notaEditando=null, fotoEditando=null;
-  let colorSeleccionado="amarillo", modoRegistro=false, grupoActivo=null, perfilActual=null, visitasConsecutivas=0;
-  let playlists=[], playlistEditando=null, emojiSeleccionado="music", colorPlaylistSeleccionado="amarillo";
-  let eventos=[], mesMostrado=new Date(), colorEventoSeleccionado="amarillo";
-  let renderEnCurso=false, renderPendiente=false, subiendoFoto=false, colaSesion=Promise.resolve();
+  let fotos = [], notas = [], notaEditando = null, fotoEditando = null;
+  let colorSeleccionado = "amarillo", modoRegistro = false, grupoActivo = null, perfilActual = null, visitasConsecutivas = 0;
+  let playlists = [], playlistEditando = null, emojiSeleccionado = "music", colorPlaylistSeleccionado = "amarillo";
+  let eventos = [], mesMostrado = new Date(), colorEventoSeleccionado = "amarillo";
+  let renderEnCurso = false, renderPendiente = false, subiendoFoto = false, colaSesion = Promise.resolve();
   const urlsFirmadasCache = new Map();
-  let archivosPendientes=[], usuarioActualId=null;
-  let colaReproduccion=[], indiceReproduccion=-1, modoAleatorio=false, modoRepetir="off";
+  let archivosPendientes = [], usuarioActualId = null;
+  let colaReproduccion = [], indiceReproduccion = -1, modoAleatorio = false, modoRepetir = "off";
   let volumenActual = parseFloat(localStorage.getItem("player_volumen") || "0.8");
-  let silenciadoAntes=false, reproduciendo=false;
-  let chatSubscription=null, chatModo="grupo", chatDestinatario=null;
+  let silenciadoAntes = false, reproduciendo = false;
+  let chatSubscription = null, chatModo = "grupo", chatDestinatario = null;
   mesMostrado.setDate(1);
 
   const mostrarLoading = (msg = "Cargando...") => { if (!loadingScreen) return; if (loadingText) loadingText.textContent = msg; loadingScreen.classList.add("active"); loadingScreen.setAttribute("aria-hidden", "false"); };
   const ocultarLoading = () => { if (!loadingScreen) return; loadingScreen.classList.remove("active"); loadingScreen.setAttribute("aria-hidden", "true"); };
 
   const IMAGENES_MASCOTA = {
-    mapache:"img/mapache.png", girasol:"img/mascota-girasol.png",
-    gatito:"img/siamesa.png", "gatito-negro":"img/gatito-negro.png",
-    hamburguesa:"img/hamburguesa.png", oveja:"img/oveja.png", pollito:"img/pollito.png",
-    jirafa:"img/jirafa.png", unicornio:"img/unicornio.png", conejo:"img/conejito.png",
-    "dragon-bebe":"img/dragon-bebe.png", "dragon-anciano":"img/dragon-anciano.png"
+    mapache: "img/mapache.png", girasol: "img/mascota-girasol.png",
+    gatito: "img/siamesa.png", "gatito-negro": "img/gatito-negro.png",
+    hamburguesa: "img/hamburguesa.png", oveja: "img/oveja.png", pollito: "img/pollito.png",
+    jirafa: "img/jirafa.png", unicornio: "img/unicornio.png", conejo: "img/conejito.png",
+    "dragon-bebe": "img/dragon-bebe.png", "dragon-anciano": "img/dragon-anciano.png"
   };
 
   const LOGROS = [
-    { id:"primeros-pasos", tipo:"grupo", icono:SVG.medal, nombre:"Primeros pasos", descripcion:"Guarda la primera foto del grupo", meta:1, medir:() => fotos.length },
-    { id:"fotografos", tipo:"grupo", icono:SVG.camera, nombre:"Fotógrafos", descripcion:"Guarda 50 fotos del grupo", meta:50, medir:() => fotos.length },
-    { id:"dj", tipo:"grupo", icono:SVG.music, nombre:"DJ", descripcion:"Añade 20 canciones al grupo", meta:20, medir:() => playlists.reduce((t,p) => t + p.canciones.length, 0) },
-    { id:"poetas", tipo:"grupo", icono:SVG.note, nombre:"Poetas", descripcion:"Escribe 30 notas del grupo", meta:30, medir:() => notas.length },
-    { id:"racha", icono:SVG.fire, nombre:"Racha de 30 días", descripcion:"Abre la app 30 días seguidos", meta:30, medir:() => visitasConsecutivas },
-    { id:"trotamundos", tipo:"grupo", icono:SVG.globe, nombre:"Trotamundos", descripcion:"Guarda 10 fotos con ubicación", meta:10, medir:() => fotos.filter(f => f.lat != null && f.lng != null).length },
-    { id:"racha-365", icono:SVG.calendar, nombre:"Un año de nosotros", descripcion:"Abre la app 365 días seguidos", meta:365, medir:() => visitasConsecutivas },
-    { id:"todos-los-logros", tipo:"grupo", icono:SVG.crown, nombre:"Leyenda absoluta", descripcion:"Completa todos los demás logros", meta:1, esFinal:true, medir:() => LOGROS.filter(l => !l.esFinal).every(l => l.medir() >= l.meta) ? 1 : 0 }
+    { id: "primeros-pasos", tipo: "grupo", icono: SVG.medal, nombre: "Primeros pasos", descripcion: "Guarda la primera foto del grupo", meta: 1, medir: () => fotos.length },
+    { id: "fotografos", tipo: "grupo", icono: SVG.camera, nombre: "Fotógrafos", descripcion: "Guarda 50 fotos del grupo", meta: 50, medir: () => fotos.length },
+    { id: "dj", tipo: "grupo", icono: SVG.music, nombre: "DJ", descripcion: "Añade 20 canciones al grupo", meta: 20, medir: () => playlists.reduce((t, p) => t + p.canciones.length, 0) },
+    { id: "poetas", tipo: "grupo", icono: SVG.note, nombre: "Poetas", descripcion: "Escribe 30 notas del grupo", meta: 30, medir: () => notas.length },
+    { id: "racha", icono: SVG.fire, nombre: "Racha de 30 días", descripcion: "Abre la app 30 días seguidos", meta: 30, medir: () => visitasConsecutivas },
+    { id: "trotamundos", tipo: "grupo", icono: SVG.globe, nombre: "Trotamundos", descripcion: "Guarda 10 fotos con ubicación", meta: 10, medir: () => fotos.filter(f => f.lat != null && f.lng != null).length },
+    { id: "racha-365", icono: SVG.calendar, nombre: "Un año de nosotros", descripcion: "Abre la app 365 días seguidos", meta: 365, medir: () => visitasConsecutivas },
+    { id: "todos-los-logros", tipo: "grupo", icono: SVG.crown, nombre: "Leyenda absoluta", descripcion: "Completa todos los demás logros", meta: 1, esFinal: true, medir: () => LOGROS.filter(l => !l.esFinal).every(l => l.medir() >= l.meta) ? 1 : 0 }
   ];
 
   const MASCOTAS_LOGROS = [
-    { id:"mapache", nombre:"el Mapache", icono:SVG.heart },{ id:"girasol", nombre:"el Girasol", icono:SVG.sunflower },
-    { id:"gatito", nombre:"la Siamesa", icono:SVG.heart },{ id:"gatito-negro", nombre:"el Gato Negro", icono:SVG.heart },
-    { id:"hamburguesa", nombre:"Hamburguesa", icono:SVG.heart },{ id:"oveja", nombre:"la Oveja", icono:SVG.heart },
-    { id:"pollito", nombre:"el Pollito", icono:SVG.heart },{ id:"jirafa", nombre:"la Jirafa", icono:SVG.heart },
-    { id:"unicornio", nombre:"el Unicornio", icono:SVG.sparkle },{ id:"conejo", nombre:"el Conejito", icono:SVG.heart },
-    { id:"dragon-bebe", nombre:"el Dragón Bebé", icono:SVG.fire },{ id:"dragon-anciano", nombre:"el Dragón Anciano", icono:SVG.crown }
+    { id: "mapache", nombre: "el Mapache", icono: SVG.heart }, { id: "girasol", nombre: "el Girasol", icono: SVG.sunflower },
+    { id: "gatito", nombre: "la Siamesa", icono: SVG.heart }, { id: "gatito-negro", nombre: "el Gato Negro", icono: SVG.heart },
+    { id: "hamburguesa", nombre: "Hamburguesa", icono: SVG.heart }, { id: "oveja", nombre: "la Oveja", icono: SVG.heart },
+    { id: "pollito", nombre: "el Pollito", icono: SVG.heart }, { id: "jirafa", nombre: "la Jirafa", icono: SVG.heart },
+    { id: "unicornio", nombre: "el Unicornio", icono: SVG.sparkle }, { id: "conejo", nombre: "el Conejito", icono: SVG.heart },
+    { id: "dragon-bebe", nombre: "el Dragón Bebé", icono: SVG.fire }, { id: "dragon-anciano", nombre: "el Dragón Anciano", icono: SVG.crown }
   ];
 
   MASCOTAS_LOGROS.forEach(m => {
     const sprite = IMAGENES_MASCOTA[m.id];
     const nombreCorto = m.nombre.replace(/^(el|la) /, "");
     LOGROS.push(
-      { id:`mascota-${m.id}`, sprites:[sprite], icono:m.icono, nombre:`Conoce a ${m.nombre}`, descripcion:`Interactúa con ${m.nombre} por primera vez`, meta:1, medir:() => JSON.parse(localStorage.getItem(`mascotas_conocidas_${getUserIdSafe()}`) || "[]").includes(m.id) ? 1 : 0 },
-      { id:`clics-${m.id}`, sprites:[sprite], icono:SVG.tap, nombre:`Fan de ${nombreCorto}`, descripcion:`Dale 100 clics a ${nombreCorto}`, meta:100, medir:() => Number(localStorage.getItem(`mascota_clicks_${getUserIdSafe()}_${m.id}`) || 0) }
+      { id: `mascota-${m.id}`, sprites: [sprite], icono: m.icono, nombre: `Conoce a ${m.nombre}`, descripcion: `Interactúa con ${m.nombre} por primera vez`, meta: 1, medir: () => JSON.parse(localStorage.getItem(`mascotas_conocidas_${getUserIdSafe()}`) || "[]").includes(m.id) ? 1 : 0 },
+      { id: `clics-${m.id}`, sprites: [sprite], icono: SVG.tap, nombre: `Fan de ${nombreCorto}`, descripcion: `Dale 100 clics a ${nombreCorto}`, meta: 100, medir: () => Number(localStorage.getItem(`mascota_clicks_${getUserIdSafe()}_${m.id}`) || 0) }
     );
   });
-MASCOTAS_LOGROS.forEach(m => { /* ... */ });
+  MASCOTAS_LOGROS.forEach(m => { /* ... */ });
 
-// ✅ AHORA SÍ: LOGROS ya está inicializado
-window.LOGROS = LOGROS;
-window.renderLogros = renderLogros;
-window._playlists = playlists;
-window._eventos = eventos;
-window._fotos = fotos;
+  // ✅ AHORA SÍ: LOGROS ya está inicializado
+  window.LOGROS = LOGROS;
+  window.renderLogros = renderLogros;
+  window._playlists = playlists;
+  window._eventos = eventos;
+  window._fotos = fotos;
 
-let logroToastTimeout = null;
+  let logroToastTimeout = null;
   const notificarLogro = (logro) => {
     if (!logroToast) return;
     const spriteHTML = logro.sprites?.[0] ? `<img src="${logro.sprites[0]}" alt="" class="logro-toast-sprite">` : "";
@@ -172,17 +172,17 @@ let logroToastTimeout = null;
     return wrapper;
   };
 
-  const NIVEL_A_ICONO = { sprout:"raiz", heart:"corazon", flame:"fuego", sparkle:"estrella", sunflower:"girasol" };
+  const NIVEL_A_ICONO = { sprout: "raiz", heart: "corazon", flame: "fuego", sparkle: "estrella", sunflower: "girasol" };
 
   const NIVELES_EXPERIENCIA = [
-    { minimo:0, nombre:"Novatos", icono:"sprout", siguiente:100, siguienteNombre:"Enamorados", siguienteIcono:"heart" },
-    { minimo:100, nombre:"Enamorados", icono:"heart", siguiente:500, siguienteNombre:"Compañeros de vida", siguienteIcono:"flame" },
-    { minimo:500, nombre:"Compañeros de vida", icono:"flame", siguiente:1000, siguienteNombre:"Almas gemelas", siguienteIcono:"sparkle" },
-    { minimo:1000, nombre:"Almas gemelas", icono:"sparkle", siguiente:5000, siguienteNombre:"Leyendas", siguienteIcono:"sunflower" },
-    { minimo:5000, nombre:"Leyendas", icono:"sunflower", siguiente:null, siguienteNombre:"Máximo nivel", siguienteIcono:null }
+    { minimo: 0, nombre: "Novatos", icono: "sprout", siguiente: 100, siguienteNombre: "Enamorados", siguienteIcono: "heart" },
+    { minimo: 100, nombre: "Enamorados", icono: "heart", siguiente: 500, siguienteNombre: "Compañeros de vida", siguienteIcono: "flame" },
+    { minimo: 500, nombre: "Compañeros de vida", icono: "flame", siguiente: 1000, siguienteNombre: "Almas gemelas", siguienteIcono: "sparkle" },
+    { minimo: 1000, nombre: "Almas gemelas", icono: "sparkle", siguiente: 5000, siguienteNombre: "Leyendas", siguienteIcono: "sunflower" },
+    { minimo: 5000, nombre: "Leyendas", icono: "sunflower", siguiente: null, siguienteNombre: "Máximo nivel", siguienteIcono: null }
   ];
 
-  const calcularExperiencia = () => { const canciones = playlists.reduce((t,p) => t + p.canciones.length, 0); return fotos.length * 10 + notas.length * 5 + canciones * 8 + visitasConsecutivas * 20; };
+  const calcularExperiencia = () => { const canciones = playlists.reduce((t, p) => t + p.canciones.length, 0); return fotos.length * 10 + notas.length * 5 + canciones * 8 + visitasConsecutivas * 20; };
 
   const hidratarIconosEn = (root) => {
     if (!root) return;
@@ -277,7 +277,7 @@ let logroToastTimeout = null;
 
   window.addEventListener("sunadventures:progress", () => renderLogros({ notificar: true }));
 
-  const usernameDesdeSesion = (s) => (s?.user?.email?.split("@")[0] || "usuario").toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0,20).padEnd(3,"_");
+  const usernameDesdeSesion = (s) => (s?.user?.email?.split("@")[0] || "usuario").toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0, 20).padEnd(3, "_");
 
   async function asegurarGrupoActivo() {
     try {
@@ -301,7 +301,7 @@ let logroToastTimeout = null;
         localStorage.setItem("grupo_activo", grupo.id);
       }
       grupoActivo = membresia.grupos || { id: membresia.grupo_id, nombre: "Nuestro grupo de aventuras" };
-      await Promise.all(["fotos","notas","playlists"].map(t => supabase.from(t).update({ grupo_id: grupoActivo.id }).eq("user_id", session.user.id).is("grupo_id", null)));
+      await Promise.all(["fotos", "notas", "playlists"].map(t => supabase.from(t).update({ grupo_id: grupoActivo.id }).eq("user_id", session.user.id).is("grupo_id", null)));
       return grupoActivo;
     } catch (err) { console.error("asegurarGrupoActivo error:", err); grupoActivo = null; return null; }
   }
@@ -404,7 +404,7 @@ let logroToastTimeout = null;
       if (!session) { fotos = []; return; }
       const { data, error } = await supabase.from("fotos").select("id,path,fecha,nota,lat,lng,lugar,grupo_id").eq("grupo_id", grupoActivo.id).order("created_at", { ascending: false });
       if (error) { fotos = []; return; }
-      fotos = (data || []).map(f => ({ id:f.id, path:f.path, fecha:f.fecha, nota:f.nota, lat:f.lat, lng:f.lng, lugar:f.lugar, grupo_id:f.grupo_id }));
+      fotos = (data || []).map(f => ({ id: f.id, path: f.path, fecha: f.fecha, nota: f.nota, lat: f.lat, lng: f.lng, lugar: f.lugar, grupo_id: f.grupo_id }));
     } catch (err) { console.warn("cargarFotos:", err); fotos = []; }
   }
 
@@ -422,7 +422,7 @@ let logroToastTimeout = null;
     try {
       const g = urlsFirmadasCache.get(path);
       if (g && g.expira > Date.now()) return g.url;
-      if (window.SunOffline) { const offlineUrl = await window.SunOffline.obtenerImagenOffline(path); if (offlineUrl) { urlsFirmadasCache.set(path, { url: offlineUrl, expira: Date.now() + 24*3600*1000 }); return offlineUrl; } }
+      if (window.SunOffline) { const offlineUrl = await window.SunOffline.obtenerImagenOffline(path); if (offlineUrl) { urlsFirmadasCache.set(path, { url: offlineUrl, expira: Date.now() + 24 * 3600 * 1000 }); return offlineUrl; } }
       const { data, error } = await supabase.storage.from(BUCKET_NAME).createSignedUrl(path, URL_EXPIRY);
       if (error) return null;
       urlsFirmadasCache.set(path, { url: data.signedUrl, expira: Date.now() + DURACION_CACHE_URL });
@@ -510,7 +510,7 @@ let logroToastTimeout = null;
       else if (inputDate) inputDate.value = new Date().toISOString().split("T")[0];
       actualizarEstadoUbicacion();
       if (fotoPreviewObjectUrl) { URL.revokeObjectURL(fotoPreviewObjectUrl); fotoPreviewObjectUrl = null; }
-     if (preview) mostrarContenidoVistaPrevia(fotoParaEditar ? await obtenerUrlFirmada(fotoParaEditar.path) : null);
+      if (preview) mostrarContenidoVistaPrevia(fotoParaEditar ? await obtenerUrlFirmada(fotoParaEditar.path) : null);
       if (modalTitle) modalTitle.textContent = fotoParaEditar ? "Editar recuerdo" : "Nuevo recuerdo";
       if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = fotoParaEditar ? "Actualizar recuerdo" : "Guardar recuerdo"; }
     } catch (err) { console.warn("abrirModal:", err); }
@@ -652,7 +652,7 @@ let logroToastTimeout = null;
       chatInput.disabled = false;
       if (error) return alert("No se pudo enviar: " + error.message);
       chatInput.value = ""; chatInput.focus();
-      supabase.functions.invoke("send-push", { body: { message: { ...mensaje, user_id: session.user.id } } }).catch(() => {});
+      supabase.functions.invoke("send-push", { body: { message: { ...mensaje, user_id: session.user.id } } }).catch(() => { });
     } catch (err) { console.warn("chat submit:", err); }
   });
 
@@ -676,80 +676,80 @@ let logroToastTimeout = null;
   if (btnAdd) btnAdd.addEventListener("click", () => abrirModal());
   modal?.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", cerrarModal));
 
-/* ---------- Listeners de vista previa (faltaban) ---------- */
-inputPhoto?.addEventListener("change", () => {
-  const file = inputPhoto.files?.[0] || null;
-  mostrarVistaPreviaFoto(file);
-  actualizarVistaPreviaFotoInfo();
-});
+  /* ---------- Listeners de vista previa (faltaban) ---------- */
+  inputPhoto?.addEventListener("change", () => {
+    const file = inputPhoto.files?.[0] || null;
+    mostrarVistaPreviaFoto(file);
+    actualizarVistaPreviaFotoInfo();
+  });
 
-inputDate?.addEventListener("change", () => {
-  const date = preview?.querySelector(".photo-preview-date");
-  const note = preview?.querySelector(".photo-preview-note");
-  actualizarContenidoVistaPrevia(date, note);
-  actualizarVistaPreviaFotoInfo();
-});
+  inputDate?.addEventListener("change", () => {
+    const date = preview?.querySelector(".photo-preview-date");
+    const note = preview?.querySelector(".photo-preview-note");
+    actualizarContenidoVistaPrevia(date, note);
+    actualizarVistaPreviaFotoInfo();
+  });
 
-inputNote?.addEventListener("input", () => {
-  const date = preview?.querySelector(".photo-preview-date");
-  const note = preview?.querySelector(".photo-preview-note");
-  actualizarContenidoVistaPrevia(date, note);
-  actualizarVistaPreviaFotoInfo();
-});
+  inputNote?.addEventListener("input", () => {
+    const date = preview?.querySelector(".photo-preview-date");
+    const note = preview?.querySelector(".photo-preview-note");
+    actualizarContenidoVistaPrevia(date, note);
+    actualizarVistaPreviaFotoInfo();
+  });
 
- function mostrarVistaPreviaFoto(file) {
-  if (fotoPreviewObjectUrl) URL.revokeObjectURL(fotoPreviewObjectUrl);
-  if (!file) {
-    mostrarContenidoVistaPrevia(null);
-    return;
-  }
-  fotoPreviewObjectUrl = URL.createObjectURL(file);
-  mostrarContenidoVistaPrevia(fotoPreviewObjectUrl);
-}
-
-function mostrarContenidoVistaPrevia(url) {
-  if (!preview) return;
-  preview.innerHTML = "";
-
-  if (url) {
-    const img = document.createElement("img");
-    img.src = url; img.alt = "Vista previa";
-    preview.appendChild(img);
-  } else {
-    const ph = document.createElement("div");
-    ph.className = "photo-preview-placeholder";
-    ph.textContent = "Selecciona una foto para verla aquí";
-    preview.appendChild(ph);
+  function mostrarVistaPreviaFoto(file) {
+    if (fotoPreviewObjectUrl) URL.revokeObjectURL(fotoPreviewObjectUrl);
+    if (!file) {
+      mostrarContenidoVistaPrevia(null);
+      return;
+    }
+    fotoPreviewObjectUrl = URL.createObjectURL(file);
+    mostrarContenidoVistaPrevia(fotoPreviewObjectUrl);
   }
 
-  const cap  = document.createElement("div");   cap.className  = "photo-preview-caption";
-  const date = document.createElement("span");  date.className = "photo-preview-date";
-  const note = document.createElement("p");     note.className = "photo-preview-note";
-  cap.append(date, note);
-  preview.appendChild(cap);
+  function mostrarContenidoVistaPrevia(url) {
+    if (!preview) return;
+    preview.innerHTML = "";
 
-  actualizarContenidoVistaPrevia(date, note);
-}
+    if (url) {
+      const img = document.createElement("img");
+      img.src = url; img.alt = "Vista previa";
+      preview.appendChild(img);
+    } else {
+      const ph = document.createElement("div");
+      ph.className = "photo-preview-placeholder";
+      ph.textContent = "Selecciona una foto para verla aquí";
+      preview.appendChild(ph);
+    }
 
-function actualizarContenidoVistaPrevia(date, note) {
-  if (date) date.textContent = inputDate?.value ? formatearFecha(inputDate.value) : "Sin fecha";
-  if (note) note.textContent = inputNote?.value.trim() || "Tu nota aparecerá aquí";
-}
+    const cap = document.createElement("div"); cap.className = "photo-preview-caption";
+    const date = document.createElement("span"); date.className = "photo-preview-date";
+    const note = document.createElement("p"); note.className = "photo-preview-note";
+    cap.append(date, note);
+    preview.appendChild(cap);
 
-function actualizarVistaPreviaFotoInfo() {
-  const date = preview?.querySelector(".photo-preview-date");
-  const note = preview?.querySelector(".photo-preview-note");
-  actualizarContenidoVistaPrevia(date, note);
-
-  if (!photoPreviewInfo) return;
-  const hayFoto = Boolean(inputPhoto?.files?.length);
-  photoPreviewInfo.hidden = !hayFoto;
-  if (hayFoto) {
-    const fecha = inputDate?.value || "Sin fecha";
-    const texto = inputNote?.value.trim();
-    photoPreviewInfo.textContent = texto ? `${fecha} · ${texto}` : fecha;
+    actualizarContenidoVistaPrevia(date, note);
   }
-}
+
+  function actualizarContenidoVistaPrevia(date, note) {
+    if (date) date.textContent = inputDate?.value ? formatearFecha(inputDate.value) : "Sin fecha";
+    if (note) note.textContent = inputNote?.value.trim() || "Tu nota aparecerá aquí";
+  }
+
+  function actualizarVistaPreviaFotoInfo() {
+    const date = preview?.querySelector(".photo-preview-date");
+    const note = preview?.querySelector(".photo-preview-note");
+    actualizarContenidoVistaPrevia(date, note);
+
+    if (!photoPreviewInfo) return;
+    const hayFoto = Boolean(inputPhoto?.files?.length);
+    photoPreviewInfo.hidden = !hayFoto;
+    if (hayFoto) {
+      const fecha = inputDate?.value || "Sin fecha";
+      const texto = inputNote?.value.trim();
+      photoPreviewInfo.textContent = texto ? `${fecha} · ${texto}` : fecha;
+    }
+  }
 
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -790,7 +790,7 @@ function actualizarVistaPreviaFotoInfo() {
       if (!confirm("¿Eliminar esta aventura del álbum?")) return;
       const foto = fotos.find(f => f.id === id);
       if (!foto) return;
-      try { await supabase.storage.from(BUCKET_NAME).remove([foto.path]); } catch {}
+      try { await supabase.storage.from(BUCKET_NAME).remove([foto.path]); } catch { }
       await eliminarFotoTabla(foto.id);
       fotos = fotos.filter(f => f.id !== id);
       urlsFirmadasCache.delete(foto.path);
@@ -804,7 +804,7 @@ function actualizarVistaPreviaFotoInfo() {
       if (!session?.user) { notas = []; return; }
       const { data, error } = await supabase.from("notas").select("id,titulo,contenido,color,created_at,grupo_id").eq("grupo_id", grupoActivo.id).order("created_at", { ascending: false });
       if (error) { notas = []; return; }
-      notas = (data || []).map(n => ({ id:n.id, titulo:n.titulo, contenido:n.contenido, color:n.color || "amarillo", created_at:n.created_at, grupo_id:n.grupo_id }));
+      notas = (data || []).map(n => ({ id: n.id, titulo: n.titulo, contenido: n.contenido, color: n.color || "amarillo", created_at: n.created_at, grupo_id: n.grupo_id }));
     } catch (err) { console.warn("cargarNotas:", err); notas = []; }
   }
   const añadirNotaTabla = async (titulo, contenido, color) => { const { data: { session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("notas").insert({ user_id: session.user.id, grupo_id: grupoActivo.id, titulo: titulo || null, contenido, color: color || "amarillo" }).select().single(); if (error) throw error; return data; };
@@ -924,7 +924,7 @@ function actualizarVistaPreviaFotoInfo() {
       if (!session?.user) { playlists = []; return; }
       const { data, error } = await supabase.from("playlists").select("id,nombre,descripcion,emoji,color,canciones,created_at,grupo_id").eq("grupo_id", grupoActivo.id).order("created_at", { ascending: false });
       if (error) { playlists = []; return; }
-      playlists = (data || []).map(p => ({ id:p.id, nombre:p.nombre, descripcion:p.descripcion, emoji:p.emoji || "music", color:p.color || "amarillo", canciones:Array.isArray(p.canciones) ? p.canciones : [], created_at:p.created_at, grupo_id:p.grupo_id }));
+      playlists = (data || []).map(p => ({ id: p.id, nombre: p.nombre, descripcion: p.descripcion, emoji: p.emoji || "music", color: p.color || "amarillo", canciones: Array.isArray(p.canciones) ? p.canciones : [], created_at: p.created_at, grupo_id: p.grupo_id }));
     } catch (err) { console.warn("cargarPlaylists:", err); playlists = []; }
   }
 
@@ -932,7 +932,7 @@ function actualizarVistaPreviaFotoInfo() {
   const eliminarPlaylistTabla = async (id) => { const { error } = await supabase.from("playlists").delete().eq("id", id); if (error) throw error; };
   const guardarCancionesTabla = async (id, canciones) => { const { error } = await supabase.from("playlists").update({ canciones }).eq("id", id); if (error) throw error; };
 
-  const EMOJI_A_SVG = { music:SVG.music, note:SVG.note, sparkle:SVG.sparkle, sunflower:SVG.sunflower, heart:SVG.heart, calendar:SVG.calendar };
+  const EMOJI_A_SVG = { music: SVG.music, note: SVG.note, sparkle: SVG.sparkle, sunflower: SVG.sunflower, heart: SVG.heart, calendar: SVG.calendar };
   const renderEmoji = (e) => EMOJI_A_SVG[e] || SVG.music;
 
   function renderPlaylists() {
@@ -1051,7 +1051,7 @@ function actualizarVistaPreviaFotoInfo() {
       const pl = playlists.find(p => p.id === playlistEditando);
       if (!pl) return;
       const c = pl.canciones[index];
-      if (c?.url?.startsWith("storage:")) { try { await supabase.storage.from(BUCKET_CANCIONES).remove([c.url.replace(/^storage:/, "")]); } catch {} }
+      if (c?.url?.startsWith("storage:")) { try { await supabase.storage.from(BUCKET_CANCIONES).remove([c.url.replace(/^storage:/, "")]); } catch { } }
       const nuevas = pl.canciones.filter((_, i) => i !== index);
       await guardarCancionesTabla(pl.id, nuevas);
       pl.canciones = nuevas;
@@ -1095,9 +1095,9 @@ function actualizarVistaPreviaFotoInfo() {
     } catch (err) { alert("No se pudo añadir: " + (err.message || err)); }
   });
 
-  const cancionesPegarTexto=$("cancion-pegar-texto"), cancionesPegarPreview=$("cancion-pegar-preview"), btnImportarCanciones=$("btn-importar-canciones");
-  const cancionPegarArchivo=$("cancion-pegar-archivo"), btnCargarArchivo=$("btn-cargar-archivo"), cancionSubirArchivo=$("cancion-subir-archivo");
-  const btnSeleccionarArchivos=$("btn-seleccionar-archivos"), cancionSubirDropzone=$("cancion-subir-dropzone"), cancionSubirLista=$("cancion-subir-lista"), btnSubirCanciones=$("btn-subir-canciones");
+  const cancionesPegarTexto = $("cancion-pegar-texto"), cancionesPegarPreview = $("cancion-pegar-preview"), btnImportarCanciones = $("btn-importar-canciones");
+  const cancionPegarArchivo = $("cancion-pegar-archivo"), btnCargarArchivo = $("btn-cargar-archivo"), cancionSubirArchivo = $("cancion-subir-archivo");
+  const btnSeleccionarArchivos = $("btn-seleccionar-archivos"), cancionSubirDropzone = $("cancion-subir-dropzone"), cancionSubirLista = $("cancion-subir-lista"), btnSubirCanciones = $("btn-subir-canciones");
 
   document.querySelectorAll(".cancion-tab").forEach(tab => { tab.addEventListener("click", () => { document.querySelectorAll(".cancion-tab").forEach(t => t.classList.toggle("active", t === tab)); document.querySelectorAll(".cancion-panel").forEach(p => p.classList.toggle("active", p.dataset.panel === tab.dataset.tab)); }); });
 
@@ -1205,7 +1205,7 @@ function actualizarVistaPreviaFotoInfo() {
       const archivos = Array.from(cancionPegarArchivo.files || []);
       if (!archivos.length) return;
       const textos = [], nombres = [];
-      for (const a of archivos) { try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size / 1024).toFixed(1)} KB)`); } catch {} }
+      for (const a of archivos) { try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size / 1024).toFixed(1)} KB)`); } catch { } }
       aplicarArchivosCargados(textos, nombres); cancionPegarArchivo.value = "";
     } catch (err) { console.warn("cargar archivo:", err); }
   });
@@ -1218,7 +1218,7 @@ function actualizarVistaPreviaFotoInfo() {
         const archivos = Array.from(e.dataTransfer?.files || []);
         if (!archivos.length) return;
         const textos = [], nombres = [];
-        for (const a of archivos) { if (!/\.(txt|csv|m3u|m3u8)$/i.test(a.name) && !a.type.startsWith("text/")) continue; try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size / 1024).toFixed(1)} KB)`); } catch {} }
+        for (const a of archivos) { if (!/\.(txt|csv|m3u|m3u8)$/i.test(a.name) && !a.type.startsWith("text/")) continue; try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size / 1024).toFixed(1)} KB)`); } catch { } }
         if (!textos.length) return alert("Formatos aceptados: .txt, .csv, .m3u, .m3u8");
         aplicarArchivosCargados(textos, nombres);
       } catch (err) { console.warn("drop archivos:", err); }
@@ -1328,7 +1328,7 @@ function actualizarVistaPreviaFotoInfo() {
     catch (err) { console.warn("Wake Lock:", err); }
   }
   async function liberarWakeLock() {
-    if (window._wakeLock) { try { await window._wakeLock.release(); } catch {} window._wakeLock = null; }
+    if (window._wakeLock) { try { await window._wakeLock.release(); } catch { } window._wakeLock = null; }
   }
 
   function actualizarMediaSession(item) {
@@ -1382,7 +1382,7 @@ function actualizarVistaPreviaFotoInfo() {
   }
 
   const pausarReproduccion = () => { if (!globalAudio) return; globalAudio.pause(); reproduciendo = false; actualizarBotonPlay(); liberarWakeLock(); };
-  const reanudarReproduccion = () => { if (!globalAudio?.src) return; globalAudio.play().then(() => { reproduciendo = true; actualizarBotonPlay(); activarWakeLock(); }).catch(() => {}); };
+  const reanudarReproduccion = () => { if (!globalAudio?.src) return; globalAudio.play().then(() => { reproduciendo = true; actualizarBotonPlay(); activarWakeLock(); }).catch(() => { }); };
 
   function siguienteCancion(autoplay = true) {
     try {
@@ -1446,7 +1446,7 @@ function actualizarVistaPreviaFotoInfo() {
       if (!session?.user) { eventos = []; return; }
       const { data, error } = await supabase.from("eventos").select("id,titulo,descripcion,fecha,color,recordatorio_dias,recurrente").eq("user_id", session.user.id).order("fecha", { ascending: true });
       if (error) { eventos = []; return; }
-      eventos = (data || []).map(e => ({ id:e.id, titulo:e.titulo, descripcion:e.descripcion, fecha:e.fecha, color:e.color || "amarillo", recordatorio_dias: e.recordatorio_dias ?? 1, recurrente: !!e.recurrente }));
+      eventos = (data || []).map(e => ({ id: e.id, titulo: e.titulo, descripcion: e.descripcion, fecha: e.fecha, color: e.color || "amarillo", recordatorio_dias: e.recordatorio_dias ?? 1, recurrente: !!e.recurrente }));
     } catch (err) { console.warn("cargarEventos:", err); eventos = []; }
   }
 
@@ -1593,7 +1593,7 @@ function actualizarVistaPreviaFotoInfo() {
         if (diff === 0) cuerpo = "¡Es hoy! " + (ev.descripcion || "");
         else if (diff === 1) cuerpo = "Es mañana " + (ev.descripcion || "");
         else cuerpo = `Faltan ${diff} días · ` + (ev.descripcion || "");
-        try { new Notification(ev.titulo, { body: cuerpo.trim(), icon: "img/girasol.jpg", tag: `evento-${ev.id}` }); } catch {}
+        try { new Notification(ev.titulo, { body: cuerpo.trim(), icon: "img/girasol.jpg", tag: `evento-${ev.id}` }); } catch { }
       });
     } catch (err) { console.warn("comprobarRecordatorios:", err); }
   }
@@ -1618,7 +1618,7 @@ function actualizarVistaPreviaFotoInfo() {
           const { data: perfil } = await supabase.from("perfiles").select("username,avatar_url").eq("id", session.user.id).single();
           if (perfil?.avatar_url) { const av = document.querySelector(".user-avatar"); if (av) av.innerHTML = `<img src="${perfil.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`; }
           if (perfil?.username) { localStorage.setItem("sunadventures_username", perfil.username); const ue = document.getElementById("user-email"); if (ue) ue.textContent = perfil.username; const udn = document.getElementById("user-dropdown-name"); if (udn) udn.textContent = perfil.username; }
-        } catch {}
+        } catch { }
         registrarVisita();
         await Promise.all([cargarFotos(), cargarNotas(), cargarPlaylists(), cargarEventos()]);
         await Promise.all([render(), Promise.resolve(renderNotas()), Promise.resolve(renderPlaylists()), Promise.resolve(renderCalendario()), Promise.resolve(renderLogros())]);
@@ -1707,7 +1707,7 @@ function actualizarVistaPreviaFotoInfo() {
     });
   });
 
-  const VISTAS = ["inicio","album","mapa","chat","logros","notas","playlists","calendario","mascotas", ...(window._extraVistas || [])];
+  const VISTAS = ["inicio", "album", "mapa", "chat", "logros", "notas", "playlists", "calendario", "mascotas", ...(window._extraVistas || [])];
   const rutaDesdeHash = () => { const h = (location.hash || "").replace(/^#/, "").trim(); return VISTAS.includes(h) ? h : "inicio"; };
 
   function mostrarVista(nombre) {
@@ -1723,47 +1723,47 @@ function actualizarVistaPreviaFotoInfo() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) { console.warn("mostrarVista:", err); }
   }
-modal?.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", cerrarModal));
-/* ---------- Pegar imagen con Ctrl+V (dentro del modal de foto) ---------- */
-function pegarImagenEnFotoModal(e) {
-  if (!modal?.classList.contains("active")) return;
-  if (fotoEditando) return; // si estamos editando no permitimos reemplazar la foto
+  modal?.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", cerrarModal));
+  /* ---------- Pegar imagen con Ctrl+V (dentro del modal de foto) ---------- */
+  function pegarImagenEnFotoModal(e) {
+    if (!modal?.classList.contains("active")) return;
+    if (fotoEditando) return; // si estamos editando no permitimos reemplazar la foto
 
-  const items = e.clipboardData?.items;
-  if (!items) return;
+    const items = e.clipboardData?.items;
+    if (!items) return;
 
-  let file = null;
-  for (const it of items) {
-    if (it.type && it.type.startsWith("image/")) {
-      file = it.getAsFile();
-      if (file) break;
+    let file = null;
+    for (const it of items) {
+      if (it.type && it.type.startsWith("image/")) {
+        file = it.getAsFile();
+        if (file) break;
+      }
     }
+    if (!file) return;
+
+    e.preventDefault();
+
+    // Asignar el archivo al input[type=file] usando DataTransfer
+    try {
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      inputPhoto.files = dt.files;
+    } catch (err) {
+      console.warn("No se pudo asignar el archivo al input:", err);
+    }
+
+    // Reusar las funciones que ya tienes
+    mostrarVistaPreviaFoto(file);
+    actualizarVistaPreviaFotoInfo();
+    notifPegado();
   }
-  if (!file) return;
 
-  e.preventDefault();
-
-  // Asignar el archivo al input[type=file] usando DataTransfer
-  try {
-    const dt = new DataTransfer();
-    dt.items.add(file);
-    inputPhoto.files = dt.files;
-  } catch (err) {
-    console.warn("No se pudo asignar el archivo al input:", err);
-  }
-
-  // Reusar las funciones que ya tienes
-  mostrarVistaPreviaFoto(file);
-  actualizarVistaPreviaFotoInfo();
-  notifPegado();
-}
-
-function notifPegado() {
-  let el = document.getElementById("foto-pegada-toast");
-  if (!el) {
-    el = document.createElement("div");
-    el.id = "foto-pegada-toast";
-    el.style.cssText = `
+  function notifPegado() {
+    let el = document.getElementById("foto-pegada-toast");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "foto-pegada-toast";
+      el.style.cssText = `
       position: fixed; top: 6rem; left: 50%; transform: translateX(-50%) translateY(-8px);
       background: linear-gradient(135deg, #ffd93d, #ffae3d); color: #2b2118;
       font-weight: 800; font-size: .9rem; padding: .55rem 1rem; border-radius: 999px;
@@ -1771,56 +1771,56 @@ function notifPegado() {
       z-index: 9999; opacity: 0; pointer-events: none;
       transition: opacity .25s, transform .25s;
     `;
-    el.textContent = "📋 ¡Foto pegada!";
-    document.body.appendChild(el);
+      el.textContent = "📋 ¡Foto pegada!";
+      document.body.appendChild(el);
+    }
+    requestAnimationFrame(() => {
+      el.style.opacity = "1";
+      el.style.transform = "translateX(-50%) translateY(0)";
+    });
+    clearTimeout(el._t);
+    el._t = setTimeout(() => {
+      el.style.opacity = "0";
+      el.style.transform = "translateX(-50%) translateY(-8px)";
+    }, 1400);
   }
-  requestAnimationFrame(() => {
-    el.style.opacity = "1";
-    el.style.transform = "translateX(-50%) translateY(0)";
-  });
-  clearTimeout(el._t);
-  el._t = setTimeout(() => {
-    el.style.opacity = "0";
-    el.style.transform = "translateX(-50%) translateY(-8px)";
-  }, 1400);
-}
 
-/* Registrar el listener una sola vez */
-document.addEventListener("paste", pegarImagenEnFotoModal);
+  /* Registrar el listener una sola vez */
+  document.addEventListener("paste", pegarImagenEnFotoModal);
   window.addEventListener("hashchange", () => mostrarVista(rutaDesdeHash()));
   mostrarVista(rutaDesdeHash());
   setTimeout(() => { if (loadingScreen?.classList.contains("active")) ocultarLoading(); }, 5000);
-modal?.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", cerrarModal));
-/* ---------- Arrastrar imagen al modal ---------- */
-const modalDrop = document.getElementById("photo-modal");
-if (modalDrop) {
-  modalDrop.addEventListener("dragover", (e) => {
-    if (fotoEditando) return;
-    if (!e.dataTransfer?.types?.includes("Files")) return;
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "copy";
-    modalDrop.classList.add("drag-foto");
-  });
-  modalDrop.addEventListener("dragleave", (e) => {
-    if (e.relatedTarget && modalDrop.contains(e.relatedTarget)) return;
-    modalDrop.classList.remove("drag-foto");
-  });
-  modalDrop.addEventListener("drop", (e) => {
-    if (fotoEditando) return;
-    const f = e.dataTransfer?.files?.[0];
-    if (!f || !f.type.startsWith("image/")) return;
-    e.preventDefault();
-    modalDrop.classList.remove("drag-foto");
-    try {
-      const dt = new DataTransfer();
-      dt.items.add(f);
-      inputPhoto.files = dt.files;
-    } catch {}
-    mostrarVistaPreviaFoto(f);
-    actualizarVistaPreviaFotoInfo();
-    notifPegado();
-  });
-}  
+  modal?.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", cerrarModal));
+  /* ---------- Arrastrar imagen al modal ---------- */
+  const modalDrop = document.getElementById("photo-modal");
+  if (modalDrop) {
+    modalDrop.addEventListener("dragover", (e) => {
+      if (fotoEditando) return;
+      if (!e.dataTransfer?.types?.includes("Files")) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "copy";
+      modalDrop.classList.add("drag-foto");
+    });
+    modalDrop.addEventListener("dragleave", (e) => {
+      if (e.relatedTarget && modalDrop.contains(e.relatedTarget)) return;
+      modalDrop.classList.remove("drag-foto");
+    });
+    modalDrop.addEventListener("drop", (e) => {
+      if (fotoEditando) return;
+      const f = e.dataTransfer?.files?.[0];
+      if (!f || !f.type.startsWith("image/")) return;
+      e.preventDefault();
+      modalDrop.classList.remove("drag-foto");
+      try {
+        const dt = new DataTransfer();
+        dt.items.add(f);
+        inputPhoto.files = dt.files;
+      } catch { }
+      mostrarVistaPreviaFoto(f);
+      actualizarVistaPreviaFotoInfo();
+      notifPegado();
+    });
+  }
 
-console.log("✅ album.js cargado");
+  console.log("✅ album.js cargado");
 });

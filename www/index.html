@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,25 +33,54 @@
   <link rel="stylesheet" href="rpg.css?v=1">
   <link rel="stylesheet" href="rpg-loot.css?v=1">
   <style>
-    svg { max-width:100%; max-height:100%; }
-    svg:not([width]):not([height]) { width:1em; height:1em; }
-    [data-view]:not(.active) { display:none !important; }
-    #loading-screen:not(.active) { display:none !important; }
-    .modal { display:none; position:fixed; inset:0; align-items:center; justify-content:center; z-index:100; }
-    .modal.active { display:flex; }
+    svg {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    svg:not([width]):not([height]) {
+      width: 1em;
+      height: 1em;
+    }
+
+    [data-view]:not(.active) {
+      display: none !important;
+    }
+
+    #loading-screen:not(.active) {
+      display: none !important;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal.active {
+      display: flex;
+    }
   </style>
 </head>
+
 <body>
   <section id="background-container">
     <header class="nav-container">
       <nav class="nav-links">
-        <a href="#inicio" class="nav-link" data-view-link="inicio"><span class="ui-icon nav-link-icon" data-icono="casa"></span><span class="nav-link-text">Inicio</span></a>
-        <a href="#album" class="nav-link" data-view-link="album"><span class="ui-icon nav-link-icon" data-icono="camara"></span><span class="nav-link-text">Álbum</span></a>
-        <a href="#mascotas" class="nav-link" data-view-link="mascotas"><span class="ui-icon nav-link-icon" data-icono="huella"></span><span class="nav-link-text">Mascotas</span></a>
+        <a href="#inicio" class="nav-link" data-view-link="inicio"><span class="ui-icon nav-link-icon"
+            data-icono="casa"></span><span class="nav-link-text">Inicio</span></a>
+        <a href="#album" class="nav-link" data-view-link="album"><span class="ui-icon nav-link-icon"
+            data-icono="camara"></span><span class="nav-link-text">Álbum</span></a>
+        <a href="#mascotas" class="nav-link" data-view-link="mascotas"><span class="ui-icon nav-link-icon"
+            data-icono="huella"></span><span class="nav-link-text">Mascotas</span></a>
       </nav>
       <div class="nav-actions">
         <button id="theme-toggle" class="theme-toggle" title="Cambiar tema"><span class="theme-icon"></span></button>
-        <button id="btn-open-login" class="btn-auth"><span class="btn-auth-icon" data-icono="estrella"></span><span class="btn-auth-text">Entrar</span></button>
+        <button id="btn-open-login" class="btn-auth"><span class="btn-auth-icon" data-icono="estrella"></span><span
+            class="btn-auth-text">Entrar</span></button>
         <div id="user-info" class="user-info" style="display:none;">
           <button id="user-menu-toggle" class="user-pill" aria-haspopup="true">
             <span class="user-avatar" data-icono="persona"></span>
@@ -60,28 +90,43 @@
           <div id="user-dropdown" class="user-dropdown" aria-hidden="true">
             <div class="user-dropdown-header">
               <div class="user-dropdown-avatar" data-icono="persona"></div>
-              <div class="user-dropdown-info"><span id="user-dropdown-name" class="user-dropdown-name"></span><span class="user-dropdown-role">Explorador de aventuras</span></div>
+              <div class="user-dropdown-info"><span id="user-dropdown-name" class="user-dropdown-name"></span><span
+                  class="user-dropdown-role">Explorador de aventuras</span></div>
             </div>
             <div class="user-dropdown-divider"></div>
-            <a href="#inicio" class="user-dropdown-item" data-view-link="inicio"><span class="user-dropdown-icon" data-icono="casa"></span><span>Inicio</span></a>
-            <a href="#album" class="user-dropdown-item" data-view-link="album"><span class="user-dropdown-icon" data-icono="camara"></span><span>Mi álbum</span></a>
-            <a href="#mapa" class="user-dropdown-item" data-view-link="mapa"><span class="user-dropdown-icon" data-icono="mapa"></span><span>Mapa</span></a>
-            <a href="#chat" class="user-dropdown-item" data-view-link="chat"><span class="user-dropdown-icon" data-icono="chat"></span><span>Chat</span></a>
-            <a href="#logros" class="user-dropdown-item" data-view-link="logros"><span class="user-dropdown-icon" data-icono="trofeo"></span><span>Logros</span></a>
-            <a href="#notas" class="user-dropdown-item" data-view-link="notas"><span class="user-dropdown-icon" data-icono="nota"></span><span>Notitas</span></a>
-            <a href="#playlists" class="user-dropdown-item" data-view-link="playlists"><span class="user-dropdown-icon" data-icono="musica"></span><span>Playlists</span></a>
-            <a href="#mascotas" class="user-dropdown-item" data-view-link="mascotas"><span class="user-dropdown-icon" data-icono="huella"></span><span>Mascotas</span></a>
+            <a href="#inicio" class="user-dropdown-item" data-view-link="inicio"><span class="user-dropdown-icon"
+                data-icono="casa"></span><span>Inicio</span></a>
+            <a href="#album" class="user-dropdown-item" data-view-link="album"><span class="user-dropdown-icon"
+                data-icono="camara"></span><span>Mi álbum</span></a>
+            <a href="#mapa" class="user-dropdown-item" data-view-link="mapa"><span class="user-dropdown-icon"
+                data-icono="mapa"></span><span>Mapa</span></a>
+            <a href="#chat" class="user-dropdown-item" data-view-link="chat"><span class="user-dropdown-icon"
+                data-icono="chat"></span><span>Chat</span></a>
+            <a href="#logros" class="user-dropdown-item" data-view-link="logros"><span class="user-dropdown-icon"
+                data-icono="trofeo"></span><span>Logros</span></a>
+            <a href="#notas" class="user-dropdown-item" data-view-link="notas"><span class="user-dropdown-icon"
+                data-icono="nota"></span><span>Notitas</span></a>
+            <a href="#playlists" class="user-dropdown-item" data-view-link="playlists"><span class="user-dropdown-icon"
+                data-icono="musica"></span><span>Playlists</span></a>
+            <a href="#mascotas" class="user-dropdown-item" data-view-link="mascotas"><span class="user-dropdown-icon"
+                data-icono="huella"></span><span>Mascotas</span></a>
             <div class="user-dropdown-divider"></div>
-            <button class="user-dropdown-item" data-action="perfil"><span class="user-dropdown-icon" data-icono="persona"></span><span>Mi perfil</span></button>
-            <button class="user-dropdown-item" data-action="ajustes"><span class="user-dropdown-icon" data-icono="ajustes"></span><span>Ajustes</span></button>
-            <button class="user-dropdown-item" data-action="amigos"><span class="user-dropdown-icon" data-icono="amigos"></span><span>Amigos y grupo</span></button>
+            <button class="user-dropdown-item" data-action="perfil"><span class="user-dropdown-icon"
+                data-icono="persona"></span><span>Mi perfil</span></button>
+            <button class="user-dropdown-item" data-action="ajustes"><span class="user-dropdown-icon"
+                data-icono="ajustes"></span><span>Ajustes</span></button>
+            <button class="user-dropdown-item" data-action="amigos"><span class="user-dropdown-icon"
+                data-icono="amigos"></span><span>Amigos y grupo</span></button>
+            <a href="sprites-showcase.html" target="_blank" class="user-dropdown-item"><span class="user-dropdown-icon"
+                data-icono="estrella"></span><span>Galería de Sprites</span></a>
             <div class="user-dropdown-divider"></div>
             <button class="user-dropdown-item" type="button" data-action="offline">
-  <span class="user-dropdown-icon" data-icono="descargar"></span>
-  <span>Descargar todo</span>
-</button>
-<div class="user-dropdown-divider"></div>
-            <button id="logout-btn" class="user-dropdown-item user-dropdown-item-danger" data-action="logout"><span class="user-dropdown-icon" data-icono="salir"></span><span>Salir</span></button>
+              <span class="user-dropdown-icon" data-icono="descargar"></span>
+              <span>Descargar todo</span>
+            </button>
+            <div class="user-dropdown-divider"></div>
+            <button id="logout-btn" class="user-dropdown-item user-dropdown-item-danger" data-action="logout"><span
+                class="user-dropdown-icon" data-icono="salir"></span><span>Salir</span></button>
           </div>
         </div>
       </div>
@@ -90,30 +135,50 @@
     <div class="lobby view active" data-view="inicio">
       <div class="lobby-content">
         <p class="lobby-eyebrow"><span class="ui-icon" data-icono="girasol"></span>Bienvenido a</p>
-        <h1 class="lobby-title"><span class="lobby-title-line">four</span><span class="lobby-title-line lobby-title-accent">Sunflowers</span></h1>
+        <h1 class="lobby-title"><span class="lobby-title-line">four</span><span
+            class="lobby-title-line lobby-title-accent">Sunflowers</span></h1>
         <p class="lobby-subtitle">A.A.V.C</p>
-        <p class="lobby-dedicatoria">Un rincón para guardar lo nuestro <span class="ui-icon" data-icono="girasol"></span></p>
+        <p class="lobby-dedicatoria">Un rincón para guardar lo nuestro <span class="ui-icon"
+            data-icono="girasol"></span></p>
         <div class="experiencia-card">
-          <div class="experiencia-topline"><span id="experiencia-titulo">Novatos</span><strong id="experiencia-xp">0 XP</strong></div>
+          <div class="experiencia-topline"><span id="experiencia-titulo">Novatos</span><strong id="experiencia-xp">0
+              XP</strong></div>
           <div class="experiencia-barra"><span id="experiencia-progreso"></span></div>
           <small id="experiencia-siguiente">100 XP para Enamorados.</small>
         </div>
         <nav class="lobby-menu">
-          <a href="#album" class="lobby-btn lobby-btn-primary" data-view-link="album"><span class="lobby-btn-icon" data-icono="camara"></span><span class="lobby-btn-text"><strong>Nuestras aventuras</strong><small>Ver el álbum</small></span></a>
-          <a href="#notas" class="lobby-btn" data-view-link="notas"><span class="lobby-btn-icon" data-icono="nota"></span><span class="lobby-btn-text"><strong>Notitas para ti</strong><small>Pensamientos que quiero guardar</small></span></a>
-          <a href="#playlists" class="lobby-btn" data-view-link="playlists"><span class="lobby-btn-icon" data-icono="musica"></span><span class="lobby-btn-text"><strong>Nuestras Playlists</strong><small>Las canciones de nosotros</small></span></a>
-          <a href="#mascotas" class="lobby-btn" data-view-link="mascotas"><span class="lobby-btn-icon" data-icono="huella"></span><span class="lobby-btn-text"><strong>Nuestras mascotas</strong><small>Las compañeras de nuestra historia</small></span></a>
-          <button class="lobby-btn" data-action="descargar" type="button"><span class="lobby-btn-icon" data-icono="descargar"></span><span class="lobby-btn-text"><strong>Descargar la App</strong><small>Android, iOS o escritorio</small></span></button>
+          <a href="#album" class="lobby-btn lobby-btn-primary" data-view-link="album"><span class="lobby-btn-icon"
+              data-icono="camara"></span><span class="lobby-btn-text"><strong>Nuestras aventuras</strong><small>Ver el
+                álbum</small></span></a>
+          <a href="#notas" class="lobby-btn" data-view-link="notas"><span class="lobby-btn-icon"
+              data-icono="nota"></span><span class="lobby-btn-text"><strong>Notitas para ti</strong><small>Pensamientos
+                que quiero guardar</small></span></a>
+          <a href="#playlists" class="lobby-btn" data-view-link="playlists"><span class="lobby-btn-icon"
+              data-icono="musica"></span><span class="lobby-btn-text"><strong>Nuestras Playlists</strong><small>Las
+                canciones de nosotros</small></span></a>
+          <a href="#mascotas" class="lobby-btn" data-view-link="mascotas"><span class="lobby-btn-icon"
+              data-icono="huella"></span><span class="lobby-btn-text"><strong>Nuestras mascotas</strong><small>Las
+                compañeras de nuestra historia</small></span></a>
+          <button class="lobby-btn" data-action="descargar" type="button"><span class="lobby-btn-icon"
+              data-icono="descargar"></span><span class="lobby-btn-text"><strong>Descargar la
+                App</strong><small>Android, iOS o escritorio</small></span></button>
         </nav>
       </div>
-      <div class="lobby-art"><div class="girasol-wrapper"><div class="burbuja">Te amo.</div><img class="girasol" src="img/girasol.jpg" alt="girasol"></div></div>
+      <div class="lobby-art">
+        <div class="girasol-wrapper">
+          <div class="burbuja">Te amo.</div><img class="girasol" src="img/girasol.jpg" alt="girasol">
+        </div>
+      </div>
     </div>
     <audio id="pop" src="sounds/soundreality-pop-sound-423716.mp3" preload="auto"></audio>
   </section>
 
   <!-- ============ CHAT ============ -->
   <section id="chat" class="chat-section view" data-view="chat">
-    <div class="chat-header"><h2 class="chat-title">Chat</h2><p class="chat-subtitle">Habla con tu grupo o en privado</p></div>
+    <div class="chat-header">
+      <h2 class="chat-title">Chat</h2>
+      <p class="chat-subtitle">Habla con tu grupo o en privado</p>
+    </div>
     <div class="chat-tabs">
       <button type="button" class="chat-tab active" data-chat-tab="grupo">Grupo</button>
       <button type="button" class="chat-tab" data-chat-tab="privado">Privado</button>
@@ -135,15 +200,22 @@
 
   <!-- ============ MAPA ============ -->
   <section id="mapa" class="mapa-section view" data-view="mapa">
-    <div class="mapa-header"><h2 class="mapa-title">Mapa de aventuras</h2><p class="mapa-subtitle">Todos los lugares donde hemos estado</p></div>
+    <div class="mapa-header">
+      <h2 class="mapa-title">Mapa de aventuras</h2>
+      <p class="mapa-subtitle">Todos los lugares donde hemos estado</p>
+    </div>
     <div id="aventuras-map" class="aventuras-map"></div>
     <p id="mapa-empty" class="mapa-empty">Añade una foto con ubicación para verla aquí.</p>
   </section>
 
   <!-- ============ LOGROS ============ -->
   <section id="logros" class="logros-section view" data-view="logros">
-    <div class="logros-header"><h2 class="logros-title">Logros</h2><p class="logros-subtitle">Cada pequeño recuerdo cuenta</p></div>
-    <div class="logros-resumen"><strong id="logros-desbloqueados">0</strong><span>logros personales desbloqueados</span></div>
+    <div class="logros-header">
+      <h2 class="logros-title">Logros</h2>
+      <p class="logros-subtitle">Cada pequeño recuerdo cuenta</p>
+    </div>
+    <div class="logros-resumen"><strong id="logros-desbloqueados">0</strong><span>logros personales desbloqueados</span>
+    </div>
     <h3 class="logros-categoria">Logros de mi cuenta</h3>
     <div id="logros-personales-grid" class="logros-grid"></div>
     <h3 class="logros-categoria">Logros del grupo</h3>
@@ -152,38 +224,65 @@
 
   <!-- ============ ÁLBUM ============ -->
   <section id="album" class="album-section view" data-view="album">
-    <div class="album-header"><h2 class="album-title">Nuestro álbum</h2><p class="album-subtitle">Cada foto guarda un momento que no queremos olvidar.</p></div>
-    <div class="album-actions"><button id="btn-add-photo" class="btn-primary"><span>+</span> Añadir un recuerdo</button></div>
+    <div class="album-header">
+      <h2 class="album-title">Nuestro álbum</h2>
+      <p class="album-subtitle">Cada foto guarda un momento que no queremos olvidar.</p>
+    </div>
+    <div class="album-actions"><button id="btn-add-photo" class="btn-primary"><span>+</span> Añadir un recuerdo</button>
+    </div>
     <div id="album-grid" class="album-grid"></div>
-    <div id="album-empty" class="album-empty"><p>Aquí empieza nuestra historia.</p><p class="album-empty-hint">Aún no hay fotos. Sube la primera.</p></div>
+    <div id="album-empty" class="album-empty">
+      <p>Aquí empieza nuestra historia.</p>
+      <p class="album-empty-hint">Aún no hay fotos. Sube la primera.</p>
+    </div>
   </section>
 
   <!-- ============ NOTAS ============ -->
   <section id="notas" class="notas-section view" data-view="notas">
-    <div class="notas-header"><h2 class="notas-title">Notitas para ti</h2><p class="notas-subtitle">Pensamientos que quiero guardar</p></div>
+    <div class="notas-header">
+      <h2 class="notas-title">Notitas para ti</h2>
+      <p class="notas-subtitle">Pensamientos que quiero guardar</p>
+    </div>
     <div class="notas-actions"><button id="btn-add-nota" class="btn-primary"><span>+</span> Añadir notita</button></div>
     <div id="notas-grid" class="notas-grid"></div>
-    <div id="notas-empty" class="notas-empty"><p>Aún no hay notitas.</p><p class="notas-empty-hint">Escribe la primera.</p></div>
+    <div id="notas-empty" class="notas-empty">
+      <p>Aún no hay notitas.</p>
+      <p class="notas-empty-hint">Escribe la primera.</p>
+    </div>
   </section>
 
   <!-- ============ PLAYLISTS ============ -->
   <section id="playlists" class="playlists-section view" data-view="playlists">
-    <div class="playlists-header"><h2 class="playlists-title">Nuestras playlists</h2><p class="playlists-subtitle">Las canciones que nos suenan a nosotros</p></div>
-    <div class="playlists-actions"><button id="btn-add-playlist" class="btn-primary"><span>+</span> Añadir playlist</button></div>
+    <div class="playlists-header">
+      <h2 class="playlists-title">Nuestras playlists</h2>
+      <p class="playlists-subtitle">Las canciones que nos suenan a nosotros</p>
+    </div>
+    <div class="playlists-actions"><button id="btn-add-playlist" class="btn-primary"><span>+</span> Añadir
+        playlist</button></div>
     <div id="playlists-grid" class="playlists-grid"></div>
-    <div id="playlists-empty" class="playlists-empty"><p>Aún no hay playlists.</p></div>
+    <div id="playlists-empty" class="playlists-empty">
+      <p>Aún no hay playlists.</p>
+    </div>
   </section>
 
   <!-- ============ MASCOTAS ============ -->
   <section id="mascotas" class="mascotas-section view" data-view="mascotas">
-    <div class="mascotas-header"><h2 class="mascotas-title">Mis mascotas</h2><p class="mascotas-subtitle">Cada una guarda un pedacito de nuestra historia.</p></div>
+    <div class="mascotas-header">
+      <h2 class="mascotas-title">Mis mascotas</h2>
+      <p class="mascotas-subtitle">Cada una guarda un pedacito de nuestra historia.</p>
+    </div>
     <div class="minijuegos-menu">
-      <button class="btn-minijuego" id="btn-juego-girasol"><span class="btn-minijuego-icon" data-icono="girasol"></span><span class="btn-minijuego-text">Atrapa el girasol</span></button>
-      <button class="btn-minijuego" id="btn-juego-memoria"><span class="btn-minijuego-icon" data-icono="imagen"></span><span class="btn-minijuego-text">Memoria</span></button>
-      <button class="btn-minijuego" id="btn-juego-adivina"><span class="btn-minijuego-icon" data-icono="globo"></span><span class="btn-minijuego-text">Adivina la mascota</span></button>
+      <button class="btn-minijuego" id="btn-juego-girasol"><span class="btn-minijuego-icon"
+          data-icono="girasol"></span><span class="btn-minijuego-text">Atrapa el girasol</span></button>
+      <button class="btn-minijuego" id="btn-juego-memoria"><span class="btn-minijuego-icon"
+          data-icono="imagen"></span><span class="btn-minijuego-text">Memoria</span></button>
+      <button class="btn-minijuego" id="btn-juego-adivina"><span class="btn-minijuego-icon"
+          data-icono="globo"></span><span class="btn-minijuego-text">Adivina la mascota</span></button>
     </div>
     <div class="mascotas-grid" id="mascotas-grid"></div>
-    <div id="mascotas-empty" class="mascotas-empty hidden"><p>Aún no has desbloqueado ninguna mascota.</p></div>
+    <div id="mascotas-empty" class="mascotas-empty hidden">
+      <p>Aún no has desbloqueado ninguna mascota.</p>
+    </div>
   </section>
 
   <!-- ============ MODAL NOTA ============ -->
@@ -194,8 +293,10 @@
       <form id="nota-form" class="modal-form">
         <div class="nota-editor-layout">
           <div class="nota-editor-fields">
-            <label class="form-field"><span class="form-label">Título (opcional)</span><input type="text" id="nota-titulo" maxlength="50" placeholder="Un titulito..."></label>
-            <label class="form-field"><span class="form-label">Notita</span><textarea id="nota-contenido" rows="4" maxlength="300" placeholder="Escribe algo bonito..." required></textarea></label>
+            <label class="form-field"><span class="form-label">Título (opcional)</span><input type="text"
+                id="nota-titulo" maxlength="50" placeholder="Un titulito..."></label>
+            <label class="form-field"><span class="form-label">Notita</span><textarea id="nota-contenido" rows="4"
+                maxlength="300" placeholder="Escribe algo bonito..." required></textarea></label>
             <div class="form-field">
               <span class="form-label">Color</span>
               <div class="color-picker">
@@ -207,9 +308,12 @@
               </div>
             </div>
           </div>
-          <div class="nota-preview-column"><span class="form-label">Vista previa</span><div id="nota-preview" class="nota-preview" hidden></div></div>
+          <div class="nota-preview-column"><span class="form-label">Vista previa</span>
+            <div id="nota-preview" class="nota-preview" hidden></div>
+          </div>
         </div>
-        <div class="modal-actions"><button type="button" class="btn-secondary" data-close-nota-modal>Mejor luego</button><button type="submit" class="btn-primary">Guardar notita</button></div>
+        <div class="modal-actions"><button type="button" class="btn-secondary" data-close-nota-modal>Mejor
+            luego</button><button type="submit" class="btn-primary">Guardar notita</button></div>
       </form>
     </div>
   </div>
@@ -220,7 +324,9 @@
     <div class="modal-content friends-modal-content">
       <h3 class="modal-title">Amigos y grupo</h3>
       <p id="friends-group-name" class="friends-group-name"></p>
-      <form id="friend-search-form" class="friend-search-form"><input id="friend-search-input" type="text" maxlength="20" placeholder="Buscar por nombre" autocomplete="off"><button type="submit" class="btn-primary">Buscar</button></form>
+      <form id="friend-search-form" class="friend-search-form"><input id="friend-search-input" type="text"
+          maxlength="20" placeholder="Buscar por nombre" autocomplete="off"><button type="submit"
+          class="btn-primary">Buscar</button></form>
       <div id="friend-search-results" class="friend-list"></div>
       <h4 class="friends-subtitle">Miembros</h4>
       <div id="group-members-list" class="friend-list"></div>
@@ -235,7 +341,8 @@
     <div class="modal-backdrop" data-close-settings></div>
     <div class="modal-content settings-modal-content">
       <h3 class="modal-title">Ajustes</h3>
-      <label class="settings-toggle"><input id="toggle-censura" type="checkbox"><span><strong>Censurar malas palabras</strong><small>Revisa los mensajes antes de guardarlos.</small></span></label>
+      <label class="settings-toggle"><input id="toggle-censura" type="checkbox"><span><strong>Censurar malas
+            palabras</strong><small>Revisa los mensajes antes de guardarlos.</small></span></label>
       <p class="settings-note">La revisión solo se aplica a mensajes nuevos.</p>
       <div class="modal-actions"><button type="button" class="btn-secondary" data-close-settings>Cerrar</button></div>
     </div>
@@ -251,19 +358,23 @@
       <h2 id="auth-title" class="auth-title">Bienvenido</h2>
       <p id="auth-subtitle" class="auth-subtitle">Inicia sesión para ver el álbum</p>
       <form id="auth-form" class="auth-form">
-        <label class="auth-field"><span class="auth-label">Usuario</span><input type="text" id="auth-username" placeholder="tu usuario" autocomplete="username" minlength="3" maxlength="20" required></label>
+        <label class="auth-field"><span class="auth-label">Usuario</span><input type="text" id="auth-username"
+            placeholder="tu usuario" autocomplete="username" minlength="3" maxlength="20" required></label>
         <label class="auth-field">
           <span class="auth-label">Contraseña</span>
           <div class="auth-password-wrap">
-            <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" autocomplete="current-password" minlength="6">
-            <button type="button" class="auth-password-toggle" data-toggle-pass="auth-password" aria-label="Mostrar contraseña"><span data-icono="globo"></span></button>
+            <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" autocomplete="current-password"
+              minlength="6">
+            <button type="button" class="auth-password-toggle" data-toggle-pass="auth-password"
+              aria-label="Mostrar contraseña"><span data-icono="globo"></span></button>
           </div>
         </label>
         <label class="auth-field" id="confirm-password-field" style="display:none;">
           <span class="auth-label">Repite la contraseña</span>
           <div class="auth-password-wrap">
             <input type="password" id="auth-password-confirm" placeholder="Repite tu contraseña" minlength="6">
-            <button type="button" class="auth-password-toggle" data-toggle-pass="auth-password-confirm" aria-label="Mostrar contraseña"><span data-icono="globo"></span></button>
+            <button type="button" class="auth-password-toggle" data-toggle-pass="auth-password-confirm"
+              aria-label="Mostrar contraseña"><span data-icono="globo"></span></button>
           </div>
         </label>
         <label class="auth-remember"><input type="checkbox" id="auth-recordar"><span>Recordar mi usuario</span></label>
@@ -271,7 +382,8 @@
         <button type="submit" id="auth-submit" class="btn-auth-submit">Entrar</button>
       </form>
       <p class="auth-forgot"><a href="#" id="auth-forgot-link">¿Olvidaste tu contraseña?</a></p>
-      <p class="auth-toggle"><span id="auth-toggle-text">¿Aún no tienes cuenta?</span><button type="button" id="auth-toggle-btn" class="auth-link">Crear cuenta</button></p>
+      <p class="auth-toggle"><span id="auth-toggle-text">¿Aún no tienes cuenta?</span><button type="button"
+          id="auth-toggle-btn" class="auth-link">Crear cuenta</button></p>
     </div>
   </div>
 
@@ -283,19 +395,27 @@
       <form id="photo-form" class="modal-form">
         <div class="photo-editor-layout">
           <div class="photo-editor-fields">
-            <label class="form-field"><span class="form-label">La foto</span><input type="file" id="input-photo" accept="image/*" required></label>
-            <label class="form-field"><span class="form-label">¿Cuándo fue?</span><input type="date" id="input-date"></label>
-            <label class="form-field"><span class="form-label">¿Qué quieres recordar?</span><textarea id="input-note" rows="3" maxlength="200" placeholder="Cuéntame algo bonito..."></textarea></label>
+            <label class="form-field"><span class="form-label">La foto</span><input type="file" id="input-photo"
+                accept="image/*" required></label>
+            <label class="form-field"><span class="form-label">¿Cuándo fue?</span><input type="date"
+                id="input-date"></label>
+            <label class="form-field"><span class="form-label">¿Qué quieres recordar?</span><textarea id="input-note"
+                rows="3" maxlength="200" placeholder="Cuéntame algo bonito..."></textarea></label>
             <label class="form-field form-location-field">
               <span class="form-label">Ubicación (opcional)</span>
               <button type="button" id="btn-photo-location" class="btn-secondary">Usar mi ubicación</button>
-              <small id="photo-location-status" class="photo-location-status">No se guardará hasta que tú lo elijas.</small>
+              <small id="photo-location-status" class="photo-location-status">No se guardará hasta que tú lo
+                elijas.</small>
               <input type="hidden" id="input-lat"><input type="hidden" id="input-lng">
             </label>
           </div>
-          <div class="photo-preview-column"><span class="form-label">Vista previa</span><div id="photo-preview" class="photo-preview"></div><p id="photo-preview-info" class="photo-preview-info" hidden></p></div>
+          <div class="photo-preview-column"><span class="form-label">Vista previa</span>
+            <div id="photo-preview" class="photo-preview"></div>
+            <p id="photo-preview-info" class="photo-preview-info" hidden></p>
+          </div>
         </div>
-        <div class="modal-actions"><button type="button" class="btn-secondary" data-close-modal>Mejor luego</button><button type="submit" class="btn-primary">Guardar recuerdo</button></div>
+        <div class="modal-actions"><button type="button" class="btn-secondary" data-close-modal>Mejor
+            luego</button><button type="submit" class="btn-primary">Guardar recuerdo</button></div>
       </form>
     </div>
   </div>
@@ -317,16 +437,21 @@
             <button type="button" class="emoji-option" data-emoji="calendar" data-icono="calendario"></button>
           </div>
         </div>
-        <label class="form-field"><span class="form-label">Nombre</span><input type="text" id="playlist-nombre" maxlength="40" placeholder="Nuestra playlist..." required></label>
-        <label class="form-field"><span class="form-label">Descripción (opcional)</span><input type="text" id="playlist-descripcion" maxlength="80" placeholder="Para cuando..."></label>
-        <div class="form-field"><span class="form-label">Color</span><div class="color-picker">
-          <button type="button" class="color-option color-amarillo activo" data-color="amarillo"></button>
-          <button type="button" class="color-option color-rosa" data-color="rosa"></button>
-          <button type="button" class="color-option color-lila" data-color="lila"></button>
-          <button type="button" class="color-option color-menta" data-color="menta"></button>
-          <button type="button" class="color-option color-cielo" data-color="cielo"></button>
-        </div></div>
-        <div class="modal-actions"><button type="button" class="btn-secondary" data-close-playlist-modal>Mejor luego</button><button type="submit" class="btn-primary">Guardar playlist</button></div>
+        <label class="form-field"><span class="form-label">Nombre</span><input type="text" id="playlist-nombre"
+            maxlength="40" placeholder="Nuestra playlist..." required></label>
+        <label class="form-field"><span class="form-label">Descripción (opcional)</span><input type="text"
+            id="playlist-descripcion" maxlength="80" placeholder="Para cuando..."></label>
+        <div class="form-field"><span class="form-label">Color</span>
+          <div class="color-picker">
+            <button type="button" class="color-option color-amarillo activo" data-color="amarillo"></button>
+            <button type="button" class="color-option color-rosa" data-color="rosa"></button>
+            <button type="button" class="color-option color-lila" data-color="lila"></button>
+            <button type="button" class="color-option color-menta" data-color="menta"></button>
+            <button type="button" class="color-option color-cielo" data-color="cielo"></button>
+          </div>
+        </div>
+        <div class="modal-actions"><button type="button" class="btn-secondary" data-close-playlist-modal>Mejor
+            luego</button><button type="submit" class="btn-primary">Guardar playlist</button></div>
       </form>
     </div>
   </div>
@@ -345,7 +470,8 @@
       </div>
       <div class="cancion-panel active" data-panel="una">
         <form id="cancion-form" class="modal-form cancion-form">
-          <div class="cancion-form-row"><input type="text" id="cancion-titulo" placeholder="Título" maxlength="60" required><input type="text" id="cancion-artista" placeholder="Artista (opcional)" maxlength="40"></div>
+          <div class="cancion-form-row"><input type="text" id="cancion-titulo" placeholder="Título" maxlength="60"
+              required><input type="text" id="cancion-artista" placeholder="Artista (opcional)" maxlength="40"></div>
           <input type="url" id="cancion-url" placeholder="Link (Spotify / YouTube) — opcional">
           <button type="submit" class="btn-primary">+ Añadir canción</button>
         </form>
@@ -360,7 +486,8 @@ Artista - Canción
             <input type="file" id="cancion-pegar-archivo" accept=".txt,.csv,.m3u,.m3u8,text/plain" multiple hidden>
             <button type="button" id="btn-cargar-archivo" class="btn-secondary">Cargar archivo(s)</button>
           </div>
-          <textarea id="cancion-pegar-texto" class="cancion-pegar-textarea" placeholder="Pega aquí tus canciones..." rows="8"></textarea>
+          <textarea id="cancion-pegar-texto" class="cancion-pegar-textarea" placeholder="Pega aquí tus canciones..."
+            rows="8"></textarea>
           <div class="cancion-pegar-opciones">
             <span class="form-label" style="margin:0;">Orden:</span>
             <label><input type="radio" name="pegar-orden" value="titulo-artista" checked> Título - Artista</label>
@@ -376,141 +503,173 @@ Artista - Canción
           <div class="cancion-subir-dropzone" id="cancion-subir-dropzone">
             <div class="cancion-subir-icon" data-icono="musica"></div>
             <p class="cancion-subir-text">Arrastra aquí tus archivos</p>
-            <input type="file" id="cancion-subir-archivo" accept="audio/*,video/mp4,.mp3,.mp4,.m4a,.wav,.ogg,.flac,.aac" multiple hidden>
+            <input type="file" id="cancion-subir-archivo" accept="audio/*,video/mp4,.mp3,.mp4,.m4a,.wav,.ogg,.flac,.aac"
+              multiple hidden>
             <button type="button" id="btn-seleccionar-archivos" class="btn-secondary">Seleccionar archivos</button>
           </div>
           <div id="cancion-subir-lista" class="cancion-subir-lista"></div>
           <button type="button" id="btn-subir-canciones" class="btn-primary" disabled>Subir todas</button>
         </div>
       </div>
-      <div class="modal-actions" style="margin-top:1rem;"><button type="button" class="btn-secondary" data-close-canciones-modal>Cerrar</button></div>
+      <div class="modal-actions" style="margin-top:1rem;"><button type="button" class="btn-secondary"
+          data-close-canciones-modal>Cerrar</button></div>
     </div>
   </div>
 
- <!-- ============ MODAL MASCOTA (con pestañas) ============ -->
-<div id="mascota-modal" class="modal mascota-modal" aria-hidden="true">
-  <div class="modal-backdrop" data-close-mascota></div>
-  <div class="mascota-modal-content">
-    <button class="mascota-modal-close" data-close-mascota aria-label="Cerrar">×</button>
+  <!-- ============ MODAL MASCOTA (con pestañas) ============ -->
+  <div id="mascota-modal" class="modal mascota-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-mascota></div>
+    <div class="mascota-modal-content">
+      <button class="mascota-modal-close" data-close-mascota aria-label="Cerrar">×</button>
 
-    <!-- Cabecera fija -->
-    <div class="mm-header">
-      <div class="mm-avatar"><img id="mm-avatar-img" src="" alt=""></div>
-      <div class="mm-header-info">
-        <span class="mm-nombre" id="mm-nombre-txt">—</span>
-        <span class="mm-estado" id="mm-estado">—</span>
-      </div>
-    </div>
-
-    <!-- Pestañas -->
-   <div class="mm-tabs" role="tablist">
-  <button type="button" class="mm-tab active" data-mm-tab="estado" role="tab">Estado</button>
-  <button type="button" class="mm-tab" data-mm-tab="inventario" role="tab">Inventario</button>
-  <button type="button" class="mm-tab" data-mm-tab="cuidado" role="tab">Cuidado</button>
-  <button type="button" class="mm-tab" data-mm-tab="tienda" role="tab">Tienda</button>
-  <button type="button" class="mm-tab" data-mm-tab="acciones" role="tab">Más</button>
-</div>
-
-       <!-- Panel: ESTADO -->
-    <div class="mm-panel active" data-mm-panel="estado">
-      <div class="mm-monedero">
-        <span class="mm-monedero-icon" data-icono="moneda"></span>
-        <span class="mm-monedero-label">SunCoins</span>
-        <span class="mm-monedero-valor" id="mm-monedas">0</span>
-      </div>
-      <div class="mm-stats">
-        <div class="mm-stat"><span class="mm-stat-emoji" data-icono="manzana"></span><div class="mm-stat-body"><div class="mm-stat-top"><span>Hambre</span><span id="mm-stat-hambre-val">0%</span></div><div class="mm-stat-barra hambre"><span id="mm-stat-hambre"></span></div></div></div>
-        <div class="mm-stat"><span class="mm-stat-emoji" data-icono="corazon"></span><div class="mm-stat-body"><div class="mm-stat-top"><span>Felicidad</span><span id="mm-stat-felicidad-val">0%</span></div><div class="mm-stat-barra felicidad"><span id="mm-stat-felicidad"></span></div></div></div>
-        <div class="mm-stat"><span class="mm-stat-emoji" data-icono="rayo"></span><div class="mm-stat-body"><div class="mm-stat-top"><span>Energía</span><span id="mm-stat-energia-val">0%</span></div><div class="mm-stat-barra energia"><span id="mm-stat-energia"></span></div></div></div>
-      </div>
-    </div>
-
-    <!-- ✅ Panel: TIENDA (embebida) — AHORA ES HERMANO, NO HIJO -->
-    <div class="mm-panel" data-mm-panel="tienda">
-      <div id="tienda-embed" class="tienda-embed"></div>
-    </div>
-
-    <!-- Panel: INVENTARIO -->
-    <div class="mm-panel" data-mm-panel="inventario">
-      <div class="mm-seccion-titulo"><span>Inventario</span><span class="mm-seccion-hint">Arrastra a la mascota</span></div>
-      <div class="mascota-inventario" id="mm-inventario"></div>
-    </div>
-
-    <!-- Panel: CUIDADO -->
-    <div class="mm-panel" data-mm-panel="cuidado">
-      <div class="cuidado-diario" id="mm-cuidado-diario"></div>
-    </div>
-
-    <!-- Panel: ACCIONES -->
-    <div class="mm-panel" data-mm-panel="acciones">
-      <div class="mm-acciones">
-        <button type="button" class="mm-accion mm-accion-mimos" data-accion="mimos"><span class="mm-accion-icono" data-icono="mimar"></span><span>Mimos</span><span class="mascota-accion-progreso" data-progreso="mimos"></span></button>
-        <button type="button" class="mm-accion mm-accion-dormir" data-accion="dormir"><span class="mm-accion-icono" data-icono-dormir></span><span data-txt-dormir>Dormir</span><span class="mascota-accion-progreso" data-progreso="dormir"></span></button>
-      </div>
-      <button type="button" class="mm-accion mm-accion-jugar" data-accion="jugar"><span class="mm-accion-icono" data-icono="jugar"></span><span>Jugar — Atrapa el girasol</span></button>
-      <div class="mm-acciones-extra">
-        <button type="button" class="mm-accion-sec" data-accion="amistad"><span class="mm-accion-icono" data-icono="corazon"></span><span>Amistades</span></button>
-      </div>
-      <div class="mm-cambiar">
-        <label class="mm-cambiar-label">Cambiar mascota:</label>
-        <div class="mm-cambiar-lista" id="mm-cambiar-lista"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
- <div id="perfil-modal" class="modal" aria-hidden="true">
-  <div class="modal-backdrop" data-close-perfil></div>
-  <div class="modal-content perfil-modal-content">
-    <h3 class="modal-title">Mi perfil</h3>
-
-    <div class="perfil-editor">
-      <div class="perfil-avatar-grande">
-        <img id="perfil-avatar-preview" src="" alt="" style="display:none;">
-        <span class="perfil-avatar-fallback" data-icono="persona"></span>
-        <button type="button" class="perfil-avatar-cambiar" id="perfil-avatar-btn" title="Cambiar foto">
-          <span data-icono="camara"></span>
-        </button>
-        <input type="file" id="perfil-avatar-input" accept="image/*" hidden>
+      <!-- Cabecera fija -->
+      <div class="mm-header">
+        <div class="mm-avatar"><img id="mm-avatar-img" src="" alt=""></div>
+        <div class="mm-header-info">
+          <span class="mm-nombre" id="mm-nombre-txt">—</span>
+          <span class="mm-estado" id="mm-estado">—</span>
+        </div>
       </div>
 
-      <label class="form-field" style="width:100%;">
-        <span class="form-label">Nombre de usuario</span>
-        <input type="text" id="perfil-username" maxlength="20" placeholder="tu_nombre">
-      </label>
-
-      <div class="perfil-stats">
-        <div class="perfil-stat"><strong id="perfil-stat-fotos">0</strong><span>Fotos</span></div>
-        <div class="perfil-stat"><strong id="perfil-stat-notas">0</strong><span>Notas</span></div>
-        <div class="perfil-stat"><strong id="perfil-stat-canciones">0</strong><span>Canciones</span></div>
-        <div class="perfil-stat"><strong id="perfil-stat-logros">0</strong><span>Logros</span></div>
-        <div class="perfil-stat"><strong id="perfil-stat-xp">0</strong><span>XP</span></div>
-        <div class="perfil-stat"><strong id="perfil-stat-mon">0</strong><span>SunCoins</span></div>
+      <!-- Pestañas -->
+      <div class="mm-tabs" role="tablist">
+        <button type="button" class="mm-tab active" data-mm-tab="estado" role="tab">Estado</button>
+        <button type="button" class="mm-tab" data-mm-tab="inventario" role="tab">Inventario</button>
+        <button type="button" class="mm-tab" data-mm-tab="cuidado" role="tab">Cuidado</button>
+        <button type="button" class="mm-tab" data-mm-tab="tienda" role="tab">Tienda</button>
+        <button type="button" class="mm-tab" data-mm-tab="acciones" role="tab">Más</button>
       </div>
 
-      <div class="modal-actions" style="width:100%;">
-        <button type="button" class="btn-secondary" data-close-perfil>Cancelar</button>
-        <button type="button" class="btn-primary" id="perfil-guardar">Guardar cambios</button>
+      <!-- Panel: ESTADO -->
+      <div class="mm-panel active" data-mm-panel="estado">
+        <div class="mm-monedero">
+          <span class="mm-monedero-icon" data-icono="moneda"></span>
+          <span class="mm-monedero-label">SunCoins</span>
+          <span class="mm-monedero-valor" id="mm-monedas">0</span>
+        </div>
+        <div class="mm-stats">
+          <div class="mm-stat"><span class="mm-stat-emoji" data-icono="manzana"></span>
+            <div class="mm-stat-body">
+              <div class="mm-stat-top"><span>Hambre</span><span id="mm-stat-hambre-val">0%</span></div>
+              <div class="mm-stat-barra hambre"><span id="mm-stat-hambre"></span></div>
+            </div>
+          </div>
+          <div class="mm-stat"><span class="mm-stat-emoji" data-icono="corazon"></span>
+            <div class="mm-stat-body">
+              <div class="mm-stat-top"><span>Felicidad</span><span id="mm-stat-felicidad-val">0%</span></div>
+              <div class="mm-stat-barra felicidad"><span id="mm-stat-felicidad"></span></div>
+            </div>
+          </div>
+          <div class="mm-stat"><span class="mm-stat-emoji" data-icono="rayo"></span>
+            <div class="mm-stat-body">
+              <div class="mm-stat-top"><span>Energía</span><span id="mm-stat-energia-val">0%</span></div>
+              <div class="mm-stat-barra energia"><span id="mm-stat-energia"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ Panel: TIENDA (embebida) — AHORA ES HERMANO, NO HIJO -->
+      <div class="mm-panel" data-mm-panel="tienda">
+        <div id="tienda-embed" class="tienda-embed"></div>
+      </div>
+
+      <!-- Panel: INVENTARIO -->
+      <div class="mm-panel" data-mm-panel="inventario">
+        <div class="mm-seccion-titulo"><span>Inventario</span><span class="mm-seccion-hint">Arrastra a la mascota</span>
+        </div>
+        <div class="mascota-inventario" id="mm-inventario"></div>
+      </div>
+
+      <!-- Panel: CUIDADO -->
+      <div class="mm-panel" data-mm-panel="cuidado">
+        <div class="cuidado-diario" id="mm-cuidado-diario"></div>
+      </div>
+
+      <!-- Panel: ACCIONES -->
+      <div class="mm-panel" data-mm-panel="acciones">
+        <div class="mm-acciones">
+          <button type="button" class="mm-accion mm-accion-mimos" data-accion="mimos"><span class="mm-accion-icono"
+              data-icono="mimar"></span><span>Mimos</span><span class="mascota-accion-progreso"
+              data-progreso="mimos"></span></button>
+          <button type="button" class="mm-accion mm-accion-dormir" data-accion="dormir"><span class="mm-accion-icono"
+              data-icono-dormir></span><span data-txt-dormir>Dormir</span><span class="mascota-accion-progreso"
+              data-progreso="dormir"></span></button>
+        </div>
+        <button type="button" class="mm-accion mm-accion-jugar" data-accion="jugar"><span class="mm-accion-icono"
+            data-icono="jugar"></span><span>Jugar — Atrapa el girasol</span></button>
+        <div class="mm-acciones-extra">
+          <button type="button" class="mm-accion-sec" data-accion="amistad"><span class="mm-accion-icono"
+              data-icono="corazon"></span><span>Amistades</span></button>
+        </div>
+        <div class="mm-cambiar">
+          <label class="mm-cambiar-label">Cambiar mascota:</label>
+          <div class="mm-cambiar-lista" id="mm-cambiar-lista"></div>
+        </div>
       </div>
     </div>
   </div>
-</div>
+
+  <div id="perfil-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-perfil></div>
+    <div class="modal-content perfil-modal-content">
+      <h3 class="modal-title">Mi perfil</h3>
+
+      <div class="perfil-editor">
+        <div class="perfil-avatar-grande">
+          <img id="perfil-avatar-preview" src="" alt="" style="display:none;">
+          <span class="perfil-avatar-fallback" data-icono="persona"></span>
+          <button type="button" class="perfil-avatar-cambiar" id="perfil-avatar-btn" title="Cambiar foto">
+            <span data-icono="camara"></span>
+          </button>
+          <input type="file" id="perfil-avatar-input" accept="image/*" hidden>
+        </div>
+
+        <label class="form-field" style="width:100%;">
+          <span class="form-label">Nombre de usuario</span>
+          <input type="text" id="perfil-username" maxlength="20" placeholder="tu_nombre">
+        </label>
+
+        <div class="perfil-stats">
+          <div class="perfil-stat"><strong id="perfil-stat-fotos">0</strong><span>Fotos</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-notas">0</strong><span>Notas</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-canciones">0</strong><span>Canciones</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-logros">0</strong><span>Logros</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-xp">0</strong><span>XP</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-mon">0</strong><span>SunCoins</span></div>
+        </div>
+
+        <div class="modal-actions" style="width:100%;">
+          <button type="button" class="btn-secondary" data-close-perfil>Cancelar</button>
+          <button type="button" class="btn-primary" id="perfil-guardar">Guardar cambios</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ============ FOOTER ============ -->
   <footer class="site-footer">
     <p>Hecho con <span class="nav-heart" data-icono="corazon"></span> por <span class="firma">A.A.V.C</span></p>
-    <p class="site-footer-sub">Cada girasol guarda un pedacito de nosotros <span class="ui-icon" data-icono="girasol"></span></p>
+    <p class="site-footer-sub">Cada girasol guarda un pedacito de nosotros <span class="ui-icon"
+        data-icono="girasol"></span></p>
   </footer>
 
   <!-- ============ LOADING ============ -->
   <div id="loading-screen" class="loading-screen" aria-hidden="true">
-    <div class="loading-content"><div class="loading-flower"><img src="img/girasol-loading.png" alt=""></div><p id="loading-text" class="loading-text">Entrando...</p></div>
+    <div class="loading-content">
+      <div class="loading-flower"><img src="img/girasol-loading.png" alt=""></div>
+      <p id="loading-text" class="loading-text">Entrando...</p>
+    </div>
   </div>
 
   <!-- ============ PLAYER ============ -->
   <div id="player-bar" class="player-bar" aria-hidden="true">
     <button id="player-close" class="player-close" title="Cerrar">×</button>
-    <div class="player-info"><div class="player-cover"><span id="player-cover-icon" data-icono="musica"></span></div><div class="player-meta"><span class="player-title" id="player-bar-title">—</span><span class="player-artist" id="player-bar-artist"></span></div></div>
+    <div class="player-info">
+      <div class="player-cover"><span id="player-cover-icon" data-icono="musica"></span></div>
+      <div class="player-meta"><span class="player-title" id="player-bar-title">—</span><span class="player-artist"
+          id="player-bar-artist"></span></div>
+    </div>
     <div class="player-controls">
       <button id="player-shuffle" class="player-btn-sm" title="Aleatorio">⤨</button>
       <button id="player-prev" class="player-btn" title="Anterior">⏮</button>
@@ -518,8 +677,11 @@ Artista - Canción
       <button id="player-next" class="player-btn" title="Siguiente">⏭</button>
       <button id="player-repeat" class="player-btn-sm" title="Repetir">↻</button>
     </div>
-    <div class="player-progress"><span class="player-time" id="player-current">0:00</span><input type="range" id="player-seek" class="player-seek" min="0" max="100" value="0" step="0.1"><span class="player-time" id="player-duration">0:00</span></div>
-    <div class="player-volume"><button id="player-volume-btn" class="player-btn-sm" title="Silenciar">♪</button><input type="range" id="player-volume" class="player-volume-slider" min="0" max="1" step="0.01" value="0.8"></div>
+    <div class="player-progress"><span class="player-time" id="player-current">0:00</span><input type="range"
+        id="player-seek" class="player-seek" min="0" max="100" value="0" step="0.1"><span class="player-time"
+        id="player-duration">0:00</span></div>
+    <div class="player-volume"><button id="player-volume-btn" class="player-btn-sm" title="Silenciar">♪</button><input
+        type="range" id="player-volume" class="player-volume-slider" min="0" max="1" step="0.01" value="0.8"></div>
     <audio id="global-audio" preload="metadata"></audio>
   </div>
 
@@ -531,90 +693,94 @@ Artista - Canción
     </div>
   </div>
   <!-- ============ MODAL RECUPERAR CONTRASEÑA ============ -->
-<div id="recuperar-modal" class="modal" aria-hidden="true">
-  <div class="modal-backdrop" data-close-recuperar></div>
-  <div class="modal-content recuperar-content">
-    <button class="recuperar-close" data-close-recuperar aria-label="Cerrar">×</button>
-    <div class="recuperar-flower" data-icono="girasol"></div>
+  <div id="recuperar-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-recuperar></div>
+    <div class="modal-content recuperar-content">
+      <button class="recuperar-close" data-close-recuperar aria-label="Cerrar">×</button>
+      <div class="recuperar-flower" data-icono="girasol"></div>
 
-    <!-- PASO 1: usuario -->
-    <div class="recuperar-paso active" data-paso="1">
-      <h3 class="recuperar-title">Recuperar contraseña</h3>
-      <p class="recuperar-sub">Escribe tu nombre de usuario y te generaremos un código.</p>
-      <label class="form-field">
-        <span class="form-label">Usuario</span>
-        <input type="text" id="recuperar-usuario" placeholder="tu usuario" maxlength="20" autocomplete="username">
-      </label>
-      <p class="recuperar-error" id="recuperar-error-1"></p>
-      <div class="modal-actions">
-        <button type="button" class="btn-secondary" data-close-recuperar>Cancelar</button>
-        <button type="button" class="btn-primary" id="recuperar-btn-1">Generar código</button>
-      </div>
-    </div>
-
-    <!-- PASO 2: código -->
-    <div class="recuperar-paso" data-paso="2">
-      <h3 class="recuperar-title">Introduce el código</h3>
-      <p class="recuperar-sub">Escribe el código de 6 dígitos que te hemos mostrado.</p>
-      <label class="form-field">
-        <span class="form-label">Código</span>
-        <input type="text" id="recuperar-codigo" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
-      </label>
-      <p class="recuperar-error" id="recuperar-error-2"></p>
-      <div class="modal-actions">
-        <button type="button" class="btn-secondary" id="recuperar-volver-1">Atrás</button>
-        <button type="button" class="btn-primary" id="recuperar-btn-2">Continuar</button>
-      </div>
-    </div>
-
-    <!-- PASO 3: nueva contraseña -->
-    <div class="recuperar-paso" data-paso="3">
-      <h3 class="recuperar-title">Nueva contraseña</h3>
-      <p class="recuperar-sub">Elige una contraseña segura (mínimo 6 caracteres).</p>
-      <label class="form-field">
-        <span class="form-label">Nueva contraseña</span>
-        <div class="auth-password-wrap">
-          <input type="password" id="recuperar-pass1" placeholder="Mínimo 6 caracteres" minlength="6">
-          <button type="button" class="auth-password-toggle" data-toggle-pass="recuperar-pass1" aria-label="Mostrar contraseña"><span data-icono="globo"></span></button>
+      <!-- PASO 1: usuario -->
+      <div class="recuperar-paso active" data-paso="1">
+        <h3 class="recuperar-title">Recuperar contraseña</h3>
+        <p class="recuperar-sub">Escribe tu nombre de usuario y te generaremos un código.</p>
+        <label class="form-field">
+          <span class="form-label">Usuario</span>
+          <input type="text" id="recuperar-usuario" placeholder="tu usuario" maxlength="20" autocomplete="username">
+        </label>
+        <p class="recuperar-error" id="recuperar-error-1"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close-recuperar>Cancelar</button>
+          <button type="button" class="btn-primary" id="recuperar-btn-1">Generar código</button>
         </div>
-      </label>
-      <label class="form-field">
-        <span class="form-label">Repite la contraseña</span>
-        <div class="auth-password-wrap">
-          <input type="password" id="recuperar-pass2" placeholder="Repite la contraseña" minlength="6">
-          <button type="button" class="auth-password-toggle" data-toggle-pass="recuperar-pass2" aria-label="Mostrar contraseña"><span data-icono="globo"></span></button>
-        </div>
-      </label>
-      <p class="recuperar-error" id="recuperar-error-3"></p>
-      <div class="modal-actions">
-        <button type="button" class="btn-secondary" id="recuperar-volver-2">Atrás</button>
-        <button type="button" class="btn-primary" id="recuperar-btn-3">Cambiar contraseña</button>
       </div>
-    </div>
 
-    <!-- PASO ÉXITO -->
-    <div class="recuperar-paso" data-paso="ok">
-      <div class="recuperar-ok-icon" data-icono="ok"></div>
-      <h3 class="recuperar-title">¡Listo!</h3>
-      <p class="recuperar-sub">Tu contraseña se ha actualizado. Ya puedes iniciar sesión.</p>
-      <div class="modal-actions">
-        <button type="button" class="btn-primary" data-close-recuperar>Entendido</button>
+      <!-- PASO 2: código -->
+      <div class="recuperar-paso" data-paso="2">
+        <h3 class="recuperar-title">Introduce el código</h3>
+        <p class="recuperar-sub">Escribe el código de 6 dígitos que te hemos mostrado.</p>
+        <label class="form-field">
+          <span class="form-label">Código</span>
+          <input type="text" id="recuperar-codigo" placeholder="000000" maxlength="6" inputmode="numeric"
+            autocomplete="one-time-code">
+        </label>
+        <p class="recuperar-error" id="recuperar-error-2"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="recuperar-volver-1">Atrás</button>
+          <button type="button" class="btn-primary" id="recuperar-btn-2">Continuar</button>
+        </div>
+      </div>
+
+      <!-- PASO 3: nueva contraseña -->
+      <div class="recuperar-paso" data-paso="3">
+        <h3 class="recuperar-title">Nueva contraseña</h3>
+        <p class="recuperar-sub">Elige una contraseña segura (mínimo 6 caracteres).</p>
+        <label class="form-field">
+          <span class="form-label">Nueva contraseña</span>
+          <div class="auth-password-wrap">
+            <input type="password" id="recuperar-pass1" placeholder="Mínimo 6 caracteres" minlength="6">
+            <button type="button" class="auth-password-toggle" data-toggle-pass="recuperar-pass1"
+              aria-label="Mostrar contraseña"><span data-icono="globo"></span></button>
+          </div>
+        </label>
+        <label class="form-field">
+          <span class="form-label">Repite la contraseña</span>
+          <div class="auth-password-wrap">
+            <input type="password" id="recuperar-pass2" placeholder="Repite la contraseña" minlength="6">
+            <button type="button" class="auth-password-toggle" data-toggle-pass="recuperar-pass2"
+              aria-label="Mostrar contraseña"><span data-icono="globo"></span></button>
+          </div>
+        </label>
+        <p class="recuperar-error" id="recuperar-error-3"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="recuperar-volver-2">Atrás</button>
+          <button type="button" class="btn-primary" id="recuperar-btn-3">Cambiar contraseña</button>
+        </div>
+      </div>
+
+      <!-- PASO ÉXITO -->
+      <div class="recuperar-paso" data-paso="ok">
+        <div class="recuperar-ok-icon" data-icono="ok"></div>
+        <h3 class="recuperar-title">¡Listo!</h3>
+        <p class="recuperar-sub">Tu contraseña se ha actualizado. Ya puedes iniciar sesión.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" data-close-recuperar>Entendido</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="icons-emojis.js"></script>
-<script src="ds.js"></script>
-<script src="offline.js"></script>
-<script src="album.js"></script>
-<script src="script.js"></script>
-<script src="tienda.js"></script>
-<script src="perfil.js"></script>
-<script src="logros-extra.js"></script>
-<script src="rpg.js"></script>
-<script src="rpg-loot.js"></script>
-<script src="juegos.js"></script>
+  <script src="ds.js"></script>
+  <script src="offline.js"></script>
+  <script src="album.js"></script>
+  <script src="script.js"></script>
+  <script src="tienda.js"></script>
+  <script src="perfil.js"></script>
+  <script src="logros-extra.js"></script>
+  <script src="rpg.js"></script>
+  <script src="rpg-loot.js"></script>
+  <script src="juegos.js"></script>
 </body>
+
 </html>
