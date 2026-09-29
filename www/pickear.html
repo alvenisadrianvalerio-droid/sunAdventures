@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>🎯 Picker de sprites</title>
+<style>
+  body{margin:0;background:#0b0c12;color:#e8eef7;font-family:system-ui,sans-serif;padding:1.2rem}
+  h1{color:#ffd93d;font-size:1.2rem;margin:0 0 .3rem}
+  p{opacity:.7;font-size:.85rem;margin:0 0 1rem}
+  .barra{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap;padding:.8rem;background:rgba(255,217,61,.08);border:2px solid rgba(255,217,61,.3);border-radius:12px;margin-bottom:1rem}
+  label{display:flex;align-items:center;gap:.35rem;font-size:.82rem}
+  input[type=number]{width:70px;padding:.35rem .5rem;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:inherit;font-family:inherit}
+  button{padding:.5rem .9rem;border-radius:999px;border:none;background:linear-gradient(135deg,#ffd93d,#ffae3d);color:#2b2118;font-weight:900;font-family:inherit;cursor:pointer;font-size:.82rem}
+  button.sec{background:rgba(255,255,255,.08);color:inherit}
+  #wrap{position:relative;overflow:auto;max-height:75vh;border:2px solid rgba(255,217,61,.3);border-radius:12px;background:#fff;padding:6px;display:inline-block}
+  #sheet{display:block;image-rendering:pixelated;cursor:crosshair;user-select:none}
+  #grid{position:absolute;top:6px;left:6px;pointer-events:none}
+  #grid i{position:absolute;background:rgba(255,217,61,.25);pointer-events:none}
+  .info{display:flex;gap:1rem;flex-wrap:wrap;padding:.6rem .9rem;margin-bottom:1rem;background:rgba(255,255,255,.05);border-radius:10px;font-size:.82rem}
+  .info strong{color:#ffd93d}
+  .preview{display:flex;align-items:center;gap:.8rem;padding:.8rem;margin-top:1rem;background:rgba(255,217,61,.1);border:2px solid rgba(255,217,61,.4);border-radius:12px}
+  .p-sprite{width:64px;height:64px;background-color:#fff;border-radius:8px;image-rendering:pixelated;background-repeat:no-repeat;border:1px solid rgba(0,0,0,.15)}
+  code{background:rgba(0,0,0,.5);padding:.2rem .5rem;border-radius:6px;color:#ffd93d;font-size:.9rem}
+  .lista{margin-top:1rem;padding:.8rem;background:rgba(0,0,0,.3);border-radius:10px;font-family:monospace;font-size:.78rem;max-height:200px;overflow-y:auto;white-space:pre}
+  .lista button{margin-left:.5rem;padding:.15rem .5rem;font-size:.7rem}
+</style>
+</head>
+<body>
+  <h1>🎯 Picker de sprites — Admurin</h1>
+  <p>Coloca este archivo junto a <code>index.html</code> y ábrelo con doble clic. Ajusta columnas/filas hasta que el recuadro naranja cuadre con un sprite.</p>
+
+  <div class="barra">
+    <label>Ruta: <input id="ruta" type="text" value="img/tienda/admurin-items.png" style="width:280px;padding:.35rem .5rem;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:inherit;font-family:inherit"></label>
+    <button id="cargar">Cargar</button>
+    <label>Cols: <input id="cols" type="number" value="10" min="1"></label>
+    <label>Filas: <input id="rows" type="number" value="100" min="1"></label>
+    <label>Zoom: <input id="zoom" type="number" value="2" min="1" max="8" step="0.5"></label>
+    <button id="aplicar">Aplicar</button>
+    <button id="auto" class="sec">Auto-detectar</button>
+  </div>
+
+  <div class="info">
+    <span>Col: <strong id="i-col">—</strong></span>
+    <span>Row: <strong id="i-row">—</strong></span>
+    <span>Celda px: <strong id="i-cpx">—</strong></span>
+    <span>Hoja: <strong id="i-tam">—</strong></span>
+  </div>
+
+  <div id="wrap"><img id="sheet" alt=""><div id="grid"></div></div>
+
+  <div class="preview">
+    <div class="p-sprite" id="prev"></div>
+    <div>
+      <div style="font-weight:900;font-size:.85rem;">Coordenadas:</div>
+      <code id="coords">[]</code>
+      <button id="copiar" style="margin-left:.6rem;">📋 Copiar</button>
+      <button id="anadir" style="margin-left:.3rem;">➕ Añadir a lista</button>
+    </div>
+  </div>
+
+  <div class="lista" id="lista"></div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const sheet = $("sheet"), grid = $("grid");
+  let cols = 10, rows = 100, cur = null;
+  const anadidos = [];
+
+  function cargar() {
+    sheet.src = $("ruta").value + "?t=" + Date.now();
+  }
+
+  function autoDetectar() {
+    if (!sheet.naturalWidth) return alert("Carga primero la imagen");
+    // Admurin suele ser 16x16; probamos ese tamaño
+    $("cols").value = Math.round(sheet.naturalWidth / 16);
+    $("rows").value = Math.round(sheet.naturalHeight / 16);
+    aplicar();
+  }
+
+  function aplicar() {
+    cols = Math.max(1, parseInt($("cols").value) || 10);
+    rows = Math.max(1, parseInt($("rows").value) || 100);
+    const zoom = parseFloat($("zoom").value) || 2;
+
+    sheet.style.width  = (sheet.naturalWidth  * zoom) + "px";
+    sheet.style.height = (sheet.naturalHeight * zoom) + "px";
+    grid.style.width   = sheet.style.width;
+    grid.style.height  = sheet.style.height;
+
+    $("i-tam").textContent = `${sheet.naturalWidth}×${sheet.naturalHeight}`;
+    $("i-cpx").textContent = `${(sheet.clientWidth/cols).toFixed(1)}×${(sheet.clientHeight/rows).toFixed(1)}`;
+
+    pintarGrid();
+    actualizarPreview();
+  }
+
+  function pintarGrid() {
+    grid.innerHTML = "";
+    const w = sheet.clientWidth, h = sheet.clientHeight;
+    const cw = w/cols, ch = h/rows;
+    if (cw < 8 || ch < 8) return;
+    for (let c=1; c<cols; c++) {
+      const i = document.createElement("i");
+      i.style.left = (c*cw)+"px"; i.style.top = "0";
+      i.style.width = "1px"; i.style.height = h+"px";
+      grid.appendChild(i);
+    }
+    for (let r=1; r<rows; r++) {
+      const i = document.createElement("i");
+      i.style.top = (r*ch)+"px"; i.style.left = "0";
+      i.style.height = "1px"; i.style.width = w+"px";
+      grid.appendChild(i);
+    }
+  }
+
+  function actualizarPreview() {
+    if (!cur) return;
+    const posX = (cur.col/(cols-1))*100;
+    const posY = (cur.row/(rows-1))*100;
+    const p = $("prev");
+    p.style.backgroundImage = `url(${sheet.src})`;
+    p.style.backgroundSize  = `${cols*100}% ${rows*100}%`;
+    p.style.backgroundPosition = `${posX}% ${posY}%`;
+    $("coords").textContent = `[${cur.col}, ${cur.row}]`;
+  }
+
+  sheet.addEventListener("load", () => { aplicar(); autoDetectar(); });
+  sheet.addEventListener("click", (e) => {
+    const r = sheet.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    const cw = sheet.clientWidth/cols;
+    const ch = sheet.clientHeight/rows;
+    cur = {
+      col: Math.max(0, Math.min(cols-1, Math.floor(x/cw))),
+      row: Math.max(0, Math.min(rows-1, Math.floor(y/ch)))
+    };
+    $("i-col").textContent = cur.col;
+    $("i-row").textContent = cur.row;
+    actualizarPreview();
+  });
+
+  $("cargar").addEventListener("click", cargar);
+  $("aplicar").addEventListener("click", aplicar);
+  $("auto").addEventListener("click", autoDetectar);
+
+  $("copiar").addEventListener("click", () => {
+    if (!cur) return;
+    const txt = `[${cur.col}, ${cur.row}]`;
+    navigator.clipboard?.writeText(txt).then(() => alert("Copiado: " + txt)).catch(() => prompt("Copia:", txt));
+  });
+
+  $("anadir").addEventListener("click", () => {
+    if (!cur) return alert("Haz clic en un sprite primero");
+    const id = prompt("ID del objeto (ej: pocion-roja):");
+    if (!id) return;
+    anadidos.push(`{ id:"${id}", nombre:"${id}", sprite:[${cur.col}, ${cur.row}], tipo:"hp", val:10, rar:"comun" },`);
+    $("lista").textContent = anadidos.join("\n");
+  });
+
+  // Carga automática al abrir
+  cargar();
+})();
+</script>
+</body>
+</html>

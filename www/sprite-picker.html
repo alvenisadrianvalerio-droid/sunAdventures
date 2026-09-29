@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>🎯 Selector de sprites</title>
+<style>
+  *,*::before,*::after { box-sizing: border-box; }
+  body {
+    margin: 0; background: #0b0c12; color: #e8eef7;
+    font-family: system-ui, sans-serif; padding: 1.5rem;
+  }
+  h1 { color: #ffd93d; margin: 0 0 .4rem; font-size: 1.4rem; }
+  p.sub { opacity: .7; font-style: italic; margin: 0 0 1rem; font-size: .9rem; }
+  .barra {
+    display: flex; gap: .8rem; align-items: center; flex-wrap: wrap;
+    padding: 1rem; background: rgba(255,217,61,.08);
+    border: 2px solid rgba(255,217,61,.3); border-radius: 14px;
+    margin-bottom: 1rem;
+  }
+  .barra label { display: flex; align-items: center; gap: .4rem; font-size: .85rem; }
+  .barra input[type=number] {
+    width: 80px; padding: .4rem .6rem; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.05);
+    color: inherit; font-family: inherit; font-size: .9rem;
+  }
+  .barra button {
+    padding: .55rem 1rem; border-radius: 999px; border: none;
+    background: linear-gradient(135deg,#ffd93d,#ffae3d); color: #2b2118;
+    font-weight: 900; font-family: inherit; cursor: pointer; font-size: .85rem;
+  }
+  .barra button.sec { background: rgba(255,255,255,.08); color: inherit; }
+  .info {
+    display: flex; gap: 1.2rem; flex-wrap: wrap; font-size: .85rem;
+    padding: .6rem 1rem; margin-bottom: 1rem;
+    background: rgba(255,255,255,.04); border-radius: 10px;
+  }
+  .info strong { color: #ffd93d; }
+  #sheet-wrap {
+    position: relative; overflow: auto; max-height: 70vh;
+    border: 2px solid rgba(255,217,61,.2); border-radius: 12px;
+    background: #fff; padding: 8px;
+  }
+  #sheet { display: block; image-rendering: pixelated; cursor: crosshair; }
+  #grid {
+    position: absolute; top: 8px; left: 8px; pointer-events: none;
+  }
+  #grid div {
+    position: absolute; border: 1px solid rgba(255,217,61,.35);
+    pointer-events: none;
+  }
+  .preview {
+    display: flex; align-items: center; gap: .8rem;
+    padding: .8rem; margin-top: 1rem;
+    background: rgba(255,217,61,.1); border: 2px solid rgba(255,217,61,.4);
+    border-radius: 12px;
+  }
+  .preview-sprite {
+    width: 64px; height: 64px;
+    background: #fff; border-radius: 8px;
+    image-rendering: pixelated;
+  }
+  .preview code {
+    background: rgba(0,0,0,.5); padding: .2rem .5rem;
+    border-radius: 6px; font-size: .9rem; color: #ffd93d;
+  }
+  .aviso {
+    padding: .6rem 1rem; margin-bottom: 1rem;
+    background: rgba(255,84,112,.15); border-left: 4px solid #ff5470;
+    border-radius: 8px; font-size: .85rem;
+  }
+</style>
+</head>
+<body>
+  <h1>🎯 Selector de sprites Admurin</h1>
+  <p class="sub">Haz clic sobre cualquier icono para pillar su <code>[col, row]</code>.</p>
+
+  <div class="aviso">
+    <strong>Antes de empezar</strong>: asegúrate de que <code>img/tienda/admurin-items.png</code> existe.
+  </div>
+
+  <div class="barra">
+    <label>Columnas: <input type="number" id="cols" value="10" min="1"></label>
+    <label>Filas:    <input type="number" id="rows" value="100" min="1"></label>
+    <label>Zoom:     <input type="number" id="zoom" value="2" min="1" max="6" step="0.5"></label>
+    <button id="aplicar">Aplicar</button>
+    <button id="copiar" class="sec">📋 Copiar coords</button>
+  </div>
+
+  <div class="info">
+    <span>Col: <strong id="i-col">—</strong></span>
+    <span>Row: <strong id="i-row">—</strong></span>
+    <span>Celda: <strong id="i-celda">—</strong></span>
+    <span>Tamaño hoja: <strong id="i-tam">—</strong></span>
+    <span>Celda px: <strong id="i-celda-px">—</strong></span>
+  </div>
+
+  <div id="sheet-wrap">
+    <img id="sheet" src="img/tienda/admurin-items.png" alt="">
+    <div id="grid"></div>
+  </div>
+
+  <div class="preview">
+    <div class="preview-sprite" id="preview"></div>
+    <div>
+      <div style="font-weight:900;font-size:.9rem;">Coordenadas seleccionadas:</div>
+      <code id="coords">{}</code>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const sheet = $("sheet"), grid = $("grid");
+  let cols = 10, rows = 100, zoom = 2;
+  let current = null;
+
+  function pintarGrid() {
+    grid.innerHTML = "";
+    const w = sheet.clientWidth, h = sheet.clientHeight;
+    const cw = w / cols, ch = h / rows;
+    // Solo pintamos grid si las celdas no son diminutas
+    if (cw < 6 || ch < 6) return;
+    for (let c = 1; c < cols; c++) {
+      const d = document.createElement("div");
+      d.style.left = (c * cw) + "px"; d.style.top = 0;
+      d.style.width = "0"; d.style.height = h + "px";
+      d.style.borderLeft = "1px dashed rgba(255,217,61,.4)";
+      grid.appendChild(d);
+    }
+    for (let r = 1; r < rows; r++) {
+      const d = document.createElement("div");
+      d.style.top = (r * ch) + "px"; d.style.left = 0;
+      d.style.height = "0"; d.style.width = w + "px";
+      d.style.borderTop = "1px dashed rgba(255,217,61,.4)";
+      grid.appendChild(d);
+    }
+  }
+
+  function actualizarPreview() {
+    if (!current) return;
+    const { col, row } = current;
+    const posX = (col / (cols - 1)) * 100;
+    const posY = (row / (rows - 1)) * 100;
+    const p = $("preview");
+    p.style.backgroundImage = `url(${sheet.src})`;
+    p.style.backgroundSize = `${cols * 100}% ${rows * 100}%`;
+    p.style.backgroundPosition = `${posX}% ${posY}%`;
+    $("coords").textContent = `[${col}, ${row}]`;
+    $("i-col").textContent = col;
+    $("i-row").textContent = row;
+    $("i-celda").textContent = (row * cols) + col;
+  }
+
+  function aplicar() {
+    cols = Math.max(1, parseInt($("cols").value) || 10);
+    rows = Math.max(1, parseInt($("rows").value) || 100);
+    zoom = parseFloat($("zoom").value) || 2;
+
+    sheet.style.width = (sheet.naturalWidth * zoom) + "px";
+    sheet.style.height = (sheet.naturalHeight * zoom) + "px";
+    grid.style.width = sheet.style.width;
+    grid.style.height = sheet.style.height;
+
+    const cw = sheet.clientWidth / cols;
+    const ch = sheet.clientHeight / rows;
+
+    $("i-tam").textContent = `${sheet.naturalWidth} × ${sheet.naturalHeight}`;
+    $("i-celda-px").textContent = `${cw.toFixed(1)} × ${ch.toFixed(1)} px`;
+    pintarGrid();
+    actualizarPreview();
+  }
+
+  sheet.addEventListener("load", () => {
+    aplicar();
+    // Sugerir cols/rows automáticamente si el usuario no sabe
+    const w = sheet.naturalWidth, h = sheet.naturalHeight;
+    // Sprite típico Admurin: 16x16 → sugerir
+    $("cols").value = Math.round(w / 16);
+    $("rows").value = Math.round(h / 16);
+    setTimeout(aplicar, 100);
+  });
+
+  sheet.addEventListener("click", (e) => {
+    const r = sheet.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    const cw = sheet.clientWidth / cols;
+    const ch = sheet.clientHeight / rows;
+    const col = Math.max(0, Math.min(cols - 1, Math.floor(x / cw)));
+    const row = Math.max(0, Math.min(rows - 1, Math.floor(y / ch)));
+    current = { col, row };
+    actualizarPreview();
+  });
+
+  $("aplicar").addEventListener("click", aplicar);
+  $("copiar").addEventListener("click", () => {
+    if (!current) return alert("Haz clic en un sprite primero");
+    const txt = `[${current.col}, ${current.row}]`;
+    navigator.clipboard.writeText(txt)
+      .then(() => alert("Copiado: " + txt))
+      .catch(() => prompt("Copia esto:", txt));
+  });
+})();
+</script>
+</body>
+</html>
