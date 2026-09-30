@@ -1310,3 +1310,16 @@ body.light .user-dropdown-item.active {
   .nav-link { width: 36px; height: 36px; }
 }
 .ui-icon { width: 1.2em; height: 1.2em; display: block; fill: none; }
+/* Pestañas del RPG */
+.rpg-tabs{display:flex;gap:.4rem;margin-bottom:1.4rem;padding:.35rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow-x:auto;scrollbar-width:none}
+.rpg-tabs::-webkit-scrollbar{display:none}
+.rpg-tab{flex:1;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.7rem .9rem;border-radius:10px;border:none;background:transparent;color:var(--text);font-family:inherit;font-size:.88rem;font-weight:800;cursor:pointer;opacity:.6;white-space:nowrap;transition:background .2s,opacity .2s}
+.rpg-tab:hover:not(.active){opacity:.9;background:rgba(255,217,61,.1)}
+.rpg-tab.active{opacity:1;background:linear-gradient(135deg,rgba(255,217,61,.25),rgba(255,217,61,.1));color:var(--accent);box-shadow:0 4px 14px rgba(255,217,61,.25)}
+.rpg-tab-icon{display:inline-flex;align-items:center;justify-content:center;width:1.15rem;height:1.15rem;flex-shrink:0;color:inherit}
+.rpg-tab-icon svg{width:100%;height:100%}
+.rpg-panel{display:none}
+.rpg-panel.active{display:block;animation:rpgPanelFade .25s ease}
+@keyframes rpgPanelFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.rpg-en-batalla .rpg-tabs{display:none!important}
+@media (max-width:500px){.rpg-tab{padding:.6rem .5rem;font-size:.78rem;gap:.3rem}.rpg-tab-icon{width:1rem;height:1rem}}

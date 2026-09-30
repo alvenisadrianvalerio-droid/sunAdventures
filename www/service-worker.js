@@ -1,10 +1,14 @@
-const CACHE_NAME = "sunadventures-v25";
+const CACHE_NAME = "sunadventures-v28"; // ⬅️ sube versión para forzar update
 const ASSETS_ESTATICOS = [
   "./","./index.html","./styles.css","./album.css","./juegos.css",
+  "./rpg.css","./rpg-loot.css","./temas.css",
   "./script.js","./album.js","./icons-emojis.js","./juegos.js",
-  "./db.js","./offline.js","./tienda.js","./perfil.js",
-  "./logros-extra.js","./manifest.json","./img/girasol-loading.png",
+  "./ds.js",              // ⬅️ CORREGIDO: era "./db.js" (no existe)
+  "./offline.js","./tienda.js","./perfil.js","./logros-extra.js",
+  "./sprites-config.js","./efectos.js","./rpg.js","./rpg-loot.js",
+  "./manifest.json","./img/girasol-loading.png",
 ];
+// ... resto igual
 
 const HOSTS_EXTERNOS = [
   "supabase.co","supabase.in","unpkg.com","jsdelivr.net",

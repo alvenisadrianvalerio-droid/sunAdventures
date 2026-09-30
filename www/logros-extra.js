@@ -36,7 +36,24 @@
     { id:"planificador",    tipo:"grupo",    nombre:"Planificador",      descripcion:"Añade 10 eventos al calendario",        meta:10,  medir:()=> (window._eventos?.length||0) },
     { id:"exploradores",    tipo:"grupo",    nombre:"Exploradores",      descripcion:"Visita 25 ubicaciones distintas",       meta:25,  medir:()=> (window._fotos||[]).filter(f=>f.lat!=null&&f.lng!=null).length },
     { id:"viajeros",        tipo:"grupo",    nombre:"Trotamundos pro",   descripcion:"Visita 100 ubicaciones distintas",      meta:100, medir:()=> (window._fotos||[]).filter(f=>f.lat!=null&&f.lng!=null).length },
-    { id:"mejor-amigo",     tipo:"grupo",    nombre:"Mejores amigos",    descripcion:"Ten una amistad de mascota al 100%",   meta:1,   medir:()=> mascotasAmistadMax() }
+    { id:"mejor-amigo",     tipo:"grupo",    nombre:"Mejores amigos",    descripcion:"Ten una amistad de mascota al 100%",   meta:1,   medir:()=> mascotasAmistadMax() },
+        /* --- Aventura RPG --- */
+    { id:"rpg-primer-paso",   tipo:"personal", nombre:"Primer paso",       descripcion:"Derrota a tu primer enemigo",        meta:1,    medir:()=> rpgState().enemigosDerrotados },
+    { id:"rpg-cazador",       tipo:"personal", nombre:"Cazador",           descripcion:"Derrota 50 enemigos",                meta:50,   medir:()=> rpgState().enemigosDerrotados },
+    { id:"rpg-exterminador",  tipo:"personal", nombre:"Exterminador",      descripcion:"Derrota 250 enemigos",               meta:250,  medir:()=> rpgState().enemigosDerrotados },
+    { id:"rpg-genocida",      tipo:"personal", nombre:"Genocida",          descripcion:"Derrota 1000 enemigos",              meta:1000, medir:()=> rpgState().enemigosDerrotados },
+    { id:"rpg-nivel-10",      tipo:"personal", nombre:"Guerrero",          descripcion:"Alcanza nivel 10 en Aventura",        meta:10,   medir:()=> rpgState().nivel },
+    { id:"rpg-nivel-25",      tipo:"personal", nombre:"Veterano",          descripcion:"Alcanza nivel 25 en Aventura",        meta:25,   medir:()=> rpgState().nivel },
+    { id:"rpg-nivel-50",      tipo:"personal", nombre:"Leyenda viva",      descripcion:"Alcanza nivel 50 en Aventura",        meta:50,   medir:()=> rpgState().nivel },
+    { id:"rpg-jefes-1",       tipo:"personal", nombre:"Matajefes",         descripcion:"Derrota a tu primer jefe",           meta:1,    medir:()=> (rpgState().jefesDerrotados||[]).length },
+    { id:"rpg-jefes-todos",   tipo:"personal", nombre:"Cazador de jefes",  descripcion:"Derrota a 3 jefes",                  meta:3,    medir:()=> (rpgState().jefesDerrotados||[]).length },
+    { id:"rpg-loot-10",       tipo:"personal", nombre:"Aventurero",        descripcion:"Consigue 10 objetos únicos",         meta:10,   medir:()=> lootStats().unicos },
+    { id:"rpg-loot-40",       tipo:"personal", nombre:"Coleccionista",     descripcion:"Consigue 40 objetos únicos",         meta:40,   medir:()=> lootStats().unicos },
+    { id:"rpg-loot-75",       tipo:"personal", nombre:"Maestro del botín", descripcion:"Consigue 75 objetos únicos",         meta:75,   medir:()=> lootStats().unicos },
+    { id:"rpg-mitico",        tipo:"personal", nombre:"Mítico",            descripcion:"Consigue un objeto Mítico",          meta:1,    medir:()=> lootStats().miticos },
+    { id:"rpg-cofres-10",     tipo:"personal", nombre:"Abrecofres",        descripcion:"Abre 10 cofres",                     meta:10,   medir:()=> lootStats().cofres },
+    { id:"rpg-cofres-50",     tipo:"personal", nombre:"Traficante",        descripcion:"Abre 50 cofres",                     meta:50,   medir:()=> lootStats().cofres },
+    { id:"rpg-bonus-100",     tipo:"personal", nombre:"Forjado",           descripcion:"Acumula +100 de bonus total",        meta:100,  medir:()=> lootStats().bonusTotal },
   ];
 
   function numLS(clave) {
@@ -66,5 +83,30 @@
     const t = setInterval(() => {
       if (inyectar() || ++tries > 20) clearInterval(t);
     }, 300);
+  }
+    function rpgState() {
+    try {
+      const u = window._getUserIdSafe?.() || "local";
+      return JSON.parse(localStorage.getItem(`sa_rpg_${u}`) || '{"nivel":1,"xp":0,"hp":100,"enemigosDerrotados":0,"jefesDerrotados":[],"statsBase":{"atk":10,"def":3}}');
+    } catch { return { nivel:1, xp:0, hp:100, enemigosDerrotados:0, jefesDerrotados:[], statsBase:{atk:10,def:3} }; }
+  }
+  function lootStats() {
+    try {
+      const u = window._getUserIdSafe?.() || "local";
+      const loot = JSON.parse(localStorage.getItem(`sa_rpg_loot_${u}`) || "{}");
+      const stats = JSON.parse(localStorage.getItem(`sa_rpg_stats_${u}`) || '{"atkBonus":0,"defBonus":0,"hpBonus":0}');
+      const unicos = Object.keys(loot).length;
+      const total = Object.values(loot).reduce((a,b)=>a+b,0);
+      const cofres = Number(localStorage.getItem(`sa_rpg_cofres_${u}`) || 0);
+      // Míticos conseguidos (contamos cuántos IDs del pool tienen rar mitico)
+      let miticos = 0;
+      try {
+        const pool = window.RpgLoot?.POOL || [];
+        const mits = new Set(pool.filter(p => p.rar === "mitico").map(p => p.id));
+        Object.keys(loot).forEach(id => { if (mits.has(id)) miticos++; });
+      } catch {}
+      const bonusTotal = (stats.atkBonus||0) + (stats.defBonus||0) + (stats.hpBonus||0);
+      return { unicos, total, cofres, miticos, bonusTotal };
+    } catch { return { unicos:0, total:0, cofres:0, miticos:0, bonusTotal:0 }; }
   }
 })();

@@ -7,8 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const CENSURA_KEY = "sunadventures_censura_activa";
   const PUSH_VAPID_PUBLIC_KEY = "BGFg_T3XTTCpN0aIKRXGq3sBvh0RGWOFmxx25tdpQ5OhNgHmuFDJ7TiXLfmgy4ktdqfE81uODV_PLKFqu_vy7_w";
   const AUDIO_EXTS = ["mp3", "m4a", "wav", "ogg", "flac", "aac", "opus"], VIDEO_EXTS = ["mp4", "webm", "mov", "mkv"];
-  const MESES_LARGOS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-  const MESES_CORTOS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+  const MESES_LARGOS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  const MESES_CORTOS = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+
+  // ⚡ OPT: límite de concurrencia para URLs firmadas
+  const LIMITE_CONCURRENCIA_URLS = 6;
 
   if (typeof window.supabase === "undefined") {
     document.getElementById("loading-screen")?.classList.remove("active");
@@ -58,11 +61,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const extensionDe = (n) => (n.split(".").pop() || "").toLowerCase();
   const esAudio = (ext) => AUDIO_EXTS.includes(ext);
   const esVideo = (ext) => VIDEO_EXTS.includes(ext);
-  const formatearFecha = (iso) => { const d = new Date(iso + "T00:00:00"); return isNaN(d) ? iso : `${String(d.getDate()).padStart(2, "0")} · ${MESES_CORTOS[d.getMonth()]} · ${d.getFullYear()}`; };
-  const formatearFechaNota = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : `${String(d.getDate()).padStart(2, "0")} ${MESES_CORTOS[d.getMonth()]} ${d.getFullYear()}`; };
-  const formatearTiempo = (seg) => (!isFinite(seg) || seg < 0) ? "0:00" : `${Math.floor(seg / 60)}:${String(Math.floor(seg % 60)).padStart(2, "0")}`;
-  const formatearTamano = (b) => b < 1024 ? b + " B" : b < 1048576 ? (b / 1024).toFixed(1) + " KB" : (b / 1048576).toFixed(1) + " MB";
-  const fechaISO = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const formatearFecha = (iso) => { const d = new Date(iso + "T00:00:00"); return isNaN(d) ? iso : `${String(d.getDate()).padStart(2,"0")} · ${MESES_CORTOS[d.getMonth()]} · ${d.getFullYear()}`; };
+  const formatearFechaNota = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : `${String(d.getDate()).padStart(2,"0")} ${MESES_CORTOS[d.getMonth()]} ${d.getFullYear()}`; };
+  const formatearTiempo = (seg) => (!isFinite(seg) || seg < 0) ? "0:00" : `${Math.floor(seg/60)}:${String(Math.floor(seg%60)).padStart(2,"0")}`;
+  const formatearTamano = (b) => b < 1024 ? b+" B" : b < 1048576 ? (b/1024).toFixed(1)+" KB" : (b/1048576).toFixed(1)+" MB";
+  const fechaISO = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   const hoyISO = () => fechaISO(new Date());
 
   const grid = $("album-grid"), empty = $("album-empty"), btnAdd = $("btn-add-photo"), modal = $("photo-modal"), modalTitle = $("modal-title"), form = $("photo-form");
@@ -106,53 +109,51 @@ document.addEventListener("DOMContentLoaded", () => {
   let chatSubscription = null, chatModo = "grupo", chatDestinatario = null;
   mesMostrado.setDate(1);
 
-  const mostrarLoading = (msg = "Cargando...") => { if (!loadingScreen) return; if (loadingText) loadingText.textContent = msg; loadingScreen.classList.add("active"); loadingScreen.setAttribute("aria-hidden", "false"); };
-  const ocultarLoading = () => { if (!loadingScreen) return; loadingScreen.classList.remove("active"); loadingScreen.setAttribute("aria-hidden", "true"); };
+  const mostrarLoading = (msg = "Cargando...") => { if (!loadingScreen) return; if (loadingText) loadingText.textContent = msg; loadingScreen.classList.add("active"); loadingScreen.setAttribute("aria-hidden","false"); };
+  const ocultarLoading = () => { if (!loadingScreen) return; loadingScreen.classList.remove("active"); loadingScreen.setAttribute("aria-hidden","true"); };
 
   const IMAGENES_MASCOTA = {
-    mapache: "img/mapache.png", girasol: "img/mascota-girasol.png",
-    gatito: "img/siamesa.png", "gatito-negro": "img/gatito-negro.png",
-    hamburguesa: "img/hamburguesa.png", oveja: "img/oveja.png", pollito: "img/pollito.png",
-    jirafa: "img/jirafa.png", unicornio: "img/unicornio.png", conejo: "img/conejito.png",
-    "dragon-bebe": "img/dragon-bebe.png", "dragon-anciano": "img/dragon-anciano.png"
+    mapache:"img/mapache.png", girasol:"img/mascota-girasol.png", gatito:"img/siamesa.png",
+    "gatito-negro":"img/gatito-negro.png", hamburguesa:"img/hamburguesa.png", oveja:"img/oveja.png",
+    pollito:"img/pollito.png", jirafa:"img/jirafa.png", unicornio:"img/unicornio.png",
+    conejo:"img/conejito.png", "dragon-bebe":"img/dragon-bebe.png", "dragon-anciano":"img/dragon-anciano.png"
   };
 
   const LOGROS = [
-    { id: "primeros-pasos", tipo: "grupo", icono: SVG.medal, nombre: "Primeros pasos", descripcion: "Guarda la primera foto del grupo", meta: 1, medir: () => fotos.length },
-    { id: "fotografos", tipo: "grupo", icono: SVG.camera, nombre: "Fotógrafos", descripcion: "Guarda 50 fotos del grupo", meta: 50, medir: () => fotos.length },
-    { id: "dj", tipo: "grupo", icono: SVG.music, nombre: "DJ", descripcion: "Añade 20 canciones al grupo", meta: 20, medir: () => playlists.reduce((t, p) => t + p.canciones.length, 0) },
-    { id: "poetas", tipo: "grupo", icono: SVG.note, nombre: "Poetas", descripcion: "Escribe 30 notas del grupo", meta: 30, medir: () => notas.length },
-    { id: "racha", icono: SVG.fire, nombre: "Racha de 30 días", descripcion: "Abre la app 30 días seguidos", meta: 30, medir: () => visitasConsecutivas },
-    { id: "trotamundos", tipo: "grupo", icono: SVG.globe, nombre: "Trotamundos", descripcion: "Guarda 10 fotos con ubicación", meta: 10, medir: () => fotos.filter(f => f.lat != null && f.lng != null).length },
-    { id: "racha-365", icono: SVG.calendar, nombre: "Un año de nosotros", descripcion: "Abre la app 365 días seguidos", meta: 365, medir: () => visitasConsecutivas },
-    { id: "todos-los-logros", tipo: "grupo", icono: SVG.crown, nombre: "Leyenda absoluta", descripcion: "Completa todos los demás logros", meta: 1, esFinal: true, medir: () => LOGROS.filter(l => !l.esFinal).every(l => l.medir() >= l.meta) ? 1 : 0 }
+    { id:"primeros-pasos", tipo:"grupo", icono:SVG.medal, nombre:"Primeros pasos", descripcion:"Guarda la primera foto del grupo", meta:1, medir:()=> fotos.length },
+    { id:"fotografos", tipo:"grupo", icono:SVG.camera, nombre:"Fotógrafos", descripcion:"Guarda 50 fotos del grupo", meta:50, medir:()=> fotos.length },
+    { id:"dj", tipo:"grupo", icono:SVG.music, nombre:"DJ", descripcion:"Añade 20 canciones al grupo", meta:20, medir:()=> playlists.reduce((t,p)=>t+p.canciones.length,0) },
+    { id:"poetas", tipo:"grupo", icono:SVG.note, nombre:"Poetas", descripcion:"Escribe 30 notas del grupo", meta:30, medir:()=> notas.length },
+    { id:"racha", icono:SVG.fire, nombre:"Racha de 30 días", descripcion:"Abre la app 30 días seguidos", meta:30, medir:()=> visitasConsecutivas },
+    { id:"trotamundos", tipo:"grupo", icono:SVG.globe, nombre:"Trotamundos", descripcion:"Guarda 10 fotos con ubicación", meta:10, medir:()=> fotos.filter(f=>f.lat!=null&&f.lng!=null).length },
+    { id:"racha-365", icono:SVG.calendar, nombre:"Un año de nosotros", descripcion:"Abre la app 365 días seguidos", meta:365, medir:()=> visitasConsecutivas },
+    { id:"todos-los-logros", tipo:"grupo", icono:SVG.crown, nombre:"Leyenda absoluta", descripcion:"Completa todos los demás logros", meta:1, esFinal:true, medir:()=> LOGROS.filter(l=>!l.esFinal).every(l=>l.medir()>=l.meta)?1:0 }
   ];
 
   const MASCOTAS_LOGROS = [
-    { id: "mapache", nombre: "el Mapache", icono: SVG.heart }, { id: "girasol", nombre: "el Girasol", icono: SVG.sunflower },
-    { id: "gatito", nombre: "la Siamesa", icono: SVG.heart }, { id: "gatito-negro", nombre: "el Gato Negro", icono: SVG.heart },
-    { id: "hamburguesa", nombre: "Hamburguesa", icono: SVG.heart }, { id: "oveja", nombre: "la Oveja", icono: SVG.heart },
-    { id: "pollito", nombre: "el Pollito", icono: SVG.heart }, { id: "jirafa", nombre: "la Jirafa", icono: SVG.heart },
-    { id: "unicornio", nombre: "el Unicornio", icono: SVG.sparkle }, { id: "conejo", nombre: "el Conejito", icono: SVG.heart },
-    { id: "dragon-bebe", nombre: "el Dragón Bebé", icono: SVG.fire }, { id: "dragon-anciano", nombre: "el Dragón Anciano", icono: SVG.crown }
+    { id:"mapache", nombre:"el Mapache", icono:SVG.heart }, { id:"girasol", nombre:"el Girasol", icono:SVG.sunflower },
+    { id:"gatito", nombre:"la Siamesa", icono:SVG.heart }, { id:"gatito-negro", nombre:"el Gato Negro", icono:SVG.heart },
+    { id:"hamburguesa", nombre:"Hamburguesa", icono:SVG.heart }, { id:"oveja", nombre:"la Oveja", icono:SVG.heart },
+    { id:"pollito", nombre:"el Pollito", icono:SVG.heart }, { id:"jirafa", nombre:"la Jirafa", icono:SVG.heart },
+    { id:"unicornio", nombre:"el Unicornio", icono:SVG.sparkle }, { id:"conejo", nombre:"el Conejito", icono:SVG.heart },
+    { id:"dragon-bebe", nombre:"el Dragón Bebé", icono:SVG.fire }, { id:"dragon-anciano", nombre:"el Dragón Anciano", icono:SVG.crown }
   ];
 
   MASCOTAS_LOGROS.forEach(m => {
     const sprite = IMAGENES_MASCOTA[m.id];
     const nombreCorto = m.nombre.replace(/^(el|la) /, "");
     LOGROS.push(
-      { id: `mascota-${m.id}`, sprites: [sprite], icono: m.icono, nombre: `Conoce a ${m.nombre}`, descripcion: `Interactúa con ${m.nombre} por primera vez`, meta: 1, medir: () => JSON.parse(localStorage.getItem(`mascotas_conocidas_${getUserIdSafe()}`) || "[]").includes(m.id) ? 1 : 0 },
-      { id: `clics-${m.id}`, sprites: [sprite], icono: SVG.tap, nombre: `Fan de ${nombreCorto}`, descripcion: `Dale 100 clics a ${nombreCorto}`, meta: 100, medir: () => Number(localStorage.getItem(`mascota_clicks_${getUserIdSafe()}_${m.id}`) || 0) }
+      { id:`mascota-${m.id}`, sprites:[sprite], icono:m.icono, nombre:`Conoce a ${m.nombre}`, descripcion:`Interactúa con ${m.nombre} por primera vez`, meta:1, medir:()=> JSON.parse(localStorage.getItem(`mascotas_conocidas_${getUserIdSafe()}`)||"[]").includes(m.id)?1:0 },
+      { id:`clics-${m.id}`, sprites:[sprite], icono:SVG.tap, nombre:`Fan de ${nombreCorto}`, descripcion:`Dale 100 clics a ${nombreCorto}`, meta:100, medir:()=> Number(localStorage.getItem(`mascota_clicks_${getUserIdSafe()}_${m.id}`)||0) }
     );
   });
-  MASCOTAS_LOGROS.forEach(m => { /* ... */ });
 
-  // ✅ AHORA SÍ: LOGROS ya está inicializado
   window.LOGROS = LOGROS;
   window.renderLogros = renderLogros;
-  window._playlists = playlists;
-  window._eventos = eventos;
-  window._fotos = fotos;
+// ✅ DESPUÉS (siempre apuntan al array actual)
+Object.defineProperty(window, "_playlists", { get: () => playlists, configurable: true });
+Object.defineProperty(window, "_eventos",   { get: () => eventos,   configurable: true });
+Object.defineProperty(window, "_fotos",     { get: () => fotos,     configurable: true });
 
   let logroToastTimeout = null;
   const notificarLogro = (logro) => {
@@ -165,24 +166,60 @@ document.addEventListener("DOMContentLoaded", () => {
     logroToastTimeout = setTimeout(() => logroToast.classList.remove("visible"), 4500);
   };
 
-  const crearIconoLogro = (logro) => {
-    const wrapper = document.createElement("span"); wrapper.className = "logro-icono-wrapper";
-    if (logro.sprites?.[0]) { const sw = document.createElement("span"); sw.className = "logro-icono-sprite"; const img = document.createElement("img"); img.src = logro.sprites[0]; img.alt = ""; img.loading = "lazy"; sw.appendChild(img); wrapper.appendChild(sw); }
-    const svgWrap = document.createElement("span"); svgWrap.className = "logro-icono-svg-badge"; svgWrap.innerHTML = logro.icono; wrapper.appendChild(svgWrap);
+    const crearIconoLogro = (logro) => {
+    const wrapper = document.createElement("span");
+    wrapper.className = "logro-icono-wrapper";
+
+    // Sprite opcional (mascotas)
+    if (logro.sprites && logro.sprites[0]) {
+      const sw = document.createElement("span");
+      sw.className = "logro-icono-sprite";
+      const img = document.createElement("img");
+      img.src = logro.sprites[0];
+      img.alt = "";
+      img.loading = "lazy";
+      sw.appendChild(img);
+      wrapper.appendChild(sw);
+    }
+
+    // Badge SVG con fallback según el tipo de logro
+    const svgWrap = document.createElement("span");
+    svgWrap.className = "logro-icono-svg-badge";
+
+    // Elegir icono: el del logro → icono según categoría → estrella por defecto
+    let iconHtml = logro.icono;
+    if (!iconHtml) {
+      const tipo = logro.id || "";
+      if (tipo.startsWith("rpg-") || tipo.includes("jefe") || tipo.includes("enemigo")) iconHtml = ICONO.espada;
+      else if (tipo.includes("chat") || tipo.includes("mensaje")) iconHtml = ICONO.chat;
+      else if (tipo.includes("juego") || tipo.includes("jugador") || tipo.includes("ganador")) iconHtml = ICONO.jugar;
+      else if (tipo.includes("compra") || tipo.includes("moneda") || tipo.includes("rico")) iconHtml = ICONO.moneda;
+      else if (tipo.includes("playlist") || tipo.includes("cancion") || tipo.includes("musical")) iconHtml = ICONO.musica;
+      else if (tipo.includes("evento") || tipo.includes("calendario") || tipo.includes("planificador")) iconHtml = ICONO.calendario;
+      else if (tipo.includes("viaje") || tipo.includes("explorador") || tipo.includes("ubicacion")) iconHtml = ICONO.mapa;
+      else if (tipo.includes("cuidado") || tipo.includes("amistad") || tipo.includes("amigo")) iconHtml = ICONO.corazon;
+      else if (tipo.includes("nivel")) iconHtml = ICONO.estrella;
+      else iconHtml = ICONO.estrella || "★";
+    }
+    svgWrap.innerHTML = iconHtml || "★";
+    wrapper.appendChild(svgWrap);
+
     return wrapper;
   };
 
-  const NIVEL_A_ICONO = { sprout: "raiz", heart: "corazon", flame: "fuego", sparkle: "estrella", sunflower: "girasol" };
-
+  const NIVEL_A_ICONO = { sprout:"raiz", heart:"corazon", flame:"fuego", sparkle:"estrella", sunflower:"girasol" };
   const NIVELES_EXPERIENCIA = [
-    { minimo: 0, nombre: "Novatos", icono: "sprout", siguiente: 100, siguienteNombre: "Enamorados", siguienteIcono: "heart" },
-    { minimo: 100, nombre: "Enamorados", icono: "heart", siguiente: 500, siguienteNombre: "Compañeros de vida", siguienteIcono: "flame" },
-    { minimo: 500, nombre: "Compañeros de vida", icono: "flame", siguiente: 1000, siguienteNombre: "Almas gemelas", siguienteIcono: "sparkle" },
-    { minimo: 1000, nombre: "Almas gemelas", icono: "sparkle", siguiente: 5000, siguienteNombre: "Leyendas", siguienteIcono: "sunflower" },
-    { minimo: 5000, nombre: "Leyendas", icono: "sunflower", siguiente: null, siguienteNombre: "Máximo nivel", siguienteIcono: null }
+    { minimo:0, nombre:"Novatos", icono:"sprout", siguiente:100, siguienteNombre:"Enamorados", siguienteIcono:"heart" },
+    { minimo:100, nombre:"Enamorados", icono:"heart", siguiente:500, siguienteNombre:"Compañeros de vida", siguienteIcono:"flame" },
+    { minimo:500, nombre:"Compañeros de vida", icono:"flame", siguiente:1000, siguienteNombre:"Almas gemelas", siguienteIcono:"sparkle" },
+    { minimo:1000, nombre:"Almas gemelas", icono:"sparkle", siguiente:5000, siguienteNombre:"Leyendas", siguienteIcono:"sunflower" },
+    { minimo:5000, nombre:"Leyendas", icono:"sunflower", siguiente:null, siguienteNombre:"Máximo nivel", siguienteIcono:null }
   ];
 
-  const calcularExperiencia = () => { const canciones = playlists.reduce((t, p) => t + p.canciones.length, 0); return fotos.length * 10 + notas.length * 5 + canciones * 8 + visitasConsecutivas * 20; };
+  const calcularExperiencia = () => {
+    const canciones = playlists.reduce((t,p)=>t+p.canciones.length,0);
+    return fotos.length*10 + notas.length*5 + canciones*8 + visitasConsecutivas*20;
+  };
 
   const hidratarIconosEn = (root) => {
     if (!root) return;
@@ -219,12 +256,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       window._experienciaActual = xp;
       window._nivelActual = NIVELES_EXPERIENCIA.findIndex(n => n.nombre === nivel.nombre) + 1;
-    } catch (err) { console.error("renderExperiencia error:", err); }
+    } catch (err) { console.error("renderExperiencia:", err); }
   }
 
   function registrarVisita() {
     try {
-      const hoy = new Date().toISOString().slice(0, 10);
+      const hoy = new Date().toISOString().slice(0,10);
       const clave = `sunadventures_visitas_${getUserIdSafe()}`;
       const dias = JSON.parse(localStorage.getItem(clave) || "[]");
       if (!dias.includes(hoy)) dias.push(hoy);
@@ -233,17 +270,22 @@ document.addEventListener("DOMContentLoaded", () => {
       visitasConsecutivas = 0;
       const fechas = new Set(ordenados);
       const cursor = new Date();
-      while (fechas.has(cursor.toISOString().slice(0, 10))) { visitasConsecutivas++; cursor.setDate(cursor.getDate() - 1); }
-    } catch (err) { visitasConsecutivas = 0; }
+      while (fechas.has(cursor.toISOString().slice(0,10))) { visitasConsecutivas++; cursor.setDate(cursor.getDate()-1); }
+    } catch { visitasConsecutivas = 0; }
   }
 
   function renderLogros({ notificar = false } = {}) {
     try {
       if (!logrosPersonalesGrid || !logrosGrupoGrid) return;
+
+      // ⚡ OPT: cachear los JSON.parse una sola vez por render
+      const cacheLS = new Map();
+      const getLS = (k) => { if (cacheLS.has(k)) return cacheLS.get(k); const v = JSON.parse(localStorage.getItem(k) || "{}"); cacheLS.set(k, v); return v; };
+
       const pintar = (logros, gridEl, clave) => {
-        const desbloqueados = JSON.parse(localStorage.getItem(clave) || "{}");
+        const desbloqueados = getLS(clave);
         let total = 0;
-        gridEl.innerHTML = "";
+        const frag = document.createDocumentFragment(); // ⚡ OPT: fragment
         logros.forEach(logro => {
           try {
             const progreso = Math.min(logro.medir(), logro.meta);
@@ -255,9 +297,11 @@ document.addEventListener("DOMContentLoaded", () => {
             contenido.className = "logro-contenido";
             contenido.innerHTML = `<h3>${logro.nombre}</h3><p>${logro.descripcion}</p><small>${desbloqueado ? "Desbloqueado" : `${progreso} / ${logro.meta}`}</small>`;
             card.append(crearIconoLogro(logro), contenido);
-            gridEl.appendChild(card);
+            frag.appendChild(card);
           } catch (err) { console.warn(`Error pintando logro ${logro.id}:`, err); }
         });
+        gridEl.innerHTML = "";
+        gridEl.appendChild(frag);
         localStorage.setItem(clave, JSON.stringify(desbloqueados));
         return total;
       };
@@ -272,12 +316,27 @@ document.addEventListener("DOMContentLoaded", () => {
         ...JSON.parse(localStorage.getItem(`sunadventures_logros_${getUserIdSafe()}`) || "{}")
       };
       if (typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
-    } catch (err) { console.error("renderLogros error:", err); }
+    } catch (err) { console.error("renderLogros:", err); }
   }
 
-  window.addEventListener("sunadventures:progress", () => renderLogros({ notificar: true }));
+  // ⚡ OPT: debounce del evento progress (antes se disparaba cientos de veces)
+  let _progressT = null;
+  window.addEventListener("sunadventures:progress", () => {
+    if (_progressT) return;
+    _progressT = setTimeout(() => {
+      _progressT = null;
+      const vistaActiva = document.querySelector("[data-view].active")?.dataset.view;
+      // Solo renderizar si la vista está activa
+      if (vistaActiva === "logros") renderLogros({ notificar: true });
+      else renderLogros({ notificar: false });
+      if (vistaActiva === "mascotas" && typeof window._renderMascotasGrid === "function") {
+        window._renderMascotasGrid();
+      }
+      if (vistaActiva === "inicio") renderExperiencia();
+    }, 350);
+  });
 
-  const usernameDesdeSesion = (s) => (s?.user?.email?.split("@")[0] || "usuario").toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0, 20).padEnd(3, "_");
+  const usernameDesdeSesion = (s) => (s?.user?.email?.split("@")[0] || "usuario").toLowerCase().replace(/[^a-z0-9_]/g,"_").slice(0,20).padEnd(3,"_");
 
   async function asegurarGrupoActivo() {
     try {
@@ -288,38 +347,40 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("sunadventures_uid", session.user.id);
       window.dispatchEvent(new Event("sunadventures:user-ready"));
       const username = usernameDesdeSesion(session);
-      const { data: perfil } = await supabase.from("perfiles").upsert({ id: session.user.id, username }, { onConflict: "id" }).select("id,username").single();
+      const { data: perfil } = await supabase.from("perfiles").upsert({ id:session.user.id, username }, { onConflict:"id" }).select("id,username").single();
       perfilActual = perfil || { id: session.user.id, username };
       const { data: membresias } = await supabase.from("grupo_miembros").select("grupo_id, grupos(id,nombre,creado_por)").eq("user_id", session.user.id).limit(20);
-      let membresia = (membresias || []).find(m => m.grupo_id === localStorage.getItem("grupo_activo")) || membresias?.[0];
+      let membresia = (membresias||[]).find(m => m.grupo_id === localStorage.getItem("grupo_activo")) || membresias?.[0];
       if (!membresia) {
-        const { data: grupo, error } = await supabase.from("grupos").insert({ nombre: "Nuestro grupo de aventuras", creado_por: session.user.id }).select("id,nombre,creado_por").single();
+        const { data: grupo, error } = await supabase.from("grupos").insert({ nombre:"Nuestro grupo de aventuras", creado_por:session.user.id }).select("id,nombre,creado_por").single();
         if (error) throw error;
-        const { error: e2 } = await supabase.from("grupo_miembros").insert({ grupo_id: grupo.id, user_id: session.user.id, rol: "owner" });
+        const { error: e2 } = await supabase.from("grupo_miembros").insert({ grupo_id:grupo.id, user_id:session.user.id, rol:"owner" });
         if (e2) throw e2;
         membresia = { grupo_id: grupo.id, grupos: grupo };
         localStorage.setItem("grupo_activo", grupo.id);
       }
       grupoActivo = membresia.grupos || { id: membresia.grupo_id, nombre: "Nuestro grupo de aventuras" };
-      await Promise.all(["fotos", "notas", "playlists"].map(t => supabase.from(t).update({ grupo_id: grupoActivo.id }).eq("user_id", session.user.id).is("grupo_id", null)));
+      await Promise.all(["fotos","notas","playlists"].map(t => supabase.from(t).update({ grupo_id: grupoActivo.id }).eq("user_id", session.user.id).is("grupo_id", null)));
       return grupoActivo;
-    } catch (err) { console.error("asegurarGrupoActivo error:", err); grupoActivo = null; return null; }
+    } catch (err) { console.error("asegurarGrupoActivo:", err); grupoActivo = null; return null; }
   }
 
   async function cargarMiembrosGrupo() {
     try {
       if (!grupoActivo || !groupMembersList) return;
       const { data } = await supabase.from("grupo_miembros").select("user_id,rol").eq("grupo_id", grupoActivo.id);
-      const ids = (data || []).map(m => m.user_id);
+      const ids = (data||[]).map(m => m.user_id);
       const { data: perfiles } = ids.length ? await supabase.from("perfiles").select("id,username").in("id", ids) : { data: [] };
-      groupMembersList.innerHTML = "";
-      (perfiles || []).forEach(perfil => {
+      const frag = document.createDocumentFragment();
+      (perfiles||[]).forEach(perfil => {
         const miembro = data.find(i => i.user_id === perfil.id);
         const div = document.createElement("div");
         div.className = "friend-row";
         div.textContent = `@${perfil.username}${miembro?.rol === "owner" ? " · propietario" : ""}`;
-        groupMembersList.appendChild(div);
+        frag.appendChild(div);
       });
+      groupMembersList.innerHTML = "";
+      groupMembersList.appendChild(frag);
     } catch (err) { console.warn("cargarMiembrosGrupo:", err); }
   }
 
@@ -329,21 +390,23 @@ document.addEventListener("DOMContentLoaded", () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
       const { data: invitaciones } = await supabase.from("invitaciones_grupo").select("id,grupo_id,grupos(nombre)").eq("invitado_id", session.user.id).eq("estado", "pendiente");
-      groupInvitesList.innerHTML = "";
-      (invitaciones || []).forEach(inv => {
+      const frag = document.createDocumentFragment();
+      (invitaciones||[]).forEach(inv => {
         const div = document.createElement("div");
         div.className = "friend-row friend-invite";
         div.textContent = `Invitación a ${inv.grupos?.nombre || "un grupo"}`;
         const btn = document.createElement("button");
         btn.type = "button"; btn.className = "btn-secondary"; btn.textContent = "Aceptar";
         btn.addEventListener("click", async () => {
-          await supabase.from("grupo_miembros").insert({ grupo_id: inv.grupo_id, user_id: session.user.id, rol: "miembro" });
-          await supabase.from("invitaciones_grupo").update({ estado: "aceptada" }).eq("id", inv.id);
+          await supabase.from("grupo_miembros").insert({ grupo_id:inv.grupo_id, user_id:session.user.id, rol:"miembro" });
+          await supabase.from("invitaciones_grupo").update({ estado:"aceptada" }).eq("id", inv.id);
           localStorage.setItem("grupo_activo", inv.grupo_id);
           window.location.reload();
         });
-        div.appendChild(btn); groupInvitesList.appendChild(div);
+        div.appendChild(btn); frag.appendChild(div);
       });
+      groupInvitesList.innerHTML = "";
+      groupInvitesList.appendChild(frag);
     } catch (err) { console.warn("cargarInvitaciones:", err); }
   }
 
@@ -351,20 +414,20 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       if (!friendsModal) return;
       await asegurarGrupoActivo();
-      friendsModal.classList.add("active"); friendsModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
+      friendsModal.classList.add("active"); friendsModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
       if (friendsGroupName) friendsGroupName.textContent = grupoActivo?.nombre || "Grupo privado";
       await cargarMiembrosGrupo();
       await cargarInvitaciones();
     } catch (err) { console.warn("abrirAmigosModal:", err); }
   }
 
-  friendsModal?.querySelectorAll("[data-close-friends]").forEach(el => el.addEventListener("click", () => { friendsModal.classList.remove("active"); friendsModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }));
+  friendsModal?.querySelectorAll("[data-close-friends]").forEach(el => el.addEventListener("click", () => { friendsModal.classList.remove("active"); friendsModal.setAttribute("aria-hidden","true"); document.body.style.overflow = ""; }));
 
   function abrirAjustes() {
     if (!settingsModal) return;
-    try { if (toggleCensura) toggleCensura.checked = localStorage.getItem(CENSURA_KEY) === "true"; settingsModal.classList.add("active"); settingsModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; } catch (err) { console.warn("abrirAjustes:", err); }
+    try { if (toggleCensura) toggleCensura.checked = localStorage.getItem(CENSURA_KEY) === "true"; settingsModal.classList.add("active"); settingsModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden"; } catch {}
   }
-  settingsModal?.querySelectorAll("[data-close-settings]").forEach(el => el.addEventListener("click", () => { settingsModal.classList.remove("active"); settingsModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }));
+  settingsModal?.querySelectorAll("[data-close-settings]").forEach(el => el.addEventListener("click", () => { settingsModal.classList.remove("active"); settingsModal.setAttribute("aria-hidden","true"); document.body.style.overflow = ""; }));
   toggleCensura?.addEventListener("change", () => localStorage.setItem(CENSURA_KEY, String(toggleCensura.checked)));
 
   const censurarMensaje = async (texto) => {
@@ -382,19 +445,21 @@ document.addEventListener("DOMContentLoaded", () => {
       const termino = friendSearchInput.value.trim().toLowerCase();
       if (!termino) return;
       const { data: perfiles } = await supabase.from("perfiles").select("id,username").ilike("username", `%${termino}%`).limit(10);
-      friendSearchResults.innerHTML = "";
-      (perfiles || []).filter(p => p.id !== perfilActual?.id).forEach(perfil => {
+      const frag = document.createDocumentFragment();
+      (perfiles||[]).filter(p => p.id !== perfilActual?.id).forEach(perfil => {
         const div = document.createElement("div");
         div.className = "friend-row";
         const span = document.createElement("span"); span.textContent = `@${perfil.username}`;
         const btn = document.createElement("button");
         btn.type = "button"; btn.className = "btn-secondary"; btn.textContent = "Invitar";
         btn.addEventListener("click", async () => {
-          const { error } = await supabase.from("invitaciones_grupo").insert({ grupo_id: grupoActivo.id, invitado_id: perfil.id, invitado_por: perfilActual.id });
+          const { error } = await supabase.from("invitaciones_grupo").insert({ grupo_id:grupoActivo.id, invitado_id:perfil.id, invitado_por:perfilActual.id });
           btn.textContent = error ? "No disponible" : "Enviada"; btn.disabled = true;
         });
-        div.append(span, btn); friendSearchResults.appendChild(div);
+        div.append(span, btn); frag.appendChild(div);
       });
+      friendSearchResults.innerHTML = "";
+      friendSearchResults.appendChild(frag);
     } catch (err) { console.warn("friendSearch:", err); }
   });
 
@@ -402,30 +467,30 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { fotos = []; return; }
-      const { data, error } = await supabase.from("fotos").select("id,path,fecha,nota,lat,lng,lugar,grupo_id").eq("grupo_id", grupoActivo.id).order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("fotos").select("id,path,fecha,nota,lat,lng,lugar,grupo_id").eq("grupo_id", grupoActivo.id).order("created_at", { ascending:false });
       if (error) { fotos = []; return; }
-      fotos = (data || []).map(f => ({ id: f.id, path: f.path, fecha: f.fecha, nota: f.nota, lat: f.lat, lng: f.lng, lugar: f.lugar, grupo_id: f.grupo_id }));
+      fotos = (data||[]).map(f => ({ id:f.id, path:f.path, fecha:f.fecha, nota:f.nota, lat:f.lat, lng:f.lng, lugar:f.lugar, grupo_id:f.grupo_id }));
     } catch (err) { console.warn("cargarFotos:", err); fotos = []; }
   }
 
   const añadirFotoTabla = async (path, fecha, nota, lat, lng) => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) throw new Error("No hay sesión");
-    const { data, error } = await supabase.from("fotos").insert({ user_id: session.user.id, grupo_id: grupoActivo.id, path, fecha: fecha || null, nota: nota || null, lat: lat || null, lng: lng || null }).select().single();
+    const { data, error } = await supabase.from("fotos").insert({ user_id:session.user.id, grupo_id:grupoActivo.id, path, fecha:fecha||null, nota:nota||null, lat:lat||null, lng:lng||null }).select().single();
     if (error) throw error;
     return data;
   };
   const eliminarFotoTabla = async (id) => { const { error } = await supabase.from("fotos").delete().eq("id", id); if (error) throw error; };
-  const actualizarFotoTabla = async (id, fecha, nota, lat, lng) => { const { data, error } = await supabase.from("fotos").update({ fecha: fecha || null, nota: nota || null, lat: lat || null, lng: lng || null }).eq("id", id).select().single(); if (error) throw error; return data; };
+  const actualizarFotoTabla = async (id, fecha, nota, lat, lng) => { const { data, error } = await supabase.from("fotos").update({ fecha:fecha||null, nota:nota||null, lat:lat||null, lng:lng||null }).eq("id", id).select().single(); if (error) throw error; return data; };
 
   async function obtenerUrlFirmada(path) {
     try {
       const g = urlsFirmadasCache.get(path);
       if (g && g.expira > Date.now()) return g.url;
-      if (window.SunOffline) { const offlineUrl = await window.SunOffline.obtenerImagenOffline(path); if (offlineUrl) { urlsFirmadasCache.set(path, { url: offlineUrl, expira: Date.now() + 24 * 3600 * 1000 }); return offlineUrl; } }
+      if (window.SunOffline) { const offlineUrl = await window.SunOffline.obtenerImagenOffline(path); if (offlineUrl) { urlsFirmadasCache.set(path, { url:offlineUrl, expira: Date.now()+24*3600*1000 }); return offlineUrl; } }
       const { data, error } = await supabase.storage.from(BUCKET_NAME).createSignedUrl(path, URL_EXPIRY);
       if (error) return null;
-      urlsFirmadasCache.set(path, { url: data.signedUrl, expira: Date.now() + DURACION_CACHE_URL });
+      urlsFirmadasCache.set(path, { url:data.signedUrl, expira: Date.now()+DURACION_CACHE_URL });
       return data.signedUrl;
     } catch (err) { console.warn("obtenerUrlFirmada:", err); return null; }
   }
@@ -439,8 +504,8 @@ document.addEventListener("DOMContentLoaded", () => {
           img.onload = () => {
             try {
               let { width, height } = img;
-              if (width > height && width > maxSize) { height = Math.round((height * maxSize) / width); width = maxSize; }
-              else if (height > maxSize) { width = Math.round((width * maxSize) / height); height = maxSize; }
+              if (width > height && width > maxSize) { height = Math.round((height*maxSize)/width); width = maxSize; }
+              else if (height > maxSize) { width = Math.round((width*maxSize)/height); height = maxSize; }
               const c = document.createElement("canvas"); c.width = width; c.height = height;
               c.getContext("2d").drawImage(img, 0, 0, width, height);
               c.toBlob(b => b ? resolve(b) : reject(new Error("toBlob")), "image/jpeg", 0.85);
@@ -453,6 +518,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // ⚡ OPT: render con concurrencia limitada + DocumentFragment
   async function render() {
     if (!grid) return;
     if (renderEnCurso) { renderPendiente = true; return; }
@@ -461,17 +527,40 @@ document.addEventListener("DOMContentLoaded", () => {
       grid.innerHTML = "";
       if (fotos.length === 0) { empty?.classList.remove("hidden"); return; }
       empty?.classList.add("hidden");
-      const elementos = await Promise.all(fotos.map(async f => { const url = await obtenerUrlFirmada(f.path); return url ? crearPolaroid(f, url) : null; }));
-      elementos.forEach(el => el && grid.appendChild(el));
-      renderMapa();
+
+      // ⚡ Concurrencia limitada a LIMITE_CONCURRENCIA_URLS
+      const urls = new Map();
+      const cola = fotos.slice();
+      const trabajadores = Array.from({ length: LIMITE_CONCURRENCIA_URLS }, async () => {
+        while (cola.length) {
+          const f = cola.shift();
+          const url = await obtenerUrlFirmada(f.path);
+          if (url) urls.set(f.id, url);
+        }
+      });
+      await Promise.all(trabajadores);
+
+      // ⚡ Un solo DocumentFragment
+      const frag = document.createDocumentFragment();
+      fotos.forEach(f => {
+        const url = urls.get(f.id);
+        if (!url) return;
+        const el = crearPolaroid(f, url);
+        if (el) frag.appendChild(el);
+      });
+      grid.appendChild(frag);
+
+      // ⚡ Mapa solo si la vista está activa
+      const vistaActiva = document.querySelector("[data-view].active")?.dataset.view;
+      if (vistaActiva === "mapa") renderMapa();
     } catch (err) { console.warn("render:", err); }
     finally { renderEnCurso = false; if (renderPendiente) { renderPendiente = false; render(); } }
   }
 
-  const activarPantallaCompleta = (el, btn) => { const api = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen; if (api) { api.call(el); btn?.setAttribute("aria-pressed", "true"); return; } alert("Tu navegador no admite pantalla completa aquí."); };
-  const cerrarPantallaCompleta = () => { const api = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen; if (api && document.fullscreenElement) api.call(document); };
+  const activarPantallaCompleta = (el, btn) => { const api = el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen; if (api) { api.call(el); btn?.setAttribute("aria-pressed","true"); return; } alert("Tu navegador no admite pantalla completa aquí."); };
+  const cerrarPantallaCompleta = () => { const api = document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen; if (api && document.fullscreenElement) api.call(document); };
   const hacerFullscreenInteractivo = (article, boton) => {
-    article.tabIndex = 0; article.setAttribute("role", "button"); article.setAttribute("aria-label", "Abrir en pantalla completa");
+    article.tabIndex = 0; article.setAttribute("role","button"); article.setAttribute("aria-label","Abrir en pantalla completa");
     article.addEventListener("click", (e) => { if (e.target.closest("button, input, textarea, a")) return; if (document.fullscreenElement === article) return cerrarPantallaCompleta(); activarPantallaCompleta(article, boton); });
     article.addEventListener("keydown", (e) => { if (e.key !== "Enter" && e.key !== " ") return; if (e.target !== article) return; e.preventDefault(); activarPantallaCompleta(article, boton); });
   };
@@ -502,7 +591,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       if (!modal) return;
       fotoEditando = fotoParaEditar;
-      modal.classList.add("active"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
+      modal.classList.add("active"); modal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
       form?.reset();
       if (inputPhoto) inputPhoto.required = !fotoParaEditar;
       if (inputPhotoCampo) inputPhotoCampo.hidden = Boolean(fotoParaEditar);
@@ -519,7 +608,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function cerrarModal() {
     try {
       if (!modal) return;
-      modal.classList.remove("active"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
+      modal.classList.remove("active"); modal.setAttribute("aria-hidden","true"); document.body.style.overflow = "";
       fotoEditando = null;
       if (inputPhoto) inputPhoto.required = true;
       if (inputPhotoCampo) inputPhotoCampo.hidden = false;
@@ -541,7 +630,7 @@ document.addEventListener("DOMContentLoaded", () => {
       navigator.geolocation.getCurrentPosition(
         ({ coords }) => { inputLat.value = coords.latitude; inputLng.value = coords.longitude; actualizarEstadoUbicacion(); btnPhotoLocation.disabled = false; },
         () => { if (photoLocationStatus) photoLocationStatus.textContent = "No se pudo obtener la ubicación."; btnPhotoLocation.disabled = false; },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+        { enableHighAccuracy:true, timeout:10000, maximumAge:300000 }
       );
     } catch (err) { console.warn("geolocation:", err); btnPhotoLocation.disabled = false; }
   });
@@ -552,11 +641,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!aventurasMap || typeof window.L === "undefined") return;
       const ubicadas = fotos.filter(f => f.lat != null && f.lng != null && f.lat !== "" && f.lng !== "" && Number.isFinite(Number(f.lat)) && Number.isFinite(Number(f.lng)));
       mapaEmpty?.classList.toggle("hidden", ubicadas.length > 0);
-      if (!mapaLeaflet) { mapaLeaflet = L.map(aventurasMap).setView([20, 0], 2); L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© OpenStreetMap" }).addTo(mapaLeaflet); }
+      if (!mapaLeaflet) { mapaLeaflet = L.map(aventurasMap).setView([20,0], 2); L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution:"© OpenStreetMap" }).addTo(mapaLeaflet); }
       mapaLeaflet.eachLayer(l => { if (l instanceof L.Marker) mapaLeaflet.removeLayer(l); });
       const puntos = [];
       ubicadas.forEach(f => { const lat = Number(f.lat), lng = Number(f.lng); L.marker([lat, lng]).addTo(mapaLeaflet).bindPopup(`<strong>${f.fecha ? formatearFecha(f.fecha) : "Recuerdo"}</strong><br>${escapeHtml(f.nota || "Sin nota")}`); puntos.push([lat, lng]); });
-      if (puntos.length) mapaLeaflet.fitBounds(L.latLngBounds(puntos), { padding: [30, 30], maxZoom: 12 });
+      if (puntos.length) mapaLeaflet.fitBounds(L.latLngBounds(puntos), { padding:[30,30], maxZoom:12 });
       setTimeout(() => mapaLeaflet?.invalidateSize(), 100);
     } catch (err) { console.warn("renderMapa:", err); }
   }
@@ -570,10 +659,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const header = document.createElement("div"); header.className = "chat-message-header";
     const av = document.createElement("div"); av.className = "chat-message-avatar";
     if (perfil.avatar_url) av.innerHTML = `<img src="${perfil.avatar_url}" alt="">`; else av.innerHTML = window.ICONO?.persona || "";
-    const nombre = document.createElement("span"); nombre.className = "chat-message-nombre"; nombre.textContent = esPropio ? "Tú" : ("@" + (perfil.username || "usuario"));
+    const nombre = document.createElement("span"); nombre.className = "chat-message-nombre"; nombre.textContent = esPropio ? "Tú" : ("@"+(perfil.username||"usuario"));
     header.append(av, nombre);
     const p = document.createElement("p"); p.textContent = m.contenido;
-    const t = document.createElement("time"); t.textContent = new Date(m.created_at).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" });
+    const t = document.createElement("time"); t.textContent = new Date(m.created_at).toLocaleString("es-ES", { dateStyle:"short", timeStyle:"short" });
     item.append(header, p, t);
     chatMessages.appendChild(item);
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -586,10 +675,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
       const { data } = await supabase.from("grupo_miembros").select("user_id").eq("grupo_id", grupoActivo.id).neq("user_id", session.user.id);
-      const ids = (data || []).map(m => m.user_id);
+      const ids = (data||[]).map(m => m.user_id);
       if (!ids.length) { sel.innerHTML = `<option value="">Sin miembros</option>`; return; }
       const { data: perfiles } = await supabase.from("perfiles").select("id,username").in("id", ids);
-      sel.innerHTML = `<option value="">— Elige —</option>` + (perfiles || []).map(p => `<option value="${p.id}">@${p.username}</option>`).join("");
+      sel.innerHTML = `<option value="">— Elige —</option>` + (perfiles||[]).map(p => `<option value="${p.id}">@${p.username}</option>`).join("");
       if (chatDestinatario) sel.value = chatDestinatario;
     } catch (e) { console.warn(e); }
   }
@@ -602,19 +691,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
       let query;
-      if (chatModo === "grupo") query = supabase.from("mensajes").select("id,user_id,contenido,created_at").eq("room_id", grupoActivo.id).is("destinatario_id", null).order("created_at", { ascending: true }).limit(100);
+      if (chatModo === "grupo") query = supabase.from("mensajes").select("id,user_id,contenido,created_at").eq("room_id", grupoActivo.id).is("destinatario_id", null).order("created_at", { ascending:true }).limit(100);
       else {
         if (!chatDestinatario) { chatMessages.innerHTML = `<div class="chat-vacio">Elige un destinatario</div>`; return; }
-        query = supabase.from("mensajes").select("id,user_id,contenido,created_at,destinatario_id").eq("room_id", grupoActivo.id).or(`and(user_id.eq.${session.user.id},destinatario_id.eq.${chatDestinatario}),and(user_id.eq.${chatDestinatario},destinatario_id.eq.${session.user.id})`).order("created_at", { ascending: true }).limit(100);
+        query = supabase.from("mensajes").select("id,user_id,contenido,created_at,destinatario_id").eq("room_id", grupoActivo.id).or(`and(user_id.eq.${session.user.id},destinatario_id.eq.${chatDestinatario}),and(user_id.eq.${chatDestinatario},destinatario_id.eq.${session.user.id})`).order("created_at", { ascending:true }).limit(100);
       }
       const { data, error } = await query;
       if (error) { if (chatStatus) chatStatus.textContent = "Error al cargar mensajes"; return; }
-      const ids = [...new Set((data || []).map(m => m.user_id))];
+      const ids = [...new Set((data||[]).map(m => m.user_id))];
       const { data: perfiles } = ids.length ? await supabase.from("perfiles").select("id,username,avatar_url").in("id", ids) : { data: [] };
-      const mapaPerfiles = Object.fromEntries((perfiles || []).map(p => [p.id, p]));
-      (data || []).forEach(m => renderMensajeChat(m, mapaPerfiles));
+      const mapaPerfiles = Object.fromEntries((perfiles||[]).map(p => [p.id, p]));
+      (data||[]).forEach(m => renderMensajeChat(m, mapaPerfiles));
       if (chatStatus) chatStatus.textContent = chatModo === "grupo" ? "Chat de grupo" : "Chat privado";
-      chatSubscription = supabase.channel(`chat-${grupoActivo.id}-${chatModo}`).on("postgres_changes", { event: "INSERT", schema: "public", table: "mensajes", filter: `room_id=eq.${grupoActivo.id}` }, async ({ new: m }) => {
+      chatSubscription = supabase.channel(`chat-${grupoActivo.id}-${chatModo}`).on("postgres_changes", { event:"INSERT", schema:"public", table:"mensajes", filter:`room_id=eq.${grupoActivo.id}` }, async ({ new: m }) => {
         if (chatModo === "grupo" && m.destinatario_id) return;
         if (chatModo === "privado" && (!m.destinatario_id || (m.user_id !== session.user.id && m.destinatario_id !== session.user.id))) return;
         if (!mapaPerfiles[m.user_id]) { const { data: p } = await supabase.from("perfiles").select("id,username,avatar_url").eq("id", m.user_id).single(); if (p) mapaPerfiles[m.user_id] = p; }
@@ -647,26 +736,26 @@ document.addEventListener("DOMContentLoaded", () => {
       chatInput.disabled = true;
       let contenido;
       try { contenido = await censurarMensaje(original); } catch { chatInput.disabled = false; return; }
-      const ins = { room_id: grupoActivo.id, grupo_id: grupoActivo.id, user_id: session.user.id, contenido, destinatario_id: chatModo === "privado" ? chatDestinatario : null };
+      const ins = { room_id:grupoActivo.id, grupo_id:grupoActivo.id, user_id:session.user.id, contenido, destinatario_id:chatModo === "privado" ? chatDestinatario : null };
       const { data: mensaje, error } = await supabase.from("mensajes").insert(ins).select("id,user_id,contenido,created_at").single();
       chatInput.disabled = false;
       if (error) return alert("No se pudo enviar: " + error.message);
       chatInput.value = ""; chatInput.focus();
-      supabase.functions.invoke("send-push", { body: { message: { ...mensaje, user_id: session.user.id } } }).catch(() => { });
+      supabase.functions.invoke("send-push", { body:{ message:{ ...mensaje, user_id:session.user.id } } }).catch(() => {});
     } catch (err) { console.warn("chat submit:", err); }
   });
 
-  const convertirClaveBase64 = (clave) => { const padding = "=".repeat((4 - clave.length % 4) % 4); return Uint8Array.from(atob((clave + padding).replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)); };
+  const convertirClaveBase64 = (clave) => { const padding = "=".repeat((4-clave.length%4)%4); return Uint8Array.from(atob((clave+padding).replace(/-/g,"+").replace(/_/g,"/")), c => c.charCodeAt(0)); };
   async function activarPush() {
     try {
       if (!("serviceWorker" in navigator) || !("PushManager" in window)) return alert("Este navegador no admite notificaciones push.");
       const permiso = await Notification.requestPermission();
       if (permiso !== "granted") return;
       const registro = await navigator.serviceWorker.ready;
-      const sub = await registro.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: convertirClaveBase64(PUSH_VAPID_PUBLIC_KEY) });
+      const sub = await registro.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: convertirClaveBase64(PUSH_VAPID_PUBLIC_KEY) });
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return alert("Inicia sesión para activar notificaciones.");
-      const { error } = await supabase.from("push_subscriptions").upsert({ user_id: session.user.id, endpoint: sub.endpoint, subscription: sub.toJSON() }, { onConflict: "endpoint" });
+      const { error } = await supabase.from("push_subscriptions").upsert({ user_id:session.user.id, endpoint:sub.endpoint, subscription:sub.toJSON() }, { onConflict:"endpoint" });
       if (error) throw error;
       if (btnEnablePush) btnEnablePush.textContent = "Notificaciones activadas";
     } catch (err) { console.warn("activarPush:", err); }
@@ -676,33 +765,13 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnAdd) btnAdd.addEventListener("click", () => abrirModal());
   modal?.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", cerrarModal));
 
-  /* ---------- Listeners de vista previa (faltaban) ---------- */
-  inputPhoto?.addEventListener("change", () => {
-    const file = inputPhoto.files?.[0] || null;
-    mostrarVistaPreviaFoto(file);
-    actualizarVistaPreviaFotoInfo();
-  });
-
-  inputDate?.addEventListener("change", () => {
-    const date = preview?.querySelector(".photo-preview-date");
-    const note = preview?.querySelector(".photo-preview-note");
-    actualizarContenidoVistaPrevia(date, note);
-    actualizarVistaPreviaFotoInfo();
-  });
-
-  inputNote?.addEventListener("input", () => {
-    const date = preview?.querySelector(".photo-preview-date");
-    const note = preview?.querySelector(".photo-preview-note");
-    actualizarContenidoVistaPrevia(date, note);
-    actualizarVistaPreviaFotoInfo();
-  });
+  inputPhoto?.addEventListener("change", () => { const file = inputPhoto.files?.[0] || null; mostrarVistaPreviaFoto(file); actualizarVistaPreviaFotoInfo(); });
+  inputDate?.addEventListener("change", () => { const date = preview?.querySelector(".photo-preview-date"); const note = preview?.querySelector(".photo-preview-note"); actualizarContenidoVistaPrevia(date, note); actualizarVistaPreviaFotoInfo(); });
+  inputNote?.addEventListener("input", () => { const date = preview?.querySelector(".photo-preview-date"); const note = preview?.querySelector(".photo-preview-note"); actualizarContenidoVistaPrevia(date, note); actualizarVistaPreviaFotoInfo(); });
 
   function mostrarVistaPreviaFoto(file) {
     if (fotoPreviewObjectUrl) URL.revokeObjectURL(fotoPreviewObjectUrl);
-    if (!file) {
-      mostrarContenidoVistaPrevia(null);
-      return;
-    }
+    if (!file) { mostrarContenidoVistaPrevia(null); return; }
     fotoPreviewObjectUrl = URL.createObjectURL(file);
     mostrarContenidoVistaPrevia(fotoPreviewObjectUrl);
   }
@@ -710,24 +779,12 @@ document.addEventListener("DOMContentLoaded", () => {
   function mostrarContenidoVistaPrevia(url) {
     if (!preview) return;
     preview.innerHTML = "";
-
-    if (url) {
-      const img = document.createElement("img");
-      img.src = url; img.alt = "Vista previa";
-      preview.appendChild(img);
-    } else {
-      const ph = document.createElement("div");
-      ph.className = "photo-preview-placeholder";
-      ph.textContent = "Selecciona una foto para verla aquí";
-      preview.appendChild(ph);
-    }
-
+    if (url) { const img = document.createElement("img"); img.src = url; img.alt = "Vista previa"; preview.appendChild(img); }
+    else { const ph = document.createElement("div"); ph.className = "photo-preview-placeholder"; ph.textContent = "Selecciona una foto para verla aquí"; preview.appendChild(ph); }
     const cap = document.createElement("div"); cap.className = "photo-preview-caption";
     const date = document.createElement("span"); date.className = "photo-preview-date";
     const note = document.createElement("p"); note.className = "photo-preview-note";
-    cap.append(date, note);
-    preview.appendChild(cap);
-
+    cap.append(date, note); preview.appendChild(cap);
     actualizarContenidoVistaPrevia(date, note);
   }
 
@@ -740,15 +797,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const date = preview?.querySelector(".photo-preview-date");
     const note = preview?.querySelector(".photo-preview-note");
     actualizarContenidoVistaPrevia(date, note);
-
     if (!photoPreviewInfo) return;
     const hayFoto = Boolean(inputPhoto?.files?.length);
     photoPreviewInfo.hidden = !hayFoto;
-    if (hayFoto) {
-      const fecha = inputDate?.value || "Sin fecha";
-      const texto = inputNote?.value.trim();
-      photoPreviewInfo.textContent = texto ? `${fecha} · ${texto}` : fecha;
-    }
+    if (hayFoto) { const fecha = inputDate?.value || "Sin fecha"; const texto = inputNote?.value.trim(); photoPreviewInfo.textContent = texto ? `${fecha} · ${texto}` : fecha; }
   }
 
   form?.addEventListener("submit", async (e) => {
@@ -762,9 +814,9 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           const act = await actualizarFotoTabla(fotoEditando.id, fecha, nota, parseCoord(inputLat?.value), parseCoord(inputLng?.value));
           const idx = fotos.findIndex(f => f.id === fotoEditando.id);
-          if (idx !== -1) fotos[idx] = { ...fotos[idx], fecha: act.fecha, nota: act.nota, lat: act.lat, lng: act.lng };
+          if (idx !== -1) fotos[idx] = { ...fotos[idx], fecha:act.fecha, nota:act.nota, lat:act.lat, lng:act.lng };
           cerrarModal(); await render(); window.dispatchEvent(new Event("sunadventures:progress"));
-        } catch (err) { alert("No se pudo actualizar: " + (err.message || err)); if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Actualizar recuerdo"; } }
+        } catch (err) { alert("No se pudo actualizar: " + (err.message||err)); if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Actualizar recuerdo"; } }
         finally { subiendoFoto = false; }
         return;
       }
@@ -774,13 +826,13 @@ document.addEventListener("DOMContentLoaded", () => {
       mostrarLoading("Guardando recuerdo...");
       try {
         const blob = await redimensionarImagen(file, 1600);
-        const filePath = `fotos/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
-        const { error: upErr } = await supabase.storage.from(BUCKET_NAME).upload(filePath, blob, { contentType: "image/jpeg" });
+        const filePath = `fotos/${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
+        const { error: upErr } = await supabase.storage.from(BUCKET_NAME).upload(filePath, blob, { contentType:"image/jpeg" });
         if (upErr) throw upErr;
         const nueva = await añadirFotoTabla(filePath, fecha, nota, parseCoord(inputLat?.value), parseCoord(inputLng?.value));
-        fotos.unshift({ id: nueva.id, path: nueva.path, fecha: nueva.fecha, nota: nueva.nota, lat: nueva.lat, lng: nueva.lng });
+        fotos.unshift({ id:nueva.id, path:nueva.path, fecha:nueva.fecha, nota:nueva.nota, lat:nueva.lat, lng:nueva.lng });
         cerrarModal(); await render(); window.dispatchEvent(new Event("sunadventures:progress"));
-      } catch (err) { alert("No se pudo subir la foto: " + (err.message || err)); if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Guardar recuerdo"; } }
+      } catch (err) { alert("No se pudo subir la foto: " + (err.message||err)); if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Guardar recuerdo"; } }
       finally { subiendoFoto = false; ocultarLoading(); }
     } catch (err) { console.error(err); subiendoFoto = false; ocultarLoading(); }
   });
@@ -790,26 +842,26 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!confirm("¿Eliminar esta aventura del álbum?")) return;
       const foto = fotos.find(f => f.id === id);
       if (!foto) return;
-      try { await supabase.storage.from(BUCKET_NAME).remove([foto.path]); } catch { }
+      try { await supabase.storage.from(BUCKET_NAME).remove([foto.path]); } catch {}
       await eliminarFotoTabla(foto.id);
       fotos = fotos.filter(f => f.id !== id);
       urlsFirmadasCache.delete(foto.path);
       await render();
-    } catch (err) { alert("No se pudo eliminar: " + (err.message || err)); }
+    } catch (err) { alert("No se pudo eliminar: " + (err.message||err)); }
   }
 
   async function cargarNotas() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) { notas = []; return; }
-      const { data, error } = await supabase.from("notas").select("id,titulo,contenido,color,created_at,grupo_id").eq("grupo_id", grupoActivo.id).order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("notas").select("id,titulo,contenido,color,created_at,grupo_id").eq("grupo_id", grupoActivo.id).order("created_at", { ascending:false });
       if (error) { notas = []; return; }
-      notas = (data || []).map(n => ({ id: n.id, titulo: n.titulo, contenido: n.contenido, color: n.color || "amarillo", created_at: n.created_at, grupo_id: n.grupo_id }));
+      notas = (data||[]).map(n => ({ id:n.id, titulo:n.titulo, contenido:n.contenido, color:n.color||"amarillo", created_at:n.created_at, grupo_id:n.grupo_id }));
     } catch (err) { console.warn("cargarNotas:", err); notas = []; }
   }
-  const añadirNotaTabla = async (titulo, contenido, color) => { const { data: { session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("notas").insert({ user_id: session.user.id, grupo_id: grupoActivo.id, titulo: titulo || null, contenido, color: color || "amarillo" }).select().single(); if (error) throw error; return data; };
+  const añadirNotaTabla = async (titulo, contenido, color) => { const { data: { session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("notas").insert({ user_id:session.user.id, grupo_id:grupoActivo.id, titulo:titulo||null, contenido, color:color||"amarillo" }).select().single(); if (error) throw error; return data; };
   const eliminarNotaTabla = async (id) => { const { error } = await supabase.from("notas").delete().eq("id", id); if (error) throw error; };
-  const actualizarNotaTabla = async (id, titulo, contenido, color) => { const { data, error } = await supabase.from("notas").update({ titulo: titulo || null, contenido, color: color || "amarillo" }).eq("id", id).select().single(); if (error) throw error; return data; };
+  const actualizarNotaTabla = async (id, titulo, contenido, color) => { const { data, error } = await supabase.from("notas").update({ titulo:titulo||null, contenido, color:color||"amarillo" }).eq("id", id).select().single(); if (error) throw error; return data; };
 
   function renderNotas() {
     try {
@@ -817,14 +869,16 @@ document.addEventListener("DOMContentLoaded", () => {
       notasGrid.innerHTML = "";
       if (notas.length === 0) { notasEmpty?.classList.remove("hidden"); return; }
       notasEmpty?.classList.add("hidden");
-      notas.forEach(n => notasGrid.appendChild(crearNotaPolaroid(n)));
+      const frag = document.createDocumentFragment();
+      notas.forEach(n => frag.appendChild(crearNotaPolaroid(n)));
+      notasGrid.appendChild(frag);
     } catch (err) { console.warn("renderNotas:", err); }
   }
 
   function crearNotaPolaroid(nota) {
     try {
       const article = document.createElement("article");
-      article.className = "nota color-" + (nota.color || "amarillo");
+      article.className = "nota color-" + (nota.color||"amarillo");
       hacerFullscreenInteractivo(article);
       const btnDel = crearBtn("nota-delete", SVG.trash, "Eliminar nota", (e) => { e.stopPropagation(); eliminarNota(nota.id); });
       const btnFull = crearBtn("nota-fullscreen", SVG.expand, "Pantalla completa", (e) => { e.preventDefault(); e.stopPropagation(); if (document.fullscreenElement === article) { cerrarPantallaCompleta(); return; } activarPantallaCompleta(article, btnFull); });
@@ -833,9 +887,9 @@ document.addEventListener("DOMContentLoaded", () => {
       article.append(btnDel, btnFull, btnClose, btnEdit);
       if (nota.titulo) { const h3 = document.createElement("h3"); h3.className = "nota-titulo"; h3.textContent = nota.titulo; article.appendChild(h3); }
       const wrap = document.createElement("div"); wrap.className = "nota-contenido-wrap";
-      const lineas = (nota.contenido || "").split(/\r?\n/);
+      const lineas = (nota.contenido||"").split(/\r?\n/);
       if (lineas.length === 0 || (lineas.length === 1 && lineas[0].trim() === "")) { const p = document.createElement("p"); p.className = "nota-contenido"; p.textContent = nota.contenido || ""; wrap.appendChild(p); }
-      else { lineas.forEach(linea => { const row = document.createElement("div"); row.className = "nota-linea"; const cb = document.createElement("input"); cb.type = "checkbox"; cb.className = "nota-check"; cb.setAttribute("aria-label", "Marcar línea como hecha"); const txt = document.createElement("span"); txt.className = "nota-texto"; txt.textContent = linea.trim() || " "; cb.addEventListener("change", () => txt.classList.toggle("tachada", cb.checked)); row.append(cb, txt); wrap.appendChild(row); }); }
+      else { lineas.forEach(linea => { const row = document.createElement("div"); row.className = "nota-linea"; const cb = document.createElement("input"); cb.type = "checkbox"; cb.className = "nota-check"; cb.setAttribute("aria-label","Marcar línea como hecha"); const txt = document.createElement("span"); txt.className = "nota-texto"; txt.textContent = linea.trim() || " "; cb.addEventListener("change", () => txt.classList.toggle("tachada", cb.checked)); row.append(cb, txt); wrap.appendChild(row); }); }
       article.appendChild(wrap);
       if (nota.created_at) { const f = document.createElement("span"); f.className = "nota-fecha"; f.textContent = formatearFechaNota(nota.created_at); article.appendChild(f); }
       return article;
@@ -846,7 +900,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       if (!notaModal) return;
       notaEditando = notaParaEditar;
-      notaModal.classList.add("active"); notaModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
+      notaModal.classList.add("active"); notaModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
       notaForm?.reset();
       colorSeleccionado = notaParaEditar?.color || "amarillo";
       if (notaParaEditar) { if (notaTitulo) notaTitulo.value = notaParaEditar.titulo || ""; if (notaContenido) notaContenido.value = notaParaEditar.contenido || ""; }
@@ -874,7 +928,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function cerrarNotaModal() {
     try {
       if (!notaModal) return;
-      notaModal.classList.remove("active"); notaModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
+      notaModal.classList.remove("active"); notaModal.setAttribute("aria-hidden","true"); document.body.style.overflow = "";
       notaEditando = null;
       if (notaTituloCampo) notaTituloCampo.hidden = false;
       if (notaColorCampo) notaColorCampo.hidden = false;
@@ -888,7 +942,7 @@ document.addEventListener("DOMContentLoaded", () => {
       await eliminarNotaTabla(id);
       notas = notas.filter(n => n.id !== id);
       renderNotas();
-    } catch (err) { alert("No se pudo eliminar: " + (err.message || err)); }
+    } catch (err) { alert("No se pudo eliminar: " + (err.message||err)); }
   }
 
   btnAddNota?.addEventListener("click", () => abrirNotaModal());
@@ -908,13 +962,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (notaEditando) {
           const act = await actualizarNotaTabla(notaEditando.id, notaEditando.titulo, contenido, notaEditando.color);
           const idx = notas.findIndex(n => n.id === notaEditando.id);
-          if (idx !== -1) notas[idx] = { id: act.id, titulo: act.titulo, contenido: act.contenido, color: act.color, created_at: act.created_at };
+          if (idx !== -1) notas[idx] = { id:act.id, titulo:act.titulo, contenido:act.contenido, color:act.color, created_at:act.created_at };
         } else {
           const nueva = await añadirNotaTabla(titulo, contenido, colorSeleccionado);
-          notas.unshift({ id: nueva.id, titulo: nueva.titulo, contenido: nueva.contenido, color: nueva.color, created_at: nueva.created_at });
+          notas.unshift({ id:nueva.id, titulo:nueva.titulo, contenido:nueva.contenido, color:nueva.color, created_at:nueva.created_at });
         }
         cerrarNotaModal(); renderNotas(); window.dispatchEvent(new Event("sunadventures:progress"));
-      } catch (err) { alert("No se pudo guardar: " + (err.message || err)); if (notaSubmitBtn) { notaSubmitBtn.disabled = false; notaSubmitBtn.textContent = notaEditando ? "Actualizar texto" : "Guardar notita"; } }
+      } catch (err) { alert("No se pudo guardar: " + (err.message||err)); if (notaSubmitBtn) { notaSubmitBtn.disabled = false; notaSubmitBtn.textContent = notaEditando ? "Actualizar texto" : "Guardar notita"; } }
     } catch (err) { console.warn("nota submit:", err); }
   });
 
@@ -922,17 +976,17 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) { playlists = []; return; }
-      const { data, error } = await supabase.from("playlists").select("id,nombre,descripcion,emoji,color,canciones,created_at,grupo_id").eq("grupo_id", grupoActivo.id).order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("playlists").select("id,nombre,descripcion,emoji,color,canciones,created_at,grupo_id").eq("grupo_id", grupoActivo.id).order("created_at", { ascending:false });
       if (error) { playlists = []; return; }
-      playlists = (data || []).map(p => ({ id: p.id, nombre: p.nombre, descripcion: p.descripcion, emoji: p.emoji || "music", color: p.color || "amarillo", canciones: Array.isArray(p.canciones) ? p.canciones : [], created_at: p.created_at, grupo_id: p.grupo_id }));
+      playlists = (data||[]).map(p => ({ id:p.id, nombre:p.nombre, descripcion:p.descripcion, emoji:p.emoji||"music", color:p.color||"amarillo", canciones:Array.isArray(p.canciones)?p.canciones:[], created_at:p.created_at, grupo_id:p.grupo_id }));
     } catch (err) { console.warn("cargarPlaylists:", err); playlists = []; }
   }
 
-  const añadirPlaylistTabla = async (nombre, descripcion, emoji, color) => { const { data: { session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("playlists").insert({ user_id: session.user.id, grupo_id: grupoActivo.id, nombre, descripcion: descripcion || null, emoji: emoji || "music", color: color || "amarillo", canciones: [] }).select().single(); if (error) throw error; return data; };
+  const añadirPlaylistTabla = async (nombre, descripcion, emoji, color) => { const { data: { session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("playlists").insert({ user_id:session.user.id, grupo_id:grupoActivo.id, nombre, descripcion:descripcion||null, emoji:emoji||"music", color:color||"amarillo", canciones:[] }).select().single(); if (error) throw error; return data; };
   const eliminarPlaylistTabla = async (id) => { const { error } = await supabase.from("playlists").delete().eq("id", id); if (error) throw error; };
   const guardarCancionesTabla = async (id, canciones) => { const { error } = await supabase.from("playlists").update({ canciones }).eq("id", id); if (error) throw error; };
 
-  const EMOJI_A_SVG = { music: SVG.music, note: SVG.note, sparkle: SVG.sparkle, sunflower: SVG.sunflower, heart: SVG.heart, calendar: SVG.calendar };
+  const EMOJI_A_SVG = { music:SVG.music, note:SVG.note, sparkle:SVG.sparkle, sunflower:SVG.sunflower, heart:SVG.heart, calendar:SVG.calendar };
   const renderEmoji = (e) => EMOJI_A_SVG[e] || SVG.music;
 
   function renderPlaylists() {
@@ -941,14 +995,16 @@ document.addEventListener("DOMContentLoaded", () => {
       playlistsGrid.innerHTML = "";
       if (playlists.length === 0) { playlistsEmpty?.classList.remove("hidden"); return; }
       playlistsEmpty?.classList.add("hidden");
-      playlists.forEach(p => playlistsGrid.appendChild(crearPlaylistCard(p)));
+      const frag = document.createDocumentFragment();
+      playlists.forEach(p => frag.appendChild(crearPlaylistCard(p)));
+      playlistsGrid.appendChild(frag);
     } catch (err) { console.warn("renderPlaylists:", err); }
   }
 
   function crearPlaylistCard(pl) {
     try {
       const card = document.createElement("article");
-      card.className = "playlist-card color-" + (pl.color || "amarillo");
+      card.className = "playlist-card color-" + (pl.color||"amarillo");
       const btnDel = crearBtn("playlist-card-delete", SVG.close, "Eliminar playlist", (e) => { e.stopPropagation(); eliminarPlaylist(pl.id); });
       card.appendChild(btnDel);
       const header = document.createElement("div"); header.className = "playlist-card-header";
@@ -962,7 +1018,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const count = document.createElement("span"); count.className = "playlist-card-count";
       count.textContent = n === 0 ? "Sin canciones" : n === 1 ? "1 canción" : `${n} canciones`;
       card.appendChild(count);
-      if (n > 0) { const prev = document.createElement("div"); prev.className = "playlist-card-preview"; prev.textContent = pl.canciones.slice(0, 3).map(c => c.titulo + (c.artista ? " · " + c.artista : "")).join("\n"); card.appendChild(prev); }
+      if (n > 0) { const prev = document.createElement("div"); prev.className = "playlist-card-preview"; prev.textContent = pl.canciones.slice(0,3).map(c => c.titulo + (c.artista ? " · " + c.artista : "")).join("\n"); card.appendChild(prev); }
       card.addEventListener("click", () => abrirCancionesModal(pl.id));
       return card;
     } catch (err) { console.warn("crearPlaylistCard:", err); return document.createElement("div"); }
@@ -971,7 +1027,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function abrirPlaylistModal() {
     try {
       if (!playlistModal) return;
-      playlistModal.classList.add("active"); playlistModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
+      playlistModal.classList.add("active"); playlistModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
       playlistForm?.reset();
       emojiSeleccionado = "music"; colorPlaylistSeleccionado = "amarillo";
       document.querySelectorAll("#emoji-picker .emoji-option").forEach(o => o.classList.toggle("activo", o.dataset.emoji === "music"));
@@ -984,7 +1040,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function cerrarPlaylistModal() {
     try {
       if (!playlistModal) return;
-      playlistModal.classList.remove("active"); playlistModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
+      playlistModal.classList.remove("active"); playlistModal.setAttribute("aria-hidden","true"); document.body.style.overflow = "";
     } catch (err) { console.warn("cerrarPlaylistModal:", err); }
   }
 
@@ -994,7 +1050,7 @@ document.addEventListener("DOMContentLoaded", () => {
       await eliminarPlaylistTabla(id);
       playlists = playlists.filter(p => p.id !== id);
       renderPlaylists();
-    } catch (err) { alert("No se pudo eliminar: " + (err.message || err)); }
+    } catch (err) { alert("No se pudo eliminar: " + (err.message||err)); }
   }
 
   function abrirCancionesModal(id) {
@@ -1005,7 +1061,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (cancionesModalTitle) cancionesModalTitle.textContent = pl.nombre;
       if (cancionesModalDesc) cancionesModalDesc.textContent = pl.descripcion || "";
       renderCancionesLista(); resetCancionTabs();
-      cancionesModal.classList.add("active"); cancionesModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
+      cancionesModal.classList.add("active"); cancionesModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
       setTimeout(() => cancionTitulo?.focus(), 100);
     } catch (err) { console.warn("abrirCancionesModal:", err); }
   }
@@ -1013,7 +1069,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function cerrarCancionesModal() {
     try {
       if (!cancionesModal) return;
-      cancionesModal.classList.remove("active"); cancionesModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
+      cancionesModal.classList.remove("active"); cancionesModal.setAttribute("aria-hidden","true"); document.body.style.overflow = "";
       playlistEditando = null;
     } catch (err) { console.warn("cerrarCancionesModal:", err); }
   }
@@ -1024,7 +1080,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const pl = playlists.find(p => p.id === playlistEditando);
       cancionesLista.innerHTML = "";
       if (!pl || pl.canciones.length === 0) { const v = document.createElement("div"); v.className = "canciones-lista-vacia"; v.textContent = "Aún no hay canciones. ¡Añade la primera!"; cancionesLista.appendChild(v); return; }
-      pl.canciones.forEach((c, i) => cancionesLista.appendChild(crearCancionItem(c, i)));
+      const frag = document.createDocumentFragment();
+      pl.canciones.forEach((c, i) => frag.appendChild(crearCancionItem(c, i)));
+      cancionesLista.appendChild(frag);
       actualizarEstadoReproduciendo();
     } catch (err) { console.warn("renderCancionesLista:", err); }
   }
@@ -1051,12 +1109,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const pl = playlists.find(p => p.id === playlistEditando);
       if (!pl) return;
       const c = pl.canciones[index];
-      if (c?.url?.startsWith("storage:")) { try { await supabase.storage.from(BUCKET_CANCIONES).remove([c.url.replace(/^storage:/, "")]); } catch { } }
+      if (c?.url?.startsWith("storage:")) { try { await supabase.storage.from(BUCKET_CANCIONES).remove([c.url.replace(/^storage:/, "")]); } catch {} }
       const nuevas = pl.canciones.filter((_, i) => i !== index);
       await guardarCancionesTabla(pl.id, nuevas);
       pl.canciones = nuevas;
       renderCancionesLista(); renderPlaylists();
-    } catch (err) { alert("No se pudo quitar la canción: " + (err.message || err)); }
+    } catch (err) { alert("No se pudo quitar la canción: " + (err.message||err)); }
   }
 
   btnAddPlaylist?.addEventListener("click", abrirPlaylistModal);
@@ -1074,9 +1132,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (playlistSubmitBtn) { playlistSubmitBtn.disabled = true; playlistSubmitBtn.textContent = "Guardando..."; }
       try {
         const nueva = await añadirPlaylistTabla(nombre, descripcion, emojiSeleccionado, colorPlaylistSeleccionado);
-        playlists.unshift({ id: nueva.id, nombre: nueva.nombre, descripcion: nueva.descripcion, emoji: nueva.emoji, color: nueva.color, canciones: [], created_at: nueva.created_at });
+        playlists.unshift({ id:nueva.id, nombre:nueva.nombre, descripcion:nueva.descripcion, emoji:nueva.emoji, color:nueva.color, canciones:[], created_at:nueva.created_at });
         cerrarPlaylistModal(); renderPlaylists();
-      } catch (err) { alert("No se pudo guardar: " + (err.message || err)); if (playlistSubmitBtn) { playlistSubmitBtn.disabled = false; playlistSubmitBtn.textContent = "Guardar playlist"; } }
+      } catch (err) { alert("No se pudo guardar: " + (err.message||err)); if (playlistSubmitBtn) { playlistSubmitBtn.disabled = false; playlistSubmitBtn.textContent = "Guardar playlist"; } }
     } catch (err) { console.warn("playlist submit:", err); }
   });
 
@@ -1092,7 +1150,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pl.canciones = nuevas;
       renderCancionesLista(); renderPlaylists();
       cancionForm.reset(); cancionTitulo?.focus();
-    } catch (err) { alert("No se pudo añadir: " + (err.message || err)); }
+    } catch (err) { alert("No se pudo añadir: " + (err.message||err)); }
   });
 
   const cancionesPegarTexto = $("cancion-pegar-texto"), cancionesPegarPreview = $("cancion-pegar-preview"), btnImportarCanciones = $("btn-importar-canciones");
@@ -1117,20 +1175,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function parsearListaCanciones(texto, orden) {
     const resultado = [], separadores = [" - ", " – ", " — ", " | ", "\t"];
-    (texto || "").split(/\r?\n/).forEach(raw => {
+    (texto||"").split(/\r?\n/).forEach(raw => {
       let linea = raw.trim();
       if (!linea || /^#EXT/i.test(linea)) return;
       if (/^[A-Za-z]:\\/.test(linea) || /^\/Users\//.test(linea) || /^\/(home|mnt|media)\//.test(linea)) return;
       if (/^(playlist|canciones|songs|tracklist|mi playlist|lista)\s*:?\s*$/i.test(linea)) return;
       linea = linea.replace(/^(?:#\d+|\d+\s*[\.\)\-:]\s*)/, "").replace(/^[•·*\-–—]\s*/, "");
       if (!linea) return;
-      if (/^https?:\/\/\S+$/i.test(linea)) { resultado.push({ titulo: "Canción", artista: "", url: linea }); return; }
+      if (/^https?:\/\/\S+$/i.test(linea)) { resultado.push({ titulo:"Canción", artista:"", url:linea }); return; }
       let url = "";
       const m = linea.match(/\s*[\(\[]?(https?:\/\/[^\s\)\]]+)[\)\]]?\s*$/i);
       if (m) { url = m[1]; linea = linea.replace(m[0], "").trim(); }
       const sep = separadores.find(s => linea.includes(s));
       if (sep) { const partes = linea.split(sep).map(p => p.trim()).filter(Boolean); if (partes.length >= 2) { const [titulo, artista] = orden === "artista-titulo" ? [partes.slice(1).join(" - "), partes[0]] : [partes[0], partes.slice(1).join(" - ")]; resultado.push({ titulo, artista, url }); return; } }
-      resultado.push({ titulo: linea, artista: "", url });
+      resultado.push({ titulo:linea, artista:"", url });
     });
     return resultado;
   }
@@ -1146,7 +1204,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cancionesPegarPreview.classList.add("visible");
       const cab = document.createElement("span"); cab.className = "cancion-pegar-preview-num"; cab.textContent = `${canciones.length} canción${canciones.length === 1 ? "" : "es"} detectada${canciones.length === 1 ? "" : "s"}`;
       cancionesPegarPreview.appendChild(cab);
-      canciones.slice(0, 5).forEach(c => { const item = document.createElement("div"); item.className = "cancion-pegar-preview-item"; item.textContent = "• " + c.titulo + (c.artista ? " — " + c.artista : "") + (c.url ? " (con enlace)" : ""); cancionesPegarPreview.appendChild(item); });
+      canciones.slice(0,5).forEach(c => { const item = document.createElement("div"); item.className = "cancion-pegar-preview-item"; item.textContent = "• " + c.titulo + (c.artista ? " — " + c.artista : "") + (c.url ? " (con enlace)" : ""); cancionesPegarPreview.appendChild(item); });
       if (canciones.length > 5) { const m = document.createElement("div"); m.className = "cancion-pegar-preview-item"; m.style.opacity = "0.5"; m.textContent = `… y ${canciones.length - 5} más`; cancionesPegarPreview.appendChild(m); }
     } catch (err) { console.warn("actualizarPreviewPegar:", err); }
   }
@@ -1166,7 +1224,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const actualizadas = [...pl.canciones, ...nuevas];
         await guardarCancionesTabla(pl.id, actualizadas); pl.canciones = actualizadas;
         renderCancionesLista(); renderPlaylists(); resetCancionTabs();
-      } catch (err) { alert("No se pudo importar: " + (err.message || err)); }
+      } catch (err) { alert("No se pudo importar: " + (err.message||err)); }
       finally { btnImportarCanciones.disabled = false; btnImportarCanciones.textContent = "Importar todas"; }
     } catch (err) { console.warn("importar:", err); }
   });
@@ -1205,20 +1263,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const archivos = Array.from(cancionPegarArchivo.files || []);
       if (!archivos.length) return;
       const textos = [], nombres = [];
-      for (const a of archivos) { try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size / 1024).toFixed(1)} KB)`); } catch { } }
+      for (const a of archivos) { try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size/1024).toFixed(1)} KB)`); } catch {} }
       aplicarArchivosCargados(textos, nombres); cancionPegarArchivo.value = "";
     } catch (err) { console.warn("cargar archivo:", err); }
   });
 
   if (cancionesPegarTexto) {
-    ["dragenter", "dragover"].forEach(evt => cancionesPegarTexto.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); cancionesPegarTexto.classList.add("drag-over"); }));
-    ["dragleave", "drop"].forEach(evt => cancionesPegarTexto.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); if (evt === "dragleave" && e.relatedTarget && cancionesPegarTexto.contains(e.relatedTarget)) return; cancionesPegarTexto.classList.remove("drag-over"); }));
+    ["dragenter","dragover"].forEach(evt => cancionesPegarTexto.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); cancionesPegarTexto.classList.add("drag-over"); }));
+    ["dragleave","drop"].forEach(evt => cancionesPegarTexto.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); if (evt === "dragleave" && e.relatedTarget && cancionesPegarTexto.contains(e.relatedTarget)) return; cancionesPegarTexto.classList.remove("drag-over"); }));
     cancionesPegarTexto.addEventListener("drop", async (e) => {
       try {
         const archivos = Array.from(e.dataTransfer?.files || []);
         if (!archivos.length) return;
         const textos = [], nombres = [];
-        for (const a of archivos) { if (!/\.(txt|csv|m3u|m3u8)$/i.test(a.name) && !a.type.startsWith("text/")) continue; try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size / 1024).toFixed(1)} KB)`); } catch { } }
+        for (const a of archivos) { if (!/\.(txt|csv|m3u|m3u8)$/i.test(a.name) && !a.type.startsWith("text/")) continue; try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size/1024).toFixed(1)} KB)`); } catch {} }
         if (!textos.length) return alert("Formatos aceptados: .txt, .csv, .m3u, .m3u8");
         aplicarArchivosCargados(textos, nombres);
       } catch (err) { console.warn("drop archivos:", err); }
@@ -1228,10 +1286,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const tituloDesdeArchivo = (nombre) => {
     try {
       const base = nombre.replace(/\.[^.]+$/, "");
-      const sep = [" - ", " – ", " — "].find(s => base.includes(s));
-      if (sep) { const p = base.split(sep).map(x => x.trim()).filter(Boolean); return { titulo: p[0] || base, artista: p.slice(1).join(" - ") || "" }; }
-      return { titulo: base, artista: "" };
-    } catch { return { titulo: nombre, artista: "" }; }
+      const sep = [" - "," – "," — "].find(s => base.includes(s));
+      if (sep) { const p = base.split(sep).map(x => x.trim()).filter(Boolean); return { titulo:p[0] || base, artista:p.slice(1).join(" - ") || "" }; }
+      return { titulo:base, artista:"" };
+    } catch { return { titulo:nombre, artista:"" }; }
   };
 
   function agregarArchivosACola(files) {
@@ -1241,7 +1299,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (archivosPendientes.some(p => p.file.name === f.name && p.file.size === f.size)) continue;
         const ext = extensionDe(f.name);
         if (!esAudio(ext) && !esVideo(ext)) continue;
-        archivosPendientes.push({ file: f, id: Math.random().toString(36).slice(2), estado: "pending" });
+        archivosPendientes.push({ file:f, id:Math.random().toString(36).slice(2), estado:"pending" });
       }
       renderColaArchivos(); actualizarBotonSubir();
     } catch (err) { console.warn("agregarArchivosACola:", err); }
@@ -1252,7 +1310,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!cancionSubirLista) return;
       cancionSubirLista.innerHTML = "";
       if (!archivosPendientes.length) return;
-      const textos = { pending: "Pendiente", uploading: "Subiendo...", done: "Listo", error: "Error" };
+      const textos = { pending:"Pendiente", uploading:"Subiendo...", done:"Listo", error:"Error" };
+      const frag = document.createDocumentFragment();
       archivosPendientes.forEach(item => {
         const el = document.createElement("div"); el.className = "cancion-subir-item";
         const icon = document.createElement("span"); icon.className = "cancion-subir-item-icon"; icon.innerHTML = SVG.music;
@@ -1264,8 +1323,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const btn = document.createElement("button"); btn.type = "button"; btn.className = "cancion-subir-item-remove"; btn.innerHTML = SVG.close; btn.title = "Quitar de la cola";
         btn.addEventListener("click", () => { archivosPendientes = archivosPendientes.filter(x => x.id !== item.id); renderColaArchivos(); actualizarBotonSubir(); });
         el.append(icon, info, status, btn);
-        cancionSubirLista.appendChild(el);
+        frag.appendChild(el);
       });
+      cancionSubirLista.appendChild(frag);
     } catch (err) { console.warn("renderColaArchivos:", err); }
   }
 
@@ -1275,15 +1335,15 @@ document.addEventListener("DOMContentLoaded", () => {
   cancionSubirArchivo?.addEventListener("change", () => { agregarArchivosACola(cancionSubirArchivo.files); cancionSubirArchivo.value = ""; });
 
   if (cancionSubirDropzone) {
-    ["dragenter", "dragover"].forEach(evt => cancionSubirDropzone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); cancionSubirDropzone.classList.add("drag-over"); }));
-    ["dragleave", "drop"].forEach(evt => cancionSubirDropzone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); if (evt === "dragleave" && e.relatedTarget && cancionSubirDropzone.contains(e.relatedTarget)) return; cancionSubirDropzone.classList.remove("drag-over"); }));
+    ["dragenter","dragover"].forEach(evt => cancionSubirDropzone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); cancionSubirDropzone.classList.add("drag-over"); }));
+    ["dragleave","drop"].forEach(evt => cancionSubirDropzone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); if (evt === "dragleave" && e.relatedTarget && cancionSubirDropzone.contains(e.relatedTarget)) return; cancionSubirDropzone.classList.remove("drag-over"); }));
     cancionSubirDropzone.addEventListener("drop", e => { const files = e.dataTransfer?.files; if (files?.length) agregarArchivosACola(files); });
   }
 
   async function subirArchivoACanciones(item, userId) {
     const ext = extensionDe(item.file.name) || "bin";
-    const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const { error } = await supabase.storage.from(BUCKET_CANCIONES).upload(path, item.file, { contentType: item.file.type || "application/octet-stream", upsert: false });
+    const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const { error } = await supabase.storage.from(BUCKET_CANCIONES).upload(path, item.file, { contentType:item.file.type || "application/octet-stream", upsert:false });
     if (error) throw error;
     return path;
   }
@@ -1301,7 +1361,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const nuevas = []; let exitos = 0, fallos = 0;
       for (const item of pendientes) {
         item.estado = "uploading"; renderColaArchivos();
-        try { const path = await subirArchivoACanciones(item, session.user.id); const meta = tituloDesdeArchivo(item.file.name); nuevas.push({ titulo: meta.titulo, artista: meta.artista, url: "storage:" + path }); item.estado = "done"; exitos++; }
+        try { const path = await subirArchivoACanciones(item, session.user.id); const meta = tituloDesdeArchivo(item.file.name); nuevas.push({ titulo:meta.titulo, artista:meta.artista, url:"storage:"+path }); item.estado = "done"; exitos++; }
         catch { item.estado = "error"; fallos++; }
         renderColaArchivos();
       }
@@ -1310,13 +1370,13 @@ document.addEventListener("DOMContentLoaded", () => {
         archivosPendientes = archivosPendientes.filter(a => a.estado !== "done");
         renderColaArchivos();
         alert(fallos === 0 ? `${exitos} archivo(s) subido(s) correctamente` : `Subidos ${exitos}, fallaron ${fallos}.`);
-      } catch (err) { alert("Error guardando en la playlist: " + (err.message || err)); }
+      } catch (err) { alert("Error guardando en la playlist: " + (err.message||err)); }
       finally { btnSubirCanciones.disabled = false; btnSubirCanciones.textContent = "Subir todas"; actualizarBotonSubir(); }
     } catch (err) { console.warn("subir canciones:", err); }
   });
 
-  const mostrarPlayerBar = () => { if (!playerBar) return; playerBar.classList.add("visible"); playerBar.setAttribute("aria-hidden", "false"); document.body.classList.add("player-abierto"); };
-  const ocultarPlayerBar = () => { if (!playerBar) return; playerBar.classList.remove("visible"); playerBar.setAttribute("aria-hidden", "true"); document.body.classList.remove("player-abierto"); };
+  const mostrarPlayerBar = () => { if (!playerBar) return; playerBar.classList.add("visible"); playerBar.setAttribute("aria-hidden","false"); document.body.classList.add("player-abierto"); };
+  const ocultarPlayerBar = () => { if (!playerBar) return; playerBar.classList.remove("visible"); playerBar.setAttribute("aria-hidden","true"); document.body.classList.remove("player-abierto"); };
   const actualizarIconoVolumen = () => { if (!playerVolumeBtn) return; if (globalAudio.muted || volumenActual === 0) playerVolumeBtn.innerHTML = SVG.volMute; else if (volumenActual < 0.4) playerVolumeBtn.innerHTML = SVG.volLow; else playerVolumeBtn.innerHTML = SVG.volHigh; };
   const actualizarBotonPlay = () => { if (!playerPlay) return; playerPlay.innerHTML = reproduciendo ? SVG.pause : SVG.play; playerPlay.title = reproduciendo ? "Pausar" : "Reproducir"; };
   if (globalAudio) { globalAudio.volume = volumenActual; if (playerVolume) playerVolume.value = volumenActual; actualizarIconoVolumen(); }
@@ -1328,15 +1388,15 @@ document.addEventListener("DOMContentLoaded", () => {
     catch (err) { console.warn("Wake Lock:", err); }
   }
   async function liberarWakeLock() {
-    if (window._wakeLock) { try { await window._wakeLock.release(); } catch { } window._wakeLock = null; }
+    if (window._wakeLock) { try { await window._wakeLock.release(); } catch {} window._wakeLock = null; }
   }
 
   function actualizarMediaSession(item) {
     if (!("mediaSession" in navigator)) return;
     try {
       navigator.mediaSession.metadata = new MediaMetadata({
-        title: item.titulo || "Sin título", artist: item.artista || "Four Sunflowers",
-        album: "Nuestras playlists", artwork: [{ src: "img/girasol.jpg", sizes: "512x512", type: "image/jpeg" }]
+        title:item.titulo || "Sin título", artist:item.artista || "Four Sunflowers",
+        album:"Nuestras playlists", artwork:[{ src:"img/girasol.jpg", sizes:"512x512", type:"image/jpeg" }]
       });
       navigator.mediaSession.setActionHandler("play", reanudarReproduccion);
       navigator.mediaSession.setActionHandler("pause", pausarReproduccion);
@@ -1354,7 +1414,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!pl) return;
       if (!pl.canciones[indiceInicial]?.url?.startsWith("storage:")) return;
       colaReproduccion = []; let idxEnCola = -1;
-      pl.canciones.forEach((c, i) => { if (c.url?.startsWith("storage:")) { colaReproduccion.push({ titulo: c.titulo, artista: c.artista || "", url: c.url, playlistId }); if (i === indiceInicial) idxEnCola = colaReproduccion.length - 1; } });
+      pl.canciones.forEach((c, i) => { if (c.url?.startsWith("storage:")) { colaReproduccion.push({ titulo:c.titulo, artista:c.artista || "", url:c.url, playlistId }); if (i === indiceInicial) idxEnCola = colaReproduccion.length - 1; } });
       if (idxEnCola < 0) return;
       indiceReproduccion = idxEnCola;
       reproducirIndiceActual();
@@ -1382,7 +1442,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const pausarReproduccion = () => { if (!globalAudio) return; globalAudio.pause(); reproduciendo = false; actualizarBotonPlay(); liberarWakeLock(); };
-  const reanudarReproduccion = () => { if (!globalAudio?.src) return; globalAudio.play().then(() => { reproduciendo = true; actualizarBotonPlay(); activarWakeLock(); }).catch(() => { }); };
+  const reanudarReproduccion = () => { if (!globalAudio?.src) return; globalAudio.play().then(() => { reproduciendo = true; actualizarBotonPlay(); activarWakeLock(); }).catch(() => {}); };
 
   function siguienteCancion(autoplay = true) {
     try {
@@ -1444,13 +1504,13 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) { eventos = []; return; }
-      const { data, error } = await supabase.from("eventos").select("id,titulo,descripcion,fecha,color,recordatorio_dias,recurrente").eq("user_id", session.user.id).order("fecha", { ascending: true });
+      const { data, error } = await supabase.from("eventos").select("id,titulo,descripcion,fecha,color,recordatorio_dias,recurrente").eq("user_id", session.user.id).order("fecha", { ascending:true });
       if (error) { eventos = []; return; }
-      eventos = (data || []).map(e => ({ id: e.id, titulo: e.titulo, descripcion: e.descripcion, fecha: e.fecha, color: e.color || "amarillo", recordatorio_dias: e.recordatorio_dias ?? 1, recurrente: !!e.recurrente }));
+      eventos = (data||[]).map(e => ({ id:e.id, titulo:e.titulo, descripcion:e.descripcion, fecha:e.fecha, color:e.color||"amarillo", recordatorio_dias:e.recordatorio_dias ?? 1, recurrente:!!e.recurrente }));
     } catch (err) { console.warn("cargarEventos:", err); eventos = []; }
   }
 
-  const añadirEventoTabla = async (titulo, descripcion, fecha, color, recordatorio, recurrente) => { const { data: { session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("eventos").insert({ user_id: session.user.id, titulo, descripcion: descripcion || null, fecha, color: color || "amarillo", recordatorio_dias: recordatorio, recurrente }).select().single(); if (error) throw error; return data; };
+  const añadirEventoTabla = async (titulo, descripcion, fecha, color, recordatorio, recurrente) => { const { data: { session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("eventos").insert({ user_id:session.user.id, titulo, descripcion:descripcion||null, fecha, color:color||"amarillo", recordatorio_dias:recordatorio, recurrente }).select().single(); if (error) throw error; return data; };
   const eliminarEventoTabla = async (id) => { const { error } = await supabase.from("eventos").delete().eq("id", id); if (error) throw error; };
 
   function renderCalendario() {
@@ -1465,6 +1525,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const diasAnt = new Date(año, mes, 0).getDate();
       const total = Math.ceil((offset + ultimoDia) / 7) * 7;
       const hoy = hoyISO();
+      const frag = document.createDocumentFragment();
       for (let i = 0; i < total; i++) {
         const celda = document.createElement("button");
         celda.type = "button"; celda.className = "cal-dia";
@@ -1476,27 +1537,29 @@ document.addEventListener("DOMContentLoaded", () => {
         if (iso === hoy) celda.classList.add("hoy");
         const span = document.createElement("span"); span.className = "cal-dia-numero"; span.textContent = num; celda.appendChild(span);
         const evs = eventosDelDia(iso);
-        if (evs.length) { const dots = document.createElement("div"); dots.className = "cal-dia-eventos"; evs.slice(0, 4).forEach(ev => { const d = document.createElement("span"); d.className = `cal-evento-punto color-${ev.color}`; dots.appendChild(d); }); celda.appendChild(dots); }
+        if (evs.length) { const dots = document.createElement("div"); dots.className = "cal-dia-eventos"; evs.slice(0,4).forEach(ev => { const d = document.createElement("span"); d.className = `cal-evento-punto color-${ev.color}`; dots.appendChild(d); }); celda.appendChild(dots); }
         celda.addEventListener("click", () => abrirEventoModal(iso));
-        calGrid.appendChild(celda);
+        frag.appendChild(celda);
       }
+      calGrid.appendChild(frag);
       renderProximos(); actualizarEmptyCalendario();
     } catch (err) { console.warn("renderCalendario:", err); }
   }
 
   function eventosDelDia(iso) { return eventos.filter(ev => { if (!ev.recurrente) return ev.fecha === iso; const [, mEv, dEv] = ev.fecha.split("-"); const [, mIso, dIso] = iso.split("-"); return mEv === mIso && dEv === dIso; }); }
-
-  function proximaFechaEvento(ev) { const hoy = new Date(); hoy.setHours(0, 0, 0, 0); const [y, m, d] = ev.fecha.split("-").map(Number); if (ev.recurrente) { const este = new Date(hoy.getFullYear(), m - 1, d); return este < hoy ? new Date(hoy.getFullYear() + 1, m - 1, d) : este; } return new Date(y, m - 1, d); }
-  const diasHasta = (fecha) => { const h = new Date(); h.setHours(0, 0, 0, 0); const f = new Date(fecha); f.setHours(0, 0, 0, 0); return Math.round((f - h) / 86400000); };
+  function proximaFechaEvento(ev) { const hoy = new Date(); hoy.setHours(0,0,0,0); const [y, m, d] = ev.fecha.split("-").map(Number); if (ev.recurrente) { const este = new Date(hoy.getFullYear(), m-1, d); return este < hoy ? new Date(hoy.getFullYear()+1, m-1, d) : este; } return new Date(y, m-1, d); }
+  const diasHasta = (fecha) => { const h = new Date(); h.setHours(0,0,0,0); const f = new Date(fecha); f.setHours(0,0,0,0); return Math.round((f-h)/86400000); };
 
   function renderProximos() {
     try {
       if (!calProximos) return;
       calProximos.innerHTML = "";
-      const conFecha = eventos.map(ev => ({ ev, p: proximaFechaEvento(ev) })).filter(x => diasHasta(x.p) >= 0).sort((a, b) => a.p - b.p).slice(0, 8);
+      const conFecha = eventos.map(ev => ({ ev, p: proximaFechaEvento(ev) })).filter(x => diasHasta(x.p) >= 0).sort((a,b) => a.p - b.p).slice(0,8);
       if (!conFecha.length) { calProximosVacio?.classList.remove("hidden"); return; }
       calProximosVacio?.classList.add("hidden");
-      conFecha.forEach(({ ev, p }) => calProximos.appendChild(crearItemProximo(ev, p)));
+      const frag = document.createDocumentFragment();
+      conFecha.forEach(({ ev, p }) => frag.appendChild(crearItemProximo(ev, p)));
+      calProximos.appendChild(frag);
     } catch (err) { console.warn("renderProximos:", err); }
   }
 
@@ -1505,7 +1568,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const item = document.createElement("div"); item.className = "cal-proximo-item color-" + ev.color;
       const fb = document.createElement("div"); fb.className = "cal-proximo-fecha";
       const dia = document.createElement("span"); dia.className = "cal-proximo-dia"; dia.textContent = proxima.getDate();
-      const mes = document.createElement("span"); mes.className = "cal-proximo-mes"; mes.textContent = MESES_LARGOS[proxima.getMonth()].slice(0, 3);
+      const mes = document.createElement("span"); mes.className = "cal-proximo-mes"; mes.textContent = MESES_LARGOS[proxima.getMonth()].slice(0,3);
       fb.append(dia, mes);
       const info = document.createElement("div"); info.className = "cal-proximo-info";
       const t = document.createElement("span"); t.className = "cal-proximo-titulo"; t.textContent = ev.titulo; info.appendChild(t);
@@ -1515,11 +1578,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (diff === 0) { cuando.classList.add("hoy"); cuando.textContent = "¡HOY!"; }
       else if (diff === 1) cuando.textContent = "Mañana";
       else if (diff < 7) cuando.textContent = `En ${diff} días`;
-      else if (diff < 30) cuando.textContent = `En ${Math.round(diff / 7)} sem.`;
-      else cuando.textContent = `En ${Math.round(diff / 30)} meses`;
+      else if (diff < 30) cuando.textContent = `En ${Math.round(diff/7)} sem.`;
+      else cuando.textContent = `En ${Math.round(diff/30)} meses`;
       const btn = crearBtn("cal-proximo-delete", SVG.close, "Eliminar fecha", (e) => { e.stopPropagation(); eliminarEvento(ev.id); });
       item.append(fb, info, cuando, btn);
-      item.addEventListener("click", () => { mesMostrado = new Date(proxima.getFullYear(), proxima.getMonth(), 1); renderCalendario(); document.querySelector(".calendario-wrapper")?.scrollIntoView({ behavior: "smooth", block: "start" }); });
+      item.addEventListener("click", () => { mesMostrado = new Date(proxima.getFullYear(), proxima.getMonth(), 1); renderCalendario(); document.querySelector(".calendario-wrapper")?.scrollIntoView({ behavior:"smooth", block:"start" }); });
       return item;
     } catch (err) { console.warn("crearItemProximo:", err); return document.createElement("div"); }
   }
@@ -1529,7 +1592,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function abrirEventoModal(fechaPrefill) {
     try {
       if (!eventoModal) return;
-      eventoModal.classList.add("active"); eventoModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
+      eventoModal.classList.add("active"); eventoModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
       eventoForm?.reset();
       colorEventoSeleccionado = "amarillo";
       document.querySelectorAll("#evento-form .color-option").forEach(o => o.classList.toggle("activo", o.dataset.color === "amarillo"));
@@ -1540,12 +1603,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function cerrarEventoModal() {
-    try { if (!eventoModal) return; eventoModal.classList.remove("active"); eventoModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; } catch (err) { console.warn(err); }
+    try { if (!eventoModal) return; eventoModal.classList.remove("active"); eventoModal.setAttribute("aria-hidden","true"); document.body.style.overflow = ""; } catch {}
   }
 
   async function eliminarEvento(id) {
     try { if (!confirm("¿Eliminar esta fecha del calendario?")) return; await eliminarEventoTabla(id); eventos = eventos.filter(e => e.id !== id); renderCalendario(); }
-    catch (err) { alert("No se pudo eliminar: " + (err.message || err)); }
+    catch (err) { alert("No se pudo eliminar: " + (err.message||err)); }
   }
 
   btnAddEvento?.addEventListener("click", () => abrirEventoModal());
@@ -1565,10 +1628,10 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         await pedirPermisoNotificacionesSilencioso();
         const nuevo = await añadirEventoTabla(titulo, descripcion, fecha, colorEventoSeleccionado, recordatorio, recurrente);
-        eventos.push({ id: nuevo.id, titulo: nuevo.titulo, descripcion: nuevo.descripcion, fecha: nuevo.fecha, color: nuevo.color, recordatorio_dias: nuevo.recordatorio_dias, recurrente: nuevo.recurrente });
-        eventos.sort((a, b) => a.fecha.localeCompare(b.fecha));
+        eventos.push({ id:nuevo.id, titulo:nuevo.titulo, descripcion:nuevo.descripcion, fecha:nuevo.fecha, color:nuevo.color, recordatorio_dias:nuevo.recordatorio_dias, recurrente:nuevo.recurrente });
+        eventos.sort((a,b) => a.fecha.localeCompare(b.fecha));
         cerrarEventoModal(); renderCalendario(); comprobarRecordatorios();
-      } catch (err) { alert("No se pudo guardar: " + (err.message || err)); if (eventoSubmitBtn) { eventoSubmitBtn.disabled = false; eventoSubmitBtn.textContent = "Guardar fecha"; } }
+      } catch (err) { alert("No se pudo guardar: " + (err.message||err)); if (eventoSubmitBtn) { eventoSubmitBtn.disabled = false; eventoSubmitBtn.textContent = "Guardar fecha"; } }
     } catch (err) { console.warn("evento submit:", err); }
   });
 
@@ -1593,7 +1656,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (diff === 0) cuerpo = "¡Es hoy! " + (ev.descripcion || "");
         else if (diff === 1) cuerpo = "Es mañana " + (ev.descripcion || "");
         else cuerpo = `Faltan ${diff} días · ` + (ev.descripcion || "");
-        try { new Notification(ev.titulo, { body: cuerpo.trim(), icon: "img/girasol.jpg", tag: `evento-${ev.id}` }); } catch { }
+        try { new Notification(ev.titulo, { body:cuerpo.trim(), icon:"img/girasol.jpg", tag:`evento-${ev.id}` }); } catch {}
       });
     } catch (err) { console.warn("comprobarRecordatorios:", err); }
   }
@@ -1618,7 +1681,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const { data: perfil } = await supabase.from("perfiles").select("username,avatar_url").eq("id", session.user.id).single();
           if (perfil?.avatar_url) { const av = document.querySelector(".user-avatar"); if (av) av.innerHTML = `<img src="${perfil.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`; }
           if (perfil?.username) { localStorage.setItem("sunadventures_username", perfil.username); const ue = document.getElementById("user-email"); if (ue) ue.textContent = perfil.username; const udn = document.getElementById("user-dropdown-name"); if (udn) udn.textContent = perfil.username; }
-        } catch { }
+        } catch {}
         registrarVisita();
         await Promise.all([cargarFotos(), cargarNotas(), cargarPlaylists(), cargarEventos()]);
         await Promise.all([render(), Promise.resolve(renderNotas()), Promise.resolve(renderPlaylists()), Promise.resolve(renderCalendario()), Promise.resolve(renderLogros())]);
@@ -1647,13 +1710,29 @@ document.addEventListener("DOMContentLoaded", () => {
     try { const { data: { session } } = await supabase.auth.getSession(); colaSesion = colaSesion.then(() => updateAuthUI(session)).catch(err => console.error(err)); }
     catch (err) { console.error("getSession:", err); ocultarLoading(); }
   }, 100);
-
-  function abrirAuthModal() { try { if (!authModal) return; if (authSubmit) authSubmit.disabled = false; modoRegistro = false; setModoRegistro(false); authForm?.reset(); ocultarError(); const recordar = document.getElementById("auth-recordar"); const guardado = localStorage.getItem("sunadventures_usuario_recordado"); if (guardado && authUsername) { authUsername.value = guardado; if (recordar) recordar.checked = true; } authModal.classList.add("active"); authModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; setTimeout(() => authUsername?.focus(), 100); } catch (err) { console.warn("abrirAuthModal:", err); } }
-  function cerrarAuthModal() { try { if (!authModal) return; authModal.classList.remove("active"); authModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; modoRegistro = false; if (authSubmit) authSubmit.disabled = false; authForm?.reset(); ocultarError(); setModoRegistro(false); } catch (err) { console.warn("cerrarAuthModal:", err); } }
+let _authIniciado = false;
+const _arrancarAuth = async (session) => {
+  if (_authIniciado) return;
+  _authIniciado = true;
+  try { await updateAuthUI(session); }
+  catch (err) { console.error(err); ocultarLoading(); }
+};
+supabase.auth.onAuthStateChange((event, session) => {
+  // INITIAL_SESSION lo maneja el boot; el resto dispara update normal
+  colaSesion = colaSesion.then(() => updateAuthUI(session)).catch(err => console.error(err));
+});
+setTimeout(async () => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    _arrancarAuth(session);
+  } catch (err) { console.error("getSession:", err); ocultarLoading(); }
+}, 150);
+  function abrirAuthModal() { try { if (!authModal) return; if (authSubmit) authSubmit.disabled = false; modoRegistro = false; setModoRegistro(false); authForm?.reset(); ocultarError(); const recordar = document.getElementById("auth-recordar"); const guardado = localStorage.getItem("sunadventures_usuario_recordado"); if (guardado && authUsername) { authUsername.value = guardado; if (recordar) recordar.checked = true; } authModal.classList.add("active"); authModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden"; setTimeout(() => authUsername?.focus(), 100); } catch (err) { console.warn("abrirAuthModal:", err); } }
+  function cerrarAuthModal() { try { if (!authModal) return; authModal.classList.remove("active"); authModal.setAttribute("aria-hidden","true"); document.body.style.overflow = ""; modoRegistro = false; if (authSubmit) authSubmit.disabled = false; authForm?.reset(); ocultarError(); setModoRegistro(false); } catch {} }
   function setModoRegistro(activar) { modoRegistro = activar; if (confirmField) confirmField.style.display = activar ? "flex" : "none"; if (authTitle) authTitle.textContent = activar ? "Crear cuenta" : "Bienvenido"; if (authSubtitle) authSubtitle.textContent = activar ? "Únete y guarda vuestros recuerdos" : "Inicia sesión para ver el álbum"; if (authSubmit) authSubmit.textContent = activar ? "Crear cuenta" : "Entrar"; if (authToggleText) authToggleText.textContent = activar ? "¿Ya tienes cuenta?" : "¿Aún no tienes cuenta?"; if (authToggleBtn) authToggleBtn.textContent = activar ? "Iniciar sesión" : "Crear cuenta"; ocultarError(); }
   const mostrarError = (msg) => { if (authError) { authError.textContent = msg; authError.style.display = "block"; } };
   const ocultarError = () => { if (authError) { authError.style.display = "none"; authError.textContent = ""; } };
-  const traducirError = (msg) => { if (!msg) return "Algo salió mal. Inténtalo otra vez."; if (msg.includes("Invalid login credentials")) return "Usuario o contraseña incorrectos."; if (msg.includes("Email not confirmed")) return "Debes confirmar tu cuenta antes de entrar."; if (msg.includes("User already registered")) return "Ya existe una cuenta con ese usuario."; if (msg.includes("Password should be")) return "La contraseña debe tener al menos 6 caracteres."; if (msg.includes("Unable to validate email")) return "El usuario no es válido."; if (msg.includes("rate limit")) return "Demasiados intentos. Espera un momento."; return msg; };
+  const traducirError = (msg) => { if (!msg) return "Algo salió mal."; if (msg.includes("Invalid login credentials")) return "Usuario o contraseña incorrectos."; if (msg.includes("Email not confirmed")) return "Debes confirmar tu cuenta antes de entrar."; if (msg.includes("User already registered")) return "Ya existe una cuenta con ese usuario."; if (msg.includes("Password should be")) return "La contraseña debe tener al menos 6 caracteres."; if (msg.includes("Unable to validate email")) return "El usuario no es válido."; if (msg.includes("rate limit")) return "Demasiados intentos. Espera un momento."; return msg; };
 
   btnOpenLogin?.addEventListener("click", abrirAuthModal);
   authModal?.querySelectorAll("[data-close-auth]").forEach(el => el.addEventListener("click", cerrarAuthModal));
@@ -1683,8 +1762,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   logoutBtn?.addEventListener("click", async () => { try { mostrarLoading("Saliendo..."); await supabase.auth.signOut(); } catch (err) { console.warn("logout:", err); ocultarLoading(); } });
 
-  const abrirMenuPerfil = () => { if (!userDropdown || !userMenuToggle) return; userDropdown.classList.add("open"); userDropdown.setAttribute("aria-hidden", "false"); userMenuToggle.setAttribute("aria-expanded", "true"); userInfo?.classList.add("open"); };
-  const cerrarMenuPerfil = () => { if (!userDropdown || !userMenuToggle) return; userDropdown.classList.remove("open"); userDropdown.setAttribute("aria-hidden", "true"); userMenuToggle.setAttribute("aria-expanded", "false"); userInfo?.classList.remove("open"); };
+  const abrirMenuPerfil = () => { if (!userDropdown || !userMenuToggle) return; userDropdown.classList.add("open"); userDropdown.setAttribute("aria-hidden","false"); userMenuToggle.setAttribute("aria-expanded","true"); userInfo?.classList.add("open"); };
+  const cerrarMenuPerfil = () => { if (!userDropdown || !userMenuToggle) return; userDropdown.classList.remove("open"); userDropdown.setAttribute("aria-hidden","true"); userMenuToggle.setAttribute("aria-expanded","false"); userInfo?.classList.remove("open"); };
 
   userMenuToggle?.addEventListener("click", (e) => { e.stopPropagation(); userDropdown?.classList.contains("open") ? cerrarMenuPerfil() : abrirMenuPerfil(); });
   document.addEventListener("click", (e) => { if (!userDropdown?.classList.contains("open")) return; if (userInfo && !userInfo.contains(e.target)) cerrarMenuPerfil(); });
@@ -1707,55 +1786,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  const VISTAS = ["inicio", "album", "mapa", "chat", "logros", "notas", "playlists", "calendario", "mascotas", ...(window._extraVistas || [])];
+  const VISTAS = ["inicio","album","mapa","chat","logros","notas","playlists","calendario","mascotas", ...(window._extraVistas || [])];
   const rutaDesdeHash = () => { const h = (location.hash || "").replace(/^#/, "").trim(); return VISTAS.includes(h) ? h : "inicio"; };
 
+  // ⚡ OPT: render perezoso según vista
   function mostrarVista(nombre) {
     try {
       if (!VISTAS.includes(nombre)) nombre = "inicio";
       document.querySelectorAll("[data-view]").forEach(el => el.classList.toggle("active", el.dataset.view === nombre));
       document.querySelectorAll("[data-view-link]").forEach(el => el.classList.toggle("active", el.dataset.viewLink === nombre));
       if (userDropdown?.classList.contains("open")) cerrarMenuPerfil();
+
+      // ⚡ OPT: solo renderiza lo de la vista activa
       if (nombre === "chat") { if (!grupoActivo) asegurarGrupoActivo().then(() => recargarChat()); else recargarChat(); }
-      if (nombre === "logros") renderLogros();
-      if (nombre === "inicio") renderExperiencia();
-      if (nombre === "mascotas" && typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      else if (nombre === "logros") renderLogros({ notificar: false });
+      else if (nombre === "inicio") renderExperiencia();
+      else if (nombre === "mapa") renderMapa();
+      else if (nombre === "mascotas" && typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
+
+      window.scrollTo({ top:0, behavior:"smooth" });
     } catch (err) { console.warn("mostrarVista:", err); }
   }
   modal?.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", cerrarModal));
-  /* ---------- Pegar imagen con Ctrl+V (dentro del modal de foto) ---------- */
+
   function pegarImagenEnFotoModal(e) {
     if (!modal?.classList.contains("active")) return;
-    if (fotoEditando) return; // si estamos editando no permitimos reemplazar la foto
-
+    if (fotoEditando) return;
     const items = e.clipboardData?.items;
     if (!items) return;
-
     let file = null;
-    for (const it of items) {
-      if (it.type && it.type.startsWith("image/")) {
-        file = it.getAsFile();
-        if (file) break;
-      }
-    }
+    for (const it of items) { if (it.type && it.type.startsWith("image/")) { file = it.getAsFile(); if (file) break; } }
     if (!file) return;
-
     e.preventDefault();
-
-    // Asignar el archivo al input[type=file] usando DataTransfer
-    try {
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      inputPhoto.files = dt.files;
-    } catch (err) {
-      console.warn("No se pudo asignar el archivo al input:", err);
-    }
-
-    // Reusar las funciones que ya tienes
-    mostrarVistaPreviaFoto(file);
-    actualizarVistaPreviaFotoInfo();
-    notifPegado();
+    try { const dt = new DataTransfer(); dt.items.add(file); inputPhoto.files = dt.files; } catch {}
+    mostrarVistaPreviaFoto(file); actualizarVistaPreviaFotoInfo(); notifPegado();
   }
 
   function notifPegado() {
@@ -1763,64 +1827,34 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!el) {
       el = document.createElement("div");
       el.id = "foto-pegada-toast";
-      el.style.cssText = `
-      position: fixed; top: 6rem; left: 50%; transform: translateX(-50%) translateY(-8px);
-      background: linear-gradient(135deg, #ffd93d, #ffae3d); color: #2b2118;
-      font-weight: 800; font-size: .9rem; padding: .55rem 1rem; border-radius: 999px;
-      box-shadow: 0 8px 24px rgba(255,217,61,.5), 0 0 0 2px rgba(255,217,61,.25);
-      z-index: 9999; opacity: 0; pointer-events: none;
-      transition: opacity .25s, transform .25s;
-    `;
+      el.style.cssText = `position:fixed;top:6rem;left:50%;transform:translateX(-50%) translateY(-8px);background:linear-gradient(135deg,#ffd93d,#ffae3d);color:#2b2118;font-weight:800;font-size:.9rem;padding:.55rem 1rem;border-radius:999px;box-shadow:0 8px 24px rgba(255,217,61,.5),0 0 0 2px rgba(255,217,61,.25);z-index:9999;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;`;
       el.textContent = "📋 ¡Foto pegada!";
       document.body.appendChild(el);
     }
-    requestAnimationFrame(() => {
-      el.style.opacity = "1";
-      el.style.transform = "translateX(-50%) translateY(0)";
-    });
+    requestAnimationFrame(() => { el.style.opacity = "1"; el.style.transform = "translateX(-50%) translateY(0)"; });
     clearTimeout(el._t);
-    el._t = setTimeout(() => {
-      el.style.opacity = "0";
-      el.style.transform = "translateX(-50%) translateY(-8px)";
-    }, 1400);
+    el._t = setTimeout(() => { el.style.opacity = "0"; el.style.transform = "translateX(-50%) translateY(-8px)"; }, 1400);
   }
 
-  /* Registrar el listener una sola vez */
   document.addEventListener("paste", pegarImagenEnFotoModal);
   window.addEventListener("hashchange", () => mostrarVista(rutaDesdeHash()));
   mostrarVista(rutaDesdeHash());
   setTimeout(() => { if (loadingScreen?.classList.contains("active")) ocultarLoading(); }, 5000);
   modal?.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", cerrarModal));
-  /* ---------- Arrastrar imagen al modal ---------- */
+
   const modalDrop = document.getElementById("photo-modal");
   if (modalDrop) {
-    modalDrop.addEventListener("dragover", (e) => {
-      if (fotoEditando) return;
-      if (!e.dataTransfer?.types?.includes("Files")) return;
-      e.preventDefault();
-      e.dataTransfer.dropEffect = "copy";
-      modalDrop.classList.add("drag-foto");
-    });
-    modalDrop.addEventListener("dragleave", (e) => {
-      if (e.relatedTarget && modalDrop.contains(e.relatedTarget)) return;
-      modalDrop.classList.remove("drag-foto");
-    });
+    modalDrop.addEventListener("dragover", (e) => { if (fotoEditando) return; if (!e.dataTransfer?.types?.includes("Files")) return; e.preventDefault(); e.dataTransfer.dropEffect = "copy"; modalDrop.classList.add("drag-foto"); });
+    modalDrop.addEventListener("dragleave", (e) => { if (e.relatedTarget && modalDrop.contains(e.relatedTarget)) return; modalDrop.classList.remove("drag-foto"); });
     modalDrop.addEventListener("drop", (e) => {
       if (fotoEditando) return;
       const f = e.dataTransfer?.files?.[0];
       if (!f || !f.type.startsWith("image/")) return;
-      e.preventDefault();
-      modalDrop.classList.remove("drag-foto");
-      try {
-        const dt = new DataTransfer();
-        dt.items.add(f);
-        inputPhoto.files = dt.files;
-      } catch { }
-      mostrarVistaPreviaFoto(f);
-      actualizarVistaPreviaFotoInfo();
-      notifPegado();
+      e.preventDefault(); modalDrop.classList.remove("drag-foto");
+      try { const dt = new DataTransfer(); dt.items.add(f); inputPhoto.files = dt.files; } catch {}
+      mostrarVistaPreviaFoto(f); actualizarVistaPreviaFotoInfo(); notifPegado();
     });
   }
 
-  console.log("✅ album.js cargado");
+  console.log("✅ album.js cargado (optimizado)");
 });

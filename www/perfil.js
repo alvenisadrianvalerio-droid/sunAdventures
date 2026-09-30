@@ -63,7 +63,9 @@
     let fotos = 0, notas = 0, canciones = 0, logros = 0, xp = 0, monedas = 0;
     try { fotos = Number(document.querySelectorAll("#album-grid .polaroid").length); } catch {}
     try { notas = Number(document.querySelectorAll("#notas-grid .nota").length); } catch {}
-    try { canciones = Number(document.querySelectorAll(".playlist-card-preview").length); } catch {}
+   try {
+  canciones = (window._playlists || []).reduce((t, p) => t + (p.canciones?.length || 0), 0);
+} catch {}
     try { logros = Number(window._logrosDesbloqueados ? Object.keys(window._logrosDesbloqueados).length : 0); } catch {}
     try { xp = Number(window._experienciaActual || 0); } catch {}
     try { monedas = window._TiendaAPI?.getMonedas?.() || 0; } catch {}

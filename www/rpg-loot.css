@@ -22,57 +22,53 @@
 }
 
 /* Contenedor de las notificaciones */
+/* --- Contenedor de notificaciones --- */
 .loot-popup {
-  position: fixed;
-  top: 6rem;
-  right: 1.5rem;
-  z-index: 9700;
-  display: flex;
-  flex-direction: column; /* Las apila verticalmente */
-  gap: 1rem;              /* 👈 Aumenta este valor para separarlas más */
+  position: fixed !important;
+  top: 12rem !important;
+  right: 1.5rem !important;
+  z-index: 9700 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  gap: 14px !important;               /* separación entre tarjetas */
   pointer-events: none;
-  max-height: 80vh;       /* Evita que se salgan de la pantalla */
-  overflow-y: auto;       /* Permite scroll si hay demasiadas */
+  max-height: 80vh;
+  overflow: hidden;
 }
 
-/* Cada notificación individual */
+/* --- Cada tarjeta --- */
 .loot-card {
-  position: relative;     /* 👈 Añade esto para evitar superposiciones */
-  display: flex;
+  position: relative !important;
+  display: flex !important;
   align-items: center;
   gap: .7rem;
   padding: .7rem .9rem;
   min-width: 240px;
   max-width: 300px;
+  flex: 0 0 auto !important;          /* no se encoge ni se estira */
+  margin: 0 !important;
   border-radius: 14px;
   background: rgba(11,12,18,.95);
   border: 2px solid var(--loot-color, #ffd93d);
-  box-shadow: 0 10px 30px rgba(0,0,0,.6), 0 0 0 1px rgba(255,217,61,.15) inset, 0 0 20px var(--loot-glow, rgba(255,217,61,.4));
+  box-shadow: 0 10px 30px rgba(0,0,0,.6),
+              0 0 0 1px rgba(255,217,61,.15) inset,
+              0 0 20px var(--loot-glow, rgba(255,217,61,.4));
   color: var(--text);
-  animation: lootIn .4s cubic-bezier(.34,1.56,.64,1), lootOut .3s ease 3.2s forwards;
+  animation: lootIn .35s cubic-bezier(.34,1.56,.64,1),
+             lootOut .4s ease 3s forwards;
   backdrop-filter: blur(6px);
+  will-change: transform, opacity;
 }
-.loot-card {
-  display: flex;
-  align-items: center;
-  gap: .7rem;
-  padding: .7rem .9rem;
-  min-width: 240px;
-  max-width: 300px;
-  border-radius: 14px;
-  background: rgba(11,12,18,.95);
-  border: 2px solid var(--loot-color, #ffd93d);
-  box-shadow: 0 10px 30px rgba(0,0,0,.6), 0 0 0 1px rgba(255,217,61,.15) inset, 0 0 20px var(--loot-glow, rgba(255,217,61,.4));
-  color: var(--text);
-  animation: lootIn .4s cubic-bezier(.34,1.56,.64,1), lootOut .3s ease 3.2s forwards;
-  backdrop-filter: blur(6px);
-}
+
+/* --- Animaciones SIN scale (el scale causaba el solapamiento visual) --- */
 @keyframes lootIn {
-  from { opacity: 0; transform: translateX(80px) scale(.85); }
-  to   { opacity: 1; transform: translateX(0) scale(1); }
+  from { opacity: 0; transform: translateX(60px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 @keyframes lootOut {
-  to { opacity: 0; transform: translateX(80px) scale(.85); }
+  from { opacity: 1; transform: translateX(0);     max-height: 120px; }
+  to   { opacity: 0; transform: translateX(60px);  max-height: 0;     }
 }
 .loot-card-sprite {
   width: 44px;
@@ -496,3 +492,83 @@
 .loot-cofre-item-name { font-size: .65rem; font-weight: 900; text-align: center; }
 .loot-cofre-item-rar  { font-size: .58rem; color: var(--loot-color, #ffd93d); font-weight: 700; }
 .loot-cofre-item-val  { font-size: .62rem; opacity: .8; }
+/* ============================================================
+   PESTAÑAS DEL RPG
+   ============================================================ */
+.rpg-tabs {
+  display: flex;
+  gap: .4rem;
+  margin-bottom: 1.4rem;
+  padding: .35rem;
+  background: var(--tema-card-bg, rgba(255,255,255,.04));
+  border: 1px solid var(--tema-card-border, rgba(255,255,255,.08));
+  border-radius: 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.rpg-tabs::-webkit-scrollbar { display: none; }
+
+.rpg-tab {
+  flex: 1;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: .7rem .9rem;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: .88rem;
+  font-weight: 800;
+  cursor: pointer;
+  opacity: .6;
+  white-space: nowrap;
+  transition: background .2s, opacity .2s, transform .2s;
+}
+.rpg-tab:hover:not(.active) {
+  opacity: .9;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.rpg-tab.active {
+  opacity: 1;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent) 25%, transparent),
+    color-mix(in srgb, var(--accent) 12%, transparent));
+  color: var(--accent);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.rpg-tab-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+  color: inherit;
+}
+.rpg-tab-icon svg { width: 100%; height: 100%; }
+.rpg-tab-text { line-height: 1; }
+
+.rpg-panel { display: none; }
+.rpg-panel.active {
+  display: block;
+  animation: rpgPanelFade .25s ease;
+}
+@keyframes rpgPanelFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Cuando estás en batalla, ocultamos las pestañas (no aplican) */
+.rpg-en-batalla .rpg-tabs { display: none !important; }
+
+/* Responsive */
+@media (max-width: 500px) {
+  .rpg-tab { padding: .6rem .5rem; font-size: .78rem; gap: .3rem; }
+  .rpg-tab-icon { width: 1rem; height: 1rem; }
+  .rpg-tab-text { font-size: .78rem; }
+}

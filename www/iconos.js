@@ -267,4 +267,19 @@
   window.addEventListener('hashchange', () => {
     setTimeout(() => reemplazarEmojis(document.body), 200);
   });
+    // Exponer globalmente
+  window.reemplazarEmojis = reemplazarEmojis;
+  window.crearIcono = crearIcono;
+
+  // ✅ Solo auto-ejecutar si Lucide realmente está cargado
+  // (ahorra cientos de milisegundos si no se usa)
+  const lucideListo = () => !!(window.lucide && typeof window.lucide.createIcons === "function");
+  if (lucideListo()) {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => setTimeout(() => reemplazarEmojis(document.body), 200));
+    } else {
+      setTimeout(() => reemplazarEmojis(document.body), 200);
+    }
+    window.addEventListener("hashchange", () => setTimeout(() => reemplazarEmojis(document.body), 400));
+  }
 })();

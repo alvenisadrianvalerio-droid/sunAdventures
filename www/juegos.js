@@ -21,21 +21,44 @@ document.addEventListener("DOMContentLoaded", () => {
   const getMonedas = () => window._getMonedas ? window._getMonedas() : 50;
   const setMonedas = (n) => window._setMonedas ? window._setMonedas(n) : n;
 
+  const _timersPorOverlay = new WeakMap();
+
+function registrarTimer(overlay, id) {
+  if (!_timersPorOverlay.has(overlay)) _timersPorOverlay.set(overlay, new Set());
+  _timersPorOverlay.get(overlay).add(id);
+}
+
+function limpiarTimers(overlay) {
+  const set = _timersPorOverlay.get(overlay);
+  if (!set) return;
+  set.forEach(id => {
+    if (typeof id === "number") clearInterval(id) || clearTimeout(id);
+  });
+  set.clear();
+}
+
   // ============ HELPERS ============
   function crearOverlay(id, html) {
-    document.getElementById(id)?.remove();
-    const o = document.createElement("div");
-    o.id = id; o.className = "minijuego-overlay";
-    o.innerHTML = `<div class="minijuego-panel"><button class="minijuego-cerrar" data-close-juego aria-label="Cerrar">×</button>${html}</div>`;
-    document.body.appendChild(o);
-    o.addEventListener("click", e => {
-      if (e.target === o || e.target.hasAttribute("data-close-juego")) {
-        o.classList.remove("active");
-        setTimeout(() => o.remove(), 250);
-      }
-    });
-    return o;
-  }
+  document.getElementById(id)?.remove();
+  const o = document.createElement("div");
+  o.id = id; o.className = "minijuego-overlay";
+  o.innerHTML = `<div class="minijuego-panel"><button class="minijuego-cerrar" data-close-juego aria-label="Cerrar">×</button>${html}</div>`;
+  document.body.appendChild(o);
+
+  const cerrar = () => {
+    limpiarTimers(o);       // ⬅️ mata intervals pendientes
+    o.classList.remove("active");
+    setTimeout(() => o.remove(), 250);
+  };
+
+  o.addEventListener("click", e => {
+    if (e.target === o || e.target.hasAttribute("data-close-juego")) cerrar();
+  });
+
+  // Expón un hook para que cada juego registre sus timers
+  o._cerrar = cerrar;
+  return o;
+}
 
   const HUD = (items) => `<div class="jm-hud">${items.map(i => `
     <div class="jm-hud-card${i.cls ? " " + i.cls : ""}">

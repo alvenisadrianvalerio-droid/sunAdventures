@@ -1,0 +1,553 @@
+/* ============================================================
+   TEMAS DE FONDO — SunAdventures
+   Cargar SIEMPRE después de album.css / rpg-loot.css
+   ============================================================ */
+
+/* ---------- Variables comunes ---------- */
+body[class*="tema-fondo-"] {
+  --tema-card-bg: rgba(255,255,255,.06);
+  --tema-card-bg-hover: rgba(255,255,255,.09);
+  --tema-card-border: rgba(255,255,255,.12);
+  --tema-input-bg: rgba(0,0,0,.25);
+  --tema-input-border: rgba(255,255,255,.15);
+  --tema-panel-bg: #14151c;
+  --tema-panel-border: rgba(255,255,255,.1);
+  --tema-shadow: 0 14px 34px rgba(0,0,0,.5);
+  --tema-shadow-soft: 0 6px 20px rgba(0,0,0,.35);
+  --tema-overlay: rgba(0,0,0,.65);
+  --tema-soft-text: rgba(255,255,255,.7);
+}
+
+/* ============================================================
+   🌙 TEMA NOCHE ESTRELLADA
+   ============================================================ */
+body.tema-fondo-noche {
+  --bg-1:#0d1330; --bg-2:#06081a;
+  --text:#e6ecff; --accent:#9ec0ff; --accent-dark:#4a6fb8;
+  --tema-card-bg: rgba(20, 30, 65, .78);
+  --tema-card-bg-hover: rgba(30, 45, 90, .88);
+  --tema-card-border: rgba(158, 192, 255, .22);
+  --tema-input-bg: rgba(8, 12, 30, .82);
+  --tema-input-border: rgba(158, 192, 255, .28);
+  --tema-panel-bg: #0a0e24;
+  --tema-panel-border: rgba(158, 192, 255, .25);
+  --tema-shadow: 0 16px 44px rgba(0,0,0,.7);
+  --tema-shadow-soft: 0 6px 22px rgba(0,0,0,.5);
+  --tema-overlay: rgba(3, 5, 18, .82);
+  background: #06081a !important;
+  color: var(--text);
+}
+
+body.tema-fondo-noche::before {
+  content:""; position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(80,60,160,.22), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(60,100,180,.18), transparent 50%),
+    radial-gradient(circle at 50% 90%, rgba(100,80,180,.14), transparent 55%),
+    radial-gradient(ellipse at 50% 0%, rgba(158,192,255,.1), transparent 60%),
+    linear-gradient(180deg,#06081a 0%,#0b0e26 60%,#0d1330 100%);
+}
+
+/* Estrellas */
+body.tema-fondo-noche::after {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,.85), transparent 50%),
+    radial-gradient(1.5px 1.5px at 27% 42%, rgba(255,255,255,.7), transparent 50%),
+    radial-gradient(1px 1px at 45% 12%, rgba(200,220,255,.9), transparent 50%),
+    radial-gradient(2px 2px at 62% 28%, rgba(255,255,255,.6), transparent 50%),
+    radial-gradient(1px 1px at 78% 55%, rgba(255,255,255,.8), transparent 50%),
+    radial-gradient(1.5px 1.5px at 88% 78%, rgba(200,220,255,.75), transparent 50%),
+    radial-gradient(1px 1px at 35% 72%, rgba(255,255,255,.7), transparent 50%),
+    radial-gradient(1px 1px at 92% 32%, rgba(255,255,255,.65), transparent 50%),
+    radial-gradient(1.5px 1.5px at 8% 88%, rgba(255,255,255,.7), transparent 50%),
+    radial-gradient(1px 1px at 55% 88%, rgba(200,220,255,.6), transparent 50%);
+  background-size: 550px 550px;
+  animation: cieloEstrellado 8s ease-in-out infinite;
+  opacity: .85;
+}
+@keyframes cieloEstrellado { 0%,100%{opacity:.85} 50%{opacity:1} }
+
+/* ============================================================
+   🌈 TEMA ARCOÍRIS PASTEL
+   ============================================================ */
+body.tema-fondo-arcoiris {
+  --bg-1:#fff6fb; --bg-2:#fff8fc;
+  --text:#4a2c5a; --accent:#ff6ba8; --accent-dark:#c41e6a;
+  --tema-card-bg: rgba(255, 255, 255, .78);
+  --tema-card-bg-hover: rgba(255, 255, 255, .94);
+  --tema-card-border: rgba(255, 107, 168, .25);
+  --tema-input-bg: rgba(255, 255, 255, .92);
+  --tema-input-border: rgba(255, 107, 168, .28);
+  --tema-panel-bg: #fffdfe;
+  --tema-panel-border: rgba(255, 107, 168, .28);
+  --tema-shadow: 0 16px 44px rgba(220, 130, 190, .22);
+  --tema-shadow-soft: 0 6px 20px rgba(220, 130, 190, .18);
+  --tema-overlay: rgba(80, 40, 90, .55);
+  --tema-soft-text: rgba(74, 44, 90, .7);
+  background: #fff6fb !important;
+  color: var(--text);
+}
+body.tema-fondo-arcoiris::before {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background: linear-gradient(135deg,
+    #ffe3ef 0%, #ffeed6 16%, #fffbe0 32%,
+    #e0f5e6 48%, #d8ebff 64%, #e6dcff 80%, #ffe0f4 100%);
+  opacity: .9;
+}
+body.tema-fondo-arcoiris::after {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255,200,230,.4), transparent 45%),
+    radial-gradient(circle at 80% 25%, rgba(200,220,255,.4), transparent 45%),
+    radial-gradient(circle at 60% 85%, rgba(230,200,255,.35), transparent 50%);
+  animation: auroraPastel 14s ease-in-out infinite;
+}
+@keyframes auroraPastel {
+  0%,100%{opacity:.9; transform:translate(0,0) scale(1)}
+  50%    {opacity:1;  transform:translate(2%,-1%) scale(1.05)}
+}
+
+/* ============================================================
+   🔥 TEMA FUEGO VOLCÁNICO
+   ============================================================ */
+body.tema-fondo-fuego {
+  --bg-1:#1a0a03; --bg-2:#0a0300;
+  --text:#ffe5c2; --accent:#ff9a2e; --accent-dark:#b54500;
+  --tema-card-bg: rgba(60, 20, 8, .75);
+  --tema-card-bg-hover: rgba(80, 30, 12, .85);
+  --tema-card-border: rgba(255, 154, 46, .3);
+  --tema-input-bg: rgba(30, 10, 3, .88);
+  --tema-input-border: rgba(255, 154, 46, .32);
+  --tema-panel-bg: #150600;
+  --tema-panel-border: rgba(255, 154, 46, .32);
+  --tema-shadow: 0 16px 44px rgba(0,0,0,.7);
+  --tema-shadow-soft: 0 6px 22px rgba(120, 40, 0, .45);
+  --tema-overlay: rgba(10, 3, 0, .82);
+  background: #0a0300 !important;
+  color: var(--text);
+}
+body.tema-fondo-fuego::before {
+  content:""; position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 110%, rgba(255,90,0,.55), transparent 55%),
+    radial-gradient(circle at 20% 90%, rgba(255,140,30,.35), transparent 45%),
+    radial-gradient(circle at 80% 100%, rgba(200,50,0,.4), transparent 50%),
+    linear-gradient(180deg,#0a0300 0%,#1a0800 70%,#2a0d00 100%);
+}
+body.tema-fondo-fuego::after {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-image:
+    radial-gradient(3px 3px at 15% 85%, rgba(255,140,30,.9), transparent 60%),
+    radial-gradient(2px 2px at 32% 92%, rgba(255,90,0,.8), transparent 60%),
+    radial-gradient(3px 3px at 58% 88%, rgba(255,180,60,.85), transparent 60%),
+    radial-gradient(2px 2px at 78% 94%, rgba(255,120,20,.9), transparent 60%),
+    radial-gradient(3px 3px at 92% 86%, rgba(255,160,40,.8), transparent 60%),
+    radial-gradient(2px 2px at 45% 78%, rgba(255,100,10,.7), transparent 60%);
+  background-size: 400px 400px;
+  animation: brasasSuben 9s linear infinite;
+  opacity: .8;
+}
+@keyframes brasasSuben {
+  0%   { transform: translateY(0);    opacity: .8; }
+  100% { transform: translateY(-70px); opacity: 0; }
+}
+
+/* ============================================================
+   OVERRIDES — que nada se camufle con el fondo
+   ============================================================ */
+
+/* ---------- NAV ---------- */
+body[class*="tema-fondo-"] .nav-container {
+  background: color-mix(in srgb, var(--tema-panel-bg) 88%, transparent) !important;
+  border-bottom-color: var(--tema-card-border) !important;
+}
+body[class*="tema-fondo-"] .nav-link:hover { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+body[class*="tema-fondo-"] .nav-link.active { background: color-mix(in srgb, var(--accent) 25%, transparent); }
+
+/* ---------- USER ---------- */
+body[class*="tema-fondo-"] .user-pill {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .user-dropdown {
+  background: var(--tema-panel-bg);
+  border-color: var(--tema-panel-border);
+  box-shadow: var(--tema-shadow);
+}
+body[class*="tema-fondo-"] .user-dropdown-divider { background: var(--tema-panel-border); }
+body[class*="tema-fondo-"] .user-dropdown-item:hover { background: color-mix(in srgb, var(--accent) 15%, transparent); }
+
+/* ---------- LOBBY ---------- */
+body[class*="tema-fondo-"] .experiencia-card {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+}
+body[class*="tema-fondo-"] .experiencia-barra { background: var(--tema-input-bg); }
+body[class*="tema-fondo-"] .lobby-btn {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .lobby-btn:hover {
+  background: var(--tema-card-bg-hover);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: var(--tema-shadow-soft);
+}
+body[class*="tema-fondo-"] .lobby-btn-primary {
+  background: color-mix(in srgb, var(--accent) 15%, var(--tema-card-bg));
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+body[class*="tema-fondo-"] .lobby-btn-icon { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+body[class*="tema-fondo-"] .lobby-btn-text small { color: var(--tema-soft-text); }
+
+/* ---------- MODALES ---------- */
+body[class*="tema-fondo-"] .modal-backdrop { background: var(--tema-overlay); }
+body[class*="tema-fondo-"] .modal-content,
+body[class*="tema-fondo-"] .auth-card,
+body[class*="tema-fondo-"] .recuperar-content,
+body[class*="tema-fondo-"] .amistad-panel,
+body[class*="tema-fondo-"] .tienda-panel,
+body[class*="tema-fondo-"] .mascota-modal-content,
+body[class*="tema-fondo-"] .minijuego-panel {
+  background: var(--tema-panel-bg) !important;
+  border-color: var(--tema-panel-border) !important;
+  color: var(--text) !important;
+  box-shadow: var(--tema-shadow) !important;
+}
+body.tema-fondo-arcoiris .auth-card { background: #ffffff !important; color: #4a2c5a !important; }
+
+/* ---------- FORMULARIOS ---------- */
+body[class*="tema-fondo-"] .form-field input,
+body[class*="tema-fondo-"] .form-field textarea,
+body[class*="tema-fondo-"] .form-select,
+body[class*="tema-fondo-"] .chat-form input,
+body[class*="tema-fondo-"] .cancion-form input,
+body[class*="tema-fondo-"] .cancion-pegar-textarea,
+body[class*="tema-fondo-"] .auth-field input {
+  background: var(--tema-input-bg) !important;
+  border-color: var(--tema-input-border) !important;
+  color: var(--text) !important;
+}
+body.tema-fondo-arcoiris .form-field input,
+body.tema-fondo-arcoiris .form-field textarea,
+body.tema-fondo-arcoiris .form-select,
+body.tema-fondo-arcoiris .chat-form input,
+body.tema-fondo-arcoiris .auth-field input {
+  background: rgba(255,255,255,.95) !important;
+  color: #4a2c5a !important;
+}
+
+/* ---------- BOTONES SECUNDARIOS ---------- */
+body[class*="tema-fondo-"] .btn-secondary {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .btn-secondary:hover { background: var(--tema-card-bg-hover); }
+
+/* ---------- TIENDA ---------- */
+body[class*="tema-fondo-"] .tienda-item {
+  background: var(--tema-card-bg) !important;
+  border-color: var(--tema-card-border) !important;
+}
+body[class*="tema-fondo-"] .tienda-item:hover {
+  background: var(--tema-card-bg-hover) !important;
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent) !important;
+  box-shadow: var(--tema-shadow-soft) !important;
+}
+body[class*="tema-fondo-"] .tienda-buscador input {
+  background: var(--tema-input-bg);
+  border-color: var(--tema-input-border);
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .tienda-categorias {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+}
+body[class*="tema-fondo-"] .tienda-categoria:hover:not(.active) {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+body[class*="tema-fondo-"] .tienda-filtro { border-color: var(--tema-card-border); }
+body[class*="tema-fondo-"] .tienda-filtro.active {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+body[class*="tema-fondo-"] .tienda-item-precio { background: color-mix(in srgb, var(--accent) 20%, transparent); }
+
+/* ---------- MODAL MASCOTA ---------- */
+body[class*="tema-fondo-"] .mm-tabs {
+  background: var(--tema-card-bg) !important;
+  border-color: var(--tema-card-border) !important;
+}
+body[class*="tema-fondo-"] .mm-tab { color: var(--text) !important; }
+body[class*="tema-fondo-"] .mm-tab.active {
+  background: color-mix(in srgb, var(--accent) 22%, transparent) !important;
+  color: var(--accent) !important;
+}
+body[class*="tema-fondo-"] .mm-header { border-bottom-color: var(--tema-card-border); }
+body[class*="tema-fondo-"] .mm-monedero {
+  background: color-mix(in srgb, var(--accent) 18%, var(--tema-card-bg));
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+body[class*="tema-fondo-"] .mm-stat-barra { background: var(--tema-input-bg); }
+body[class*="tema-fondo-"] .comida-item {
+  background: color-mix(in srgb, var(--accent) 12%, var(--tema-card-bg));
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+body[class*="tema-fondo-"] .mm-accion,
+body[class*="tema-fondo-"] .mm-accion-sec {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .mm-cambiar-item {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+}
+body[class*="tema-fondo-"] .cuidado-diario {
+  background: color-mix(in srgb, #4dd48e 15%, var(--tema-card-bg));
+  border-color: rgba(77, 212, 142, .35);
+}
+body[class*="tema-fondo-"] .cuidado-tarea { background: var(--tema-card-bg); }
+
+/* ---------- MASCOTAS GRID ---------- */
+body[class*="tema-fondo-"] .mascota-card {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+}
+body[class*="tema-fondo-"] .mascota-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: var(--tema-shadow-soft);
+}
+
+/* ---------- LOGROS ---------- */
+body[class*="tema-fondo-"] .logro-card {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .logro-card.desbloqueado {
+  background: color-mix(in srgb, var(--accent) 15%, var(--tema-card-bg));
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+/* ---------- CHAT ---------- */
+body[class*="tema-fondo-"] .chat-panel {
+  background: var(--tema-panel-bg);
+  border-color: var(--tema-panel-border);
+}
+body[class*="tema-fondo-"] .chat-tabs {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+}
+body[class*="tema-fondo-"] .chat-tab { color: var(--text); }
+body[class*="tema-fondo-"] .chat-tab.active {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--accent);
+}
+body[class*="tema-fondo-"] .chat-message {
+  background: color-mix(in srgb, var(--accent) 18%, var(--tema-card-bg));
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .chat-message.propio {
+  background: var(--tema-card-bg-hover);
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .chat-message-nombre { color: var(--accent); }
+body[class*="tema-fondo-"] .chat-message.propio .chat-message-nombre { color: var(--text); }
+
+/* ---------- CALENDARIO ---------- */
+body[class*="tema-fondo-"] .calendario-wrapper {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+}
+body[class*="tema-fondo-"] .cal-dia {
+  background: var(--tema-card-bg);
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .cal-dia:hover {
+  background: color-mix(in srgb, var(--accent) 18%, var(--tema-card-bg));
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+body[class*="tema-fondo-"] .cal-dia.hoy {
+  background: color-mix(in srgb, var(--accent) 28%, var(--tema-card-bg));
+  border-color: var(--accent);
+}
+body[class*="tema-fondo-"] .cal-proximo-item { background: var(--tema-card-bg); }
+body[class*="tema-fondo-"] .cal-proximo-item:hover {
+  background: color-mix(in srgb, var(--accent) 15%, var(--tema-card-bg));
+}
+
+/* ---------- NOTAS / PLAYLISTS (colores propios, forzamos texto oscuro) ---------- */
+body[class*="tema-fondo-"] .nota-titulo,
+body[class*="tema-fondo-"] .nota-texto,
+body[class*="tema-fondo-"] .nota-fecha,
+body[class*="tema-fondo-"] .playlist-card-nombre,
+body[class*="tema-fondo-"] .playlist-card-desc,
+body[class*="tema-fondo-"] .playlist-card-count,
+body[class*="tema-fondo-"] .playlist-card-emoji { color: #3d3226; }
+body[class*="tema-fondo-"] .nota-check { border-color: rgba(61,50,38,.7); }
+
+/* ---------- CANCIONES ---------- */
+body[class*="tema-fondo-"] .cancion-item {
+  background: var(--tema-card-bg);
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .cancion-item.reproduciendo {
+  background: color-mix(in srgb, var(--accent) 22%, var(--tema-card-bg));
+}
+body[class*="tema-fondo-"] .cancion-item-titulo { color: var(--text); }
+body[class*="tema-fondo-"] .cancion-tabs {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+}
+body[class*="tema-fondo-"] .cancion-tab { color: var(--text); }
+body[class*="tema-fondo-"] .cancion-tab.active {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  color: var(--accent);
+}
+body[class*="tema-fondo-"] .cancion-pegar-ejemplos {
+  background: color-mix(in srgb, var(--accent) 12%, var(--tema-card-bg));
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .cancion-pegar-preview {
+  background: color-mix(in srgb, var(--accent) 10%, var(--tema-card-bg));
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .cancion-subir-dropzone {
+  background: color-mix(in srgb, var(--accent) 8%, var(--tema-card-bg));
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+body[class*="tema-fondo-"] .cancion-subir-item {
+  background: var(--tema-card-bg);
+  color: var(--text);
+}
+
+/* ---------- PLAYER ---------- */
+body[class*="tema-fondo-"] #player-bar.player-bar {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--tema-panel-bg) 96%, transparent),
+    var(--tema-panel-bg)) !important;
+  border-top-color: var(--tema-card-border);
+}
+body[class*="tema-fondo-"] .player-title {
+  background: linear-gradient(135deg, var(--text), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+body[class*="tema-fondo-"] .player-seek { background: color-mix(in srgb, var(--accent) 18%, transparent); }
+body[class*="tema-fondo-"] .player-volume-slider { background: color-mix(in srgb, var(--text) 18%, transparent); }
+body[class*="tema-fondo-"] .player-close {
+  background: var(--tema-panel-bg);
+  border-color: var(--tema-card-border);
+}
+
+/* ---------- RPG ---------- */
+body[class*="tema-fondo-"] .rpg-hud {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent) 15%, var(--tema-card-bg)),
+    color-mix(in srgb, var(--accent) 5%, var(--tema-card-bg)));
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+body[class*="tema-fondo-"] .rpg-zone {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .rpg-zone:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: var(--tema-shadow-soft);
+}
+body[class*="tema-fondo-"] .rpg-batalla { background: linear-gradient(180deg, var(--tema-card-bg), transparent); }
+body[class*="tema-fondo-"] .rpg-log { background: var(--tema-input-bg); color: var(--text); }
+body[class*="tema-fondo-"] .rpg-btn {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .rpg-btn:hover:not(:disabled) { background: var(--tema-card-bg-hover); }
+body[class*="tema-fondo-"] .rpg-objetos { background: var(--tema-input-bg); border-color: var(--tema-card-border); }
+body[class*="tema-fondo-"] .rpg-objeto {
+  background: var(--tema-card-bg);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+body[class*="tema-fondo-"] .rpg-coleccion {
+  background: var(--tema-card-bg);
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+body[class*="tema-fondo-"] .rpg-coleccion-item { background: var(--tema-input-bg); }
+body[class*="tema-fondo-"] .rpg-cofre-card { background: var(--tema-card-bg); }
+body[class*="tema-fondo-"] .rpg-idle {
+  background: radial-gradient(circle at 50% 30%,
+    color-mix(in srgb, var(--accent) 6%, transparent), transparent 70%);
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+body[class*="tema-fondo-"] .rpg-col-filtro {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+  color: var(--text);
+}
+
+/* ---------- RPG LOOT ---------- */
+body[class*="tema-fondo-"] .loot-card { background: var(--tema-panel-bg); }
+body[class*="tema-fondo-"] .rpg-loot-modal-panel,
+body[class*="tema-fondo-"] .loot-cofre-panel { background: var(--tema-panel-bg); }
+body[class*="tema-fondo-"] .rpg-loot-modal-close {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+  color: var(--text);
+}
+
+/* ---------- NOTIFICACIONES ---------- */
+body[class*="tema-fondo-"] .mascota-notif {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent) 20%, var(--tema-panel-bg)),
+    var(--tema-panel-bg)) !important;
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent) !important;
+  color: var(--text) !important;
+  box-shadow: var(--tema-shadow) !important;
+}
+body[class*="tema-fondo-"] .logro-toast {
+  background: var(--tema-panel-bg);
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  color: var(--text);
+}
+
+/* ---------- AMISTAD ---------- */
+body[class*="tema-fondo-"] .amistad-fila { background: var(--tema-card-bg); }
+body[class*="tema-fondo-"] .amistad-barra { background: var(--tema-input-bg); }
+
+/* ---------- MINIJUEGOS ---------- */
+body[class*="tema-fondo-"] .jm-hud-card,
+body[class*="tema-fondo-"] .jg-hud-card,
+body[class*="tema-fondo-"] .ja-hud-card {
+  background: color-mix(in srgb, var(--accent) 15%, var(--tema-card-bg));
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+body[class*="tema-fondo-"] .simon-estado { background: var(--tema-card-bg); color: var(--text); }
+body[class*="tema-fondo-"] .ja-burbuja {
+  background: color-mix(in srgb, var(--accent) 12%, var(--tema-card-bg));
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+body[class*="tema-fondo-"] .ja-burbuja::after {
+  background: color-mix(in srgb, var(--accent) 12%, var(--tema-card-bg));
+  border-right-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+body[class*="tema-fondo-"] .ja-opcion {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+  color: var(--text);
+}
+body[class*="tema-fondo-"] .ja-frase { color: var(--text); }
+
+/* ---------- FOOTER ---------- */
+body[class*="tema-fondo-"] .site-footer { color: var(--text); }
+body[class*="tema-fondo-"] .offline-panel {
+  background: var(--tema-panel-bg);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+body[class*="tema-fondo-"] .offline-barra { background: var(--tema-input-bg); }

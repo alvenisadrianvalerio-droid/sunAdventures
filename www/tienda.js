@@ -1,22 +1,20 @@
 /* ============================================================
    TIENDA.JS — Tienda de SunAdventures
-   · Se monta como pestaña embebida (Tienda.montar)
-   · Y como overlay clásico (Tienda.abrir)
-   · Auto-refresco al comprar, equipar o abrir el modal
-   · Soporta sprites pixel-art (item.sprite = [col, row])
+   · Pestaña embebida (Tienda.montar) + overlay (Tienda.abrir)
+   · Soporta sprite sheets con fallback automático a SVG
+   · Auto-refresco al comprar / equipar / abrir
    ============================================================ */
 (function boot() {
   const API = window._TiendaAPI;
   if (!API) {
     let n = 0;
-    const intentar = () => {
+    const it = () => {
       if (window._TiendaAPI) return boot();
-      if (++n > 50) return console.warn("tienda.js: _TiendaAPI nunca llegó");
-      setTimeout(intentar, 100);
+      if (++n > 50) return console.warn("tienda.js: _TiendaAPI no llegó");
+      setTimeout(it, 100);
     };
-    window.addEventListener("sunadventures:api-ready", () => boot(), { once: true });
-    setTimeout(intentar, 100);
-    return;
+    window.addEventListener("sunadventures:api-ready", boot, { once: true });
+    return setTimeout(it, 100);
   }
 
   const {
@@ -27,78 +25,54 @@
     notifMascota, aplicarSkins, getUserId
   } = API;
 
-  const $   = (id) => document.getElementById(String(id).replace(/^#/, ""));
+  const $   = id => document.getElementById(String(id).replace(/^#/, ""));
   const qs  = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [...r.querySelectorAll(s)];
 
+  /* ---------- Favoritos / historial ---------- */
   const FAV_KEY  = () => `tienda_favs_${getUserId()}`;
   const HIST_KEY = () => `tienda_hist_${getUserId()}`;
   const getFavs  = () => { try { return JSON.parse(localStorage.getItem(FAV_KEY()) || "[]"); } catch { return []; } };
-  const setFavs  = (a) => { try { localStorage.setItem(FAV_KEY(), JSON.stringify(a)); } catch {} };
+  const setFavs  = a => { try { localStorage.setItem(FAV_KEY(), JSON.stringify(a)); } catch {} };
   const getHist  = () => { try { return JSON.parse(localStorage.getItem(HIST_KEY()) || "[]"); } catch { return []; } };
-  const pushHist = (item) => {
+  const pushHist = item => {
     const h = getHist();
     h.unshift({ ...item, ts: Date.now() });
     if (h.length > 30) h.length = 30;
     try { localStorage.setItem(HIST_KEY(), JSON.stringify(h)); } catch {}
   };
-  const getMascotaActual = () => localStorage.getItem("mascota_actual") || "mapache";
+  const getMascota = () => localStorage.getItem("mascota_actual") || "mapache";
 
-  let categoriaActiva = "comida";
-  let filtroActivo    = "todos";
-  let busqueda        = "";
-  let container       = null;
-  let overlay         = null;
-
-  function labelCat(c) {
-    const map = { comida: "Comida", cabeza: "Cabeza", cuello: "Cuello", ojos: "Ojos", fondos: "Fondos", efectos: "Efectos" };
-    return map[c] || (c[0].toUpperCase() + c.slice(1));
-  }
-
-  /* ============================================================
-     SPRITE SHEETS DE LA TIENDA (Comida + Cosméticos)
-     ------------------------------------------------------------
-     comida: 5 cols x 5 rows ("img/tienda/comida-sheet.png")
-     tienda: 5 cols x 5 rows ("img/tienda/tienda-sheet.png")
-     ============================================================ */
-  const SPRITE_SHEETS = {
-    comida: {
-      url: "img/tienda/comida-sheet.png",
-      cols: 5,
-      rows: 5
+  /* ---------- Sprite sheets ---------- */
+  const SHEETS = {
+    main: {
+      url:  window.SPRITE_SHEET?.url  || "img/tienda/admurin-items.png",
+      cols: window.SPRITE_SHEET?.cols || 30,
+      rows: window.SPRITE_SHEET?.rows || 110
     },
-    tienda: {
-      url: "img/tienda/tienda-sheet.png",
-      cols: 5,
-      rows: 5
-    }
+    comida: { url: "img/tienda/comida-sheet.png", cols: 5, rows: 5 },
+    tienda: { url: "img/tienda/tienda-sheet.png", cols: 5, rows: 5 }
   };
 
   function construirPreview(item, esComida) {
-    const iconoSVG = ICONO[item.icono] || ICONO.estrella || "";
-
-    // Si tiene coordenadas de sprite → renderizar sprite pixel art
     if (Array.isArray(item.sprite) && item.sprite.length === 2) {
-      const sheetKey = item.sheet || (esComida ? "comida" : "tienda");
-      const sheet = SPRITE_SHEETS[sheetKey] || SPRITE_SHEETS.tienda;
+      const key = item.sheet || (esComida ? "comida" : "tienda");
+      const s = SHEETS[key] || SHEETS.tienda;
       const [col, row] = item.sprite;
-      const posX = sheet.cols > 1 ? (col / (sheet.cols - 1)) * 100 : 50;
-      const posY = sheet.rows > 1 ? (row / (sheet.rows - 1)) * 100 : 50;
-      return `<div class="tienda-item-preview"><div class="tienda-item-sprite ${sheetKey === "tienda" ? "tienda-item-sprite-skin" : ""}" style="background-image:url('${sheet.url}');background-size:${sheet.cols * 100}% ${sheet.rows * 100}%;background-position:${posX}% ${posY}%"></div></div>`;
+      const px = s.cols > 1 ? (col / (s.cols - 1)) * 100 : 50;
+      const py = s.rows > 1 ? (row / (s.rows - 1)) * 100 : 50;
+      return `<div class="tienda-item-preview"><div class="tienda-item-sprite" style="background-image:url('${s.url}');background-size:${s.cols * 100}% ${s.rows * 100}%;background-position:${px}% ${py}%"></div></div>`;
     }
-
-    // Fallback: SVG dorado de siempre
-    return `<div class="tienda-item-preview">${iconoSVG}</div>`;
+    return `<div class="tienda-item-preview">${ICONO[item.icono] || ICONO.estrella || ""}</div>`;
   }
 
-  /* ---------- HTML interno (sin overlay) ---------- */
+  /* ---------- HTML interno ---------- */
   function htmlTienda() {
     return `
       <div class="tienda-header">
         <h2 class="tienda-titulo">Tienda</h2>
         <span class="tienda-monedero">${ICONO.moneda || ""} <span class="tienda-monedas">0</span></span>
       </div>
-
       <div class="tienda-buscador">
         <input type="text" class="tienda-buscar" placeholder="Buscar objeto..." autocomplete="off">
         <div class="tienda-filtros">
@@ -108,20 +82,28 @@
           <button type="button" class="tienda-filtro" data-filtro="favoritos">★ Favoritos</button>
         </div>
       </div>
-
       <div class="tienda-categorias" role="tablist">
         ${Object.keys(TIENDA_ITEMS).map((c, i) => `
-          <button type="button" class="tienda-categoria ${i === 0 ? "active" : ""}" data-cat="${c}">
-            ${labelCat(c)}
-          </button>
+          <button type="button" class="tienda-categoria ${i === 0 ? "active" : ""}" data-cat="${c}">${labelCat(c)}</button>
         `).join("")}
       </div>
-
       <div class="tienda-grid"></div>
       <div class="tienda-hist"></div>
     `;
   }
 
+  const labelCat = c => ({
+    comida:"Comida", cabeza:"Cabeza", cuello:"Cuello",
+    ojos:"Ojos", fondos:"Fondos", efectos:"Efectos"
+  })[c] || (c[0].toUpperCase() + c.slice(1));
+
+  let categoriaActiva = "comida";
+  let filtroActivo    = "todos";
+  let busqueda        = "";
+  let container       = null;
+  let overlay         = null;
+
+  /* ---------- Bind ---------- */
   function bind() {
     if (!container) return;
     qsa(".tienda-categoria", container).forEach(b => b.addEventListener("click", () => {
@@ -165,8 +147,8 @@
       overlay.className = "tienda-overlay";
       overlay.setAttribute("aria-hidden", "true");
       document.body.appendChild(overlay);
-      overlay.addEventListener("click", (e) => { if (e.target === overlay) cerrar(); });
-      document.addEventListener("keydown", (e) => {
+      overlay.addEventListener("click", e => { if (e.target === overlay) cerrar(); });
+      document.addEventListener("keydown", e => {
         if (e.key === "Escape" && overlay?.classList.contains("active")) cerrar();
       });
     }
@@ -183,17 +165,26 @@
     document.body.style.overflow = "";
   }
 
+  /* ---------- Precio con descuento ---------- */
+  function precioConDescuento(item, esComida) {
+    if (esComida) return item.precio;
+    try {
+      const b = window._getBonusActivos?.() || [];
+      if (b.some(x => x.tipo === "descuento_tienda")) return Math.round(item.precio * 0.85);
+    } catch {}
+    return item.precio;
+  }
+
   /* ---------- Render ---------- */
   function render() {
     if (!container || !document.body.contains(container)) return;
     const g = qs(".tienda-grid", container);
     if (!g) return;
-    g.innerHTML = "";
 
     const items    = TIENDA_ITEMS[categoriaActiva] || {};
     const esComida = categoriaActiva === "comida";
     const co   = getSkinsC();
-    const eq   = getSkinsE(getMascotaActual());
+    const eq   = getSkinsE(getMascota());
     const favs = getFavs();
     const hist = getHist();
     const histIds = new Set(hist.slice(0, 20).map(h => h.id));
@@ -204,15 +195,21 @@
     if (filtroActivo === "nuevos")    lista = lista.filter(([id]) => !histIds.has(id));
     if (filtroActivo === "favoritos") lista = lista.filter(([id]) => favs.includes(id));
 
+    const frag = document.createDocumentFragment();
     if (!lista.length) {
-      g.innerHTML = `<div class="tienda-vacio">Sin resultados.</div>`;
+      const v = document.createElement("div");
+      v.className = "tienda-vacio";
+      v.textContent = "Sin resultados.";
+      frag.appendChild(v);
     } else {
-      lista.forEach(([id, item]) => g.appendChild(crearItem(id, item, esComida, co, eq, favs)));
+      lista.forEach(([id, item]) => frag.appendChild(crearItem(id, item, esComida, co, eq, favs)));
     }
+    g.innerHTML = "";
+    g.appendChild(frag);
 
     actualizarMonedero();
     renderHist();
-    if (typeof window.hidratarIconos === "function") window.hidratarIconos(g);
+    window.hidratarIconos?.(g);
   }
 
   function crearItem(id, item, esComida, co, eq, favs) {
@@ -220,47 +217,35 @@
     it.className = "tienda-item";
     const comprado = !esComida && co.includes(id);
     const equipado = !esComida && eq[categoriaActiva] === id;
-    const puede    = getMonedas() >= item.precio;
     const esFav    = favs.includes(id);
+    const precio   = precioConDescuento(item, esComida);
+    const puede    = getMonedas() >= precio;
+
     if (comprado) it.classList.add("comprado");
     if (equipado) it.classList.add("equipado");
-
-    const previewHTML = construirPreview(item, esComida);
 
     const desc = esComida
       ? `<span class="tienda-item-desc">+${item.efecto.hambre} <span data-icono="comida"></span> +${item.efecto.felicidad} <span data-icono="corazon"></span></span>`
       : `<span class="tienda-item-desc">${item.desc || "Adorno"}</span>`;
 
-    // Calcula precio con descuento si hay corbata equipada
-    let precioFinal = item.precio;
-    if (!esComida) {
-      try {
-        const bonusActivos = typeof window._getBonusActivos === "function" ? window._getBonusActivos() : [];
-        const tieneDescuento = bonusActivos.some(function(b) { return b.tipo === "descuento_tienda"; });
-        if (tieneDescuento) precioFinal = Math.round(item.precio * 0.85);
-      } catch(e) {}
-    }
-    const puedeComprar = getMonedas() >= precioFinal;
-    const precioHtml = precioFinal < item.precio
-      ? `<span class="tienda-item-precio ${puedeComprar ? "" : "no-alcanza"}">
-           ${ICONO.moneda || ""} <s style="opacity:.5;font-size:.8em">${item.precio}</s> ${precioFinal}
-         </span>`
+    const precioHtml = precio < item.precio
+      ? `<span class="tienda-item-precio ${puede ? "" : "no-alcanza"}">${ICONO.moneda || ""} <s style="opacity:.5;font-size:.8em">${item.precio}</s> ${precio}</span>`
       : `<span class="tienda-item-precio ${puede ? "" : "no-alcanza"}">${ICONO.moneda || ""} ${item.precio}</span>`;
 
-    const bonusBadge = (!esComida && item.bonus && item.bonus.desc)
-      ? `<span class="tienda-item-efecto">\u26a1 ${item.bonus.desc}</span>`
+    const bonusBadge = (!esComida && item.bonus?.desc)
+      ? `<span class="tienda-item-efecto">⚡ ${item.bonus.desc}</span>`
       : "";
 
     it.innerHTML = `
       <button type="button" class="tienda-fav ${esFav ? "activo" : ""}" title="Favorito">★</button>
-      ${previewHTML}
+      ${construirPreview(item, esComida)}
       <span class="tienda-item-nombre">${item.nombre}</span>
       ${desc}
       ${bonusBadge}
       ${precioHtml}
     `;
 
-    qs(".tienda-fav", it).addEventListener("click", (e) => {
+    qs(".tienda-fav", it).addEventListener("click", e => {
       e.stopPropagation();
       const f = getFavs();
       const idx = f.indexOf(id);
@@ -290,11 +275,11 @@
   }
 
   function renderHist() {
-    const cont = qs(".tienda-hist", container);
-    if (!cont) return;
+    const c = qs(".tienda-hist", container);
+    if (!c) return;
     const h = getHist().slice(0, 3);
-    if (!h.length) { cont.innerHTML = ""; return; }
-    cont.innerHTML = `<span class="tienda-hist-titulo">Recientes:</span>` +
+    if (!h.length) { c.innerHTML = ""; return; }
+    c.innerHTML = `<span class="tienda-hist-titulo">Recientes:</span>` +
       h.map(x => `<span class="tienda-hist-item">${x.nombre}</span>`).join("");
   }
 
@@ -313,7 +298,7 @@
     const inv = cargarInv();
     inv[id] = (inv[id] || 0) + 1;
     guardarInv(inv);
-    if (typeof window._snd === "function") window._snd("moneda");
+    window._snd?.("moneda");
     notifMascota?.("¡Comprado!", `${item.nombre} (+1)`);
     pushHist({ id, nombre: item.nombre, cat: "comida" });
     window.dispatchEvent(new Event("sunadventures:tienda-compra"));
@@ -322,12 +307,13 @@
   }
 
   function comprarSkin(id, item) {
-    if (getMonedas() < item.precio) return;
-    setMonedas(getMonedas() - item.precio);
+    const precio = precioConDescuento(item, false);
+    if (getMonedas() < precio) return;
+    setMonedas(getMonedas() - precio);
     const c = getSkinsC();
     if (!c.includes(id)) c.push(id);
     setSkinsC(c);
-    if (typeof window._snd === "function") window._snd("compra");
+    window._snd?.("compra");
     notifMascota?.("¡Comprado!", item.nombre);
     pushHist({ id, nombre: item.nombre, cat: categoriaActiva });
     window.dispatchEvent(new Event("sunadventures:tienda-compra"));
@@ -335,14 +321,18 @@
   }
 
   function equipar(id, zona) {
-    const e = getSkinsE(getMascotaActual());
+    const e = getSkinsE(getMascota());
     if (e[zona] === id) delete e[zona];
     else e[zona] = id;
-    setSkinsE(getMascotaActual(), e);
+    setSkinsE(getMascota(), e);
     aplicarSkins?.();
-    if (typeof window._snd === "function") window._snd("blip");
+    window._snd?.("blip");
     render();
   }
+
+  /* ---------- Listeners globales ---------- */
+  window.addEventListener("sunadventures:tienda-compra", () => { if (container) render(); });
+  window.addEventListener("sunadventures:mascota-cambiada", () => { if (container) render(); });
 
   /* ---------- API pública ---------- */
   window.Tienda = { abrir, cerrar, render, montar };
