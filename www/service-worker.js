@@ -1,4 +1,4 @@
-const CACHE_NAME = "sunadventures-v28"; // ⬅️ sube versión para forzar update
+const CACHE_NAME = "sunadventures-v29"; // ⬅️ sube versión para forzar update
 const ASSETS_ESTATICOS = [
   "./","./index.html","./styles.css","./album.css","./juegos.css",
   "./rpg.css","./rpg-loot.css","./temas.css",
@@ -70,5 +70,8 @@ self.addEventListener("fetch", (event) => {
     } catch {
       return cached || Response.error();
     }
+    self.addEventListener("message", (e) => {
+  if (e.data === "SKIP_WAITING") self.skipWaiting();
+});
   })());
 });

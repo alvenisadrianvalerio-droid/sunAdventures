@@ -1316,11 +1316,24 @@ window._setMascotaImg = setMascotaImg;
   }
 
   /* ---------- PWA ---------- */
-  try {
-    if ("serviceWorker" in navigator)
-      window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(e => console.warn("SW:", e)));
-  } catch {}
-
+  /* ---------- PWA (con auto-update) ---------- */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", async () => {
+    try {
+      const reg = await navigator.serviceWorker.register("./service-worker.js");
+      setInterval(() => reg.update(), 60000);
+      reg.addEventListener("updatefound", () => {
+        const nuevo = reg.installing;
+        nuevo?.addEventListener("statechange", () => {
+          if (nuevo.state === "installed" && navigator.serviceWorker.controller) {
+            nuevo.postMessage("SKIP_WAITING");
+            setTimeout(() => location.reload(), 300);
+          }
+        });
+      });
+    } catch (e) { console.warn("SW:", e); }
+  });
+}
   /* ---------- Recuperar contraseña ---------- */
   (function initRecuperar() {
     const modal = $("recuperar-modal"); if (!modal) return;
