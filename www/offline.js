@@ -83,10 +83,14 @@
     const sbv = sb();
     if (!sbv) return alert("No hay conexión.");
     const { data: { session } } = await sbv.auth.getSession();
-    if (!session) return alert("Inicia sesión primero.");
-    const grupoId = localStorage.getItem("grupo_activo");
-    if (!grupoId) return alert("No hay grupo activo.");
-
+   if (!session) {
+  await SunModal.alert({ title: 'Inicia sesión', message: 'Necesitas una cuenta para descargar.', icon: '🔐' });
+  return;
+}
+if (!grupoId) {
+  await SunModal.alert({ title: 'Sin grupo activo', message: 'Únete o crea un grupo primero.', icon: '👥' });
+  return;
+}
     /* Fotos */
     const { data: fotos } = await sbv.from("fotos").select("path,fecha,nota").eq("grupo_id", grupoId);
     /* Playlists + canciones */
@@ -176,7 +180,15 @@
   }
 
   async function borrarTodo() {
-    if (!confirm("¿Borrar todas las imágenes y canciones descargadas?")) return;
+    const ok = await SunModal.confirm({
+  title: '¿Borrar descargas?',
+  message: 'Se eliminarán todas las imágenes y canciones guardadas para uso sin conexión.',
+  variant: 'danger',
+  icon: '📦',
+  confirmText: 'Sí, borrar todo',
+  cancelText: 'Conservar'
+});
+if (!ok) return;
     await Promise.all([DB().limpiarImagenes(), DB().limpiarCanciones()]);
     alert("Todo borrado.");
     window.dispatchEvent(new Event("offline:updated"));

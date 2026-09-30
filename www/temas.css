@@ -551,3 +551,239 @@ body[class*="tema-fondo-"] .offline-panel {
   border-color: color-mix(in srgb, var(--accent) 40%, transparent);
 }
 body[class*="tema-fondo-"] .offline-barra { background: var(--tema-input-bg); }
+/* ============================================================
+   🌳 BOSQUE PROFUNDO
+   ============================================================ */
+body.tema-fondo-bosque {
+  --bg-1:#0c1f0f; --bg-2:#06120a; --text:#dcf5e0; --accent:#7dd67e; --accent-dark:#2e7a3a;
+  --tema-card-bg: rgba(15,50,25,.72);
+  --tema-card-bg-hover: rgba(25,70,35,.85);
+  --tema-card-border: rgba(125,214,126,.22);
+  --tema-input-bg: rgba(5,20,10,.8);
+  --tema-input-border: rgba(125,214,126,.28);
+  --tema-panel-bg: #0a1a0e;
+  --tema-panel-border: rgba(125,214,126,.25);
+  --tema-overlay: rgba(3,10,5,.85);
+  background:#06120a !important;
+}
+body.tema-fondo-bosque::before {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(circle at 20% 90%, rgba(60,180,80,.2), transparent 55%),
+    radial-gradient(circle at 80% 10%, rgba(40,120,50,.25), transparent 50%),
+    linear-gradient(180deg,#06120a 0%,#0c1f0f 60%,#0a1a0e 100%);
+}
+body.tema-fondo-bosque::after {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-image:
+    radial-gradient(2px 2px at 15% 30%, rgba(180,255,180,.4), transparent 50%),
+    radial-gradient(2px 2px at 55% 65%, rgba(180,255,180,.35), transparent 50%),
+    radial-gradient(2px 2px at 85% 40%, rgba(180,255,180,.3), transparent 50%);
+  background-size:350px 350px;
+  animation: luciernagasBosque 6s ease-in-out infinite;
+}
+@keyframes luciernagasBosque{0%,100%{opacity:.7}50%{opacity:1}}
+
+/* ============================================================
+   🌊 OCÉANO PROFUNDO
+   ============================================================ */
+body.tema-fondo-oceano {
+  --bg-1:#041f3a; --bg-2:#020d1c; --text:#d4ecff; --accent:#4dd0e1; --accent-dark:#0d5f75;
+  --tema-card-bg: rgba(10,45,75,.72);
+  --tema-card-bg-hover: rgba(15,65,105,.85);
+  --tema-card-border: rgba(77,208,225,.25);
+  --tema-input-bg: rgba(2,15,35,.8);
+  --tema-input-border: rgba(77,208,225,.28);
+  --tema-panel-bg: #021220;
+  --tema-panel-border: rgba(77,208,225,.28);
+  --tema-overlay: rgba(1,5,15,.85);
+  background:#020d1c !important;
+}
+body.tema-fondo-oceano::before {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(circle at 30% 15%, rgba(77,208,225,.18), transparent 50%),
+    radial-gradient(circle at 70% 85%, rgba(20,90,150,.35), transparent 55%),
+    linear-gradient(180deg,#041f3a 0%,#021220 100%);
+}
+body.tema-fondo-oceano::after {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(150,220,255,.25) 0 4px, transparent 8px),
+    radial-gradient(circle at 45% 70%, rgba(150,220,255,.2) 0 6px, transparent 10px),
+    radial-gradient(circle at 80% 40%, rgba(150,220,255,.22) 0 5px, transparent 9px),
+    radial-gradient(circle at 25% 90%, rgba(150,220,255,.18) 0 4px, transparent 8px);
+  background-size: 500px 500px;
+  animation: burbujasOceano 12s linear infinite;
+}
+@keyframes burbujasOceano{from{background-position:0 0}to{background-position:0 -500px}}
+
+/* ============================================================
+   🏜️ DESIERTO DORADO
+   ============================================================ */
+body.tema-fondo-desierto {
+  --bg-1:#3a1e08; --bg-2:#1a0c02; --text:#ffe9c2; --accent:#ffae3d; --accent-dark:#8b4f0a;
+  --tema-card-bg: rgba(80,42,15,.72);
+  --tema-card-bg-hover: rgba(110,60,20,.85);
+  --tema-card-border: rgba(255,174,61,.28);
+  --tema-input-bg: rgba(35,18,5,.8);
+  --tema-input-border: rgba(255,174,61,.3);
+  --tema-panel-bg: #1a0c02;
+  --tema-panel-border: rgba(255,174,61,.3);
+  --tema-overlay: rgba(10,5,1,.85);
+  background:#1a0c02 !important;
+}
+body.tema-fondo-desierto::before {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 15%, rgba(255,220,120,.35), transparent 55%),
+    radial-gradient(circle at 20% 80%, rgba(180,90,20,.4), transparent 60%),
+    linear-gradient(180deg,#3a1e08 0%,#2a1506 60%,#1a0c02 100%);
+}
+
+/* ============================================================
+   🌌 AURORA BOREAL
+   ============================================================ */
+body.tema-fondo-aurora {
+  --bg-1:#051024; --bg-2:#020612; --text:#dce8ff; --accent:#7fffd4; --accent-dark:#0e8a7a;
+  --tema-card-bg: rgba(10,35,70,.7);
+  --tema-card-bg-hover: rgba(15,55,105,.85);
+  --tema-card-border: rgba(127,255,212,.28);
+  --tema-input-bg: rgba(2,8,20,.8);
+  --tema-input-border: rgba(127,255,212,.3);
+  --tema-panel-bg: #020a18;
+  --tema-panel-border: rgba(127,255,212,.28);
+  --tema-overlay: rgba(1,4,12,.85);
+  background:#020612 !important;
+}
+body.tema-fondo-aurora::before {
+  content:""; position:fixed; inset:-10%; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 30% at 30% 25%, rgba(127,255,212,.35), transparent 70%),
+    radial-gradient(ellipse 50% 25% at 65% 35%, rgba(160,140,255,.32), transparent 70%),
+    radial-gradient(ellipse 70% 30% at 50% 15%, rgba(120,200,255,.28), transparent 70%),
+    linear-gradient(180deg,#051024 0%,#020612 100%);
+  animation: auroraOndula 12s ease-in-out infinite;
+  filter: blur(18px);
+}
+@keyframes auroraOndula{
+  0%,100%{transform:translate(0,0) scale(1)}
+  50%    {transform:translate(4%,2%) scale(1.08)}
+}
+body.tema-fondo-aurora::after {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 30%, rgba(255,255,255,.9), transparent 50%),
+    radial-gradient(1.5px 1.5px at 55% 60%, rgba(200,255,230,.85), transparent 50%),
+    radial-gradient(1.5px 1.5px at 82% 25%, rgba(255,255,255,.8), transparent 50%);
+  background-size:420px 420px;
+}
+
+/* ============================================================
+   🌸 SAKURA
+   ============================================================ */
+body.tema-fondo-sakura {
+  --bg-1:#fff0f5; --bg-2:#ffe6f0; --text:#4d2436; --accent:#ff8fbc; --accent-dark:#b83872;
+  --tema-card-bg: rgba(255,255,255,.82);
+  --tema-card-bg-hover: rgba(255,255,255,.95);
+  --tema-card-border: rgba(255,143,188,.3);
+  --tema-input-bg: rgba(255,255,255,.95);
+  --tema-input-border: rgba(255,143,188,.32);
+  --tema-panel-bg: #fffdfe;
+  --tema-panel-border: rgba(255,143,188,.3);
+  --tema-overlay: rgba(90,40,70,.6);
+  --tema-soft-text: rgba(77,36,54,.72);
+  background:#ffe6f0 !important;
+  color: var(--text);
+}
+body.tema-fondo-sakura::before {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(circle at 25% 20%, rgba(255,200,220,.55), transparent 50%),
+    radial-gradient(circle at 75% 70%, rgba(255,220,235,.5), transparent 55%),
+    linear-gradient(180deg,#ffe6f0 0%,#ffeaf3 100%);
+}
+body.tema-fondo-sakura::after {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-image:
+    radial-gradient(ellipse 6px 3px at 15% 30%, rgba(255,143,188,.75), transparent 100%),
+    radial-gradient(ellipse 6px 3px at 60% 55%, rgba(255,143,188,.6), transparent 100%),
+    radial-gradient(ellipse 6px 3px at 85% 20%, rgba(255,143,188,.7), transparent 100%),
+    radial-gradient(ellipse 6px 3px at 30% 80%, rgba(255,143,188,.65), transparent 100%);
+  background-size:450px 450px;
+  animation: petalosCaen 18s linear infinite;
+}
+@keyframes petalosCaen{
+  from{background-position:0 0}
+  to  {background-position:60px 450px}
+}
+
+/* ============================================================
+   🌆 CYBERPUNK
+   ============================================================ */
+body.tema-fondo-cyberpunk {
+  --bg-1:#0a0025; --bg-2:#05000f; --text:#e6d4ff; --accent:#00fff0; --accent-dark:#8a00c2;
+  --tema-card-bg: rgba(35,10,70,.72);
+  --tema-card-bg-hover: rgba(55,15,100,.85);
+  --tema-card-border: rgba(255,0,180,.3);
+  --tema-input-bg: rgba(10,0,30,.85);
+  --tema-input-border: rgba(0,255,240,.32);
+  --tema-panel-bg: #0a0018;
+  --tema-panel-border: rgba(255,0,180,.35);
+  --tema-overlay: rgba(5,0,15,.9);
+  background:#05000f !important;
+}
+body.tema-fondo-cyberpunk::before {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255,0,180,.28), transparent 45%),
+    radial-gradient(circle at 80% 80%, rgba(0,255,240,.22), transparent 50%),
+    linear-gradient(180deg,#0a0025 0%,#05000f 100%);
+}
+body.tema-fondo-cyberpunk::after {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,255,240,.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,0,180,.08) 1px, transparent 1px);
+  background-size:40px 40px;
+  mask-image: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent);
+  animation: gridCyber 8s linear infinite;
+}
+@keyframes gridCyber{
+  from{background-position:0 0,0 0}
+  to  {background-position:40px 40px,40px 40px}
+}
+
+/* ============================================================
+   ⛈️ TORMENTA ELÉCTRICA
+   ============================================================ */
+body.tema-fondo-tormenta {
+  --bg-1:#1a1f2e; --bg-2:#0a0e18; --text:#d6dff0; --accent:#8fb4ff; --accent-dark:#2f4a8a;
+  --tema-card-bg: rgba(30,40,65,.72);
+  --tema-card-bg-hover: rgba(45,60,95,.85);
+  --tema-card-border: rgba(143,180,255,.25);
+  --tema-input-bg: rgba(10,15,30,.85);
+  --tema-input-border: rgba(143,180,255,.28);
+  --tema-panel-bg: #0a0e18;
+  --tema-panel-border: rgba(143,180,255,.3);
+  --tema-overlay: rgba(5,8,15,.88);
+  background:#0a0e18 !important;
+}
+body.tema-fondo-tormenta::before {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(143,180,255,.2), transparent 60%),
+    linear-gradient(180deg,#1a1f2e 0%,#0a0e18 100%);
+}
+body.tema-fondo-tormenta::after {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background: rgba(255,255,255,.06);
+  animation: relampago 7s ease-in-out infinite;
+}
+@keyframes relampago{
+  0%,92%,100%{opacity:0}
+  93%{opacity:.7}
+  94%{opacity:.1}
+  95%{opacity:.6}
+  96%{opacity:0}
+}

@@ -5,6 +5,8 @@
 (function () {
   const extras = [
     /* --- Personal / uso --- */
+    
+
     { id:"primer-chat",     tipo:"personal", nombre:"Primera palabra",   descripcion:"Envía tu primer mensaje en el chat",    meta:1,   medir:()=> numLS("chat_msgs") },
     { id:"conversador",     tipo:"personal", nombre:"Conversador",       descripcion:"Envía 100 mensajes en el chat",         meta:100, medir:()=> numLS("chat_msgs") },
     { id:"chat-1000",       tipo:"personal", nombre:"Imparable",         descripcion:"Envía 1000 mensajes en el chat",        meta:1000,medir:()=> numLS("chat_msgs") },
@@ -54,6 +56,38 @@
     { id:"rpg-cofres-10",     tipo:"personal", nombre:"Abrecofres",        descripcion:"Abre 10 cofres",                     meta:10,   medir:()=> lootStats().cofres },
     { id:"rpg-cofres-50",     tipo:"personal", nombre:"Traficante",        descripcion:"Abre 50 cofres",                     meta:50,   medir:()=> lootStats().cofres },
     { id:"rpg-bonus-100",     tipo:"personal", nombre:"Forjado",           descripcion:"Acumula +100 de bonus total",        meta:100,  medir:()=> lootStats().bonusTotal },
+    /* 🐰 LOGRO ESPECIAL: Máxima bestia */
+{
+  id:"maxima-bestia",
+  tipo:"personal",
+  nombre:"Máxima bestia",
+  descripcion:"Completa el juego con el conejo (derrota los 9 jefes)",
+  meta:1,
+  medir:()=> {
+    try {
+      const u = window._getUserIdSafe?.() || localStorage.getItem("sunadventures_uid") || "local";
+      const st = JSON.parse(localStorage.getItem(`sa_rpg_${u}`) || "{}");
+      const jefesDerrotados = st.jefesDerrotados || [];
+      const mascota = localStorage.getItem("mascota_actual");
+      // 9 jefes (uno por región)
+      return (mascota === "conejo" && jefesDerrotados.length >= 9) ? 1 : 0;
+    } catch { return 0; }
+  }
+},
+{
+  id:"maxima-bestia-todas",
+  tipo:"personal",
+  nombre:"Leyenda absoluta (conejil)",
+  descripcion:"Completa el juego con TODAS las mascotas",
+  meta:9,
+  medir:()=> {
+    try {
+      const u = window._getUserIdSafe?.() || "local";
+      const log = JSON.parse(localStorage.getItem(`sa_rpg_jefes_mascota_${u}`) || "{}");
+      return Object.values(log).filter(arr => (arr||[]).length >= 9).length;
+    } catch { return 0; }
+  }
+}
   ];
 
   function numLS(clave) {
@@ -109,4 +143,5 @@
       return { unicos, total, cofres, miticos, bonusTotal };
     } catch { return { unicos:0, total:0, cofres:0, miticos:0, bonusTotal:0 }; }
   }
+
 })();

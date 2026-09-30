@@ -10,10 +10,13 @@
     let n = 0;
     const it = () => {
       if (window._TiendaAPI) return boot();
-      if (++n > 50) return console.warn("tienda.js: _TiendaAPI no llegó");
+      if (++n > 100) return console.warn("tienda.js: _TiendaAPI no llegó tras 10s");
       setTimeout(it, 100);
     };
-    window.addEventListener("sunadventures:api-ready", boot, { once: true });
+    // ✅ Escuchar el evento Y hacer polling
+    window.addEventListener("sunadventures:api-ready", () => {
+      if (window._TiendaAPI) boot();
+    }, { once: true });
     return setTimeout(it, 100);
   }
 

@@ -1,57 +1,36 @@
-/* ============================================================
-   RPG-LOOT.JS — Botín, cofres y colección (v2)
-   Nuevos sprite sheets: img/rpg/loot-1.png y img/rpg/loot-2.png
-   ============================================================ */
+/* RPG-LOOT.JS v5 — Botín, cofres, colección y reroll */
 (function boot() {
   const API = window._TiendaAPI;
-  if (!API) {
-    let n = 0;
-    const it = () => {
-      if (window._TiendaAPI) return boot();
-      if (++n > 50) return;
-      setTimeout(it, 100);
-    };
-    return setTimeout(it, 100);
-  }
-
+  if (!API) { let n=0; const it=()=>{ if(window._TiendaAPI) return boot(); if(++n>50) return; setTimeout(it,100); }; return setTimeout(it,100); }
   const { notifMascota, getUserId, getMonedas, setMonedas } = API;
-  const $  = id => document.getElementById(String(id).replace(/^#/, ""));
-  const qsa= (s, r = document) => [...r.querySelectorAll(s)];
-  const rnd= (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
-  const SND= t => { try { window._snd?.(t); } catch {} };
+  const $ = id => document.getElementById(String(id).replace(/^#/, ""));
+  const qsa = (s, r = document) => [...r.querySelectorAll(s)];
+  const rnd = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+  const SND = t => { try { window._snd?.(t); } catch {} };
+  const confirmar = o => window.SunModal ? window.SunModal.confirm(o) : Promise.resolve(window.confirm(o.title));
 
-  /* ============================================================
-     SHEETS — 8×9 cada uno
-     ============================================================ */
+  /* Sheets */
   const SHEETS = {
-    loot1: { url: "img/rpg/loot-1.png", cols: 8, rows: 9 }, // Armas · Armaduras · Joyería
-    loot2: { url: "img/rpg/loot-2.png", cols: 8, rows: 9 }, // Herramientas · Recursos · Pociones
-    main:  {
-      url:  window.SPRITE_SHEET?.url  || "img/tienda/admurin-items.png",
-      cols: window.SPRITE_SHEET?.cols || 30,
-      rows: window.SPRITE_SHEET?.rows || 110
-    }
+    loot1: { url: "img/rpg/loot-1.png", cols: 8, rows: 9 },
+    loot2: { url: "img/rpg/loot-2.png", cols: 8, rows: 9 },
+    main:  { url: window.SPRITE_SHEET?.url || "img/tienda/admurin-items.png", cols: window.SPRITE_SHEET?.cols || 30, rows: window.SPRITE_SHEET?.rows || 110 }
   };
 
-  /* ---------- Render de icono (soporta cualquier sheet) ---------- */
   function renderIcono(item, size) {
     if (Array.isArray(item.sprite) && item.sprite.length === 2) {
-      const key = item.sheet || "loot1";
-      const s = SHEETS[key] || SHEETS.loot1;
+      const s = SHEETS[item.sheet] || SHEETS.loot1;
       const [col, row] = item.sprite;
       if (col >= 0 && col < s.cols && row >= 0 && row < s.rows) {
         const px = s.cols > 1 ? (col / (s.cols - 1)) * 100 : 50;
         const py = s.rows > 1 ? (row / (s.rows - 1)) * 100 : 50;
         const sz = size ? `width:${size};height:${size};` : "";
-        return `<div class="loot-sprite" style="${sz}background-image:url('${s.url}');background-size:${s.cols * 100}% ${s.rows * 100}%;background-position:${px}% ${py}%"></div>`;
+        return `<div class="loot-sprite" style="${sz}background-image:url('${s.url}');background-size:${s.cols*100}% ${s.rows*100}%;background-position:${px}% ${py}%"></div>`;
       }
     }
     return `<span class="loot-icono" data-icono="${item.icono || "estrella"}"></span>`;
   }
 
-  /* ============================================================
-     PERSISTENCIA
-     ============================================================ */
+  /* Persistencia */
   const KEY_LOOT  = () => "sa_rpg_loot_"  + getUserId();
   const KEY_STATS = () => "sa_rpg_stats_" + getUserId();
   const KEY_RPG   = () => "sa_rpg_"       + getUserId();
@@ -63,239 +42,230 @@
   const guardarEstado=s => { try { localStorage.setItem(KEY_RPG(), JSON.stringify(s)); } catch {} };
   const hpMaxRpg = s => 80 + s.nivel * 20 + (cargarStats().hpBonus || 0);
 
-  /* ============================================================
-     RAREZAS / CALIDADES / COFRES
-     ============================================================ */
+  /* Rarezas / calidades / cofres */
   const RAREZAS = {
-    comun:      { prob:0.55, label:"Común",      color:"#c9c9c9", glow:"rgba(201,201,201,.3)" },
-    raro:       { prob:0.25, label:"Raro",       color:"#6cb8ff", glow:"rgba(108,184,255,.5)" },
-    epico:      { prob:0.12, label:"Épico",      color:"#a684f0", glow:"rgba(166,132,240,.6)" },
-    legendario: { prob:0.06, label:"Legendario", color:"#ffd93d", glow:"rgba(255,217,61,.7)" },
-    mitico:     { prob:0.02, label:"Mítico",     color:"#ff6b9d", glow:"rgba(255,107,157,.8)" }
+    comun:      { prob:0.62,  label:"Común",      color:"#c9c9c9", glow:"rgba(201,201,201,.3)" },
+    raro:       { prob:0.24,  label:"Raro",       color:"#6cb8ff", glow:"rgba(108,184,255,.5)" },
+    epico:      { prob:0.095, label:"Épico",      color:"#a684f0", glow:"rgba(166,132,240,.6)" },
+    legendario: { prob:0.040, label:"Legendario", color:"#ffd93d", glow:"rgba(255,217,61,.7)" },
+    mitico:     { prob:0.005, label:"Mítico",     color:"#ff6b9d", glow:"rgba(255,107,157,.8)" }
   };
-
+  const ORDEN_RAREZAS = ["comun","raro","epico","legendario","mitico"];
+  const PROB_REROLL_RAREZA = { misma:0.94, sube1:0.05, sube2:0.005, baja1:0.005 };
   const CALIDADES = {
     normal:    { label:"Normal",    mult:1.0, icon:"" },
     reforzado: { label:"Reforzado", mult:1.25, icon:"⚡" },
     impecable: { label:"Impecable", mult:1.6, icon:"✨" },
     ancestral: { label:"Ancestral", mult:2.2, icon:"🔥" }
   };
-
   const COFRES = {
-    madera: { nombre:"Cofre de Madera", precio:50,   rarBoosts:{comun:.6,raro:.28,epico:.10,legendario:.02,mitico:0},     calBoosts:{normal:.7,reforzado:.22,impecable:.07,ancestral:.01}, emoji:"📦", color:"#a0522d", cantMin:1, cantMax:2 },
-    hierro: { nombre:"Cofre de Hierro", precio:150,  rarBoosts:{comun:.4,raro:.35,epico:.18,legendario:.06,mitico:.01},   calBoosts:{normal:.5,reforzado:.3,impecable:.16,ancestral:.04},  emoji:"🗃️", color:"#718093", cantMin:2, cantMax:3 },
-    dorado: { nombre:"Cofre Dorado",    precio:400,  rarBoosts:{comun:.2,raro:.3,epico:.3,legendario:.16,mitico:.04},     calBoosts:{normal:.25,reforzado:.35,impecable:.28,ancestral:.12},emoji:"🏆", color:"#ffd93d", cantMin:3, cantMax:5 },
-    alba:   { nombre:"Cofre del Alba",  precio:1200, rarBoosts:{comun:.05,raro:.2,epico:.35,legendario:.28,mitico:.12},   calBoosts:{normal:.05,reforzado:.2,impecable:.4,ancestral:.35},  emoji:"🌟", color:"#ff6b9d", cantMin:5, cantMax:7 }
+    madera:    { nombre:"Cofre de Madera",    precio:500,    rarBoosts:{comun:.70,raro:.22,epico:.065,legendario:.013,mitico:.002}, calBoosts:{normal:.78,reforzado:.18,impecable:.035,ancestral:.005}, emoji:"📦", color:"#a0522d", cantMin:1, cantMax:2 },
+    hierro:    { nombre:"Cofre de Hierro",    precio:3000,   rarBoosts:{comun:.55,raro:.30,epico:.115,legendario:.03,mitico:.005}, calBoosts:{normal:.62,reforzado:.26,impecable:.10,ancestral:.02},   emoji:"🗃️", color:"#718093", cantMin:2, cantMax:3 },
+    dorado:    { nombre:"Cofre Dorado",       precio:15000,  rarBoosts:{comun:.35,raro:.35,epico:.20,legendario:.085,mitico:.015}, calBoosts:{normal:.42,reforzado:.33,impecable:.20,ancestral:.05},   emoji:"🏆", color:"#ffd93d", cantMin:3, cantMax:5 },
+    alba:      { nombre:"Cofre del Alba",     precio:75000,  rarBoosts:{comun:.15,raro:.30,epico:.33,legendario:.18,mitico:.04},   calBoosts:{normal:.15,reforzado:.30,impecable:.38,ancestral:.17},   emoji:"🌟", color:"#ff6b9d", cantMin:5, cantMax:7 },
+    celestial: { nombre:"Cofre Celestial",    precio:400000, rarBoosts:{comun:.03,raro:.15,epico:.35,legendario:.37,mitico:.10},    calBoosts:{normal:.05,reforzado:.15,impecable:.42,ancestral:.38},   emoji:"☀️", color:"#fff5b8", cantMin:7, cantMax:10 }
   };
 
-  /* ============================================================
-     POOL — 100 items mapeados a los nuevos sheets
-     ============================================================ */
-  const POOL = [
-
-    /* ══════════════════════════════════════════════════════════
-       ESPADAS — LOOT-1 · fila 0
-       ══════════════════════════════════════════════════════════ */
-    { id:"espada",            nombre:"Espada de Acero",      sprite:[0,0], sheet:"loot1", tipo:"atk", val:3,  rar:"raro",       icono:"espada" },
-    { id:"espada-fuego",      nombre:"Espada Flamígera",     sprite:[1,0], sheet:"loot1", tipo:"atk", val:7,  rar:"legendario", icono:"espada" },
-    { id:"espada-hielo",      nombre:"Filo de Hielo",        sprite:[2,0], sheet:"loot1", tipo:"atk", val:6,  rar:"legendario", icono:"espada" },
-    { id:"cimitarra",         nombre:"Cimitarra Real",       sprite:[3,0], sheet:"loot1", tipo:"atk", val:3,  rar:"raro",       icono:"espada" },
-    { id:"espada-ropera",     nombre:"Espada Ropera",        sprite:[4,0], sheet:"loot1", tipo:"atk", val:4,  rar:"epico",      icono:"espada" },
-    { id:"espada-elfica",     nombre:"Espada Élfica",        sprite:[5,0], sheet:"loot1", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-    { id:"espada-legend",     nombre:"Filo del Alba",        sprite:[6,0], sheet:"loot1", tipo:"atk", val:10, rar:"mitico",     icono:"espada" },
-    { id:"espada-cristal",    nombre:"Espada de Cristal",    sprite:[7,0], sheet:"loot1", tipo:"atk", val:8,  rar:"legendario", icono:"espada" },
-
-    /* DAGAS · MAZAS · HACHAS — fila 1 */
-    { id:"daga",              nombre:"Daga Oxidada",         sprite:[0,1], sheet:"loot1", tipo:"atk", val:1,  rar:"comun",      icono:"espada" },
-    { id:"daga-asesino",      nombre:"Daga del Asesino",     sprite:[1,1], sheet:"loot1", tipo:"atk", val:3,  rar:"raro",       icono:"espada" },
-    { id:"daga-cristal",      nombre:"Daga Carmesí",         sprite:[2,1], sheet:"loot1", tipo:"atk", val:4,  rar:"epico",      icono:"espada" },
-    { id:"maza",              nombre:"Maza de Hierro",       sprite:[3,1], sheet:"loot1", tipo:"atk", val:2,  rar:"comun",      icono:"espada" },
-    { id:"martillo-hierro",   nombre:"Martillo de Hierro",   sprite:[4,1], sheet:"loot1", tipo:"atk", val:3,  rar:"raro",       icono:"espada" },
-    { id:"hacha-guerra",      nombre:"Hacha de Guerra",      sprite:[5,1], sheet:"loot1", tipo:"atk", val:4,  rar:"raro",       icono:"espada" },
-    { id:"hacha-doble",       nombre:"Hacha Doble",          sprite:[6,1], sheet:"loot1", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-    { id:"hacha-cristal",     nombre:"Hacha Azulada",        sprite:[7,1], sheet:"loot1", tipo:"atk", val:6,  rar:"legendario", icono:"espada" },
-
-    /* ARCOS Y BASTONES — fila 2 */
-    { id:"arco-madera",       nombre:"Arco de Madera",       sprite:[0,2], sheet:"loot1", tipo:"atk", val:1,  rar:"comun",      icono:"espada" },
-    { id:"arco-elfico",       nombre:"Arco Élfico",          sprite:[1,2], sheet:"loot1", tipo:"atk", val:4,  rar:"epico",      icono:"espada" },
-    { id:"arco-fuego",        nombre:"Arco Ígneo",           sprite:[2,2], sheet:"loot1", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-    { id:"arco-hielo",        nombre:"Arco Gélido",          sprite:[3,2], sheet:"loot1", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-    { id:"ballesta",          nombre:"Ballesta de Torre",    sprite:[4,2], sheet:"loot1", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-    { id:"baston",            nombre:"Bastón Antiguo",       sprite:[5,2], sheet:"loot1", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-    { id:"vara-cristal",      nombre:"Vara de Cristal",      sprite:[6,2], sheet:"loot1", tipo:"atk", val:4,  rar:"raro",       icono:"espada" },
-    { id:"baculo-fuego",      nombre:"Báculo de Fuego",      sprite:[7,2], sheet:"loot1", tipo:"atk", val:7,  rar:"legendario", icono:"espada" },
-
-    /* ORBES Y VARITAS — fila 3 */
-    { id:"baston-antiguo",    nombre:"Bastón Ancestral",     sprite:[0,3], sheet:"loot1", tipo:"atk", val:6,  rar:"legendario", icono:"espada" },
-    { id:"baculo-cristal",    nombre:"Báculo Cristalino",    sprite:[1,3], sheet:"loot1", tipo:"atk", val:4,  rar:"epico",      icono:"espada" },
-    { id:"baculo-rayo",       nombre:"Báculo del Rayo",      sprite:[2,3], sheet:"loot1", tipo:"atk", val:8,  rar:"legendario", icono:"espada" },
-    { id:"cetro-solar",       nombre:"Cetro Solar",          sprite:[3,3], sheet:"loot1", tipo:"atk", val:9,  rar:"legendario", icono:"espada" },
-    { id:"baculo-fuego2",     nombre:"Báculo Ardiente",      sprite:[4,3], sheet:"loot1", tipo:"atk", val:7,  rar:"legendario", icono:"espada" },
-    { id:"baculo-infinito",   nombre:"Báculo del Infinito",  sprite:[5,3], sheet:"loot1", tipo:"atk", val:15, rar:"mitico",     icono:"espada" },
-    { id:"baculo-sombra",     nombre:"Báculo Umbrío",        sprite:[6,3], sheet:"loot1", tipo:"atk", val:10, rar:"mitico",     icono:"espada" },
-    { id:"varita",            nombre:"Varita Mágica",        sprite:[7,3], sheet:"loot1", tipo:"atk", val:3,  rar:"raro",       icono:"espada" },
-
-    /* AMULETOS Y PERGAMINOS — fila 4 */
-    { id:"amuleto-sol",       nombre:"Amuleto Solar",        sprite:[0,4], sheet:"loot1", tipo:"atk", val:6,  rar:"legendario", icono:"espada" },
-    { id:"amuleto-azul",      nombre:"Amuleto Azul",         sprite:[1,4], sheet:"loot1", tipo:"def", val:5,  rar:"epico",      icono:"espada" },
-    { id:"amuleto-rubi",      nombre:"Amuleto de Rubí",      sprite:[2,4], sheet:"loot1", tipo:"atk", val:4,  rar:"epico",      icono:"espada" },
-    { id:"amuleto-esmeralda", nombre:"Amuleto Esmeralda",    sprite:[3,4], sheet:"loot1", tipo:"hp",  val:40, rar:"epico",      icono:"espada" },
-    { id:"pergamino-azul",    nombre:"Pergamino Arcano",     sprite:[4,4], sheet:"loot1", tipo:"atk", val:5,  rar:"epico",      icono:"nota", consumible:true },
-    { id:"pergamino-rojo",    nombre:"Pergamino Ígneo",      sprite:[5,4], sheet:"loot1", tipo:"atk", val:4,  rar:"raro",       icono:"nota", consumible:true },
-    { id:"pergamino-madera",  nombre:"Pergamino Rúnico",     sprite:[6,4], sheet:"loot1", tipo:"hp",  val:25, rar:"raro",       icono:"nota", consumible:true },
-    { id:"pergamino-escudo",  nombre:"Pergamino Protector",  sprite:[7,4], sheet:"loot1", tipo:"def", val:5,  rar:"epico",      icono:"nota", consumible:true },
-
-    /* ANILLOS Y CASCOS — fila 5 */
-    { id:"anillo-poder",      nombre:"Anillo de Poder",      sprite:[0,5], sheet:"loot1", tipo:"atk", val:3,  rar:"raro",       icono:"espada" },
-    { id:"anillo-estrella",   nombre:"Anillo Estelar",       sprite:[1,5], sheet:"loot1", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-    { id:"anillo-silver",     nombre:"Anillo de Plata",      sprite:[2,5], sheet:"loot1", tipo:"def", val:4,  rar:"epico",      icono:"espada" },
-    { id:"anillo-esmeralda",  nombre:"Anillo Esmeralda",     sprite:[3,5], sheet:"loot1", tipo:"hp",  val:35, rar:"epico",      icono:"espada" },
-    { id:"casco-hierro",      nombre:"Casco de Hierro",      sprite:[4,5], sheet:"loot1", tipo:"def", val:2,  rar:"raro",       icono:"espada" },
-    { id:"casco-alba",        nombre:"Casco del Alba",       sprite:[5,5], sheet:"loot1", tipo:"def", val:5,  rar:"epico",      icono:"espada" },
-    { id:"casco-cruz",        nombre:"Casco Cruzado",        sprite:[6,5], sheet:"loot1", tipo:"def", val:6,  rar:"legendario", icono:"espada" },
-    { id:"casco-sombra",      nombre:"Casco Umbrío",         sprite:[7,5], sheet:"loot1", tipo:"def", val:7,  rar:"legendario", icono:"espada" },
-
-    /* BOTAS Y CAPAS — fila 6 */
-    { id:"botas-piel",        nombre:"Botas de Piel",        sprite:[0,6], sheet:"loot1", tipo:"def", val:2,  rar:"raro",       icono:"espada" },
-    { id:"botas-silver",      nombre:"Botas de Plata",       sprite:[1,6], sheet:"loot1", tipo:"def", val:3,  rar:"raro",       icono:"espada" },
-    { id:"botas-aladas",      nombre:"Botas Aladas",         sprite:[2,6], sheet:"loot1", tipo:"def", val:3,  rar:"raro",       icono:"espada" },
-    { id:"botas-sombra",      nombre:"Botas Umbrías",        sprite:[3,6], sheet:"loot1", tipo:"def", val:4,  rar:"epico",      icono:"espada" },
-    { id:"capa-hood",         nombre:"Capucha Oscura",       sprite:[4,6], sheet:"loot1", tipo:"def", val:3,  rar:"raro",       icono:"espada" },
-    { id:"capa-mago",         nombre:"Capa de Mago",         sprite:[5,6], sheet:"loot1", tipo:"def", val:5,  rar:"epico",      icono:"espada" },
-    { id:"mascara",           nombre:"Máscara Blanca",       sprite:[6,6], sheet:"loot1", tipo:"def", val:4,  rar:"epico",      icono:"espada" },
-    { id:"capa-sombras",      nombre:"Capa de Sombras",      sprite:[7,6], sheet:"loot1", tipo:"def", val:7,  rar:"legendario", icono:"espada" },
-
-    /* ARMADURAS Y GUANTES — fila 7 */
-    { id:"coraza-cuero",      nombre:"Coraza de Cuero",      sprite:[0,7], sheet:"loot1", tipo:"def", val:3,  rar:"raro",       icono:"espada" },
-    { id:"coraza-malla",      nombre:"Cota de Malla",        sprite:[1,7], sheet:"loot1", tipo:"def", val:4,  rar:"epico",      icono:"espada" },
-    { id:"coraza-placas",     nombre:"Coraza de Placas",     sprite:[2,7], sheet:"loot1", tipo:"def", val:5,  rar:"epico",      icono:"espada" },
-    { id:"armadura-dorada",   nombre:"Armadura Dorada",      sprite:[3,7], sheet:"loot1", tipo:"def", val:8,  rar:"legendario", icono:"espada" },
-    { id:"guante-cuero",      nombre:"Guante de Cuero",      sprite:[4,7], sheet:"loot1", tipo:"def", val:2,  rar:"raro",       icono:"espada" },
-    { id:"guante-sombra",     nombre:"Guante Umbrío",        sprite:[5,7], sheet:"loot1", tipo:"def", val:4,  rar:"epico",      icono:"espada" },
-    { id:"guante-garra",      nombre:"Garra de Bestia",      sprite:[6,7], sheet:"loot1", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-    { id:"guantelete",        nombre:"Guantelete de Poder",  sprite:[7,7], sheet:"loot1", tipo:"def", val:4,  rar:"epico",      icono:"espada" },
-
-    /* COMIDA Y OBJETOS — fila 8 */
-    { id:"manzana-comida",    nombre:"Manzana Fresca",       sprite:[0,8], sheet:"loot1", tipo:"hp",  val:15, rar:"comun",      consumible:true, icono:"manzana" },
-    { id:"queso",             nombre:"Queso Curado",         sprite:[1,8], sheet:"loot1", tipo:"hp",  val:20, rar:"comun",      consumible:true, icono:"comida" },
-    { id:"huevo",             nombre:"Huevo Frito",          sprite:[2,8], sheet:"loot1", tipo:"hp",  val:18, rar:"comun",      consumible:true, icono:"comida" },
-    { id:"carne",             nombre:"Carne Asada",          sprite:[3,8], sheet:"loot1", tipo:"hp",  val:30, rar:"raro",       consumible:true, icono:"comida" },
-    { id:"llave-pequena",     nombre:"Llave Menuda",         sprite:[4,8], sheet:"loot1", tipo:"hp",  val:20, rar:"raro",       icono:"llave" },
-    { id:"llave-hierro",      nombre:"Llave de Hierro",      sprite:[5,8], sheet:"loot1", tipo:"hp",  val:30, rar:"epico",      icono:"llave" },
-    { id:"vela",              nombre:"Vela Sagrada",         sprite:[6,8], sheet:"loot1", tipo:"hp",  val:25, rar:"raro",       consumible:true, icono:"fuego" },
-    { id:"caliz-estelar",     nombre:"Cáliz Estelar",        sprite:[7,8], sheet:"loot1", tipo:"hp",  val:70, rar:"legendario", icono:"espada" },
-
-    /* ══════════════════════════════════════════════════════════
-       ESPADAS CORTAS — LOOT-2 · fila 0
-       ══════════════════════════════════════════════════════════ */
-    { id:"espada-corta",      nombre:"Espada Corta",         sprite:[0,0], sheet:"loot2", tipo:"atk", val:1,  rar:"comun",      icono:"espada" },
-    { id:"espada-larga",      nombre:"Espada Larga",         sprite:[1,0], sheet:"loot2", tipo:"atk", val:2,  rar:"comun",      icono:"espada" },
-    { id:"espada-cruzada",    nombre:"Espada Cruzada",       sprite:[2,0], sheet:"loot2", tipo:"atk", val:3,  rar:"raro",       icono:"espada" },
-    { id:"espada-cruzada-azul", nombre:"Espada Cruzada Azul",sprite:[3,0], sheet:"loot2", tipo:"atk", val:4,  rar:"epico",      icono:"espada" },
-    { id:"katana",            nombre:"Katana",               sprite:[4,0], sheet:"loot2", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-    { id:"katana-dorada",     nombre:"Katana Dorada",        sprite:[5,0], sheet:"loot2", tipo:"atk", val:6,  rar:"legendario", icono:"espada" },
-    { id:"sable",             nombre:"Sable Curvo",          sprite:[6,0], sheet:"loot2", tipo:"atk", val:4,  rar:"epico",      icono:"espada" },
-    { id:"baston-simple",     nombre:"Bastón Simple",        sprite:[7,0], sheet:"loot2", tipo:"atk", val:2,  rar:"comun",      icono:"espada" },
-
-    /* PICOS Y DAGAS — fila 1 */
-    { id:"pico",              nombre:"Pico Minero",          sprite:[0,1], sheet:"loot2", tipo:"atk", val:3,  rar:"raro",       icono:"espada" },
-    { id:"pico-dorado",       nombre:"Pico Dorado",          sprite:[1,1], sheet:"loot2", tipo:"atk", val:4,  rar:"epico",      icono:"espada" },
-    { id:"daga-azul",         nombre:"Daga Azul",            sprite:[2,1], sheet:"loot2", tipo:"atk", val:3,  rar:"raro",       icono:"espada" },
-    { id:"daga-verde",        nombre:"Daga Verde",           sprite:[3,1], sheet:"loot2", tipo:"atk", val:3,  rar:"raro",       icono:"espada" },
-    { id:"hacha",             nombre:"Hacha de Leñador",     sprite:[4,1], sheet:"loot2", tipo:"atk", val:3,  rar:"raro",       icono:"espada" },
-    { id:"martillo-madera",   nombre:"Martillo de Madera",   sprite:[5,1], sheet:"loot2", tipo:"atk", val:2,  rar:"comun",      icono:"espada" },
-    { id:"hacha-curva",       nombre:"Hacha Curva",          sprite:[6,1], sheet:"loot2", tipo:"atk", val:4,  rar:"epico",      icono:"espada" },
-    { id:"hacha-cristal2",    nombre:"Hacha de Cristal",     sprite:[7,1], sheet:"loot2", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-
-    /* MARTILLOS Y MAZAS — fila 2 */
-    { id:"garrote",           nombre:"Garrote",              sprite:[0,2], sheet:"loot2", tipo:"atk", val:1,  rar:"comun",      icono:"espada" },
-    { id:"martillo",          nombre:"Martillo de Guerra",   sprite:[1,2], sheet:"loot2", tipo:"atk", val:4,  rar:"raro",       icono:"espada" },
-    { id:"martillo-mixto",    nombre:"Martillo Mixto",       sprite:[2,2], sheet:"loot2", tipo:"atk", val:4,  rar:"raro",       icono:"espada" },
-    { id:"martillo-plata",    nombre:"Martillo de Plata",    sprite:[3,2], sheet:"loot2", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-    { id:"maza-azul",         nombre:"Maza Azulada",         sprite:[4,2], sheet:"loot2", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-    { id:"maza-naranja",      nombre:"Maza Ígnea",           sprite:[5,2], sheet:"loot2", tipo:"atk", val:6,  rar:"legendario", icono:"espada" },
-    { id:"arco-amarillo",     nombre:"Arco Dorado",          sprite:[6,2], sheet:"loot2", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-    { id:"arco-oscuro",       nombre:"Arco Sombrío",         sprite:[7,2], sheet:"loot2", tipo:"atk", val:6,  rar:"legendario", icono:"espada" },
-
-    /* BALLESTAS Y ARCOS — fila 3 */
-    { id:"maza-corta",        nombre:"Maza Corta",           sprite:[0,3], sheet:"loot2", tipo:"atk", val:2,  rar:"comun",      icono:"espada" },
-    { id:"maza-azul2",        nombre:"Maza Azul",            sprite:[1,3], sheet:"loot2", tipo:"atk", val:4,  rar:"epico",      icono:"espada" },
-    { id:"ballesta-corta",    nombre:"Ballesta Corta",       sprite:[2,3], sheet:"loot2", tipo:"atk", val:4,  rar:"epico",      icono:"espada" },
-    { id:"ballesta-pesada",   nombre:"Ballesta Pesada",      sprite:[3,3], sheet:"loot2", tipo:"atk", val:6,  rar:"legendario", icono:"espada" },
-    { id:"arco-ornamentado",  nombre:"Arco Ornamentado",     sprite:[4,3], sheet:"loot2", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-    { id:"arco-simple",       nombre:"Arco Simple",          sprite:[5,3], sheet:"loot2", tipo:"atk", val:2,  rar:"comun",      icono:"espada" },
-    { id:"arco-curvo",        nombre:"Arco Curvo",           sprite:[6,3], sheet:"loot2", tipo:"atk", val:3,  rar:"raro",       icono:"espada" },
-    { id:"arco-real",         nombre:"Arco Real",            sprite:[7,3], sheet:"loot2", tipo:"atk", val:6,  rar:"legendario", icono:"espada" },
-
-    /* ESCUDOS Y CASCOS — fila 4 */
-    { id:"escudo-madera",     nombre:"Escudo de Madera",     sprite:[0,4], sheet:"loot2", tipo:"def", val:1,  rar:"comun",      icono:"espada" },
-    { id:"escudo-hierro",     nombre:"Escudo de Hierro",     sprite:[1,4], sheet:"loot2", tipo:"def", val:3,  rar:"raro",       icono:"espada" },
-    { id:"escudo-torre",      nombre:"Escudo Torre",         sprite:[2,4], sheet:"loot2", tipo:"def", val:6,  rar:"epico",      icono:"espada" },
-    { id:"libro-rojo",        nombre:"Grimorio Rojo",        sprite:[3,4], sheet:"loot2", tipo:"atk", val:3,  rar:"epico",      icono:"nota" },
-    { id:"casco-caballero",   nombre:"Casco de Caballero",   sprite:[4,4], sheet:"loot2", tipo:"def", val:5,  rar:"epico",      icono:"espada" },
-    { id:"casco-visor",       nombre:"Casco con Visor",      sprite:[5,4], sheet:"loot2", tipo:"def", val:5,  rar:"epico",      icono:"espada" },
-    { id:"casco-legendario",  nombre:"Casco Alado",          sprite:[6,4], sheet:"loot2", tipo:"def", val:8,  rar:"legendario", icono:"espada" },
-    { id:"casco-negro",       nombre:"Casco Negro",          sprite:[7,4], sheet:"loot2", tipo:"def", val:6,  rar:"legendario", icono:"espada" },
-
-    /* YUNQUES Y ARMADURAS — fila 5 */
-    { id:"yunque",            nombre:"Yunque de Forja",      sprite:[0,5], sheet:"loot2", tipo:"hp",  val:30, rar:"raro",       icono:"espada" },
-    { id:"yunque-pequeno",    nombre:"Yunque Pequeño",       sprite:[1,5], sheet:"loot2", tipo:"hp",  val:20, rar:"comun",      icono:"espada" },
-    { id:"armadura-gris",     nombre:"Armadura Gris",        sprite:[2,5], sheet:"loot2", tipo:"def", val:4,  rar:"epico",      icono:"espada" },
-    { id:"armadura-azul",     nombre:"Armadura Azul",        sprite:[3,5], sheet:"loot2", tipo:"def", val:6,  rar:"legendario", icono:"espada" },
-    { id:"capa-roja",         nombre:"Capa Roja",            sprite:[4,5], sheet:"loot2", tipo:"def", val:4,  rar:"epico",      icono:"espada" },
-    { id:"cofre-madera",      nombre:"Cofre Pequeño",        sprite:[5,5], sheet:"loot2", tipo:"hp",  val:25, rar:"raro",       icono:"cofre" },
-    { id:"capucha",           nombre:"Capucha",              sprite:[6,5], sheet:"loot2", tipo:"def", val:2,  rar:"comun",      icono:"espada" },
-    { id:"calavera",          nombre:"Calavera Maldita",     sprite:[7,5], sheet:"loot2", tipo:"atk", val:5,  rar:"epico",      icono:"espada" },
-
-    /* COLLARES Y MINERALES — fila 6 */
-    { id:"collar-oro",        nombre:"Collar de Oro",        sprite:[0,6], sheet:"loot2", tipo:"hp",  val:25, rar:"raro",       icono:"espada" },
-    { id:"collar-doble",      nombre:"Collar Doble",         sprite:[1,6], sheet:"loot2", tipo:"hp",  val:35, rar:"epico",      icono:"espada" },
-    { id:"collar-hierro",     nombre:"Collar de Hierro",     sprite:[2,6], sheet:"loot2", tipo:"def", val:3,  rar:"raro",       icono:"espada" },
-    { id:"collar-corazon",    nombre:"Collar de Corazón",    sprite:[3,6], sheet:"loot2", tipo:"hp",  val:50, rar:"legendario", icono:"espada" },
-    { id:"lingote-hierro",    nombre:"Lingote de Hierro",    sprite:[4,6], sheet:"loot2", tipo:"hp",  val:20, rar:"comun",      icono:"espada" },
-    { id:"lingote-oro",       nombre:"Lingote de Oro",       sprite:[5,6], sheet:"loot2", tipo:"hp",  val:40, rar:"epico",      icono:"espada" },
-    { id:"tronco",            nombre:"Tronco Recio",         sprite:[6,6], sheet:"loot2", tipo:"def", val:2,  rar:"comun",      icono:"espada" },
-    { id:"ramas",             nombre:"Ramas Secas",          sprite:[7,6], sheet:"loot2", tipo:"def", val:1,  rar:"comun",      icono:"espada" },
-
-    /* MATERIALES Y COMIDA — fila 7 */
-    { id:"trigo",             nombre:"Haz de Trigo",         sprite:[0,7], sheet:"loot2", tipo:"hp",  val:15, rar:"comun",      consumible:true, icono:"comida" },
-    { id:"pan",               nombre:"Hogaza de Pan",        sprite:[1,7], sheet:"loot2", tipo:"hp",  val:25, rar:"comun",      consumible:true, icono:"comida" },
-    { id:"muslo",             nombre:"Muslo Asado",          sprite:[2,7], sheet:"loot2", tipo:"hp",  val:35, rar:"raro",       consumible:true, icono:"comida" },
-    { id:"hongo",             nombre:"Hongo Silvestre",      sprite:[3,7], sheet:"loot2", tipo:"hp",  val:18, rar:"comun",      consumible:true, icono:"girasol" },
-    { id:"piedra",            nombre:"Piedra Común",         sprite:[4,7], sheet:"loot2", tipo:"def", val:1,  rar:"comun",      icono:"espada" },
-    { id:"roca-marron",       nombre:"Roca Marrón",          sprite:[5,7], sheet:"loot2", tipo:"def", val:2,  rar:"comun",      icono:"espada" },
-    { id:"mineral-azul",      nombre:"Mineral Azul",         sprite:[6,7], sheet:"loot2", tipo:"hp",  val:30, rar:"raro",       icono:"gema" },
-    { id:"paja",              nombre:"Paca de Paja",         sprite:[7,7], sheet:"loot2", tipo:"hp",  val:15, rar:"comun",      icono:"comida" },
-
-    /* POCIONES Y PLANTAS — fila 8 */
-    { id:"pocion-azul",       nombre:"Poción Azul",          sprite:[0,8], sheet:"loot2", tipo:"hp",  val:50, rar:"epico",      consumible:true, icono:"pocion" },
-    { id:"pocion-dorada",     nombre:"Poción Dorada",        sprite:[1,8], sheet:"loot2", tipo:"hp",  val:80, rar:"legendario", consumible:true, icono:"pocion" },
-    { id:"hierba-verde",      nombre:"Hierba Curativa",      sprite:[2,8], sheet:"loot2", tipo:"hp",  val:20, rar:"comun",      consumible:true, icono:"raiz" },
-    { id:"platano",           nombre:"Plátano",              sprite:[3,8], sheet:"loot2", tipo:"hp",  val:15, rar:"comun",      consumible:true, icono:"comida" },
-    { id:"hoja-verde",        nombre:"Hoja de Rocío",        sprite:[4,8], sheet:"loot2", tipo:"hp",  val:12, rar:"comun",      consumible:true, icono:"raiz" },
-    { id:"flor-roja",         nombre:"Flor de Brasa",        sprite:[5,8], sheet:"loot2", tipo:"hp",  val:18, rar:"raro",       consumible:true, icono:"girasol" },
-    { id:"pluma",             nombre:"Pluma Mágica",         sprite:[6,8], sheet:"loot2", tipo:"hp",  val:40, rar:"epico",      icono:"espada" },
-    { id:"daga-roja",         nombre:"Daga Carmesí",         sprite:[7,8], sheet:"loot2", tipo:"atk", val:6,  rar:"legendario", icono:"espada" },
-
-    /* ══════════════════════════════════════════════════════════
-       MÍTICOS EXTRA (para las 4 categorías top)
-       ══════════════════════════════════════════════════════════ */
-    { id:"orbe-creacion",     nombre:"Orbe de la Creación",  sprite:[5,3], sheet:"loot1", tipo:"atk", val:20, rar:"mitico",     icono:"gema" },
-    { id:"mandoble-divino",   nombre:"Mandoble Divino",      sprite:[6,0], sheet:"loot1", tipo:"atk", val:12, rar:"mitico",     icono:"espada" },
-    { id:"corona-imperial",   nombre:"Corona Imperial",      sprite:[3,7], sheet:"loot1", tipo:"def", val:12, rar:"mitico",     icono:"corona" },
-    { id:"caliz-mitico",      nombre:"Cáliz de la Eternidad",sprite:[7,8], sheet:"loot1", tipo:"hp",  val:100, rar:"mitico",    icono:"espada" }
+  /* POOL — formato comprimido
+     [id, nombre, col, row, sheet, tipo, val, rar, consumible?, icono?]
+     sheet: 1=loot1 · 2=loot2
+     rar: c=comun · r=raro · e=epico · l=legendario · m=mitico
+     icono: esp·not·man·com·poc·lla·fue·gem·cof·cor·rai·gir */
+  const _P = [
+    /* loot1 — fila 0 */
+    ["espada","Espada de Acero",0,0,1,"atk",3,"r"],
+    ["espada-fuego","Espada Flamígera",1,0,1,"atk",7,"l"],
+    ["espada-hielo","Filo de Hielo",2,0,1,"atk",6,"l"],
+    ["cimitarra","Cimitarra Real",3,0,1,"atk",3,"r"],
+    ["espada-ropera","Espada Ropera",4,0,1,"atk",4,"e"],
+    ["espada-elfica","Espada Élfica",5,0,1,"atk",5,"e"],
+    ["espada-legend","Filo del Alba",6,0,1,"atk",10,"m"],
+    ["espada-cristal","Espada de Cristal",7,0,1,"atk",8,"l"],
+    /* fila 1 */
+    ["daga","Daga Oxidada",0,1,1,"atk",1,"c"],
+    ["daga-asesino","Daga del Asesino",1,1,1,"atk",3,"r"],
+    ["daga-cristal","Daga Carmesí",2,1,1,"atk",4,"e"],
+    ["maza","Maza de Hierro",3,1,1,"atk",2,"c"],
+    ["martillo-hierro","Martillo de Hierro",4,1,1,"atk",3,"r"],
+    ["hacha-guerra","Hacha de Guerra",5,1,1,"atk",4,"r"],
+    ["hacha-doble","Hacha Doble",6,1,1,"atk",5,"e"],
+    ["hacha-cristal","Hacha Azulada",7,1,1,"atk",6,"l"],
+    /* fila 2 */
+    ["arco-madera","Arco de Madera",0,2,1,"atk",1,"c"],
+    ["arco-elfico","Arco Élfico",1,2,1,"atk",4,"e"],
+    ["arco-fuego","Arco Ígneo",2,2,1,"atk",5,"e"],
+    ["arco-hielo","Arco Gélido",3,2,1,"atk",5,"e"],
+    ["ballesta","Ballesta de Torre",4,2,1,"atk",5,"e"],
+    ["baston","Bastón Antiguo",5,2,1,"atk",5,"e"],
+    ["vara-cristal","Vara de Cristal",6,2,1,"atk",4,"r"],
+    ["baculo-fuego","Báculo de Fuego",7,2,1,"atk",7,"l"],
+    /* fila 3 */
+    ["baston-antiguo","Bastón Ancestral",0,3,1,"atk",6,"l"],
+    ["baculo-cristal","Báculo Cristalino",1,3,1,"atk",4,"e"],
+    ["baculo-rayo","Báculo del Rayo",2,3,1,"atk",8,"l"],
+    ["cetro-solar","Cetro Solar",3,3,1,"atk",9,"l"],
+    ["baculo-fuego2","Báculo Ardiente",4,3,1,"atk",7,"l"],
+    ["baculo-infinito","Báculo del Infinito",5,3,1,"atk",15,"m"],
+    ["baculo-sombra","Báculo Umbrío",6,3,1,"atk",10,"m"],
+    ["varita","Varita Mágica",7,3,1,"atk",3,"r"],
+    /* fila 4 */
+    ["amuleto-sol","Amuleto Solar",0,4,1,"atk",6,"l"],
+    ["amuleto-azul","Amuleto Azul",1,4,1,"def",5,"e"],
+    ["amuleto-rubi","Amuleto de Rubí",2,4,1,"atk",4,"e"],
+    ["amuleto-esmeralda","Amuleto Esmeralda",3,4,1,"hp",40,"e"],
+    ["pergamino-azul","Pergamino Arcano",4,4,1,"atk",5,"e",1,"not"],
+    ["pergamino-rojo","Pergamino Ígneo",5,4,1,"atk",4,"r",1,"not"],
+    ["pergamino-madera","Pergamino Rúnico",6,4,1,"hp",25,"r",1,"not"],
+    ["pergamino-escudo","Pergamino Protector",7,4,1,"def",5,"e",1,"not"],
+    /* fila 5 */
+    ["anillo-poder","Anillo de Poder",0,5,1,"atk",3,"r"],
+    ["anillo-estrella","Anillo Estelar",1,5,1,"atk",5,"e"],
+    ["anillo-silver","Anillo de Plata",2,5,1,"def",4,"e"],
+    ["anillo-esmeralda","Anillo Esmeralda",3,5,1,"hp",35,"e"],
+    ["casco-hierro","Casco de Hierro",4,5,1,"def",2,"r"],
+    ["casco-alba","Casco del Alba",5,5,1,"def",5,"e"],
+    ["casco-cruz","Casco Cruzado",6,5,1,"def",6,"l"],
+    ["casco-sombra","Casco Umbrío",7,5,1,"def",7,"l"],
+    /* fila 6 */
+    ["botas-piel","Botas de Piel",0,6,1,"def",2,"r"],
+    ["botas-silver","Botas de Plata",1,6,1,"def",3,"r"],
+    ["botas-aladas","Botas Aladas",2,6,1,"def",3,"r"],
+    ["botas-sombra","Botas Umbrías",3,6,1,"def",4,"e"],
+    ["capa-hood","Capucha Oscura",4,6,1,"def",3,"r"],
+    ["capa-mago","Capa de Mago",5,6,1,"def",5,"e"],
+    ["mascara","Máscara Blanca",6,6,1,"def",4,"e"],
+    ["capa-sombras","Capa de Sombras",7,6,1,"def",7,"l"],
+    /* fila 7 */
+    ["coraza-cuero","Coraza de Cuero",0,7,1,"def",3,"r"],
+    ["coraza-malla","Cota de Malla",1,7,1,"def",4,"e"],
+    ["coraza-placas","Coraza de Placas",2,7,1,"def",5,"e"],
+    ["armadura-dorada","Armadura Dorada",3,7,1,"def",8,"l"],
+    ["guante-cuero","Guante de Cuero",4,7,1,"def",2,"r"],
+    ["guante-sombra","Guante Umbrío",5,7,1,"def",4,"e"],
+    ["guante-garra","Garra de Bestia",6,7,1,"atk",5,"e"],
+    ["guantelete","Guantelete de Poder",7,7,1,"def",4,"e"],
+    /* fila 8 */
+    ["manzana-comida","Manzana Fresca",0,8,1,"hp",15,"c",1,"man"],
+    ["queso","Queso Curado",1,8,1,"hp",20,"c",1,"com"],
+    ["huevo","Huevo Frito",2,8,1,"hp",18,"c",1,"com"],
+    ["carne","Carne Asada",3,8,1,"hp",30,"r",1,"com"],
+    ["llave-pequena","Llave Menuda",4,8,1,"hp",20,"r",0,"lla"],
+    ["llave-hierro","Llave de Hierro",5,8,1,"hp",30,"e",0,"lla"],
+    ["vela","Vela Sagrada",6,8,1,"hp",25,"r",1,"fue"],
+    ["caliz-estelar","Cáliz Estelar",7,8,1,"hp",70,"l"],
+    /* loot2 — fila 0 */
+    ["espada-corta","Espada Corta",0,0,2,"atk",1,"c"],
+    ["espada-larga","Espada Larga",1,0,2,"atk",2,"c"],
+    ["espada-cruzada","Espada Cruzada",2,0,2,"atk",3,"r"],
+    ["espada-cruzada-azul","Espada Cruzada Azul",3,0,2,"atk",4,"e"],
+    ["katana","Katana",4,0,2,"atk",5,"e"],
+    ["katana-dorada","Katana Dorada",5,0,2,"atk",6,"l"],
+    ["sable","Sable Curvo",6,0,2,"atk",4,"e"],
+    ["baston-simple","Bastón Simple",7,0,2,"atk",2,"c"],
+    /* fila 1 */
+    ["pico","Pico Minero",0,1,2,"atk",3,"r"],
+    ["pico-dorado","Pico Dorado",1,1,2,"atk",4,"e"],
+    ["daga-azul","Daga Azul",2,1,2,"atk",3,"r"],
+    ["daga-verde","Daga Verde",3,1,2,"atk",3,"r"],
+    ["hacha","Hacha de Leñador",4,1,2,"atk",3,"r"],
+    ["martillo-madera","Martillo de Madera",5,1,2,"atk",2,"c"],
+    ["hacha-curva","Hacha Curva",6,1,2,"atk",4,"e"],
+    ["hacha-cristal2","Hacha de Cristal",7,1,2,"atk",5,"e"],
+    /* fila 2 */
+    ["garrote","Garrote",0,2,2,"atk",1,"c"],
+    ["martillo","Martillo de Guerra",1,2,2,"atk",4,"r"],
+    ["martillo-mixto","Martillo Mixto",2,2,2,"atk",4,"r"],
+    ["martillo-plata","Martillo de Plata",3,2,2,"atk",5,"e"],
+    ["maza-azul","Maza Azulada",4,2,2,"atk",5,"e"],
+    ["maza-naranja","Maza Ígnea",5,2,2,"atk",6,"l"],
+    ["arco-amarillo","Arco Dorado",6,2,2,"atk",5,"e"],
+    ["arco-oscuro","Arco Sombrío",7,2,2,"atk",6,"l"],
+    /* fila 3 */
+    ["maza-corta","Maza Corta",0,3,2,"atk",2,"c"],
+    ["maza-azul2","Maza Azul",1,3,2,"atk",4,"e"],
+    ["ballesta-corta","Ballesta Corta",2,3,2,"atk",4,"e"],
+    ["ballesta-pesada","Ballesta Pesada",3,3,2,"atk",6,"l"],
+    ["arco-ornamentado","Arco Ornamentado",4,3,2,"atk",5,"e"],
+    ["arco-simple","Arco Simple",5,3,2,"atk",2,"c"],
+    ["arco-curvo","Arco Curvo",6,3,2,"atk",3,"r"],
+    ["arco-real","Arco Real",7,3,2,"atk",6,"l"],
+    /* fila 4 */
+    ["escudo-madera","Escudo de Madera",0,4,2,"def",1,"c"],
+    ["escudo-hierro","Escudo de Hierro",1,4,2,"def",3,"r"],
+    ["escudo-torre","Escudo Torre",2,4,2,"def",6,"e"],
+    ["libro-rojo","Grimorio Rojo",3,4,2,"atk",3,"e",0,"not"],
+    ["casco-caballero","Casco de Caballero",4,4,2,"def",5,"e"],
+    ["casco-visor","Casco con Visor",5,4,2,"def",5,"e"],
+    ["casco-legendario","Casco Alado",6,4,2,"def",8,"l"],
+    ["casco-negro","Casco Negro",7,4,2,"def",6,"l"],
+    /* fila 5 */
+    ["yunque","Yunque de Forja",0,5,2,"hp",30,"r"],
+    ["yunque-pequeno","Yunque Pequeño",1,5,2,"hp",20,"c"],
+    ["armadura-gris","Armadura Gris",2,5,2,"def",4,"e"],
+    ["armadura-azul","Armadura Azul",3,5,2,"def",6,"l"],
+    ["capa-roja","Capa Roja",4,5,2,"def",4,"e"],
+    ["cofre-madera","Cofre Pequeño",5,5,2,"hp",25,"r",0,"cof"],
+    ["capucha","Capucha",6,5,2,"def",2,"c"],
+    ["calavera","Calavera Maldita",7,5,2,"atk",5,"e"],
+    /* fila 6 */
+    ["collar-oro","Collar de Oro",0,6,2,"hp",25,"r"],
+    ["collar-doble","Collar Doble",1,6,2,"hp",35,"e"],
+    ["collar-hierro","Collar de Hierro",2,6,2,"def",3,"r"],
+    ["collar-corazon","Collar de Corazón",3,6,2,"hp",50,"l"],
+    ["lingote-hierro","Lingote de Hierro",4,6,2,"hp",20,"c"],
+    ["lingote-oro","Lingote de Oro",5,6,2,"hp",40,"e"],
+    ["tronco","Tronco Recio",6,6,2,"def",2,"c"],
+    ["ramas","Ramas Secas",7,6,2,"def",1,"c"],
+    /* fila 7 */
+    ["trigo","Haz de Trigo",0,7,2,"hp",15,"c",1,"com"],
+    ["pan","Hogaza de Pan",1,7,2,"hp",25,"c",1,"com"],
+    ["muslo","Muslo Asado",2,7,2,"hp",35,"r",1,"com"],
+    ["hongo","Hongo Silvestre",3,7,2,"hp",18,"c",1,"gir"],
+    ["piedra","Piedra Común",4,7,2,"def",1,"c"],
+    ["roca-marron","Roca Marrón",5,7,2,"def",2,"c"],
+    ["mineral-azul","Mineral Azul",6,7,2,"hp",30,"r",0,"gem"],
+    ["paja","Paca de Paja",7,7,2,"hp",15,"c",1,"com"],
+    /* fila 8 */
+    ["pocion-azul","Poción Azul",0,8,2,"hp",50,"e",1,"poc"],
+    ["pocion-dorada","Poción Dorada",1,8,2,"hp",80,"l",1,"poc"],
+    ["hierba-verde","Hierba Curativa",2,8,2,"hp",20,"c",1,"rai"],
+    ["platano","Plátano",3,8,2,"hp",15,"c",1,"com"],
+    ["hoja-verde","Hoja de Rocío",4,8,2,"hp",12,"c",1,"rai"],
+    ["flor-roja","Flor de Brasa",5,8,2,"hp",18,"r",1,"gir"],
+    ["pluma","Pluma Mágica",6,8,2,"hp",40,"e"],
+    ["daga-roja","Daga Carmesí",7,8,2,"atk",6,"l"],
+    /* míticos extra */
+    ["orbe-creacion","Orbe de la Creación",5,3,1,"atk",20,"m",0,"gem"],
+    ["mandoble-divino","Mandoble Divino",6,0,1,"atk",12,"m"],
+    ["corona-imperial","Corona Imperial",3,7,1,"def",12,"m",0,"cor"],
+    ["caliz-mitico","Cáliz de la Eternidad",7,8,1,"hp",100,"m"]
   ];
 
-  /* ============================================================
-     SORTEO
-     ============================================================ */
+  const RAR_MAP = { c:"comun", r:"raro", e:"epico", l:"legendario", m:"mitico" };
+  const SHEET_MAP = { 1:"loot1", 2:"loot2" };
+  const ICO_MAP = { esp:"espada", not:"nota", man:"manzana", com:"comida", poc:"pocion", lla:"llave", fue:"fuego", gem:"gema", cof:"cofre", cor:"corona", rai:"raiz", gir:"girasol" };
+
+  const POOL = _P.map(([id, nombre, col, row, sh, tipo, val, rar, cons, ico]) => {
+    const it = {
+      id, nombre,
+      sprite: [col, row],
+      sheet: SHEET_MAP[sh],
+      tipo, val,
+      rar: RAR_MAP[rar],
+      icono: ico ? ICO_MAP[ico] : (tipo === "hp" ? "manzana" : "espada")
+    };
+    if (cons) it.consumible = true;
+    return it;
+  });
+
+  /* Sorteo */
   function sortearCon(probs) {
     const r = Math.random();
     let acc = 0;
     for (const k of Object.keys(probs)) { acc += probs[k]; if (r <= acc) return k; }
     return Object.keys(probs)[0];
   }
-  const sortearRareza = b => sortearCon(b || Object.fromEntries(Object.entries(RAREZAS).map(e => [e[0], e[1].prob])));
+  const sortearRareza  = b => sortearCon(b || Object.fromEntries(Object.entries(RAREZAS).map(e => [e[0], e[1].prob])));
   const sortearCalidad = b => sortearCon(b || { normal:.7, reforzado:.2, impecable:.08, ancestral:.02 });
 
   function sortearItem(rareza, calidad) {
@@ -309,8 +279,11 @@
     let r;
     if (jefe) {
       const x = Math.random();
-      r = x < .12 ? "mitico" : x < .3 ? "legendario" : x < .6 ? "epico" : x < .85 ? "raro" : "comun";
-    } else r = sortearRareza();
+      r = x < 0.008 ? "mitico" : x < 0.048 ? "legendario" : x < 0.20 ? "epico" : x < 0.55 ? "raro" : "comun";
+    } else {
+      const x = Math.random();
+      r = x < 0.0015 ? "mitico" : x < 0.02 ? "legendario" : x < 0.12 ? "epico" : x < 0.42 ? "raro" : "comun";
+    }
     return sortearItem(r, sortearCalidad());
   }
 
@@ -325,9 +298,20 @@
     window.dispatchEvent(new Event("rpg:stats-cambiados"));
   }
 
+  function quitarBonus(item) {
+    if (item.consumible) return;
+    const st = cargarStats();
+    const v = item.valFinal || item.val;
+    if (item.tipo === "atk") st.atkBonus = Math.max(0, st.atkBonus - v);
+    if (item.tipo === "def") st.defBonus = Math.max(0, st.defBonus - v);
+    if (item.tipo === "hp")  st.hpBonus  = Math.max(0, st.hpBonus  - v);
+    guardarStats(st);
+    window.dispatchEvent(new Event("rpg:stats-cambiados"));
+  }
+
   function usarConsumible(id) {
     const item = POOL.find(p => p.id === id);
-    if (!item || !item.consumible) return false;
+    if (!item?.consumible) return false;
     const loot = cargarLoot();
     if (!loot[id] || loot[id] <= 0) return false;
     loot[id]--;
@@ -338,9 +322,7 @@
   }
   const getConsumibles = () => { const l = cargarLoot(); return POOL.filter(p => p.consumible && (l[p.id] || 0) > 0); };
 
-  /* ============================================================
-     POPUP + MODAL DETALLE
-     ============================================================ */
+  /* Popup + modal detalle */
   function mostrarPopup(item) {
     let c = $("loot-popup");
     if (!c) { c = document.createElement("div"); c.id = "loot-popup"; c.className = "loot-popup"; document.body.appendChild(c); }
@@ -393,6 +375,7 @@
       });
       acc.appendChild(b);
     }
+    añadirBotonReroll(m, item);
     const bc = document.createElement("button");
     bc.type = "button"; bc.className = "btn-secondary"; bc.textContent = "Cerrar";
     bc.addEventListener("click", () => m.classList.remove("active"));
@@ -401,9 +384,149 @@
     if (window.hidratarIconos) window.hidratarIconos(m);
   }
 
-  /* ============================================================
-     COFRES
-     ============================================================ */
+  /* Reroll */
+  const COSTO_REROLL = { comun:100, raro:500, epico:2500, legendario:12000, mitico:50000 };
+
+  function moverRareza(actual, delta) {
+    const i = ORDEN_RAREZAS.indexOf(actual);
+    if (i < 0) return actual;
+    const n = Math.max(0, Math.min(ORDEN_RAREZAS.length - 1, i + delta));
+    return ORDEN_RAREZAS[n];
+  }
+
+  function sortearNuevaRareza(original) {
+    const r = Math.random(), t = PROB_REROLL_RAREZA;
+    if (r < t.misma) return original;
+    if (r < t.misma + t.sube1) return moverRareza(original, 1);
+    if (r < t.misma + t.sube1 + t.sube2) return moverRareza(original, 2);
+    return moverRareza(original, -1);
+  }
+
+  function buscarCandidatos(original, nuevaRareza, sheetOverride) {
+    const sheet = sheetOverride || original.sheet;
+    const base = rar => POOL.filter(p =>
+      p.rar === rar && p.id !== original.id && p.tipo === original.tipo &&
+      p.consumible === original.consumible && p.sheet === sheet
+    );
+    let cand = base(nuevaRareza);
+    let rarezaFinal = nuevaRareza;
+    if (!cand.length) { cand = base(original.rar); rarezaFinal = original.rar; }
+    return { cand, rarezaFinal };
+  }
+
+  function rerollItem(itemId) {
+    const original = POOL.find(p => p.id === itemId);
+    if (!original) return { error: "Item no encontrado" };
+    const loot = cargarLoot();
+    const cant = loot[itemId] || 0;
+    if (cant <= 0) return { error: "No tienes este objeto" };
+    const costo = COSTO_REROLL[original.rar] || 500;
+    if (getMonedas() < costo) return { error: `Necesitas ${costo} monedas` };
+
+    const rarezaSorteada = sortearNuevaRareza(original.rar);
+    const { cand, rarezaFinal } = buscarCandidatos(original, rarezaSorteada);
+    if (!cand.length) return { error: "No hay alternativas del mismo tipo" };
+
+    const nuevo = cand[Math.floor(Math.random() * cand.length)];
+    setMonedas(getMonedas() - costo);
+    quitarBonus(original);
+
+    loot[itemId]--;
+    if (loot[itemId] <= 0) delete loot[itemId];
+    loot[nuevo.id] = (loot[nuevo.id] || 0) + 1;
+    if (!nuevo.consumible) aplicarBonus(nuevo);
+    guardarLoot(loot);
+
+    const delta = ORDEN_RAREZAS.indexOf(rarezaFinal) - ORDEN_RAREZAS.indexOf(original.rar);
+    if (delta > 0) SND("victoria");
+    else if (delta < 0) SND("derrota");
+    else SND("sparkle");
+
+    mostrarPopup(nuevo);
+    window.dispatchEvent(new Event("rpg:stats-cambiados"));
+    renderColeccion();
+    return { ok:true, nuevo, costo, rarezaAnterior:original.rar, rarezaNueva:rarezaFinal, cambioRareza:delta !== 0, delta };
+  }
+
+  async function rerollCategoria(cat) {
+    const loot = cargarLoot();
+    const ids = Object.keys(loot).filter(id => {
+      const it = POOL.find(p => p.id === id);
+      return it && it.sheet === cat && !it.consumible;
+    });
+    if (!ids.length) return { error: "No hay objetos para rerollear" };
+    const total = ids.reduce((s, id) => {
+      const it = POOL.find(p => p.id === id);
+      return s + (COSTO_REROLL[it.rar] || 500) * loot[id];
+    }, 0);
+    if (getMonedas() < total) return { error: `Necesitas ${total} monedas` };
+
+    const ok = await confirmar({
+      title: '¿Rerollear objetos?',
+      message: `Se rerollearán <strong>${ids.length}</strong> objetos por <strong>${total} monedas</strong>.<br><br><em>88% misma rareza · 9% +1 tier · 2% +2 tiers · 1% -1 tier</em>`,
+      variant: 'warning',
+      icon: '🎲',
+      confirmText: `Pagar ${total} 🪙`,
+      cancelText: 'Cancelar'
+    });
+    if (!ok) return { cancel:true };
+
+    setMonedas(getMonedas() - total);
+    let cambiados = 0, mejoras = 0, bajadas = 0;
+
+    ids.forEach(id => {
+      const cant = loot[id];
+      const original = POOL.find(p => p.id === id);
+      for (let i = 0; i < cant; i++) {
+        const rarezaSorteada = sortearNuevaRareza(original.rar);
+        const { cand, rarezaFinal } = buscarCandidatos(original, rarezaSorteada, cat);
+        if (!cand.length) continue;
+        const nuevo = cand[Math.floor(Math.random() * cand.length)];
+        quitarBonus(original);
+        aplicarBonus(nuevo);
+        loot[nuevo.id] = (loot[nuevo.id] || 0) + 1;
+        cambiados++;
+        const delta = ORDEN_RAREZAS.indexOf(rarezaFinal) - ORDEN_RAREZAS.indexOf(original.rar);
+        if (delta > 0) mejoras++;
+        else if (delta < 0) bajadas++;
+      }
+      delete loot[id];
+    });
+
+    guardarLoot(loot);
+    renderColeccion();
+    window.dispatchEvent(new Event("rpg:stats-cambiados"));
+    SND(mejoras > 0 ? "victoria" : "sparkle");
+    return { ok:true, cambiados, mejoras, bajadas, total };
+  }
+
+  function añadirBotonReroll(modal, item) {
+    const acc = modal.querySelector(".rpg-loot-modal-acciones");
+    if (!acc || item.consumible) return;
+    const loot = cargarLoot();
+    const cant = loot[item.id] || 0;
+    if (cant <= 0) return;
+    const costo = COSTO_REROLL[item.rar] || 500;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "rpg-loot-usar";
+    b.style.background = "linear-gradient(135deg,#6cb8ff,#a684f0)";
+    b.style.color = "#1a1030";
+    b.textContent = `🎲 Reroll (${costo} 🪙)`;
+    b.title = "88% misma · 9% +1 · 2% +2 · 1% -1";
+    b.addEventListener("click", () => {
+      const r = rerollItem(item.id);
+      if (r.error) return alert(r.error);
+      modal.classList.remove("active");
+      const txt = r.delta > 0 ? `⭐ ¡Subió a ${RAREZAS[r.rarezaNueva].label}!`
+                : r.delta < 0 ? `💧 Bajó a ${RAREZAS[r.rarezaNueva].label}...`
+                : r.nuevo.nombre;
+      notifMascota?.("🎲 Reroll", txt);
+    });
+    acc.insertBefore(b, acc.firstChild);
+  }
+
+  /* Cofres */
   function abrirCofre(tipo, cant) {
     cant = cant || 1;
     const def = COFRES[tipo]; if (!def) return;
@@ -443,14 +566,12 @@
     m.onclick = e => { if (e.target === m || e.target.classList.contains("rpg-loot-modal-close") || e.target.id === "btn-cerrar-cofre") m.classList.remove("active"); };
   }
 
-  /* ============================================================
-     RENDER PESTAÑA OBJETOS
-     ============================================================ */
+  /* Colección */
   const CATS = [
-    { id:"todos",    label:"Todos",     sheets:null },
-    { id:"loot1",    label:"Arsenal",   sheets:["loot1"] },
-    { id:"loot2",    label:"Recursos",  sheets:["loot2"] },
-    { id:"consumibles", label:"Pociones", soloConsumibles:true }
+    { id:"todos",       label:"Todos",     sheets:null },
+    { id:"loot1",       label:"Arsenal",   sheets:["loot1"] },
+    { id:"loot2",       label:"Recursos",  sheets:["loot2"] },
+    { id:"consumibles", label:"Pociones",  soloConsumibles:true }
   ];
   let filtro = "todos";
 
@@ -467,6 +588,7 @@
     if (cat.soloConsumibles) pool = pool.filter(p => p.consumible);
 
     const filtros = CATS.map(x => `<button class="rpg-col-filtro ${x.id === filtro ? "active" : ""}" data-cat="${x.id}">${x.label}</button>`).join("");
+    const puedeReroll = filtro === "loot1" || filtro === "loot2";
 
     let grid = "";
     pool.forEach(p => {
@@ -474,19 +596,37 @@
       grid += `<div class="rpg-coleccion-item rar-${p.rar}${p.consumible && t ? " consumible" : ""}${t ? "" : " bloqueado"}" data-id="${p.id}" title="${t ? p.nombre + (p.consumible ? " (usable)" : "") : "???"} (${RAREZAS[p.rar].label})">${renderIcono(p)}${t ? `<span class="rpg-coleccion-cant">×${t}</span>` : ""}</div>`;
     });
 
-    c.innerHTML = `<div class="rpg-coleccion-header"><span class="rpg-coleccion-titulo">🎒 Colección</span><span class="rpg-coleccion-count">${uniq} / ${POOL.length} · ${total} objetos</span></div><div class="rpg-col-filtros">${filtros}</div><div class="rpg-coleccion-grid">${grid}</div>`;
+    c.innerHTML = `
+      <div class="rpg-coleccion-header">
+        <span class="rpg-coleccion-titulo">🎒 Colección</span>
+        <span class="rpg-coleccion-count">${uniq} / ${POOL.length} · ${total} objetos</span>
+      </div>
+      <div class="rpg-col-filtros">
+        ${filtros}
+        ${puedeReroll ? `<button class="rpg-col-filtro" id="btn-reroll-cat" style="margin-left:auto;border-color:rgba(108,184,255,.5);color:#6cb8ff;font-weight:900;" title="88% misma · 9% +1 · 2% +2 · 1% -1">🎲 Reroll ${cat.label}</button>` : ""}
+      </div>
+      <div class="rpg-coleccion-grid">${grid}</div>`;
 
     if (window.hidratarIconos) window.hidratarIconos(c);
-    qsa(".rpg-col-filtro", c).forEach(b => b.addEventListener("click", () => { filtro = b.dataset.cat; renderColeccion(); }));
+    qsa(".rpg-col-filtro[data-cat]", c).forEach(b => b.addEventListener("click", () => { filtro = b.dataset.cat; renderColeccion(); }));
     qsa(".rpg-coleccion-item", c).forEach(el => el.addEventListener("click", () => {
       const it = POOL.find(p => p.id === el.dataset.id);
       if (it) mostrarDetalleItem(it);
     }));
+
+    document.getElementById("btn-reroll-cat")?.addEventListener("click", async () => {
+      const r = await rerollCategoria(filtro);
+      if (r.error) alert(r.error);
+      else if (!r.cancel) {
+        let msg = `🎲 ${r.cambiados} objetos rerolleados.\nCoste: ${r.total} 🪙`;
+        if (r.mejoras > 0) msg += `\n⭐ ${r.mejoras} mejoras de rareza!`;
+        if (r.bajadas > 0) msg += `\n💧 ${r.bajadas} bajadas...`;
+        alert(msg);
+      }
+    });
   }
 
-  /* ============================================================
-     RENDER PESTAÑA COFRES
-     ============================================================ */
+  /* Cofres — render */
   function renderCofres() {
     const c = document.querySelector('[data-rpg-panel="cofres"]');
     if (!c) return;
@@ -501,9 +641,7 @@
     }));
   }
 
-  /* ============================================================
-     EVENTOS
-     ============================================================ */
+  /* Eventos */
   window.addEventListener("sunadventures:rpg-tab", e => {
     const t = e.detail?.tab || "zonas";
     setTimeout(() => { if (t === "objetos") renderColeccion(); else if (t === "cofres") renderCofres(); }, 0);
@@ -526,15 +664,16 @@
     renderColeccion();
   });
 
-  /* ============================================================
-     API PÚBLICA
-     ============================================================ */
+  /* API pública */
   window.RpgLoot = {
-    POOL, SHEETS, RAREZAS, CALIDADES, COFRES,
+    POOL, SHEETS, RAREZAS, CALIDADES, COFRES, COSTO_REROLL,
+    ORDEN_RAREZAS, PROB_REROLL_RAREZA,
     cargarLoot, guardarLoot, cargarStats, guardarStats,
     usarConsumible, getConsumibles,
     mostrarDetalleItem, mostrarPopup, renderIcono,
     renderColeccion, renderCofres, abrirCofre,
+    rerollItem, rerollCategoria, añadirBotonReroll,
+    moverRareza, sortearNuevaRareza,
     simular: jefe => {
       const it = sortearItemVictoria(!!jefe);
       const l = cargarLoot();
@@ -545,8 +684,16 @@
       renderColeccion();
       return it;
     },
-    reset: () => {
-      if (!confirm("¿Borrar TODO tu botín y bonus?")) return;
+    reset: async () => {
+      const ok = await confirmar({
+        title: '¿Borrar TODO tu botín?',
+        message: 'Perderás todas las reliquias, objetos y bonus acumulados. Esta acción es irreversible.',
+        variant: 'danger',
+        icon: '💀',
+        confirmText: 'Sí, borrar todo',
+        cancelText: 'Cancelar'
+      });
+      if (!ok) return;
       localStorage.removeItem(KEY_LOOT());
       localStorage.removeItem(KEY_STATS());
       renderColeccion();
@@ -554,5 +701,5 @@
     }
   };
 
-  console.log("✅ rpg-loot.js v2 listo · " + POOL.length + " items · 2 sheets");
+  console.log("✅ rpg-loot.js v5 listo · " + POOL.length + " items");
 })();

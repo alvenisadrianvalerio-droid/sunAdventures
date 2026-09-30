@@ -1,5 +1,7 @@
 /* ============================================================
-   RPG.JS — Aventura por turnos · versión compacta con pestañas
+   RPG.JS v7 — Aventura HARDCORE
+   · 15 regiones · 150 zonas · Enemigos con especiales
+   · Jefes con 2 fases · Escalado brutal
    ============================================================ */
 window._extraVistas = window._extraVistas || [];
 if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
@@ -7,42 +9,70 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 (function boot() {
   const API = window._TiendaAPI;
   if (!API) { let n=0; const it=()=>{ if(window._TiendaAPI) return boot(); if(++n>50) return; setTimeout(it,100); }; return setTimeout(it,100); }
-
   const { ICONO, COMIDAS, getMonedas, setMonedas, cargarInv, notifMascota, getUserId } = API;
-  const $  = id => document.getElementById(String(id).replace(/^#/,""));
-  const qs = (s,r=document)=>r.querySelector(s);
-  const qsa= (s,r=document)=>[...r.querySelectorAll(s)];
-  const rnd= (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  const $   = id => document.getElementById(String(id).replace(/^#/,""));
+  const qs  = (s,r=document)=>r.querySelector(s);
+  const qsa = (s,r=document)=>[...r.querySelectorAll(s)];
+  const rnd = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
   const clamp=(n,a=0,b=1e9)=>Math.max(a,Math.min(b,n));
-  const SND= t=>{ try{window._snd?.(t);}catch{} };
+  const SND = t=>{ try{window._snd?.(t);}catch{} };
   const MASCOTAS = window._MASCOTAS || {};
+  const FX = det => window.dispatchEvent(new CustomEvent("rpg:fx",{detail:det}));
+  const FX_KEY = id => (window.RpgCanvas?.HABILIDAD_FX?.[id]) || "slash";
 
-  /* ============================================================
-     ZONAS
-     ============================================================ */
-  const ZONAS = [
-    { id:"bosque",    nombre:"Bosque de Girasoles", desc:"Enemigos tranquilos",     icono:ICONO.bosque,   nivel:1,  enemigos:["abeja","mariposa","caracol","pajaro"],        hp:30,   atk:8,   xp:12,   monedas:8    },
-    { id:"cueva",     nombre:"Cueva Cristal",       desc:"Oscura y fría",           icono:ICONO.montaña,  nivel:3,  enemigos:["lagarto","pulpo","tortuga"],                  hp:60,   atk:15,  xp:28,   monedas:18   },
-    { id:"castillo",  nombre:"Castillo de Naipes",  desc:"Guardias de élite",       icono:ICONO.castillo, nivel:6,  enemigos:["dragon-bebe","jirafa","hamburguesa"],         hp:100,  atk:25,  xp:55,   monedas:35   },
-    { id:"torre",     nombre:"Torre del Alba",      desc:"El primer jefe",          icono:ICONO.corona,   nivel:10, enemigos:["dragon-anciano"], jefe:true,                 hp:200,  atk:40,  xp:150,  monedas:120  },
-    { id:"desierto",  nombre:"Desierto Ardiente",   desc:"Arena y escorpiones",     icono:ICONO.fuego,    nivel:13, enemigos:["escorpion","serpiente","escarabajo"],        hp:260,  atk:50,  xp:220,  monedas:180  },
-    { id:"glaciar",   nombre:"Glaciar Eterno",      desc:"Hielo que corta",         icono:ICONO.copo,     nivel:16, enemigos:["lobo-hielo","oso-polar","elemental-hielo"],   hp:330,  atk:62,  xp:300,  monedas:240  },
-    { id:"volcan",    nombre:"Volcán Dormido",      desc:"Ríos de lava",            icono:ICONO.fuego,    nivel:20, enemigos:["golem-lava","salamandra","fenix-joven"],      hp:420,  atk:76,  xp:400,  monedas:320  },
-    { id:"ruinas",    nombre:"Ruinas Antiguas",     desc:"Ecos del pasado",         icono:ICONO.castillo, nivel:24, enemigos:["esqueleto","momia","gargola"],                hp:520,  atk:90,  xp:520,  monedas:420  },
-    { id:"pantano",   nombre:"Pantano Sombrío",     desc:"Niebla venenosa",         icono:ICONO.bosque,   nivel:28, enemigos:["sapo-gigante","cocodrilo","bruja-pantano"],   hp:640,  atk:105, xp:660,  monedas:540  },
-    { id:"cavernas",  nombre:"Cavernas de Cristal", desc:"Gemas vivientes",         icono:ICONO.gema,     nivel:32, enemigos:["golem-cristal","murcielago","espectro"],     hp:780,  atk:120, xp:820,  monedas:680  },
-    { id:"monte",     nombre:"Monte Celestial",     desc:"Rumbo al cielo",          icono:ICONO.montaña,  nivel:36, enemigos:["grifo","quimera","elemental-aire"],         hp:950,  atk:138, xp:1000, monedas:850  },
-    { id:"oceano",    nombre:"Ciudad Sumergida",    desc:"Bajo las olas",           icono:ICONO.globo,    nivel:40, enemigos:["sirena","kraken-joven","tiburon"],          hp:1150, atk:158, xp:1200, monedas:1050 },
-    { id:"sombras",   nombre:"Reino de Sombras",    desc:"Nadie sale igual",        icono:ICONO.luna,     nivel:45, enemigos:["espectro-negro","vampiro","nigromante"],    hp:1400, atk:180, xp:1450, monedas:1300 },
-    { id:"fortaleza", nombre:"Fortaleza Mecánica",  desc:"Acero y engranajes",      icono:ICONO.ajustes,  nivel:50, enemigos:["robot-guardia","dron","mech-gigante"],     hp:1700, atk:205, xp:1750, monedas:1600 },
-    { id:"valle",     nombre:"Valle de Dragones",   desc:"JEFE — Nido ancestral",   icono:ICONO.fuego,    nivel:55, enemigos:["dragon-rojo"], jefe:true,                 hp:2200, atk:235, xp:2200, monedas:2100 },
-    { id:"abismo",    nombre:"Abismo Final",        desc:"JEFE FINAL — El vacío",   icono:ICONO.corona,   nivel:60, enemigos:["senor-abismo"], jefe:true,                 hp:3000, atk:280, xp:3500, monedas:3500 }
+  /* ---------- 15 REGIONES ---------- */
+  const REGIONES = [
+    { id:"praderas", nombre:"Praderas de Girasoles", icono:ICONO.girasol,
+      base:["abeja","mariposa","caracol","pajaro","conejo"], elite:["jirafa","oveja","pollito","girasol"],
+      jefe:"girasol-anciano", jefeNombre:"El Girasol Ancestral", jefeIcono:ICONO.girasol },
+    { id:"bosque", nombre:"Bosque Umbrío", icono:ICONO.bosque,
+      base:["lagarto","sapo-gigante","cocodrilo","pulpo","tortuga"], elite:["bruja-pantano","espectro","hongo"],
+      jefe:"arbol-ancestral", jefeNombre:"El Árbol que Susurra", jefeIcono:ICONO.bosque },
+    { id:"cueva", nombre:"Cavernas de Cristal", icono:ICONO.gema,
+      base:["murcielago","golem-cristal","espectro","lagarto"], elite:["gargola","elemental-hielo","golem-lava"],
+      jefe:"reina-cristal", jefeNombre:"La Reina de Cristal", jefeIcono:ICONO.gema },
+    { id:"desierto", nombre:"Desierto Ardiente", icono:ICONO.fuego,
+      base:["escorpion","serpiente","escarabajo","momia"], elite:["salamandra","fenix-joven","golem-lava"],
+      jefe:"faraon", jefeNombre:"El Faraón Olvidado", jefeIcono:ICONO.corona },
+    { id:"glaciar", nombre:"Glaciar Eterno", icono:ICONO.copo,
+      base:["lobo-hielo","oso-polar","elemental-hielo","espectro"], elite:["gargola","quimera","elemental-aire"],
+      jefe:"rey-glaciar", jefeNombre:"El Rey del Hielo Eterno", jefeIcono:ICONO.corona },
+    { id:"volcan", nombre:"Volcán Dormido", icono:ICONO.fuego,
+      base:["golem-lava","salamandra","fenix-joven","escorpion"], elite:["quimera","gargola","espectro-negro"],
+      jefe:"dragon-rojo", jefeNombre:"El Dragón Rojo", jefeIcono:ICONO.fuego },
+    { id:"ruinas", nombre:"Ruinas Antiguas", icono:ICONO.castillo,
+      base:["esqueleto","momia","gargola","espectro"], elite:["nigromante","vampiro","golem-cristal"],
+      jefe:"lich", jefeNombre:"El Lich Supremo", jefeIcono:ICONO.corona },
+    { id:"sombras", nombre:"Reino de Sombras", icono:ICONO.luna,
+      base:["espectro-negro","vampiro","nigromante","murcielago"], elite:["kraken-joven","tiburon","sirena"],
+      jefe:"senor-sombras", jefeNombre:"El Señor de las Sombras", jefeIcono:ICONO.luna },
+    { id:"abismo", nombre:"Abismo Final", icono:ICONO.corona,
+      base:["mech-gigante","robot-guardia","dron","golem-cristal"], elite:["dragon-rojo","kraken-joven","nigromante"],
+      jefe:"senor-abismo", jefeNombre:"El Señor del Abismo", jefeIcono:ICONO.corona },
+    { id:"selva", nombre:"Selva Ancestral", icono:ICONO.bosque,
+      base:["jaguar","mono-loco","serpiente-emplumada","planta-carnivora","tucan-sombrio"], elite:["chaman-jaguar","tigre-espiritu","tarantula-gigante"],
+      jefe:"senor-selva", jefeNombre:"El Señor de la Selva", jefeIcono:ICONO.bosque },
+    { id:"pantano", nombre:"Pantano Maldito", icono:ICONO.gota,
+      base:["rana-venenosa","cocodrilo-muerto","bruja-pantano","serpiente-veneno","espectro-fango"], elite:["hechicero-pantano","rey-ranas","treant-podrido"],
+      jefe:"diosa-pantano", jefeNombre:"La Diosa del Pantano", jefeIcono:ICONO.gota },
+    { id:"tundra", nombre:"Tundra Helada", icono:ICONO.copo,
+      base:["yeti","lobo-blanco","oso-polar","elemental-hielo","gigante-hielo"], elite:["rey-yeti","quimera-nieve","dragon-blanco-joven"],
+      jefe:"titan-glaciar", jefeNombre:"El Titán Glaciar", jefeIcono:ICONO.copo },
+    { id:"cielo", nombre:"Cielo Celestial", icono:ICONO.estrella,
+      base:["grifo","angel-caido","harpia","halcon-gigante","elemental-aire"], elite:["serafin","quimera-alada","dragon-tormenta"],
+      jefe:"dios-cielo", jefeNombre:"El Dios del Cielo", jefeIcono:ICONO.estrella },
+    { id:"inframundo", nombre:"Inframundo Ardiente", icono:ICONO.fuego,
+      base:["demonio-menor","alma-perdida","cerberus-cachorro","succubus","espectro-fuego"], elite:["senor-demonio","lich-infierno","dragon-negro"],
+      jefe:"senor-inframundo", jefeNombre:"El Señor del Inframundo", jefeIcono:ICONO.fuego },
+    { id:"vacio", nombre:"Vacío Absoluto", icono:ICONO.corona,
+      base:["horror","aberracion","ojo-vacio","tentaculo","sombra-vacia"], elite:["caballero-vacio","titan-vacio","dragon-vacio"],
+      jefe:"el-vacio", jefeNombre:"El Vacío", jefeIcono:ICONO.corona }
   ];
 
   const NOMBRES = {
-    abeja:"Abeja Soldado", mariposa:"Mariposa Sombría", caracol:"Caracol Blindado", pajaro:"Gorrión Guerrero",
-    lagarto:"Lagarto Espinoso", pulpo:"Pulpo Abisal", tortuga:"Tortuga de Hierro",
-    "dragon-bebe":"Dragón Bebé", jirafa:"Jirafa Colosal", hamburguesa:"Hamburguesa Mutante", "dragon-anciano":"Dragón Ancestral",
+    abeja:"Abeja Soldado", mariposa:"Mariposa Sombría", caracol:"Caracol Blindado", pajaro:"Gorrión Guerrero", conejo:"Conejo Espinoso",
+    lagarto:"Lagarto Espinoso", pulpo:"Pulpo Abisal", tortuga:"Tortuga de Hierro", "dragon-bebe":"Dragón Bebé",
+    jirafa:"Jirafa Colosal", hamburguesa:"Hamburguesa Mutante", girasol:"Girasol Guardián", hongo:"Hongo Lunar",
     escorpion:"Escorpión de Arena", serpiente:"Serpiente del Desierto", escarabajo:"Escarabajo Sagrado",
     "lobo-hielo":"Lobo de Hielo", "oso-polar":"Oso Polar", "elemental-hielo":"Elemental Glacial",
     "golem-lava":"Golem de Lava", salamandra:"Salamandra Ígnea", "fenix-joven":"Fénix Joven",
@@ -53,41 +83,90 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     sirena:"Sirena Hipnótica", "kraken-joven":"Kraken Joven", tiburon:"Tiburón Colosal",
     "espectro-negro":"Espectro Negro", vampiro:"Vampiro Lord", nigromante:"Nigromante",
     "robot-guardia":"Robot Guardián", dron:"Dron Asesino", "mech-gigante":"Mech Gigante",
-    "dragon-rojo":"Dragón Rojo Ancestral", "senor-abismo":"Señor del Abismo"
+    "dragon-rojo":"Dragón Rojo Ancestral", "senor-abismo":"Señor del Abismo",
+    "girasol-anciano":"Girasol Ancestral", "arbol-ancestral":"Árbol Susurrante",
+    "reina-cristal":"Reina de Cristal", faraon:"Faraón Olvidado", "rey-glaciar":"Rey del Hielo",
+    lich:"Lich Supremo", "senor-sombras":"Señor de Sombras",
+    /* Nuevas regiones */
+    jaguar:"Jaguar Sangriento", "mono-loco":"Mono Poseído", "serpiente-emplumada":"Serpiente Emplumada",
+    "planta-carnivora":"Planta Carnívora", "tucan-sombrio":"Tucán Sombrío",
+    "chaman-jaguar":"Chamán Jaguar", "tigre-espiritu":"Tigre Espíritu", "tarantula-gigante":"Tarántula Gigante",
+    "senor-selva":"El Señor de la Selva",
+    "rana-venenosa":"Rana Venenosa", "cocodrilo-muerto":"Cocodrilo No-Muerto", "serpiente-veneno":"Serpiente de Veneno",
+    "espectro-fango":"Espectro del Fango", "hechicero-pantano":"Hechicero del Pantano",
+    "rey-ranas":"Rey de las Ranas", "treant-podrido":"Treant Podrido", "diosa-pantano":"La Diosa del Pantano",
+    yeti:"Yeti", "lobo-blanco":"Lobo Blanco", "gigante-hielo":"Gigante de Hielo",
+    "rey-yeti":"Rey Yeti", "quimera-nieve":"Quimera de Nieve", "dragon-blanco-joven":"Dragón Blanco Joven",
+    "titan-glaciar":"El Titán Glaciar",
+    harpia:"Harpía", "angel-caido":"Ángel Caído", "halcon-gigante":"Halcón Gigante",
+    serafin:"Serafín", "quimera-alada":"Quimera Alada", "dragon-tormenta":"Dragón de Tormenta",
+    "dios-cielo":"El Dios del Cielo",
+    "demonio-menor":"Demonio Menor", "alma-perdida":"Alma Perdida", "cerberus-cachorro":"Cerberus Cachorro",
+    succubus:"Súcubo", "espectro-fuego":"Espectro de Fuego", "senor-demonio":"Señor Demonio",
+    "lich-infierno":"Lich del Infierno", "dragon-negro":"Dragón Negro",
+    "senor-inframundo":"El Señor del Inframundo",
+    horror:"Horror", aberracion:"Aberración", "ojo-vacio":"Ojo del Vacío", tentaculo:"Tentáculo",
+    "sombra-vacia":"Sombra Vacía", "caballero-vacio":"Caballero del Vacío", "titan-vacio":"Titán Vacío",
+    "dragon-vacio":"Dragón Vacío", "el-vacio":"El Vacío"
   };
 
-  /* ============================================================
-     ESTADO
-     ============================================================ */
+  /* ---------- 150 zonas ---------- */
+  const ZONAS = (() => {
+    const z = [];
+    REGIONES.forEach((reg, ri) => {
+      for (let i = 1; i <= 10; i++) {
+        const idx = ri * 10 + i, esJefe = i === 10, esMini = i === 5, esElite = i >= 6 && i <= 9;
+        // Escalado brutal
+        const hp  = Math.round(45 + idx*30 + idx*idx*3.6 + (esJefe ? idx*350 : esMini ? idx*100 : 0));
+        const atk = Math.round(7 + idx*2.6 + Math.pow(idx,1.75)*1.3 + (esJefe ? idx*12 : esMini ? idx*5 : 0));
+        const xp  = Math.round(9 + idx*7 + (esJefe ? idx*100 : esMini ? idx*25 : 0));
+        const mon = Math.round(3 + idx*1.4 + (esJefe ? 55 : esMini ? 15 : 0));
+        const enemigos = esJefe ? [reg.jefe] : esMini ? [...reg.elite.slice(0,2), reg.base[0]] : esElite ? reg.elite : reg.base;
+        z.push({
+          id:`${reg.id}-${i}`, nombre: esJefe ? reg.jefeNombre : `${reg.nombre} · ${i}`,
+          desc: esJefe ? "⚔️ JEFE DE REGIÓN" : esMini ? "★ Mini-jefe" : reg.nombre,
+          icono: esJefe ? reg.jefeIcono : reg.icono, nivel: idx, enemigos, hp, atk, xp, monedas:mon,
+          jefe: esJefe, miniJefe: esMini, region: reg.id, regionNombre: reg.nombre, orden: idx
+        });
+      }
+    });
+    return z;
+  })();
+
+  const GRUPOS = REGIONES.map((reg, i) => ({
+    id:i, nombre:reg.nombre, icono:reg.icono, jefe:reg.jefeNombre, jefeIcono:reg.jefeIcono,
+    zonas: ZONAS.filter(z => Math.floor((z.orden-1)/10) === i),
+    nivelMin: i*10+1, nivelMax: (i+1)*10
+  }));
+
+  /* ---------- Estado ---------- */
   const KEY = () => `sa_rpg_${getUserId()}`;
   const def = () => ({ nivel:1, xp:0, hp:100, enemigosDerrotados:0, jefesDerrotados:[], zonaActual:null, statsBase:{atk:10,def:3} });
   const cargar = () => { try { const r = localStorage.getItem(KEY()); return r ? { ...def(), ...JSON.parse(r) } : def(); } catch { return def(); } };
   const guardar = s => { try { localStorage.setItem(KEY(), JSON.stringify(s)); } catch {} };
-
   const statsLoot = () => { try { return JSON.parse(localStorage.getItem(`sa_rpg_stats_${getUserId()}`) || '{"atkBonus":0,"defBonus":0,"hpBonus":0}'); } catch { return { atkBonus:0, defBonus:0, hpBonus:0 }; } };
   const bonus = () => { try { return window._getBonusActivos?.() || []; } catch { return []; } };
-const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x.val || 0), 0);
+  const bonusTipo = t => bonus().filter(x=>x.tipo===t).reduce((s,x)=>s+(x.val||0),0);
   const tieneBonus = t => bonus().some(x => x.tipo === t);
 
+  let state = cargar();
   const hpMax       = () => 80 + state.nivel*20 + (statsLoot().hpBonus||0) + bonusTipo("hp_max");
   const atkTotal    = () => state.statsBase.atk + state.nivel*3 + (statsLoot().atkBonus||0) + bonusTipo("atk_fijo");
   const defTotal    = () => state.statsBase.def + state.nivel*2 + (statsLoot().defBonus||0) + bonusTipo("def_fijo");
-  const xpParaSubir = () => Math.round(state.nivel*100 + Math.pow(state.nivel,1.6)*20);
+  const xpParaSubir = () => Math.round(state.nivel * 320 + Math.pow(state.nivel, 2.3) * 60);
 
-  let state = cargar(), enemigo = null, turnoJugador = true, overlayObjetos = false;
+  let enemigo = null, turnoJugador = true, overlayObjetos = false;
+  let buffsHeroe = [], buffsEnemigo = [];
 
-  /* ============================================================
-     INYECCIÓN
-     ============================================================ */
+  /* ---------- Inyección ---------- */
   function inyectarSeccion() {
     if ($("rpg")) return;
     const sec = document.createElement("section");
     sec.id = "rpg"; sec.className = "rpg-section view"; sec.dataset.view = "rpg";
-    sec.innerHTML = `<div class="rpg-header"><h2 class="rpg-title">Aventura</h2><p class="rpg-subtitle">Lucha, sube de nivel y conquista las zonas</p></div><div id="rpg-content"></div>`;
+    sec.innerHTML = `<div class="rpg-header"><h2 class="rpg-title">Aventura</h2><p class="rpg-subtitle">15 regiones · 150 zonas · Enemigos con especiales</p></div><div id="rpg-content"></div>`;
     const f = qs(".site-footer");
     f ? f.parentNode.insertBefore(sec, f) : document.body.appendChild(sec);
   }
-
   function inyectarNav() {
     if (qs('[data-view-link="rpg"]')) return;
     const nav = qs(".nav-links"); if (!nav) return;
@@ -105,9 +184,6 @@ const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x
     }
   }
 
-  /* ============================================================
-     RENDER
-     ============================================================ */
   function render() {
     inyectarNav(); inyectarSeccion();
     const c = $("rpg-content"); if (!c) return;
@@ -126,18 +202,15 @@ const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x
       <div class="rpg-panel ${tab==="zonas"?"active":""}" data-rpg-panel="zonas">${htmlMapa()}</div>
       <div class="rpg-panel ${tab==="objetos"?"active":""}" data-rpg-panel="objetos"></div>
       <div class="rpg-panel ${tab==="cofres"?"active":""}" data-rpg-panel="cofres"></div>`;
-
-    qsa(".rpg-zone", c).forEach(b => b.addEventListener("click", () => entrarZona(b.dataset.zona)));
     qsa(".rpg-tab", c).forEach(t => t.addEventListener("click", () => {
       const target = t.dataset.rpgTab;
       c.dataset.tabActiva = target;
       qsa(".rpg-tab", c).forEach(x => x.classList.toggle("active", x === t));
       qsa(".rpg-panel", c).forEach(p => p.classList.toggle("active", p.dataset.rpgPanel === target));
-      window.dispatchEvent(new CustomEvent("sunadventures:rpg-tab", { detail: { tab: target } }));
+      window.dispatchEvent(new CustomEvent("sunadventures:rpg-tab", { detail:{ tab:target } }));
     }));
-
     if (window.hidratarIconos) window.hidratarIconos(c);
-    setTimeout(() => window.dispatchEvent(new CustomEvent("sunadventures:rpg-tab", { detail: { tab } })), 0);
+    setTimeout(() => window.dispatchEvent(new CustomEvent("sunadventures:rpg-tab", { detail:{ tab } })), 0);
   }
 
   function htmlMapa() {
@@ -147,12 +220,9 @@ const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x
     const st = statsLoot();
     const bonusTxt = (st.atkBonus + st.defBonus + st.hpBonus) > 0
       ? `<span style="font-size:.68rem;opacity:.75;margin-left:.4rem;">+${st.atkBonus}ATK +${st.defBonus}DEF +${st.hpBonus}HP</span>` : "";
-
     return `
       <div class="rpg-hud">
-        <div class="rpg-hero-avatar">
-          <img src="${m.imagen}" alt="${m.nombre}" style="width:58px;height:58px;max-width:58px;max-height:58px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'">
-        </div>
+        <div class="rpg-hero-avatar"><img src="${m.imagen}" alt="${m.nombre}" style="width:58px;height:58px;max-width:58px;max-height:58px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'"></div>
         <div class="rpg-hero-info">
           <div class="rpg-hero-name">${m.nombre} <span class="rpg-hero-lvl">Nv ${state.nivel}</span>${bonusTxt}</div>
           <div class="rpg-barra-label"><span>HP</span><span>${Math.round(state.hp)} / ${hpMax()}</span></div>
@@ -162,30 +232,111 @@ const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x
         </div>
         <div class="rpg-coins">${ICONO.moneda||""} ${getMonedas()}</div>
       </div>
-      <div class="rpg-zones">
-        ${ZONAS.map(z => {
-          const d = state.nivel >= z.nivel || state.enemigosDerrotados >= z.nivel*3;
-          const v = z.jefe && state.jefesDerrotados.includes(z.id);
-          return `<button type="button" class="rpg-zone ${d?"":"bloqueada"} ${z.jefe?"jefe":""}" data-zona="${z.id}" ${d?"":"disabled"}>
-            <span class="rpg-zone-nivel">${z.jefe?"JEFE":"Nv "+z.nivel}</span>
-            <div class="rpg-zone-icon">${z.icono||""}</div>
-            <div class="rpg-zone-nombre">${z.nombre}${v?" ✓":""}</div>
-            <div class="rpg-zone-desc">${z.desc}</div>
+      <div class="rpg-grupos-grid">
+        ${GRUPOS.map(g => {
+          const completadas = g.zonas.filter(z => z.jefe && state.jefesDerrotados.includes(z.id)).length;
+          const desbloqueado = state.nivel >= g.nivelMin - 2 || state.enemigosDerrotados >= g.nivelMin * 6;
+          const prog = g.zonas.filter(z => state.enemigosDerrotados >= z.nivel * 6 || state.nivel >= z.nivel - 2).length;
+          return `<button type="button" class="rpg-grupo-card ${desbloqueado?"":"bloqueada"}" data-grupo="${g.id}" ${desbloqueado?"":"disabled"}>
+            <div class="rpg-grupo-icono">${g.icono || ""}</div>
+            <div class="rpg-grupo-nombre">${g.nombre}</div>
+            <div class="rpg-grupo-rango">Nv ${g.nivelMin}–${g.nivelMax}</div>
+            <div class="rpg-grupo-progreso"><span style="width:${(prog/10)*100}%"></span></div>
+            <div class="rpg-grupo-badge">${completadas ? "👑" : `${prog}/10`}</div>
           </button>`;
         }).join("")}
       </div>
       <div class="rpg-idle">
         <div class="rpg-idle-icono">${ICONO.espada||""}</div>
-        <div class="rpg-idle-titulo">Elige una zona</div>
+        <div class="rpg-idle-titulo">Elige una región</div>
         <div class="rpg-idle-desc">Enemigos derrotados: ${state.enemigosDerrotados}</div>
       </div>`;
   }
 
+  /* ---------- Popup de grupo ---------- */
+  function abrirPopupGrupo(grupo) {
+    let m = $("rpg-popup-grupo"); if (m) m.remove();
+    m = document.createElement("div");
+    m.id = "rpg-popup-grupo"; m.className = "rpg-popup-grupo";
+    const zonas = grupo.zonas;
+    const W = 260, H = 560, MX = 60, ANCHO = W - MX*2;
+    const puntos = zonas.map((z, i) => {
+      const t = i / (zonas.length - 1 || 1);
+      const onda = Math.sin(i * 0.9) * 0.5;
+      const x = MX + (onda * 0.5 + 0.5) * ANCHO;
+      const y = H - 40 - t * (H - 80);
+      return { x:+x.toFixed(1), y:+y.toFixed(1), z };
+    });
+    let pathD = ""; puntos.forEach((p, i) => pathD += (i===0?"M ":" L ") + p.x + " " + p.y);
+    let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="rpg-popup-svg">`;
+    svg += `<defs><pattern id="pg-grid" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M 8 0 L 0 0 0 8" fill="none" stroke="rgba(120,80,30,.12)" stroke-width="0.5"/></pattern></defs>`;
+    svg += `<rect width="${W}" height="${H}" fill="url(#pg-grid)"/>`;
+    svg += `<path d="${pathD}" class="rpg-popup-path"/>`;
+    puntos.forEach(p => {
+      const z = p.z;
+      const desbloqueada = state.nivel >= z.nivel - 2 || state.enemigosDerrotados >= z.nivel * 6;
+      const conquistada = z.jefe && state.jefesDerrotados.includes(z.id);
+      let cls = "rpg-popup-dot";
+      if (z.jefe) cls += " jefe"; else if (z.miniJefe) cls += " minijefe";
+      if (!desbloqueada) cls += " bloqueada";
+      if (conquistada) cls += " conquistada";
+      const r = z.jefe ? 10 : z.miniJefe ? 7 : 5.5;
+      svg += `<circle cx="${p.x}" cy="${p.y}" r="${r}" class="${cls}" data-zona="${z.id}"><title>${z.nombre} · Nv ${z.nivel}</title></circle>`;
+      svg += `<text x="${p.x + 14}" y="${p.y + 4}" class="rpg-popup-label">${z.nivel}</text>`;
+    });
+    svg += `</svg>`;
+    m.innerHTML = `
+      <div class="rpg-popup-panel">
+        <button class="rpg-popup-close" aria-label="Cerrar">×</button>
+        <div class="rpg-popup-titulo"><span>${grupo.icono || ""} ${grupo.nombre}</span><small>Nv ${grupo.nivelMin}–${grupo.nivelMax} · Jefe: ${grupo.jefe}</small></div>
+        <div class="rpg-popup-svg-wrap">${svg}</div>
+        <div class="rpg-popup-leyenda">
+          <span><i class="dot-normal"></i>Zona</span>
+          <span><i class="dot-mini"></i>Mini-jefe</span>
+          <span><i class="dot-jefe"></i>Jefe</span>
+          <span><i class="dot-lock"></i>Bloqueada</span>
+        </div>
+      </div>`;
+    document.body.appendChild(m);
+    requestAnimationFrame(() => m.classList.add("active"));
+  }
+
+  document.addEventListener("click", e => {
+    const card = e.target.closest(".rpg-grupo-card");
+    if (card && !card.disabled) {
+      e.preventDefault(); e.stopPropagation();
+      const g = GRUPOS[Number(card.dataset.grupo)];
+      if (g) abrirPopupGrupo(g);
+      return;
+    }
+    const popup = e.target.closest("#rpg-popup-grupo");
+    if (popup) {
+      if (e.target === popup || e.target.classList.contains("rpg-popup-close")) {
+        popup.classList.remove("active");
+        setTimeout(() => popup.remove(), 250);
+        return;
+      }
+      const dot = e.target.closest(".rpg-popup-dot");
+      if (dot) {
+        e.preventDefault(); e.stopPropagation();
+        const z = ZONAS.find(x => x.id === dot.dataset.zona);
+        if (!z) return;
+        const ok = state.nivel >= z.nivel - 2 || state.enemigosDerrotados >= z.nivel * 6;
+        if (!ok) { SND("derrota"); return; }
+        popup.classList.remove("active");
+        setTimeout(() => { popup.remove(); entrarZona(z.id); }, 200);
+      }
+    }
+  }, true);
+
+  /* ---------- Batalla ---------- */
   function renderBatalla(c) {
     const m = MASCOTAS[localStorage.getItem("mascota_actual")||"mapache"] || MASCOTAS.mapache;
     const hpPct = clamp(state.hp / hpMax() * 100);
     const eIcon = ICONO[enemigo.iconoKey] || ICONO.estrella || "";
-
+    const mascotaId = localStorage.getItem("mascota_actual") || "mapache";
+    const habs = window.RpgHabilidades?.ataquesDesbloqueados(mascotaId, state.nivel) || [];
+    const esFase2 = enemigo.phase === 2;
     c.innerHTML = `
       <div class="rpg-hud">
         <div class="rpg-hero-avatar"><img src="${m.imagen}" alt="${m.nombre}" style="width:58px;height:58px;max-width:58px;max-height:58px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'"></div>
@@ -193,58 +344,95 @@ const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x
           <div class="rpg-hero-name">${m.nombre} <span class="rpg-hero-lvl">Nv ${state.nivel}</span></div>
           <div class="rpg-barra-label"><span>HP</span><span>${Math.round(state.hp)} / ${hpMax()}</span></div>
           <div class="rpg-barra hp"><span style="width:${hpPct}%"></span></div>
+          ${enemigo.dot ? `<div class="rpg-barra-label" style="color:#ff9a3d"><span>🔥 Quemadura</span><span>${enemigo.dot} dmg/turno</span></div>` : ""}
+          ${state.sangrado > 0 ? `<div class="rpg-barra-label" style="color:#ff5470"><span>🩸 Sangrado</span><span>${state.sangrado} dmg/turno</span></div>` : ""}
         </div>
         <div class="rpg-coins">${ICONO.moneda||""} ${getMonedas()}</div>
       </div>
-      <div class="rpg-batalla" id="rpg-batalla">
+      <div class="rpg-batalla ${esFase2 ? 'rpg-enraged' : ''}" id="rpg-batalla">
         <div class="rpg-batalla-top">
           <div class="rpg-fighter" id="fighter-heroe">
             <div class="rpg-fighter-sprite" id="sprite-heroe"><img src="${m.imagen}" alt="" style="width:90px;height:90px;max-width:90px;max-height:90px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'"></div>
             <div class="rpg-fighter-nombre">${m.nombre}</div>
             <div class="rpg-fighter-hp">${Math.round(state.hp)} HP</div>
+            <div class="rpg-buffs" id="buffs-heroe"></div>
           </div>
           <div class="rpg-vs">VS</div>
           <div class="rpg-fighter" id="fighter-enemigo">
-            <div class="rpg-fighter-sprite enemigo" id="sprite-enemigo">${eIcon}</div>
-            <div class="rpg-fighter-nombre">${enemigo.nombre}</div>
-            <div class="rpg-fighter-hp" id="hp-enemigo">${enemigo.hp} HP</div>
+            <div class="rpg-fighter-sprite enemigo ${esFase2 ? 'fase2' : ''}" id="sprite-enemigo">${eIcon}</div>
+            <div class="rpg-fighter-nombre">${enemigo.nombre} ${enemigo.jefe ? (esFase2 ? '🔥 FASE 2' : '👑') : ''}</div>
+            <div class="rpg-fighter-hp" id="hp-enemigo">${Math.round(enemigo.hp)} HP${enemigo.shield > 0 ? ` · 🛡️${enemigo.shield}` : ''}</div>
+            <div class="rpg-buffs" id="buffs-enemigo"></div>
           </div>
         </div>
         <div class="rpg-log" id="rpg-log"><div class="rpg-log-item info">¡Un ${enemigo.nombre} aparece!</div></div>
+        <div class="rpg-habs-grid" id="rpg-habs-grid">
+          ${habs.length ? habs.map(h => `
+            <button type="button" class="rpg-hab rpg-hab-${h.tipo}" data-hab="${h.id}" title="${h.desc}">
+              <span class="rpg-hab-nombre">${h.nombre}</span><span class="rpg-hab-lv">Nv ${h.lv}</span>
+            </button>`).join("") : `
+            <button type="button" class="rpg-hab rpg-hab-daño" data-hab="ataque-basico" title="Ataque básico">
+              <span class="rpg-hab-nombre">Ataque</span><span class="rpg-hab-lv">Básico</span>
+            </button>`}
+        </div>
         <div class="rpg-acciones" id="rpg-acciones">
-          <button type="button" class="rpg-btn atacar" id="btn-atacar">⚔ Atacar</button>
           <button type="button" class="rpg-btn objeto" id="btn-objeto">🧪 Objeto</button>
           <button type="button" class="rpg-btn huir" id="btn-huir">🏃 Huir</button>
         </div>
         <div id="rpg-objetos-wrap"></div>
       </div>`;
-
     if (window.hidratarIconos) window.hidratarIconos(c);
-    $("#btn-atacar")?.addEventListener("click", atacar);
+    qsa(".rpg-hab", c).forEach(b => b.addEventListener("click", () => usarHabilidad(b.dataset.hab)));
     $("#btn-objeto")?.addEventListener("click", toggleObjetos);
     $("#btn-huir")?.addEventListener("click", huir);
+    renderBuffs();
   }
 
-  /* ============================================================
-     COMBATE
-     ============================================================ */
+  function renderBuffs() {
+    const h = $("buffs-heroe"), e = $("buffs-enemigo");
+    const chip = (t,v,l) => `<span class="rpg-buff-chip ${t}">${l||t.toUpperCase()} ${v>0?"+":""}${v}</span>`;
+    if (h) h.innerHTML = buffsHeroe.map(b => chip(b.tipo, b.val, b.label)).join("");
+    if (e) e.innerHTML = buffsEnemigo.map(b => chip(b.tipo, b.val, b.label)).join("");
+  }
+  const buffVal = t => buffsHeroe.filter(b => b.tipo === t).reduce((s,b) => s+b.val, 0);
+  function tickBuffs() {
+    buffsHeroe = buffsHeroe.map(b => ({ ...b, turnos: b.turnos-1 })).filter(b => b.turnos > 0);
+    buffsEnemigo = buffsEnemigo.map(b => ({ ...b, turnos: b.turnos-1 })).filter(b => b.turnos > 0);
+    renderBuffs();
+  }
+
   function entrarZona(id) {
     const z = ZONAS.find(x => x.id === id); if (!z) return;
     state.zonaActual = z.id; guardar(state);
     const eId = z.enemigos[rnd(0, z.enemigos.length-1)];
     const v = rnd(-20,20)/100;
     const hp = Math.round(z.hp * (1+v));
-    enemigo = { id:eId, iconoKey:eId, nombre:NOMBRES[eId]||eId, hpMax:hp, hp, atk:Math.round(z.atk*(1+v)), xp:z.xp, monedas:z.monedas, jefe:!!z.jefe };
-    turnoJugador = true; overlayObjetos = false; SND("blip"); render();
+    // Especiales según tier
+    const tier = z.jefe ? 'jefe' : z.miniJefe ? 'elite' : (z.nivel >= 6 && z.nivel % 10 >= 6 && z.nivel % 10 <= 9) ? 'elite' : 'comun';
+    const esp = ESPECIALES[tier][rnd(0, ESPECIALES[tier].length-1)];
+    enemigo = {
+      id:eId, iconoKey:eId, nombre:NOMBRES[eId]||eId, hpMax:hp, hp,
+      atk:Math.round(z.atk*(1+v)), xp:z.xp, monedas:z.monedas, jefe:!!z.jefe,
+      dot:0, dotDur:0, shield:0, phase:1, tier,
+      special: esp, specialCD: z.jefe ? 2 : z.miniJefe ? 3 : 4, specialTimer: z.jefe ? 2 : z.miniJefe ? 3 : 4
+    };
+    turnoJugador = true; overlayObjetos = false;
+    buffsHeroe = []; buffsEnemigo = [];
+    SND("blip"); render();
   }
 
+  const ESPECIALES = {
+    comun:  ['heal', 'buff', 'debuff', 'poison'],
+    elite:  ['multihit', 'drain', 'shield', 'curse'],
+    jefe:   ['firebreath', 'summon', 'apocalypse', 'curse']
+  };
+
   function log(txt, tipo="info") {
-    const l = $("#rpg-log"); if (!l) return;
+    const l = $("rpg-log"); if (!l) return;
     const d = document.createElement("div");
     d.className = "rpg-log-item " + tipo; d.textContent = txt;
     l.appendChild(d); l.scrollTop = l.scrollHeight;
   }
-
   function floatDmg(sel, txt, tipo="daño") {
     const el = qs(sel); if (!el) return;
     const f = document.createElement("span");
@@ -252,67 +440,326 @@ const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x
     el.style.position = "relative"; f.style.left = "50%"; f.style.top = "20%";
     el.appendChild(f); setTimeout(() => f.remove(), 1000);
   }
-
   function deshab(d) {
-    ["#btn-atacar","#btn-objeto","#btn-huir"].forEach(s => { const b = qs(s); if (b) b.disabled = d; });
+    qsa(".rpg-hab", document).forEach(b => b.disabled = d);
+    ["#btn-objeto","#btn-huir"].forEach(s => { const b = qs(s); if (b) b.disabled = d; });
   }
-
   function actualizarHPs() {
-    const he = $("hp-enemigo"); if (he) he.textContent = `${Math.max(0,enemigo.hp)} HP`;
+    const he = $("hp-enemigo");
+    if (he) he.textContent = `${Math.max(0,enemigo.hp)} HP${enemigo.shield > 0 ? ` · 🛡️${enemigo.shield}` : ''}`;
     const hh = qs("#fighter-heroe .rpg-fighter-hp"); if (hh) hh.textContent = `${Math.round(state.hp)} HP`;
     const b = qs(".rpg-barra.hp > span"); if (b) b.style.width = clamp(state.hp/hpMax()*100) + "%";
   }
 
-  function atacar() {
+  /* ---------- Usar habilidad ---------- */
+  function usarHabilidad(habId) {
     if (!enemigo || !turnoJugador) return;
+
+    if (habId === "ataque-basico") {
+      turnoJugador = false; deshab(true);
+      const dmg = Math.max(1, Math.round(atkTotal() * 0.9));
+      aplicarDmgEnemigo(dmg);
+      log(`Atacas por ${dmg} daño.`, "daño");
+      floatDmg("#sprite-enemigo", "-"+dmg, "daño");
+      FX({ tipo:"attack", target:"enemy", valor:dmg, fxKey:"slash" });
+      actualizarHPs();
+      if (enemigo.hp <= 0) return setTimeout(victoria, 500);
+      setTimeout(turnoEnemigo, 800);
+      return;
+    }
+
+    const hab = window.RpgHabilidades?.ataquePorId(habId);
+    if (!hab) return;
     turnoJugador = false; deshab(true);
-    const crit = Math.random() < (0.15 + bonusTipo("crit_pct")/100);
-    let dmg = atkTotal() - rnd(2,6);
-    if (crit) dmg = Math.round(dmg * 1.8);
-    if (enemigo.jefe && tieneBonus("crit_jefe")) dmg = Math.round(dmg * (1 + bonusTipo("crit_jefe")/100));
-    const fuego = bonusTipo("fuego_atk");
-    if (fuego > 0) dmg += rnd(0, fuego);
-    dmg = Math.max(1, dmg);
-    enemigo.hp = Math.max(0, enemigo.hp - dmg);
-    SND(crit ? "victoria" : "atrapado");
-    log((crit?"¡CRÍTICO! ":"") + "Atacas por " + dmg + " daño." + (fuego>0?" 🔥":""), crit?"critico":"daño");
-    floatDmg("#sprite-enemigo", "-"+dmg, crit?"critico":"daño");
+    const mascotaId = localStorage.getItem("mascota_actual") || "mapache";
+    const pasiva = window.RpgHabilidades?.getPasiva(mascotaId) || {};
+    const fxKey = FX_KEY(habId);
+
+    if (hab.tipo === "boost" && hab.buff) {
+      Object.entries(hab.buff).forEach(([k,v]) => {
+        if (["atk","def","crit","esq"].includes(k))
+          buffsHeroe.push({ tipo:k, val:v, turnos: hab.buff.dur||3, label:k.toUpperCase() });
+      });
+      log(`✨ ${hab.nombre}: buff aplicado.`, "curar");
+      FX({ tipo:"buff", target:"hero", fxKey:"buffAtk" });
+      renderBuffs();
+      setTimeout(turnoEnemigo, 800);
+      return;
+    }
+
+    if (hab.tipo === "soporte") {
+      const curado = Math.round(hpMax() * (hab.heal||0.3));
+      const antes = state.hp;
+      state.hp = clamp(state.hp + curado, 0, hpMax());
+      guardar(state);
+      if (hab.limpia) { enemigo.dot = 0; log("🧼 Limpias efectos negativos.", "curar"); }
+      if (hab.buff) {
+        Object.entries(hab.buff).forEach(([k,v]) => {
+          if (["atk","def"].includes(k)) buffsHeroe.push({ tipo:k, val:v, turnos:hab.buff.dur||3, label:k.toUpperCase() });
+        });
+        renderBuffs();
+      }
+      log(`💚 ${hab.nombre}: +${Math.round(state.hp-antes)} HP.`, "curar");
+      floatDmg("#sprite-heroe", `+${Math.round(state.hp-antes)}`, "curar");
+      FX({ tipo:"heal", target:"hero", valor:Math.round(state.hp-antes), fxKey:"heal" });
+      actualizarHPs();
+      setTimeout(turnoEnemigo, 800);
+      return;
+    }
+
+    if (hab.tipo === "daño_indirecto") {
+      enemigo.dot = Math.round(enemigo.hpMax * (hab.dmgInd||0.1));
+      enemigo.dotDur = hab.dur || 3;
+      if (hab.debuff) {
+        const k = hab.debuff.atk ? "atk" : "def";
+        const v = -(hab.debuff.atk || hab.debuff.def);
+        buffsEnemigo.push({ tipo:k, val:v, turnos:hab.debuff.dur||3, label:"-"+k.toUpperCase() });
+        renderBuffs();
+      }
+      log(`☠️ ${hab.nombre}: ${enemigo.dot} dmg por ${enemigo.dotDur} turnos.`, "critico");
+      const dmg0 = Math.max(1, Math.round(atkTotal() * 0.5));
+      aplicarDmgEnemigo(dmg0);
+      floatDmg("#sprite-enemigo", "-"+dmg0, "daño");
+      FX({ tipo:"attack", target:"enemy", valor:dmg0, fxKey:fxKey });
+      actualizarHPs();
+      if (enemigo.hp <= 0) return setTimeout(victoria, 500);
+      setTimeout(turnoEnemigo, 900);
+      return;
+    }
+
+    const hits = hab.hits || 1;
+    let totalDmg = 0;
+    const critBase = 0.15 + (bonusTipo("crit_pct")/100) + (buffVal("crit")/100);
+    const atkBuffed = atkTotal() + buffVal("atk");
+    let algunCrit = false;
+    for (let i = 0; i < hits; i++) {
+      const crit = Math.random() < critBase;
+      if (crit) algunCrit = true;
+      let dmg = Math.round((atkBuffed * (hab.mult||1)) - rnd(1,4));
+      if (crit) dmg = Math.round(dmg * 1.8);
+      if (enemigo.jefe && tieneBonus("crit_jefe")) dmg = Math.round(dmg * (1 + bonusTipo("crit_jefe")/100));
+      dmg = Math.max(1, dmg);
+      aplicarDmgEnemigo(dmg);
+      totalDmg += dmg;
+      if (i === hits - 1) log((crit?"¡CRÍTICO! ":"") + `${hab.nombre}: ${dmg} daño.`, crit?"critico":"daño");
+      else log(`${hab.nombre} [${i+1}/${hits}]: ${dmg} daño.`, "daño");
+      if (enemigo.hp <= 0) break;
+    }
+    floatDmg("#sprite-enemigo", "-"+totalDmg, "daño");
+    FX({ tipo:"attack", target:"enemy", valor:totalDmg, fxKey:fxKey, critico:algunCrit });
+    SND("atrapado");
+
+    if (hab.drain) {
+      const robado = Math.round(totalDmg * hab.drain);
+      state.hp = clamp(state.hp + robado, 0, hpMax());
+      log(`🩸 Drenas ${robado} HP.`, "curar");
+      guardar(state);
+    }
+    if (hab.robo) { setMonedas(getMonedas() + hab.robo); log(`💰 Robas ${hab.robo} monedas.`, "info"); }
+
+    actualizarHPs();
     qs("#sprite-enemigo")?.classList.add("golpeado");
     setTimeout(() => qs("#sprite-enemigo")?.classList.remove("golpeado"), 350);
-    actualizarHPs();
 
-    if (bonusTipo("stun_pct") > 0 && Math.random() < bonusTipo("stun_pct")/100) {
-      log("⚡ ¡Enemigo aturdido!", "critico");
-      if (enemigo.hp > 0) { setTimeout(() => { turnoJugador = true; deshab(false); }, 600); return; }
+    // Chequear fase 2 jefe
+    chequearFaseJefe();
+
+    if (enemigo.hp <= 0) return setTimeout(victoria, 500);
+
+    if (pasiva.tipo === "doble_ataque" && Math.random()*100 < pasiva.val) {
+      log("🐰 ¡Brinco extra! Atacas otra vez.", "critico");
+      setTimeout(() => {
+        const seg = Math.max(1, Math.round(atkBuffed * 0.7));
+        aplicarDmgEnemigo(seg);
+        floatDmg("#sprite-enemigo", "-"+seg, "daño");
+        FX({ tipo:"attack", target:"enemy", valor:seg, fxKey:"slash" });
+        log(`Brinquito extra: ${seg} daño.`, "daño");
+        actualizarHPs();
+        chequearFaseJefe();
+        if (enemigo.hp <= 0) return setTimeout(victoria, 400);
+        setTimeout(turnoEnemigo, 800);
+      }, 500);
+      return;
     }
-    if (enemigo.hp <= 0) { setTimeout(victoria, 500); return; }
     setTimeout(turnoEnemigo, 800);
+  }
+
+  function aplicarDmgEnemigo(dmg) {
+    if (enemigo.shield > 0) {
+      const abs = Math.min(dmg, enemigo.shield);
+      enemigo.shield -= abs; dmg -= abs;
+    }
+    enemigo.hp = Math.max(0, enemigo.hp - dmg);
+  }
+
+  function chequearFaseJefe() {
+    if (enemigo.jefe && enemigo.phase === 1 && enemigo.hp / enemigo.hpMax <= 0.5) {
+      enemigo.phase = 2;
+      enemigo.atk = Math.round(enemigo.atk * 1.4);
+      enemigo.shield = Math.round(enemigo.hpMax * 0.12);
+      log('🔥 ¡EL JEFE SE ENFURECE! +40% ATK', 'critico');
+      SND('growl');
+      const b = $('rpg-batalla');
+      if (b) { b.classList.add('rpg-enraged'); }
+    }
+  }
+
+  /* ---------- Turno enemigo ---------- */
+  function tickDoT() {
+    if (enemigo.dot && enemigo.dot > 0) {
+      aplicarDmgEnemigo(enemigo.dot);
+      log(`🔥 Quemadura: -${enemigo.dot} HP.`, "daño");
+      floatDmg("#sprite-enemigo", "-"+enemigo.dot, "daño");
+      FX({ tipo:"attack", target:"enemy", valor:enemigo.dot, fxKey:"burn" });
+      actualizarHPs();
+      if (enemigo.hp <= 0) { setTimeout(victoria, 400); return true; }
+      enemigo.dotDur--;
+      if (enemigo.dotDur <= 0) enemigo.dot = 0;
+    }
+    return false;
   }
 
   function turnoEnemigo() {
     if (!enemigo) return;
+    if (tickDoT()) return;
     const rg = bonusTipo("regen_turno");
     if (rg > 0) {
       const a = state.hp; state.hp = Math.min(hpMax(), state.hp + rg);
       const c = Math.round(state.hp - a); if (c > 0) log("💚 Regeneras " + c + " HP.", "curar");
     }
-    const esq = bonusTipo("esquivar")/100;
+    // Sangrado
+    if (state.sangrado > 0) {
+      state.hp = Math.max(0, state.hp - state.sangrado);
+      log(`🩸 Sangrado: -${state.sangrado} HP`, "daño");
+      if (state.hp <= 0) return setTimeout(derrota, 500);
+    }
+    const esq = bonusTipo("esquivar")/100 + buffVal("esq")/100;
     if (esq > 0 && Math.random() < esq) {
       log("😎 ¡Esquivaste!", "curar"); floatDmg("#sprite-heroe", "¡ESQUIVA!", "curar");
-      guardar(state); actualizarHPs(); turnoJugador = true; deshab(false); return;
+      guardar(state); actualizarHPs(); tickBuffs();
+      turnoJugador = true; deshab(false); return;
     }
-    const dmg = Math.max(1, enemigo.atk - defTotal() + rnd(-3,3));
+    // Chequear especial
+    enemigo.specialTimer--;
+    if (enemigo.specialTimer <= 0) {
+      enemigo.specialTimer = enemigo.specialCD;
+      return setTimeout(() => ejecutarEspecial(), 500);
+    }
+    ataqueNormalEnemigo();
+  }
+
+  function ataqueNormalEnemigo() {
+    const atkEnemigo = Math.max(1, enemigo.atk + buffsEnemigo.filter(b => b.tipo === "atk").reduce((s,b)=>s+b.val,0));
+    const defHeroe = defTotal() + buffVal("def");
+    const dmg = Math.max(1, atkEnemigo - defHeroe + rnd(-3,3));
     state.hp = Math.max(0, state.hp - dmg); guardar(state);
     SND("derrota");
     log(enemigo.nombre + " te ataca por " + dmg + ".", "daño");
     floatDmg("#sprite-heroe", "-"+dmg, "daño");
+    FX({ tipo:"attack", target:"hero", valor:dmg, fxKey:"bolt" });
     qs("#sprite-heroe")?.classList.add("golpeado");
     setTimeout(() => qs("#sprite-heroe")?.classList.remove("golpeado"), 350);
-    actualizarHPs();
-    if (state.hp <= 0) { setTimeout(derrota, 500); return; }
+    actualizarHPs(); tickBuffs();
+    if (state.hp <= 0) return setTimeout(derrota, 500);
     turnoJugador = true; deshab(false);
   }
 
+  function ejecutarEspecial() {
+    if (!enemigo) return;
+    const s = enemigo.special;
+    SND('growl');
+    switch (s) {
+      case 'heal': {
+        const c = Math.round(enemigo.hpMax * 0.20);
+        enemigo.hp = Math.min(enemigo.hpMax, enemigo.hp + c);
+        log(`💚 ${enemigo.nombre} se cura ${c} HP.`, "curar");
+        break;
+      }
+      case 'buff': {
+        enemigo.atk = Math.round(enemigo.atk * 1.18);
+        log(`⬆️ ${enemigo.nombre} se potencia (+18% ATK).`, "info");
+        break;
+      }
+      case 'debuff': {
+        buffsHeroe.push({ tipo:'atk', val:-4, turnos:3, label:'-ATK' });
+        log(`⬇️ ¡Tu ATK baja 4!`, "daño");
+        renderBuffs();
+        break;
+      }
+      case 'poison': {
+        state.sangrado = (state.sangrado || 0) + 3;
+        log('☠️ ¡Envenenado! +3 daño/turno.', "daño");
+        break;
+      }
+      case 'multihit': {
+        let total = 0;
+        for (let i = 0; i < 3; i++) {
+          const defHeroe = defTotal() + buffVal("def");
+          const d = Math.max(1, Math.floor(enemigo.atk * 0.6) - defHeroe + rnd(-2,2));
+          state.hp = Math.max(0, state.hp - d);
+          total += d;
+        }
+        log(`💥💥💥 ¡Triple golpe! ${total} daño.`, "daño");
+        floatDmg("#sprite-heroe", "-"+total, "daño");
+        FX({ tipo:"attack", target:"hero", valor:total, fxKey:"dagger" });
+        break;
+      }
+      case 'drain': {
+        const defHeroe = defTotal() + buffVal("def");
+        const d = Math.max(1, Math.floor(enemigo.atk * 0.9) - defHeroe + rnd(-2,2));
+        state.hp = Math.max(0, state.hp - d);
+        enemigo.hp = Math.min(enemigo.hpMax, enemigo.hp + Math.round(d * 0.7));
+        log(`🩸 ${enemigo.nombre} te drena ${d} HP.`, "daño");
+        floatDmg("#sprite-heroe", "-"+d, "daño");
+        break;
+      }
+      case 'shield': {
+        enemigo.shield += Math.round(enemigo.hpMax * 0.20);
+        log(`🛡️ ${enemigo.nombre} se blinda (${enemigo.shield}).`, "info");
+        break;
+      }
+      case 'curse': {
+        buffsHeroe.push({ tipo:'def', val:-3, turnos:3, label:'-DEF' });
+        log('💀 ¡Maldición! -3 DEF durante 3 turnos.', "critico");
+        renderBuffs();
+        break;
+      }
+      case 'firebreath': {
+        const defHeroe = defTotal() + buffVal("def");
+        const d = Math.max(1, Math.round(enemigo.atk * 1.5) - defHeroe + rnd(-2,2));
+        state.hp = Math.max(0, state.hp - d);
+        enemigo.dot = Math.round(enemigo.hpMax * 0.05);
+        enemigo.dotDur = 2;
+        log(`🔥 ¡Aliento de fuego! ${d} daño + quemadura.`, "critico");
+        floatDmg("#sprite-heroe", "-"+d, "daño");
+        FX({ tipo:"attack", target:"hero", valor:d, fxKey:"fireball", critico:true });
+        break;
+      }
+      case 'summon': {
+        const defHeroe = defTotal() + buffVal("def");
+        const d = Math.max(1, Math.round(enemigo.atk * 0.8) - defHeroe + rnd(-2,2));
+        state.hp = Math.max(0, state.hp - d);
+        enemigo.hp = Math.min(enemigo.hpMax, enemigo.hp + Math.round(enemigo.hpMax * 0.12));
+        log(`💀 ${enemigo.nombre} invoca esqueletos · ${d} daño · se cura.`, "critico");
+        break;
+      }
+      case 'apocalypse': {
+        const defHeroe = defTotal() + buffVal("def");
+        const d = Math.max(1, Math.round(enemigo.atk * 1.9) - defHeroe + rnd(-2,2));
+        state.hp = Math.max(0, state.hp - d);
+        enemigo.shield += Math.round(enemigo.hpMax * 0.10);
+        log(`☄️ ¡APOCALIPSIS! ${d} daño + escudo.`, "critico");
+        floatDmg("#sprite-heroe", "-"+d, "daño");
+        FX({ tipo:"attack", target:"hero", valor:d, fxKey:"fireball", critico:true });
+        break;
+      }
+    }
+    actualizarHPs();
+    if (state.hp <= 0) return setTimeout(derrota, 500);
+    turnoJugador = true; deshab(false);
+  }
+
+  /* ---------- Objetos ---------- */
   function toggleObjetos() {
     if (!turnoJugador) return;
     overlayObjetos = !overlayObjetos;
@@ -328,14 +775,7 @@ const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x
       return;
     }
     w.innerHTML = `<div class="rpg-objetos">
-      ${comidas.map(([id,c]) => {
-        let ic = ICONO[c.icono] || "";
-        if (Array.isArray(c.sprite) && c.sprite.length === 2) {
-          const px = (c.sprite[0]/4)*100, py = (c.sprite[1]/4)*100;
-          ic = `<div class="tienda-item-sprite" style="width:28px;height:28px;background-position:${px}% ${py}%"></div>`;
-        }
-        return `<button type="button" class="rpg-objeto" data-tipo="comida" data-id="${id}" title="${c.nombre}"><span class="rpg-objeto-icono">${ic}</span><span class="rpg-objeto-cantidad">${inv[id]}</span></button>`;
-      }).join("")}
+      ${comidas.map(([id,c]) => `<button type="button" class="rpg-objeto" data-tipo="comida" data-id="${id}" title="${c.nombre}"><span class="rpg-objeto-icono">${ICONO[c.icono]||""}</span><span class="rpg-objeto-cantidad">${inv[id]}</span></button>`).join("")}
       ${consum.map(it => {
         const c = lootInv[it.id] || 0;
         const ic = RL?.renderIcono ? RL.renderIcono(it, "30px") : `<span class="loot-icono" data-icono="${it.icono}"></span>`;
@@ -359,6 +799,7 @@ const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x
     guardar(state); SND("comer");
     log(`Usas ${c.nombre}. +${Math.round(state.hp-a)} HP.`, "curar");
     floatDmg("#sprite-heroe", `+${Math.round(state.hp-a)}`, "curar");
+    FX({ tipo:"consumible", target:"hero", valor:Math.round(state.hp-a), fxKey:"potionRed" });
     actualizarHPs();
     overlayObjetos = false; const w = $("rpg-objetos-wrap"); if (w) w.innerHTML = "";
     turnoJugador = false; deshab(true);
@@ -370,20 +811,19 @@ const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x
     const RL = window.RpgLoot; if (!RL?.usarConsumible) return;
     const item = RL.POOL.find(p => p.id === id); if (!item) return;
     if (!RL.usarConsumible(id)) return;
-    if (item.tipo === "hp") {
+    if (item.tipo === "hp" || item.tipo === "def") {
+      const cur = item.tipo === "hp" ? item.val : item.val*3;
       const a = state.hp;
-      state.hp = clamp(state.hp + item.val, 0, hpMax()); guardar(state);
+      state.hp = clamp(state.hp + cur, 0, hpMax()); guardar(state);
       SND("comer"); log(`Usas ${item.nombre}. +${Math.round(state.hp-a)} HP.`, "curar");
       floatDmg("#sprite-heroe", `+${Math.round(state.hp-a)}`, "curar");
+      FX({ tipo:"consumible", target:"hero", valor:Math.round(state.hp-a), fxKey:"potionBlue" });
     } else if (item.tipo === "atk") {
-      enemigo.hp = Math.max(0, enemigo.hp - item.val);
+      aplicarDmgEnemigo(item.val);
       SND("sparkle"); log(`¡Lanzas ${item.nombre}! ${item.val} de daño.`, "critico");
       floatDmg("#sprite-enemigo", `-${item.val}`, "critico");
-    } else if (item.tipo === "def") {
-      const a = state.hp;
-      state.hp = clamp(state.hp + item.val*3, 0, hpMax()); guardar(state);
-      SND("comer"); log(`Usas ${item.nombre}. +${Math.round(state.hp-a)} HP.`, "curar");
-      floatDmg("#sprite-heroe", `+${Math.round(state.hp-a)}`, "curar");
+      FX({ tipo:"attack", target:"enemy", valor:item.val, fxKey:"fireball", critico:true });
+      chequearFaseJefe();
     }
     actualizarHPs();
     overlayObjetos = false; const w = $("rpg-objetos-wrap"); if (w) w.innerHTML = "";
@@ -392,12 +832,14 @@ const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x
     else setTimeout(turnoEnemigo, 700);
   }
 
+  /* ---------- Huir / Victoria / Derrota ---------- */
   function huir() {
     if (!turnoJugador || !enemigo) return;
-    const chance = tieneBonus("escape_seguro") ? 1 : 0.7;
+    if (enemigo.jefe) { log("❌ No puedes huir de un jefe.", "daño"); return; }
+    const chance = tieneBonus("escape_seguro") ? 1 : 0.6;
     if (Math.random() < chance) {
       log("Escapas del combate...", "info");
-      setTimeout(() => { enemigo = null; render(); }, 500);
+      setTimeout(() => { enemigo = null; buffsHeroe = []; buffsEnemigo = []; state.sangrado = 0; render(); }, 500);
     } else {
       log("¡No pudiste escapar!", "daño");
       turnoJugador = false; deshab(true);
@@ -412,46 +854,56 @@ const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x
     const xpB = bonusTipo("xp_extra")/100;
     if (xpB > 0) xp = Math.round(xp * (1+xpB));
     mon += bonusTipo("monedas_victoria");
-
-    window.dispatchEvent(new CustomEvent("rpg:victoria", { detail: { enemigo: { ...enemigo, zona:state.zonaActual, xp, monedas:mon } } }));
+    window.dispatchEvent(new CustomEvent("rpg:victoria", { detail:{ enemigo:{ ...enemigo, zona:state.zonaActual, xp, monedas:mon } } }));
     state.enemigosDerrotados++;
     state.xp += xp;
     if (eraJefe && !state.jefesDerrotados.includes(state.zonaActual)) state.jefesDerrotados.push(state.zonaActual);
-
+    if (eraJefe) {
+      try {
+        const u = getUserId();
+        const mascota = localStorage.getItem("mascota_actual") || "mapache";
+        const k = `sa_rpg_jefes_mascota_${u}`;
+        const logData = JSON.parse(localStorage.getItem(k) || "{}");
+        logData[mascota] = logData[mascota] || [];
+        if (!logData[mascota].includes(state.zonaActual)) logData[mascota].push(state.zonaActual);
+        localStorage.setItem(k, JSON.stringify(logData));
+        if (mascota === "conejo" && logData[mascota].length >= 9) {
+          try { notifMascota?.("🐰 ¡MÁXIMA BESTIA!", "¡Has completado el juego con el conejo!"); } catch {}
+        }
+      } catch {}
+    }
     let sub = 0;
     while (state.xp >= xpParaSubir()) { state.xp -= xpParaSubir(); state.nivel++; state.hp = hpMax(); sub++; }
     const cuv = bonusTipo("curar_victoria");
     if (cuv > 0) { state.hp = Math.min(hpMax(), state.hp + cuv); log("💚 +"+cuv+" HP.", "curar"); }
-
     setMonedas(getMonedas() + mon);
     SND("victoria");
     try { window._darPremio?.(0, 10, "¡Victoria!"); } catch {}
-    try { notifMascota("¡Victoria!", "+"+mon+" monedas · +"+xp+" XP"); } catch {}
+    try { notifMascota?.("¡Victoria!", "+"+mon+" monedas · +"+xp+" XP"); } catch {}
     guardar(state);
     $("rpg-batalla")?.classList.add("ganada");
     log("¡"+nE+" derrotado! +"+xp+" XP, +"+mon+" monedas.", "info");
     if (sub > 0) log("¡Subiste a nivel "+state.nivel+"!", "critico");
-    setTimeout(() => { enemigo = null; render(); }, 1500);
+    setTimeout(() => { enemigo = null; buffsHeroe = []; buffsEnemigo = []; state.sangrado = 0; render(); }, 1500);
   }
 
   function derrota() {
     SND("derrota"); log("Has caído...", "daño");
     try { notifMascota?.("Derrota", "Pierdes la mitad de tus monedas"); } catch {}
     setMonedas(getMonedas() - Math.floor(getMonedas()/2));
-    state.hp = Math.round(hpMax()*0.3); guardar(state);
+    state.hp = Math.round(hpMax()*0.3);
+    state.sangrado = 0;
+    guardar(state);
     $("rpg-batalla")?.classList.add("muerto");
-    setTimeout(() => { enemigo = null; render(); }, 1600);
+    setTimeout(() => { enemigo = null; buffsHeroe = []; buffsEnemigo = []; render(); }, 1600);
   }
 
-  /* ============================================================
-     ACTIVACIÓN
-     ============================================================ */
+  /* ---------- Activación de vista ---------- */
   function activarVistaRpg() {
     qsa("[data-view]").forEach(el => el.classList.toggle("active", el.dataset.view === "rpg"));
     qsa("[data-view-link]").forEach(el => el.classList.toggle("active", el.dataset.viewLink === "rpg"));
     document.body.style.overflow = "";
   }
-
   window.addEventListener("hashchange", () => { if (location.hash === "#rpg") { activarVistaRpg(); render(); } });
   document.addEventListener("click", e => {
     if (!e.target.closest('[data-view-link="rpg"]')) return;
@@ -464,6 +916,14 @@ const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();
   setTimeout(() => { if (location.hash === "#rpg" && !$("rpg")?.classList.contains("active")) { activarVistaRpg(); render(); } }, 300);
 
-  window.Rpg = { state: () => state, enemigo: () => enemigo, zonas: ZONAS, reset: () => { localStorage.removeItem(KEY()); state = def(); render(); } };
-  console.log("✅ rpg.js listo · zonas:", ZONAS.length);
+  window.Rpg = {
+    state: () => state,
+    enemigo: () => enemigo,
+    zonas: ZONAS,
+    grupos: GRUPOS,
+    abrirPopupGrupo,
+    reset: () => { localStorage.removeItem(KEY()); state = def(); render(); }
+  };
+  window._rpgEntrarZona = entrarZona;
+  console.log("✅ rpg.js v7 HARDCORE listo · zonas:", ZONAS.length, "· regiones:", REGIONES.length);
 })();

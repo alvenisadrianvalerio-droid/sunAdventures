@@ -304,6 +304,13 @@ body.light .girasol{filter:drop-shadow(0 8px 14px var(--shadow))}
 .mascota{pointer-events:auto;width:90px;height:90px;cursor:pointer;transition:transform .2s;animation:mascotaFloat 3s ease-in-out infinite;filter:drop-shadow(0 8px 12px rgba(0,0,0,.35));position:relative;will-change:transform}
 .mascota:hover{transform:scale(1.1) rotate(-3deg)}
 .mascota:active{transform:scale(.92)}
+.mascota, .mascota-img {
+  touch-action: manipulation;          /* ⚡ sin delay ni doble-tap zoom */
+  -webkit-tap-highlight-color: transparent;  /* sin flash azul en Android */
+  -webkit-touch-callout: none;         /* sin menú contextual en iOS */
+  user-select: none;
+  -webkit-user-select: none;
+}
 .mascota-img{width:100%;height:100%;display:block;object-fit:contain;image-rendering:pixelated;user-select:none;-webkit-user-drag:none;pointer-events:auto}
 @keyframes mascotaFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 .mascota.saludo{animation:mascotaShake .7s ease-in-out}
