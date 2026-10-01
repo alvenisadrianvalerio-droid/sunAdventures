@@ -1,4 +1,4 @@
-const CACHE_NAME = "sunadventures-v40"; // ⬅️ sube versión para forzar update
+const CACHE_NAME = "sunadventures-v41"; // ⬅️ sube versión para forzar update
 const ASSETS_ESTATICOS = [
   "./","./index.html","./styles.css","./album.css","./juegos.css",
   "./rpg.css","./rpg-loot.css","./temas.css",
