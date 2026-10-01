@@ -1,5 +1,5 @@
 /* ============================================================
-   RPG.JS v7 — Aventura HARDCORE
+   RPG.JS v8 — Aventura HARDCORE + pestaña Roguelike nativa
    · 15 regiones · 150 zonas · Enemigos con especiales
    · Jefes con 2 fases · Escalado brutal
    ============================================================ */
@@ -87,7 +87,6 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     "girasol-anciano":"Girasol Ancestral", "arbol-ancestral":"Árbol Susurrante",
     "reina-cristal":"Reina de Cristal", faraon:"Faraón Olvidado", "rey-glaciar":"Rey del Hielo",
     lich:"Lich Supremo", "senor-sombras":"Señor de Sombras",
-    /* Nuevas regiones */
     jaguar:"Jaguar Sangriento", "mono-loco":"Mono Poseído", "serpiente-emplumada":"Serpiente Emplumada",
     "planta-carnivora":"Planta Carnívora", "tucan-sombrio":"Tucán Sombrío",
     "chaman-jaguar":"Chamán Jaguar", "tigre-espiritu":"Tigre Espíritu", "tarantula-gigante":"Tarántula Gigante",
@@ -116,7 +115,6 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     REGIONES.forEach((reg, ri) => {
       for (let i = 1; i <= 10; i++) {
         const idx = ri * 10 + i, esJefe = i === 10, esMini = i === 5, esElite = i >= 6 && i <= 9;
-        // Escalado brutal
         const hp  = Math.round(45 + idx*30 + idx*idx*3.6 + (esJefe ? idx*350 : esMini ? idx*100 : 0));
         const atk = Math.round(7 + idx*2.6 + Math.pow(idx,1.75)*1.3 + (esJefe ? idx*12 : esMini ? idx*5 : 0));
         const xp  = Math.round(9 + idx*7 + (esJefe ? idx*100 : esMini ? idx*25 : 0));
@@ -158,7 +156,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   let enemigo = null, turnoJugador = true, overlayObjetos = false;
   let buffsHeroe = [], buffsEnemigo = [];
 
-  /* ---------- Inyección ---------- */
+  /* ---------- Inyección de sección y nav ---------- */
   function inyectarSeccion() {
     if ($("rpg")) return;
     const sec = document.createElement("section");
@@ -191,24 +189,47 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     else { c.classList.remove("rpg-en-batalla"); renderPantalla(c); }
   }
 
+  /* ---------- ✅ Render principal con pestaña Roguelike NATIVA ---------- */
   function renderPantalla(c) {
     const tab = c.dataset.tabActiva || "zonas";
     c.innerHTML = `
       <div class="rpg-tabs" role="tablist">
-        <button type="button" class="rpg-tab ${tab==="zonas"?"active":""}" data-rpg-tab="zonas"><span class="rpg-tab-icon">${ICONO.mapa||""}</span><span class="rpg-tab-text">Zonas</span></button>
-        <button type="button" class="rpg-tab ${tab==="objetos"?"active":""}" data-rpg-tab="objetos"><span class="rpg-tab-icon">${ICONO.gema||""}</span><span class="rpg-tab-text">Objetos</span></button>
-        <button type="button" class="rpg-tab ${tab==="cofres"?"active":""}" data-rpg-tab="cofres"><span class="rpg-tab-icon">${ICONO.regalo||""}</span><span class="rpg-tab-text">Cofres</span></button>
+        <button type="button" class="rpg-tab ${tab==="zonas"?"active":""}" data-rpg-tab="zonas">
+          <span class="rpg-tab-icon">${ICONO.mapa||""}</span><span class="rpg-tab-text">Zonas</span>
+        </button>
+        <button type="button" class="rpg-tab ${tab==="objetos"?"active":""}" data-rpg-tab="objetos">
+          <span class="rpg-tab-icon">${ICONO.gema||""}</span><span class="rpg-tab-text">Objetos</span>
+        </button>
+        <button type="button" class="rpg-tab ${tab==="cofres"?"active":""}" data-rpg-tab="cofres">
+          <span class="rpg-tab-icon">${ICONO.regalo||""}</span><span class="rpg-tab-text">Cofres</span>
+        </button>
+        <button type="button" class="rpg-tab" data-rpg-tab="roguelike">
+          <span class="rpg-tab-icon">🎲</span><span class="rpg-tab-text">Roguelike</span>
+        </button>
       </div>
       <div class="rpg-panel ${tab==="zonas"?"active":""}" data-rpg-panel="zonas">${htmlMapa()}</div>
       <div class="rpg-panel ${tab==="objetos"?"active":""}" data-rpg-panel="objetos"></div>
       <div class="rpg-panel ${tab==="cofres"?"active":""}" data-rpg-panel="cofres"></div>`;
+
     qsa(".rpg-tab", c).forEach(t => t.addEventListener("click", () => {
       const target = t.dataset.rpgTab;
+
+      /* ⚡ Pestaña Roguelike → panel independiente */
+      if (target === "roguelike") {
+        qsa(".rpg-tab", c).forEach(x => x.classList.toggle("active", x === t));
+        qsa(".rpg-panel", c).forEach(p => p.classList.toggle("active", false));
+        if (window.RpgRoguelike?.abrir) window.RpgRoguelike.abrir();
+        else console.warn("[rpg.js] RpgRoguelike no está cargado todavía");
+        return;
+      }
+
+      /* Pestañas normales */
       c.dataset.tabActiva = target;
       qsa(".rpg-tab", c).forEach(x => x.classList.toggle("active", x === t));
       qsa(".rpg-panel", c).forEach(p => p.classList.toggle("active", p.dataset.rpgPanel === target));
       window.dispatchEvent(new CustomEvent("sunadventures:rpg-tab", { detail:{ tab:target } }));
     }));
+
     if (window.hidratarIconos) window.hidratarIconos(c);
     setTimeout(() => window.dispatchEvent(new CustomEvent("sunadventures:rpg-tab", { detail:{ tab } })), 0);
   }
@@ -401,13 +422,18 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     renderBuffs();
   }
 
+  const ESPECIALES = {
+    comun:  ['heal', 'buff', 'debuff', 'poison'],
+    elite:  ['multihit', 'drain', 'shield', 'curse'],
+    jefe:   ['firebreath', 'summon', 'apocalypse', 'curse']
+  };
+
   function entrarZona(id) {
     const z = ZONAS.find(x => x.id === id); if (!z) return;
     state.zonaActual = z.id; guardar(state);
     const eId = z.enemigos[rnd(0, z.enemigos.length-1)];
     const v = rnd(-20,20)/100;
     const hp = Math.round(z.hp * (1+v));
-    // Especiales según tier
     const tier = z.jefe ? 'jefe' : z.miniJefe ? 'elite' : (z.nivel >= 6 && z.nivel % 10 >= 6 && z.nivel % 10 <= 9) ? 'elite' : 'comun';
     const esp = ESPECIALES[tier][rnd(0, ESPECIALES[tier].length-1)];
     enemigo = {
@@ -420,12 +446,6 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     buffsHeroe = []; buffsEnemigo = [];
     SND("blip"); render();
   }
-
-  const ESPECIALES = {
-    comun:  ['heal', 'buff', 'debuff', 'poison'],
-    elite:  ['multihit', 'drain', 'shield', 'curse'],
-    jefe:   ['firebreath', 'summon', 'apocalypse', 'curse']
-  };
 
   function log(txt, tipo="info") {
     const l = $("rpg-log"); if (!l) return;
@@ -451,7 +471,25 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const b = qs(".rpg-barra.hp > span"); if (b) b.style.width = clamp(state.hp/hpMax()*100) + "%";
   }
 
-  /* ---------- Usar habilidad ---------- */
+  function aplicarDmgEnemigo(dmg) {
+    if (enemigo.shield > 0) {
+      const abs = Math.min(dmg, enemigo.shield);
+      enemigo.shield -= abs; dmg -= abs;
+    }
+    enemigo.hp = Math.max(0, enemigo.hp - dmg);
+  }
+  function chequearFaseJefe() {
+    if (enemigo.jefe && enemigo.phase === 1 && enemigo.hp / enemigo.hpMax <= 0.5) {
+      enemigo.phase = 2;
+      enemigo.atk = Math.round(enemigo.atk * 1.4);
+      enemigo.shield = Math.round(enemigo.hpMax * 0.12);
+      log('🔥 ¡EL JEFE SE ENFURECE! +40% ATK', 'critico');
+      SND('growl');
+      const b = $('rpg-batalla');
+      if (b) b.classList.add('rpg-enraged');
+    }
+  }
+
   function usarHabilidad(habId) {
     if (!enemigo || !turnoJugador) return;
 
@@ -560,10 +598,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     actualizarHPs();
     qs("#sprite-enemigo")?.classList.add("golpeado");
     setTimeout(() => qs("#sprite-enemigo")?.classList.remove("golpeado"), 350);
-
-    // Chequear fase 2 jefe
     chequearFaseJefe();
-
     if (enemigo.hp <= 0) return setTimeout(victoria, 500);
 
     if (pasiva.tipo === "doble_ataque" && Math.random()*100 < pasiva.val) {
@@ -584,27 +619,6 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     setTimeout(turnoEnemigo, 800);
   }
 
-  function aplicarDmgEnemigo(dmg) {
-    if (enemigo.shield > 0) {
-      const abs = Math.min(dmg, enemigo.shield);
-      enemigo.shield -= abs; dmg -= abs;
-    }
-    enemigo.hp = Math.max(0, enemigo.hp - dmg);
-  }
-
-  function chequearFaseJefe() {
-    if (enemigo.jefe && enemigo.phase === 1 && enemigo.hp / enemigo.hpMax <= 0.5) {
-      enemigo.phase = 2;
-      enemigo.atk = Math.round(enemigo.atk * 1.4);
-      enemigo.shield = Math.round(enemigo.hpMax * 0.12);
-      log('🔥 ¡EL JEFE SE ENFURECE! +40% ATK', 'critico');
-      SND('growl');
-      const b = $('rpg-batalla');
-      if (b) { b.classList.add('rpg-enraged'); }
-    }
-  }
-
-  /* ---------- Turno enemigo ---------- */
   function tickDoT() {
     if (enemigo.dot && enemigo.dot > 0) {
       aplicarDmgEnemigo(enemigo.dot);
@@ -627,7 +641,6 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       const a = state.hp; state.hp = Math.min(hpMax(), state.hp + rg);
       const c = Math.round(state.hp - a); if (c > 0) log("💚 Regeneras " + c + " HP.", "curar");
     }
-    // Sangrado
     if (state.sangrado > 0) {
       state.hp = Math.max(0, state.hp - state.sangrado);
       log(`🩸 Sangrado: -${state.sangrado} HP`, "daño");
@@ -639,7 +652,6 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       guardar(state); actualizarHPs(); tickBuffs();
       turnoJugador = true; deshab(false); return;
     }
-    // Chequear especial
     enemigo.specialTimer--;
     if (enemigo.specialTimer <= 0) {
       enemigo.specialTimer = enemigo.specialCD;
@@ -759,7 +771,6 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     turnoJugador = true; deshab(false);
   }
 
-  /* ---------- Objetos ---------- */
   function toggleObjetos() {
     if (!turnoJugador) return;
     overlayObjetos = !overlayObjetos;
@@ -832,7 +843,6 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     else setTimeout(turnoEnemigo, 700);
   }
 
-  /* ---------- Huir / Victoria / Derrota ---------- */
   function huir() {
     if (!turnoJugador || !enemigo) return;
     if (enemigo.jefe) { log("❌ No puedes huir de un jefe.", "daño"); return; }
@@ -925,5 +935,5 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     reset: () => { localStorage.removeItem(KEY()); state = def(); render(); }
   };
   window._rpgEntrarZona = entrarZona;
-  console.log("✅ rpg.js v7 HARDCORE listo · zonas:", ZONAS.length, "· regiones:", REGIONES.length);
+  console.log("✅ rpg.js v8 listo · zonas:", ZONAS.length, "· regiones:", REGIONES.length);
 })();

@@ -1,9 +1,9 @@
 /* ============================================================
-   RPG-ROGUELIKE.JS v2 — Modo Roguelike HARDCORE
+   RPG-ROGUELIKE.JS v3 — Roguelike HARDCORE
    · 10 pisos · 6 columnas · Enemigos con especiales
    · Jefes con 2 fases · Maldiciones persistentes
-   · Cooldowns de habilidades · Nodos evento
-   · Meta-progresión con desbloqueos permanentes
+   · Cooldowns · Nodos evento · Meta-progresión
+   · Panel se auto-inyecta si rpg.js lo borra
    ============================================================ */
 (function boot() {
   const API = window._TiendaAPI;
@@ -34,7 +34,6 @@
     boss:    { ico:'👑',  nombre:'Jefe',     color:'#ffae3d' }
   };
 
-  /* Enemigos con estadísticas base escaladas y especiales */
   const ENEMIGOS_RL = {
     comun: [
       { id:'slime',      nombre:'Slime Ácido',    hp:28, atk:7,  xp:10, ico:'🟢', special:'poison' },
@@ -64,7 +63,6 @@
     ]
   };
 
-  /* Reliquias más escasas y poderosas */
   const RELIQUIAS = [
     { id:'r-atk',    nombre:'Filo Ardiente',     desc:'+6 ATK',                ico:'⚔️', rar:'comun',      aplicar:s=>s.atk+=6 },
     { id:'r-def',    nombre:'Égida de Hierro',   desc:'+4 DEF',                ico:'🛡️', rar:'comun',      aplicar:s=>s.def+=4 },
@@ -103,7 +101,6 @@
   const cargarMeta = () => { try { return { ...metaDef(), ...JSON.parse(localStorage.getItem(KEY_META()) || '{}') }; } catch { return metaDef(); } };
   const guardarMeta = m => { try { localStorage.setItem(KEY_META(), JSON.stringify(m)); } catch {} };
 
-  /* Bonificaciones desbloqueadas por meta-progresión */
   function bonosMeta(m) {
     const b = { hp:0, atk:0, def:0, pocion:0, crit:0 };
     const r = m.runs || 0;
@@ -135,20 +132,25 @@
       mapa: null, salaActual: null,
       enBatalla: false, enemigo: null,
       turno: 'jugador',
-      cd: 0,                // cooldown de habilidad
-      cdMax: 3,             // base
-      cdReduction: 0,
-      cdPenalty: 0,
-      doubleAtk: 0,
-      regen: 0,
-      sangrado: 0,
-      log: [],
-      vivo: true,
-      semilla: Date.now()
+      cd: 0, cdMax: 3, cdReduction: 0, cdPenalty: 0,
+      doubleAtk: 0, regen: 0, sangrado: 0,
+      log: [], vivo: true, semilla: Date.now()
     };
   }
 
-  const cargarRun = () => { try { const r = localStorage.getItem(KEY_RUN()); return r ? JSON.parse(r) : null; } catch { return null; } };
+  const cargarRun = () => {
+  try {
+    const r = localStorage.getItem(KEY_RUN());
+    if (!r) return null;
+    const saved = JSON.parse(r);
+    if (!saved || typeof saved !== "object") return null;
+    /* ✅ Merge: los valores guardados pisan los defaults,
+       pero cualquier propiedad NUEVA (reliquias, maldiciones, mapa, etc.)
+       que falte en el save antiguo se rellena con el default. */
+    const base = nuevoRun(saved.mascota || localStorage.getItem("mascota_actual") || "mapache");
+    return { ...base, ...saved };
+  } catch { return null; }
+};
   const guardarRun = s => { try { localStorage.setItem(KEY_RUN(), JSON.stringify(s)); } catch {} };
   const limpiarRun = () => { try { localStorage.removeItem(KEY_RUN()); } catch {} };
 
@@ -156,7 +158,7 @@
   let _animTimer = null;
 
   /* ============================================================
-     MAPA PROCEDURAL — 6 columnas, 2-4 nodos por columna
+     MAPA PROCEDURAL
      ============================================================ */
   function generarPiso(piso) {
     const nodos = [];
@@ -165,9 +167,7 @@
       for (let f = 0; f < n; f++) {
         let tipo = 'combat';
         const roll = Math.random();
-        // Última columna: siempre jefe
         if (c === COLS_POR_PISO - 1) tipo = 'boss';
-        // Primera columna: siempre combate
         else if (c === 0) tipo = 'combat';
         else if (roll < 0.05) tipo = 'elite';
         else if (roll < 0.14) tipo = 'treasure';
@@ -202,12 +202,10 @@
     }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // Fondo
     const g = ctx.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, '#0a0e27'); g.addColorStop(1, '#050816');
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
-    // Grid
     ctx.strokeStyle = 'rgba(255,217,61,0.05)'; ctx.lineWidth = 1;
     for (let x = 0; x < W; x += 32) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
     for (let y = 0; y < H; y += 32) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
@@ -217,7 +215,6 @@
     const porColumna = {};
     mapa.nodos.forEach(n => { porColumna[n.col] = porColumna[n.col] || []; porColumna[n.col].push(n); });
 
-    // Conexiones desde actual
     const curNodo = mapa.nodos.find(n => n.id === mapa.actual);
     if (curNodo) {
       ctx.strokeStyle = 'rgba(255,217,61,0.35)';
@@ -230,7 +227,6 @@
       ctx.setLineDash([]);
     }
 
-    // Nodos
     const pulse = 0.5 + Math.sin(Date.now() / 320) * 0.5;
     mapa.nodos.forEach(n => {
       const { x, y } = centroNodo(n, colW, H, porColumna);
@@ -267,7 +263,6 @@
       }
     });
 
-    // HUD
     ctx.fillStyle = 'rgba(255,217,61,0.9)';
     ctx.font = '900 15px system-ui, sans-serif';
     ctx.textAlign = 'left'; ctx.textBaseline = 'top';
@@ -287,19 +282,30 @@
   }
 
   /* ============================================================
-     PANEL PRINCIPAL
+     ✅ INYECCIÓN DEL PANEL (auto-recupera si rpg.js lo borra)
      ============================================================ */
   function inyectarSeccion() {
-    if ($('rpg-roguelike-panel')) return;
+    const existente = $('rpg-roguelike-panel');
+    if (existente && document.body.contains(existente)) return existente;
+
     const panel = document.createElement('div');
     panel.id = 'rpg-roguelike-panel';
     panel.className = 'rpg-rl-panel';
     panel.style.display = 'none';
-    document.body.appendChild(panel);
+
+    /* Insertar DENTRO de #rpg-content si existe, sino al final del body */
+    const rpgContent = $('rpg-content');
+    if (rpgContent) rpgContent.appendChild(panel);
+    else document.body.appendChild(panel);
+
+    return panel;
   }
 
+  /* ============================================================
+     RENDER DEL PANEL
+     ============================================================ */
   function renderPanel() {
-    const panel = $('rpg-roguelike-panel');
+    const panel = inyectarSeccion();
     if (!panel) return;
     if (_animTimer) { cancelAnimationFrame(_animTimer); _animTimer = null; }
     if (!state || !state.vivo) { renderMenuInicio(panel); return; }
@@ -464,7 +470,6 @@
   function iniciarBatalla(tier) {
     const lista = ENEMIGOS_RL[tier];
     const base = lista[rnd(0, lista.length - 1)];
-    // Escalado MUCHO más agresivo
     const escalaHP  = 1 + (state.piso - 1) * 0.65 + (state.nivel - 1) * 0.12;
     const escalaATK = 1 + (state.piso - 1) * 0.50 + (state.nivel - 1) * 0.10;
     const hpMax = Math.round(base.hp * escalaHP);
@@ -481,7 +486,7 @@
     };
     state.enBatalla = true;
     state.turno = 'jugador';
-    state.cd = 0; // reset cooldown de habilidad al empezar combate
+    state.cd = 0;
     state.log = [];
     guardarRun(state);
     renderPanel();
@@ -543,7 +548,6 @@
       }
     }));
 
-    // Log previo
     if (state.log.length) {
       const log = $('rl-log');
       state.log.forEach(t => {
@@ -582,7 +586,6 @@
     let dmg = calcularDmgBase();
     const crit = Math.random() < state.crit;
     if (crit) dmg = Math.round(dmg * 1.8);
-    // Escudo del enemigo
     if (state.enemigo.shield > 0) {
       const absorbed = Math.min(dmg, state.enemigo.shield);
       state.enemigo.shield -= absorbed;
@@ -595,13 +598,10 @@
     logBatalla(`⚔️ Atacas por ${dmg}${crit ? ' ¡CRÍTICO!' : ''}`);
     state.enemigo.hp = Math.max(0, state.enemigo.hp - dmg);
 
-    // Robo de vida
     if (state.lifesteal > 0) {
       const rob = Math.round(dmg * state.lifesteal);
       if (rob > 0) { state.hp = clamp(state.hp + rob, 0, state.hpMax); logBatalla(`🩸 Robas ${rob} HP`); }
     }
-    // Thorns (refleja si enemigo ataca)
-    // Doble ataque
     if (state.doubleAtk > 0 && Math.random() < state.doubleAtk) {
       logBatalla('🪞 ¡Ataque doble!');
       setTimeout(() => {
@@ -617,7 +617,6 @@
   }
 
   function afterPlayerAction() {
-    // Chequear fase 2 del jefe
     const e = state.enemigo;
     if (e && e.tier === 'jefe' && e.phase === 1 && e.hp / e.hpMax <= 0.5) {
       e.phase = 2;
@@ -629,12 +628,10 @@
       if (canvas) canvas.classList.add('shake');
       setTimeout(() => canvas?.classList.remove('shake'), 600);
     }
-    // Sangrado
     if (state.sangrado > 0) {
       state.hp = Math.max(0, state.hp - state.sangrado);
       logBatalla(`🩸 Sangrado: -${state.sangrado} HP`);
     }
-    // Regeneración
     if (state.regen > 0) {
       state.hp = clamp(state.hp + state.regen, 0, state.hpMax);
       logBatalla(`💚 Regeneras ${state.regen} HP`);
@@ -751,13 +748,11 @@
     if (ee && state.enemigo) ee.textContent = `${Math.round(state.enemigo.hp)} / ${state.enemigo.hpMax}`;
   }
 
-  /* Enemigo con especiales */
   function turnoEnemigo() {
     if (!state.enBatalla || !state.enemigo) return;
     const e = state.enemigo;
     actualizarBarraHeroe();
 
-    // Quemadura del enemigo
     if (e.quemado > 0) {
       const q = Math.round(e.hpMax * 0.06);
       e.hp = Math.max(0, e.hp - q);
@@ -766,22 +761,16 @@
       if (e.hp <= 0) return setTimeout(victoriaBatalla, 400);
     }
 
-    // Cooldown del especial
     e.specialTimer--;
-
-    // ¿Usar especial?
     if (e.specialTimer <= 0) {
       e.specialTimer = e.specialCD;
       setTimeout(() => ejecutarEspecial(e), 400);
       return;
     }
-
-    // Ataque normal
     setTimeout(() => ataqueNormalEnemigo(e), 600);
   }
 
   function ataqueNormalEnemigo(e) {
-    // Esquivar
     if (Math.random() < state.evasion) {
       logBatalla(`😎 Esquivaste a ${e.nombre}`);
       SND('blip');
@@ -799,7 +788,6 @@
     const anim = $('rl-canvas-batalla')?._batallaAnim;
     anim?.playEnemyAttack(dmg);
 
-    // Thorns
     if (state.thorns > 0) {
       e.hp = Math.max(0, e.hp - state.thorns);
       logBatalla(`🌵 Espinas: ${state.thorns} daño a enemigo`);
@@ -920,15 +908,12 @@
       }
       return derrotaBatalla();
     }
-    // Reducir cooldown de habilidad
     if (state.cd > 0) state.cd--;
     state.turno = 'jugador';
     guardarRun(state);
     reactivarBotones(qs('.rpg-rl-batalla'));
-    // Actualizar texto del botón de habilidad
     const habBtn = qs('[data-accion="habilidad"] span:last-child');
     if (habBtn) {
-      const cdMax = state.cdMax + state.cdPenalty - state.cdReduction;
       habBtn.textContent = state.cd <= 0 ? 'Habilidad' : `CD: ${state.cd}`;
       const btn = qs('[data-accion="habilidad"]');
       if (btn) btn.disabled = state.cd > 0;
@@ -948,14 +933,12 @@
       state.nivel++;
       state.xpSig = Math.round(state.xpSig * 1.45);
       state.hpMax += 12;
-      // NO se cura al subir de nivel (hardcore)
       state.atk += 2;
       state.def += 1;
       subido = true;
     }
     SND('victoria');
 
-    // Maldición por jefe/élite
     let maldicionAplicada = null;
     if (e.tier === 'jefe' && Math.random() < 0.55) {
       const nuevas = MALDICIONES.filter(m => !state.maldiciones.includes(m.id));
@@ -1042,10 +1025,10 @@
   }
 
   /* ============================================================
-     MODALES DE EVENTO / TESORO / TIENDA / DESCANSO
+     MODALES
      ============================================================ */
   function mostrarRecompensa(titulo, lineas, onClose) {
-    const panel = $('rpg-roguelike-panel');
+    const panel = inyectarSeccion();
     const card = document.createElement('div');
     card.className = 'rpg-rl-recompensa';
     card.innerHTML = `
@@ -1063,7 +1046,7 @@
   }
 
   function mostrarEleccion(titulo, opciones) {
-    const panel = $('rpg-roguelike-panel');
+    const panel = inyectarSeccion();
     const card = document.createElement('div');
     card.className = 'rpg-rl-recompensa';
     card.innerHTML = `
@@ -1112,7 +1095,7 @@
   }
 
   function abrirTienda() {
-    const panel = $('rpg-roguelike-panel');
+    const panel = inyectarSeccion();
     const pool = RELIQUIAS.filter(r => !state.reliquias.includes(r.id));
     const items = [];
     for (let i = 0; i < 2 && pool.length; i++) {
@@ -1182,7 +1165,7 @@
   }
 
   function abrirDescanso() {
-    const panel = $('rpg-roguelike-panel');
+    const panel = inyectarSeccion();
     const card = document.createElement('div');
     card.className = 'rpg-rl-recompensa';
     card.innerHTML = `
@@ -1214,7 +1197,6 @@
     }));
   }
 
-  /* EVENTOS — con riesgos reales */
   const EVENTOS = [
     {
       titulo:'🗿 Altar Antiguo',
@@ -1289,7 +1271,7 @@
 
   function abrirEvento() {
     const ev = EVENTOS[rnd(0, EVENTOS.length - 1)];
-    const panel = $('rpg-roguelike-panel');
+    const panel = inyectarSeccion();
     const card = document.createElement('div');
     card.className = 'rpg-rl-recompensa';
     card.innerHTML = `
@@ -1500,27 +1482,33 @@
      API pública
      ============================================================ */
   window.RpgRoguelike = {
-    abrir() { inyectarSeccion(); const p = $('rpg-roguelike-panel'); if (p) p.style.display = 'block'; renderPanel(); },
-    cerrar() { const p = $('rpg-roguelike-panel'); if (p) p.style.display = 'none'; },
+    abrir() {
+      const panel = inyectarSeccion();
+      if (panel) panel.style.display = 'block';
+      renderPanel();
+    },
+    cerrar() {
+      const p = $('rpg-roguelike-panel');
+      if (p) p.style.display = 'none';
+    },
     reset() { limpiarRun(); state = null; renderPanel(); },
     state: () => state,
     RELIQUIAS, ENEMIGOS_RL, MALDICIONES
   };
 
-  setTimeout(() => {
-    const tabs = qs('.rpg-tabs');
-    if (tabs && !qs('[data-rpg-tab="roguelike"]')) {
-      const b = document.createElement('button');
-      b.type = 'button'; b.className = 'rpg-tab'; b.dataset.rpgTab = 'roguelike';
-      b.innerHTML = '<span class="rpg-tab-icon">🎲</span><span class="rpg-tab-text">Roguelike</span>';
-      b.addEventListener('click', () => {
-        qsa('.rpg-tab').forEach(x => x.classList.toggle('active', x === b));
-        qsa('.rpg-panel').forEach(p => p.classList.toggle('active', false));
-        window.RpgRoguelike.abrir();
-      });
-      tabs.appendChild(b);
-    }
-  }, 1200);
+  /* Ocultar/mostrar panel al cambiar de pestaña normal */
+  window.addEventListener("sunadventures:rpg-tab", () => {
+    const p = $("rpg-roguelike-panel");
+    if (p) p.style.display = "none";
+  });
 
-  console.log('✅ rpg-roguelike.js v2 HARDCORE listo');
+  /* Cuando el usuario cambia de vista, si no está en #rpg, ocultar */
+  window.addEventListener("hashchange", () => {
+    if (location.hash !== "#rpg") {
+      const p = $("rpg-roguelike-panel");
+      if (p) p.style.display = "none";
+    }
+  });
+
+  console.log('✅ rpg-roguelike.js v3 listo · panel auto-reinyectable');
 })();
