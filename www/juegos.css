@@ -170,3 +170,84 @@ body.light .btn-minijuego-icon {
 .pn-carta { aspect-ratio: 1; border-radius: 12px; border: 2px solid rgba(255,217,61,.3); background: linear-gradient(135deg, rgba(166,132,240,.3), rgba(106,62,196,.5)); color: #fff; font-family: inherit; font-size: 1.5rem; font-weight: 900; cursor: pointer; }
 .pn-carta.volteada { background: linear-gradient(135deg, #fff8e1, #ffe9b0); color: #3d3226; }
 .pn-carta.emparejada { background: linear-gradient(135deg, rgba(77,212,142,.5), rgba(42,138,74,.7)); color: #fff; }
+.desafio-diario {
+  width: min(100%, 760px);
+  margin: 1.25rem auto 1.75rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid rgba(255, 217, 61, .35);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255, 217, 61, .12), rgba(255, 255, 255, .035));
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .14);
+}
+.desafio-diario-cabecera {
+  display: flex;
+  align-items: flex-start;
+  gap: .85rem;
+}
+.desafio-diario-icono {
+  display: grid;
+  place-items: center;
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 12px;
+  background: rgba(255, 217, 61, .16);
+  color: var(--accent, #ffd93d);
+}
+.desafio-diario-icono svg { width: 1.35rem; height: 1.35rem; }
+.desafio-diario h3 {
+  margin: 0;
+  color: var(--text, #fff);
+  font-size: 1rem;
+}
+.desafio-diario-cabecera p,
+.desafio-diario-juegos {
+  margin: .25rem 0 0;
+  color: var(--text-muted, rgba(255, 255, 255, .72));
+  font-size: .82rem;
+  line-height: 1.45;
+}
+.desafio-diario-progreso {
+  height: 9px;
+  margin: 1rem 0 .6rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .12);
+}
+.desafio-diario-progreso span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffd93d, #ffab3d);
+  transition: width .45s ease;
+}
+.desafio-diario-pie {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: .4rem .8rem;
+  color: var(--text, #fff);
+  font-size: .78rem;
+  font-weight: 700;
+}
+.desafio-diario-premio { color: var(--accent, #ffd93d); }
+.desafio-diario.completado {
+  border-color: rgba(102, 214, 150, .5);
+  background: linear-gradient(135deg, rgba(102, 214, 150, .14), rgba(255, 255, 255, .035));
+}
+.desafio-diario.completado .desafio-diario-progreso span {
+  background: linear-gradient(90deg, #66d696, #a4ed84);
+}
+body.light .desafio-diario {
+  background: linear-gradient(135deg, rgba(255, 217, 61, .18), rgba(255, 255, 255, .78));
+  box-shadow: 0 10px 28px rgba(139, 90, 20, .1);
+}
+body.light .desafio-diario h3,
+body.light .desafio-diario-pie { color: var(--text, #46351c); }
+body.light .desafio-diario-cabecera p,
+body.light .desafio-diario-juegos { color: var(--text-muted, #715d3d); }
+@media (max-width: 520px) {
+  .desafio-diario { padding: .9rem; }
+  .desafio-diario-pie { flex-direction: column; }
+}

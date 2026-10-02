@@ -199,7 +199,11 @@ document.addEventListener("DOMContentLoaded", () => {
     { minimo:1000, nombre:"Almas gemelas", icono:"sparkle", siguiente:5000, siguienteNombre:"Leyendas", siguienteIcono:"sunflower" },
     { minimo:5000, nombre:"Leyendas", icono:"sunflower", siguiente:null, siguienteNombre:"Máximo nivel", siguienteIcono:null }
   ];
-  const calcularExperiencia = () => fotos.length*10 + notas.length*5 + playlists.reduce((t,p)=>t+p.canciones.length,0)*8 + visitasConsecutivas*20;
+  const calcularExperiencia = () => {
+    const base = fotos.length*10 + notas.length*5 + playlists.reduce((t,p)=>t+p.canciones.length,0)*8 + visitasConsecutivas*20;
+    const extra = Math.max(0, Number(localStorage.getItem(`sa_experiencia_extra_${getUserIdSafe()}`)) || 0);
+    return base + extra;
+  };
   const hidratarIconosEn = root => { if (!root) return; root.querySelectorAll("[data-icono]").forEach(el => { const k = el.dataset.icono; if (window.ICONO?.[k] && !el.querySelector("svg")) el.innerHTML = window.ICONO[k]; }); };
 
   function renderExperiencia() {
@@ -459,14 +463,19 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   async function cargarFotos() {
-    try {
-      const { data:{ session } } = await supabase.auth.getSession();
-      if (!session) { fotos = []; return; }
-      const { data, error } = await supabase.from("fotos").select("id,path,fecha,nota,lat,lng,lugar,grupo_id").eq("grupo_id", grupoActivo.id).order("created_at", { ascending:false });
-      if (error) { fotos = []; return; }
-      fotos = (data||[]).map(f => ({ id:f.id, path:f.path, fecha:f.fecha, nota:f.nota, lat:f.lat, lng:f.lng, lugar:f.lugar, grupo_id:f.grupo_id }));
-    } catch (err) { console.warn("cargarFotos:", err); fotos = []; }
-  }
+  try {
+    const { data:{ session } } = await supabase.auth.getSession();
+    if (!session) { fotos = []; return; }
+    if (!grupoActivo) await asegurarGrupoActivo();
+    if (!grupoActivo) { fotos = []; return; }
+    const { data, error } = await supabase.from("fotos")
+      .select("id,path,fecha,nota,lat,lng,lugar,grupo_id")
+      .eq("grupo_id", grupoActivo.id)
+      .order("created_at", { ascending:false });
+    if (error) { console.warn("cargarFotos error:", error); fotos = []; return; }
+    fotos = (data||[]).map(f => ({ id:f.id, path:f.path, fecha:f.fecha, nota:f.nota, lat:f.lat, lng:f.lng, lugar:f.lugar, grupo_id:f.grupo_id }));
+  } catch (err) { console.warn("cargarFotos:", err); fotos = []; }
+}
 
   const añadirFotoTabla = async (path, fecha, nota, lat, lng) => {
     const { data:{ session } } = await supabase.auth.getSession();
@@ -823,15 +832,30 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* ---------- NOTAS ---------- */
-  async function cargarNotas() {
-    try {
-      const { data:{ session } } = await supabase.auth.getSession();
-      if (!session?.user) { notas = []; return; }
-      const { data, error } = await supabase.from("notas").select("id,titulo,contenido,color,created_at,grupo_id").eq("grupo_id", grupoActivo.id).order("created_at", { ascending:false });
-      if (error) { notas = []; return; }
-      notas = (data||[]).map(n => ({ id:n.id, titulo:n.titulo, contenido:n.contenido, color:n.color||"amarillo", created_at:n.created_at, grupo_id:n.grupo_id }));
-    } catch (err) { console.warn("cargarNotas:", err); notas = []; }
+ async function cargarNotas() {
+  try {
+    const { data:{ session } } = await supabase.auth.getSession();
+    if (!session?.user) { notas = []; return; }
+    if (!grupoActivo) await asegurarGrupoActivo();
+    if (!grupoActivo) { notas = []; return; }
+    const { data, error } = await supabase.from("notas")
+      .select("id,titulo,contenido,color,created_at,grupo_id")
+      .eq("grupo_id", grupoActivo.id)
+      .order("created_at", { ascending:false });
+    if (error) { console.warn("cargarNotas error:", error); notas = []; return; }
+    notas = (data||[]).map(n => ({
+      id: n.id,
+      titulo: n.titulo,
+      contenido: n.contenido,
+      color: n.color || "amarillo",
+      created_at: n.created_at,
+      grupo_id: n.grupo_id
+    }));
+  } catch (err) {
+    console.warn("cargarNotas:", err);
+    notas = [];
   }
+}
   const añadirNotaTabla = async (titulo, contenido, color) => { const { data:{ session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("notas").insert({ user_id:session.user.id, grupo_id:grupoActivo.id, titulo:titulo||null, contenido, color:color||"amarillo" }).select().single(); if (error) throw error; return data; };
   const eliminarNotaTabla = async id => { const { error } = await supabase.from("notas").delete().eq("id", id); if (error) throw error; };
   const actualizarNotaTabla = async (id, titulo, contenido, color) => { const { data, error } = await supabase.from("notas").update({ titulo:titulo||null, contenido, color:color||"amarillo" }).eq("id", id).select().single(); if (error) throw error; return data; };
@@ -937,7 +961,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const idx = notas.findIndex(n => n.id === notaEditando.id);
           if (idx !== -1) notas[idx] = { id:act.id, titulo:act.titulo, contenido:act.contenido, color:act.color, created_at:act.created_at };
         } else {
-          const nueva = await añadirNotaTabla(titulo, contenido, colorSeleccionado);
+          const colorFinal = colorSeleccionado || document.querySelector(".color-option.activo")?.dataset.color || "amarillo";
+const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
           notas.unshift({ id:nueva.id, titulo:nueva.titulo, contenido:nueva.contenido, color:nueva.color, created_at:nueva.created_at });
         }
         cerrarNotaModal(); renderNotas(); window.dispatchEvent(new Event("sunadventures:progress"));
@@ -947,14 +972,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ---------- PLAYLISTS + CANCIONES ---------- */
   async function cargarPlaylists() {
-    try {
-      const { data:{ session } } = await supabase.auth.getSession();
-      if (!session?.user) { playlists = []; return; }
-      const { data, error } = await supabase.from("playlists").select("id,nombre,descripcion,emoji,color,canciones,created_at,grupo_id").eq("grupo_id", grupoActivo.id).order("created_at", { ascending:false });
-      if (error) { playlists = []; return; }
-      playlists = (data||[]).map(p => ({ id:p.id, nombre:p.nombre, descripcion:p.descripcion, emoji:p.emoji||"music", color:p.color||"amarillo", canciones:Array.isArray(p.canciones)?p.canciones:[], created_at:p.created_at, grupo_id:p.grupo_id }));
-    } catch (err) { console.warn("cargarPlaylists:", err); playlists = []; }
+  try {
+    const { data:{ session } } = await supabase.auth.getSession();
+    if (!session?.user) { playlists = []; return; }
+    if (!grupoActivo) await asegurarGrupoActivo();
+    if (!grupoActivo) { playlists = []; return; }
+    const { data, error } = await supabase.from("playlists")
+      .select("id,nombre,descripcion,emoji,color,canciones,created_at,grupo_id")
+      .eq("grupo_id", grupoActivo.id)
+      .order("created_at", { ascending:false });
+    if (error) { console.warn("cargarPlaylists error:", error); playlists = []; return; }
+    playlists = (data||[]).map(p => ({
+      id: p.id,
+      nombre: p.nombre,
+      descripcion: p.descripcion,
+      emoji: p.emoji || "music",
+      color: p.color || "amarillo",
+      canciones: Array.isArray(p.canciones) ? p.canciones : [],
+      created_at: p.created_at,
+      grupo_id: p.grupo_id
+    }));
+  } catch (err) {
+    console.warn("cargarPlaylists:", err);
+    playlists = [];
   }
+}
   const añadirPlaylistTabla = async (nombre, descripcion, emoji, color) => { const { data:{ session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("playlists").insert({ user_id:session.user.id, grupo_id:grupoActivo.id, nombre, descripcion:descripcion||null, emoji:emoji||"music", color:color||"amarillo", canciones:[] }).select().single(); if (error) throw error; return data; };
   const eliminarPlaylistTabla = async id => { const { error } = await supabase.from("playlists").delete().eq("id", id); if (error) throw error; };
   const guardarCancionesTabla = async (id, canciones) => { const { error } = await supabase.from("playlists").update({ canciones }).eq("id", id); if (error) throw error; };
@@ -1648,6 +1690,13 @@ document.addEventListener("DOMContentLoaded", () => {
           if (perfil?.avatar_url) { const av = document.querySelector(".user-avatar"); if (av) av.innerHTML = `<img src="${perfil.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`; }
           if (perfil?.username) { localStorage.setItem("sunadventures_username", perfil.username); const ue = $("user-email"); if (ue) ue.textContent = perfil.username; const udn = $("user-dropdown-name"); if (udn) udn.textContent = perfil.username; }
         } catch {}
+        if (logueado) {
+  // ✅ FIX: guardar uid SIEMPRE
+  localStorage.setItem("sunadventures_uid", session.user.id);
+  window._sunUserId = session.user.id;
+  // ✅ FIX: notificar a todos los módulos
+  window.dispatchEvent(new Event("sunadventures:user-ready"));
+}
         registrarVisita();
         await Promise.all([cargarFotos(), cargarNotas(), cargarPlaylists(), cargarEventos()]);
         await Promise.all([render(), Promise.resolve(renderNotas()), Promise.resolve(renderPlaylists()), Promise.resolve(renderCalendario()), Promise.resolve(renderLogros())]);
@@ -1828,6 +1877,6 @@ document.addEventListener("DOMContentLoaded", () => {
       mostrarVistaPreviaFoto(f); actualizarVistaPreviaFotoInfo(); notifPegado();
     });
   }
-
+ 
   console.log("✅ album.js v2 cargado (modales custom + optimizado)");
 });

@@ -166,20 +166,12 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     f ? f.parentNode.insertBefore(sec, f) : document.body.appendChild(sec);
   }
   function inyectarNav() {
-    if (qs('[data-view-link="rpg"]')) return;
-    const nav = qs(".nav-links"); if (!nav) return;
-    const a = document.createElement("a");
-    a.href = "#rpg"; a.className = "nav-link"; a.dataset.viewLink = "rpg";
-    a.innerHTML = `<span class="ui-icon nav-link-icon" data-icono="espada"></span><span class="nav-link-text">Aventura</span>`;
-    nav.appendChild(a);
-    const dd = qs("#user-dropdown");
-    if (dd) {
-      const btn = document.createElement("a");
-      btn.href = "#rpg"; btn.className = "user-dropdown-item"; btn.dataset.viewLink = "rpg";
-      btn.innerHTML = `<span class="user-dropdown-icon" data-icono="espada"></span><span>Aventura RPG</span>`;
-      const lo = qs("#logout-btn");
-      lo ? lo.parentNode.insertBefore(btn, lo) : dd.appendChild(btn);
-    }
+  if (qs('[data-view-link="rpg"]')) return;
+  const nav = qs(".nav-links"); if (!nav) return;
+  const a = document.createElement("a");
+  a.href = "#rpg"; a.className = "nav-link"; a.dataset.viewLink = "rpg";
+  a.innerHTML = `<span class="ui-icon nav-link-icon" data-icono="espada"></span><span class="nav-link-text">Aventura</span>`;
+  nav.appendChild(a);
   }
 
   function render() {
@@ -256,7 +248,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       <div class="rpg-grupos-grid">
         ${GRUPOS.map(g => {
           const completadas = g.zonas.filter(z => z.jefe && state.jefesDerrotados.includes(z.id)).length;
-          const desbloqueado = state.nivel >= g.nivelMin - 2 || state.enemigosDerrotados >= g.nivelMin * 6;
+          const primeraZona = g.zonas[0];
+const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(primeraZona.id) : (state.nivel >= g.nivelMin - 2 || state.enemigosDerrotados >= g.nivelMin * 6);
           const prog = g.zonas.filter(z => state.enemigosDerrotados >= z.nivel * 6 || state.nivel >= z.nivel - 2).length;
           return `<button type="button" class="rpg-grupo-card ${desbloqueado?"":"bloqueada"}" data-grupo="${g.id}" ${desbloqueado?"":"disabled"}>
             <div class="rpg-grupo-icono">${g.icono || ""}</div>
@@ -267,6 +260,12 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
           </button>`;
         }).join("")}
       </div>
+      <div style="display:flex;justify-content:center;margin:1rem 0;">
+  <button type="button" class="rpg-btn huir" data-rpg-accion="descansar"
+          style="max-width:300px;padding:.8rem 1.4rem;">
+    💤 Descansar <span id="rpg-rest-cost" style="margin-left:.4rem;opacity:.85;">—</span>
+  </button>
+</div>
       <div class="rpg-idle">
         <div class="rpg-idle-icono">${ICONO.espada||""}</div>
         <div class="rpg-idle-titulo">Elige una región</div>
@@ -342,7 +341,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         e.preventDefault(); e.stopPropagation();
         const z = ZONAS.find(x => x.id === dot.dataset.zona);
         if (!z) return;
-        const ok = state.nivel >= z.nivel - 2 || state.enemigosDerrotados >= z.nivel * 6;
+        const ok = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(z.id) : (state.nivel >= z.nivel - 2 || state.enemigosDerrotados >= z.nivel * 6);
         if (!ok) { SND("derrota"); return; }
         popup.classList.remove("active");
         setTimeout(() => { popup.remove(); entrarZona(z.id); }, 200);

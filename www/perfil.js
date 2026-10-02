@@ -117,12 +117,28 @@
   }
 
   async function guardar() {
-    if (!perfil) return;
-    const nombreEl = $("perfil-username");
-    const username = nombreEl?.value.trim().toLowerCase();
-    if (!username || !/^[a-z0-9_-]{3,20}$/.test(username)) {
-      return alert("Usuario inválido (3-20 letras, números, _ o -).");
+  if (!perfil) return;
+  const nombreEl = $("perfil-username");
+  let username = (nombreEl?.value || "").trim().toLowerCase();
+
+  // 🧹 Sanear: quitar cualquier carácter no permitido automáticamente
+  const limpio = username.replace(/[^a-z0-9_-]/g, "");
+  if (nombreEl && nombreEl.value !== limpio) nombreEl.value = limpio;
+  username = limpio;
+
+  // ✅ Validar con modal bonito en vez de alert nativo
+  if (!username || username.length < 3 || username.length > 20) {
+    if (window.SunModal) {
+      return window.SunModal.alert({
+        title: "Nombre no válido",
+        message: "Debe tener entre <strong>3 y 20 caracteres</strong>.<br>Solo <strong>letras, números, _ y -</strong> (sin puntos ni espacios).",
+        variant: "warning",
+        icon: "✏️",
+        confirmText: "Entendido"
+      });
     }
+    return alert("Usuario inválido (3-20 letras, números, _ o -).");
+  }
     const btn = $("perfil-guardar");
     if (btn) { btn.disabled = true; btn.textContent = "Guardando..."; }
     try {

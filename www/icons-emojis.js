@@ -57,7 +57,7 @@
     mimar: F(`<path d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21z"/>`),
     dormir: S(`<path d="M3 20v-8l7-2 5 2 6-3v11H3z"/><path d="M12 12c1-2 3-3 5-2v4h-5z"/><circle cx="17" cy="10" r="2"/>`),
     jugar: S(`<line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/>`),
-    moneda: F(`<circle cx="12" cy="12" r="10" fill="#ffd93d" stroke="#b8860b" stroke-width="1.5"/><circle cx="12" cy="12" r="7" fill="#ffe066"/><text x="12" y="16" font-size="9" fill="#8b6914" text-anchor="middle" font-weight="bold">S</text>`),
+   moneda: `<img src="img/coin.png" alt="SunCoin" class="coin-icon">`,
     /* Comidas */
     manzana: F32(`<path d="M16 9c-3-4-8-4-10 0-2 5 1 12 5 15 2 1 3 1 5 0 2 1 3 1 5 0 4-3 7-10 5-15-2-4-7-4-10 0z" fill="#e63946"/><path d="M16 4c0-2 1-3 3-3" stroke="#5a3010" stroke-width="1.5" fill="none" stroke-linecap="round"/>`),
     zanahoria: F32(`<path d="M16 30L8 12c-1-3 1-6 4-6h8c3 0 5 3 4 6L16 30z" fill="#f77f00"/><path d="M12 6l4-4M16 6l2-5M20 6l4-4" stroke="#2a8a4a" stroke-width="2" fill="none" stroke-linecap="round"/>`),

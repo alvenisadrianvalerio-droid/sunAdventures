@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SunAdventures · Nuestro rincón</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
   <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
   <link rel="manifest" href="manifest.json">
@@ -28,8 +28,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="styles.css?v=115">
   <link rel="stylesheet" href="album.css?v=115">
-  <link rel="stylesheet" href="juegos.css?v=115">
-  <link rel="stylesheet" href="rpg.css?v=1">
+  <link rel="stylesheet" href="juegos.css?v=116">
   <link rel="stylesheet" href="rpg.css?v=1">
   <link rel="stylesheet" href="rpg-loot.css?v=1">
   <link rel="stylesheet" href="temas.css?v=1">
@@ -71,15 +70,12 @@
   <section id="background-container">
     <header class="nav-container">
       <nav class="nav-links">
-        <a href="#inicio" class="nav-link" data-view-link="inicio"><span class="ui-icon nav-link-icon"
-            data-icono="casa"></span><span class="nav-link-text">Inicio</span></a>
-        <a href="#album" class="nav-link" data-view-link="album"><span class="ui-icon nav-link-icon"
-            data-icono="camara"></span><span class="nav-link-text">Álbum</span></a>
-        <a href="#mascotas" class="nav-link" data-view-link="mascotas"><span class="ui-icon nav-link-icon"
-            data-icono="huella"></span><span class="nav-link-text">Mascotas</span></a>
+        <a href="#inicio" class="nav-link" data-view-link="inicio"><span class="ui-icon nav-link-icon" data-icono="casa"></span><span class="nav-link-text">Inicio</span></a>
+        <a href="#album" class="nav-link" data-view-link="album"><span class="ui-icon nav-link-icon" data-icono="camara"></span><span class="nav-link-text">Álbum</span></a>
+        <a href="#chat" class="nav-link" data-view-link="chat"><span class="ui-icon nav-link-icon" data-icono="chat"></span><span class="nav-link-text">Chat</span></a>
+        <a href="#mascotas" class="nav-link" data-view-link="mascotas"><span class="ui-icon nav-link-icon" data-icono="huella"></span><span class="nav-link-text">Mascotas</span></a>
       </nav>
       <div class="nav-actions">
-        <button id="theme-toggle" class="theme-toggle" title="Cambiar tema"><span class="theme-icon"></span></button>
         <button id="btn-open-login" class="btn-auth"><span class="btn-auth-icon" data-icono="estrella"></span><span
             class="btn-auth-text">Entrar</span></button>
         <div id="user-info" class="user-info" style="display:none;">
@@ -88,46 +84,29 @@
             <span id="user-email" class="user-email"></span>
             <span class="user-chevron">▾</span>
           </button>
-          <div id="user-dropdown" class="user-dropdown" aria-hidden="true">
-            <div class="user-dropdown-header">
-              <div class="user-dropdown-avatar" data-icono="persona"></div>
-              <div class="user-dropdown-info"><span id="user-dropdown-name" class="user-dropdown-name"></span><span
-                  class="user-dropdown-role">Explorador de aventuras</span></div>
-            </div>
-            <div class="user-dropdown-divider"></div>
-            <a href="#inicio" class="user-dropdown-item" data-view-link="inicio"><span class="user-dropdown-icon"
-                data-icono="casa"></span><span>Inicio</span></a>
-            <a href="#album" class="user-dropdown-item" data-view-link="album"><span class="user-dropdown-icon"
-                data-icono="camara"></span><span>Mi álbum</span></a>
-            <a href="#mapa" class="user-dropdown-item" data-view-link="mapa"><span class="user-dropdown-icon"
-                data-icono="mapa"></span><span>Mapa</span></a>
-            <a href="#chat" class="user-dropdown-item" data-view-link="chat"><span class="user-dropdown-icon"
-                data-icono="chat"></span><span>Chat</span></a>
-            <a href="#logros" class="user-dropdown-item" data-view-link="logros"><span class="user-dropdown-icon"
-                data-icono="trofeo"></span><span>Logros</span></a>
-            <a href="#notas" class="user-dropdown-item" data-view-link="notas"><span class="user-dropdown-icon"
-                data-icono="nota"></span><span>Notitas</span></a>
-            <a href="#playlists" class="user-dropdown-item" data-view-link="playlists"><span class="user-dropdown-icon"
-                data-icono="musica"></span><span>Playlists</span></a>
-            <a href="#mascotas" class="user-dropdown-item" data-view-link="mascotas"><span class="user-dropdown-icon"
-                data-icono="huella"></span><span>Mascotas</span></a>
-            <div class="user-dropdown-divider"></div>
-            <button class="user-dropdown-item" data-action="perfil"><span class="user-dropdown-icon"
-                data-icono="persona"></span><span>Mi perfil</span></button>
-            <button class="user-dropdown-item" data-action="ajustes"><span class="user-dropdown-icon"
-                data-icono="ajustes"></span><span>Ajustes</span></button>
-            <button class="user-dropdown-item" data-action="amigos"><span class="user-dropdown-icon"
-                data-icono="amigos"></span><span>Amigos y grupo</span></button>
-            <button class="user-dropdown-item" type="button" data-action="offline">
-              <span class="user-dropdown-icon" data-icono="descargar"></span>
-              <span>Descargar todo</span>
-            </button>
-            <div class="user-dropdown-divider"></div>
-            <button id="logout-btn" class="user-dropdown-item user-dropdown-item-danger" data-action="logout"><span
-                class="user-dropdown-icon" data-icono="salir"></span><span>Salir</span></button>
-          </div>
-        </div>
-      </div>
+                  <div id="user-dropdown" class="user-dropdown" aria-hidden="true">
+                    <div class="user-dropdown-header">
+                      <div class="user-dropdown-avatar" data-icono="persona"></div>
+                      <div class="user-dropdown-info"><span id="user-dropdown-name" class="user-dropdown-name"></span><span class="user-dropdown-role">Explorador de aventuras</span></div>
+                    </div>
+                    <div class="user-dropdown-divider"></div>
+                    <a href="#mapa" class="user-dropdown-item" data-view-link="mapa"><span class="user-dropdown-icon" data-icono="mapa"></span><span>Mapa</span></a>
+                    <a href="#logros" class="user-dropdown-item" data-view-link="logros"><span class="user-dropdown-icon" data-icono="trofeo"></span><span>Logros</span></a>
+                    <a href="#notas" class="user-dropdown-item" data-view-link="notas"><span class="user-dropdown-icon" data-icono="nota"></span><span>Notitas</span></a>
+                    <a href="#playlists" class="user-dropdown-item" data-view-link="playlists"><span class="user-dropdown-icon" data-icono="musica"></span><span>Playlists</span></a>
+                    <div class="user-dropdown-divider"></div>
+                    <button class="user-dropdown-item" data-action="perfil"><span class="user-dropdown-icon" data-icono="persona"></span><span>Mi perfil</span></button>
+                    <button class="user-dropdown-item" data-action="cambiar-nombre"><span class="user-dropdown-icon" data-icono="lapiz"></span></button>
+                    <button class="user-dropdown-item" data-action="ajustes"><span class="user-dropdown-icon" data-icono="ajustes"></span><span>Ajustes</span></button>
+                    <button class="user-dropdown-item" data-action="amigos"><span class="user-dropdown-icon" data-icono="amigos"></span><span>Amigos y grupo</span></button>
+                    <button class="user-dropdown-item" type="button" data-action="offline">
+                      <span class="user-dropdown-icon" data-icono="descargar"></span><span>Descargar todo</span>
+                    </button>
+                    <div class="user-dropdown-divider"></div>
+                    <button id="logout-btn" class="user-dropdown-item user-dropdown-item-danger" data-action="logout"><span class="user-dropdown-icon" data-icono="salir"></span><span>Salir</span></button>
+                  </div>
+                </div>
+              </div>
     </header>
 
     <div class="lobby view active" data-view="inicio">
@@ -277,6 +256,25 @@
       <button class="btn-minijuego" id="btn-juego-adivina"><span class="btn-minijuego-icon"
           data-icono="globo"></span><span class="btn-minijuego-text">Adivina la mascota</span></button>
     </div>
+    <section class="desafio-diario" id="desafio-minijuegos" aria-labelledby="desafio-minijuegos-titulo"
+      aria-live="polite">
+      <div class="desafio-diario-cabecera">
+        <span class="desafio-diario-icono" data-icono="calendario" aria-hidden="true"></span>
+        <div>
+          <h3 id="desafio-minijuegos-titulo">Reto diario de minijuegos</h3>
+          <p>Prueba 2 minijuegos distintos. Sin rachas ni penalización por descansar.</p>
+        </div>
+      </div>
+      <div class="desafio-diario-progreso" role="progressbar" aria-label="Progreso del reto diario"
+        aria-valuemin="0" aria-valuemax="2" aria-valuenow="0">
+        <span id="desafio-minijuegos-progreso"></span>
+      </div>
+      <div class="desafio-diario-pie">
+        <span id="desafio-minijuegos-estado">0 de 2 minijuegos distintos</span>
+        <span class="desafio-diario-premio">🏆 +20 SunCoins · ✨ +25 XP</span>
+      </div>
+      <p class="desafio-diario-juegos" id="desafio-minijuegos-juegos">Completa cualquier minijuego para empezar.</p>
+    </section>
     <div class="mascotas-grid" id="mascotas-grid"></div>
     <div id="mascotas-empty" class="mascotas-empty hidden">
       <p>Aún no has desbloqueado ninguna mascota.</p>
@@ -683,13 +681,19 @@ Artista - Canción
     <audio id="global-audio" preload="metadata"></audio>
   </div>
 
-  <!-- ============ MASCOTA FLOTANTE ============ -->
-  <div class="mascota-wrapper" id="mascota-wrapper">
-    <div class="mascota" id="mascota" role="img" aria-label="Tu mascota">
-      <img class="mascota-img" id="mascota-img" src="img/mapache.png" alt="Mapache">
-      <div class="mascota-burbuja" id="mascota-burbuja" aria-live="polite"></div>
-    </div>
+ <!-- ============ MASCOTA FLOTANTE ============ -->
+<div class="mascota-wrapper" id="mascota-wrapper">
+  <div class="mascota" id="mascota" role="img" aria-label="Tu mascota">
+    <img class="mascota-img" id="mascota-img" src="img/mapache.png" alt="Mapache">
+    <div class="mascota-burbuja" id="mascota-burbuja" aria-live="polite"></div>
   </div>
+</div>
+<!-- ============ BURBUJA TIENDA FLOTANTE ============ -->
+<button id="shop-bubble" class="shop-bubble" type="button" aria-label="Abrir tienda">
+  <img src="img/tienda/admurin-items.png" alt="Tienda" onerror="this.style.display='none'">
+  <span class="shop-bubble-icon" data-icono="tienda"></span>
+  <span class="shop-bubble-text">Tienda</span>
+</button>
   <!-- ============ MODAL RECUPERAR CONTRASEÑA ============ -->
   <div id="recuperar-modal" class="modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-recuperar></div>
@@ -785,7 +789,11 @@ Artista - Canción
   <script src="rpg-canvas.js"></script>
   <script src="rpg-roguelike.js"></script>
   <script src="juegos.js"></script>
+  <script src="desafios-diarios.js"></script>
+  <script src="mejoras.js"></script>
   <script src="efectos.js"></script>
+  <script src="parches-v2.js"></script>
+  <script src="parches-v3.js"></script>
 </body>
 
 </html>

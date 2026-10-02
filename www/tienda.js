@@ -62,9 +62,11 @@
       const key = item.sheet || (esComida ? "comida" : "tienda");
       const s = SHEETS[key] || SHEETS.tienda;
       const [col, row] = item.sprite;
-      const px = s.cols > 1 ? (col / (s.cols - 1)) * 100 : 50;
-      const py = s.rows > 1 ? (row / (s.rows - 1)) * 100 : 50;
-      return `<div class="tienda-item-preview"><div class="tienda-item-sprite" style="background-image:url('${s.url}');background-size:${s.cols * 100}% ${s.rows * 100}%;background-position:${px}% ${py}%"></div></div>`;
+      if (Number.isInteger(col) && Number.isInteger(row) && col >= 0 && col < s.cols && row >= 0 && row < s.rows) {
+        const px = s.cols > 1 ? (col / (s.cols - 1)) * 100 : 50;
+        const py = s.rows > 1 ? (row / (s.rows - 1)) * 100 : 50;
+        return `<div class="tienda-item-preview"><div class="tienda-item-sprite" style="background-image:url('${s.url}');background-size:${s.cols * 100}% ${s.rows * 100}%;background-position:${px}% ${py}%"></div></div>`;
+      }
     }
     return `<div class="tienda-item-preview">${ICONO[item.icono] || ICONO.estrella || ""}</div>`;
   }

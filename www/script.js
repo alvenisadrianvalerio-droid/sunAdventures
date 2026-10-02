@@ -144,7 +144,10 @@ document.addEventListener("DOMContentLoaded", () => {
       aurora:{nombre:"Fondo Aurora boreal",precio:15000,icono:"estrella",sheet:"tienda",sprite:[4,0],desc:"Cambia toda la web",bonus:{tipo:"tema_aurora",val:1,desc:"Temática aurora polar"}},
       sakura:{nombre:"Fondo Sakura",precio:11000,icono:"girasol",sheet:"tienda",sprite:[0,5],desc:"Cambia toda la web",bonus:{tipo:"tema_sakura",val:1,desc:"Temática flor de cerezo"}},
       cyberpunk:{nombre:"Fondo Cyberpunk",precio:22000,icono:"rayoDoble",sheet:"tienda",sprite:[1,5],desc:"Cambia toda la web",bonus:{tipo:"tema_cyberpunk",val:1,desc:"Temática neón futurista"}},
-      tormenta:{nombre:"Fondo Tormenta eléctrica",precio:18000,icono:"rayo",sheet:"tienda",sprite:[2,5],desc:"Cambia toda la web",bonus:{tipo:"tema_tormenta",val:1,desc:"Temática lluvia y relámpagos"}}
+      tormenta:{nombre:"Fondo Tormenta eléctrica",precio:18000,icono:"rayo",sheet:"tienda",sprite:[2,5],desc:"Cambia toda la web",bonus:{tipo:"tema_tormenta",val:1,desc:"Temática lluvia y relámpagos"}},
+      volcan:{nombre:"Fondo Volcán",precio:9500,icono:"fuego",sheet:"tienda",sprite:[0,5],desc:"Cambia toda la web",bonus:{tipo:"tema_volcan",val:1,desc:"Temática volcánica ardiente"}},
+galaxia:{nombre:"Fondo Galaxia",precio:14000,icono:"estrellaDoble",sheet:"tienda",sprite:[1,5],desc:"Cambia toda la web",bonus:{tipo:"tema_galaxia",val:1,desc:"Temática cósmica"}},
+neon:{nombre:"Fondo Neón",precio:20000,icono:"rayoDoble",sheet:"tienda",sprite:[2,5],desc:"Cambia toda la web",bonus:{tipo:"tema_neon",val:1,desc:"Temática cyberpunk neón"}},
     },
     efectos: {
       chispas:{nombre:"Chispas",precio:150,icono:"rayoDoble",sheet:"tienda",sprite:[1,4],desc:"Al hacer clic",bonus:{tipo:"stun_pct",val:8,desc:"8% aturdimiento en ataque"}},
@@ -1018,7 +1021,13 @@ document.addEventListener("DOMContentLoaded", () => {
         snd("blip");
         if (!pr) { pr = el; return; }
         if (pr === el) return;
-        sg = el; it++; eI.textContent = it; bl = true;
+        sg = el; it++; eI.textContent = it; bl = true; racha = 0; eRa.textContent = racha;
+vidas--; eV.textContent = vidas;
+snd("derrota");
+// ✅ Revelar sprite
+sprite.style.filter = "blur(0) brightness(1)";
+sprite.style.transform = "scale(1)";
+sprite.style.opacity = "1";
         if (pr.dataset.id === sg.dataset.id) {
           setTimeout(() => {
             pr.classList.add("emparejada"); sg.classList.add("emparejada");
@@ -1107,7 +1116,12 @@ document.addEventListener("DOMContentLoaded", () => {
       cor = id;
       frase.textContent = `"${texto}"`;
       sprite.src = MASCOTAS[cor].imagen;
-      sprite.onerror = () => { sprite.style.display = "none"; };
+sprite.onerror = () => { sprite.style.display = "none"; };
+// ✅ Ocultar hasta que responda
+sprite.style.filter = "blur(14px) brightness(0.4)";
+sprite.style.transform = "scale(.6)";
+sprite.style.transition = "filter .5s, transform .5s";
+sprite.style.opacity = "0.25";
       const dist = pf.filter(x => x !== cor).sort(() => Math.random() - 0.5).slice(0, OPC - 1);
       const ops = [...dist, cor].sort(() => Math.random() - 0.5);
       op.innerHTML = "";
@@ -1121,9 +1135,16 @@ document.addEventListener("DOMContentLoaded", () => {
       iniciarTimer();
     };
     const resp = (b, id) => {
-      if (bl) return;
-      bl = true;
-      clearInterval(timer);
+  if (bl) return;
+  bl = true;
+  clearInterval(timer);
+  // ✅ Revelar sprite
+  sprite.style.filter = "blur(0) brightness(1)";
+  sprite.style.transform = "scale(1)";
+  sprite.style.opacity = "1";
+      
+      
+      
       if (id === cor) {
         b.classList.add("correcta"); a++; eA.textContent = a;
         const bonus = tr >= SEG / 2 ? 3 : 1;
@@ -1386,7 +1407,8 @@ document.addEventListener("DOMContentLoaded", () => {
     "tema-fondo-noche","tema-fondo-arcoiris","tema-fondo-fuego",
     "tema-fondo-bosque","tema-fondo-oceano","tema-fondo-desierto",
     "tema-fondo-aurora","tema-fondo-sakura","tema-fondo-cyberpunk",
-    "tema-fondo-tormenta"
+    "tema-fondo-tormenta", "tema-fondo-galaxia","tema-fondo-cueva","tema-fondo-volcan",
+    "tema-fondo-espacial","tema-fondo-campo","tema-fondo-ciudad","tema-fondo-montana" 
   ];
   window._aplicarTemaFondo = function () {
     try {

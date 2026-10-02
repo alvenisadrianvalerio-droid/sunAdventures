@@ -57,7 +57,17 @@
     /* Buffs enemigos */
     curse:      { sheet:'loot1', col:3, row:2, w:58, h:58, tint:'#a684f0', pulse:true },
     burn:       { sheet:'loot1', col:1, row:3, w:56, h:56, tint:'#ff6b35' },
-    poison:     { sheet:'loot2', col:4, row:8, w:56, h:56, tint:'#4dd48e' }
+    poison:     { sheet:'loot2', col:4, row:8, w:56, h:56, tint:'#4dd48e' },
+    
+    /* Nuevas auras */
+auraSagrada:  { sheet:'loot1', col:0, row:7, w:72, h:72, tint:'#ffd93d', pulse:true },
+auraOscura:   { sheet:'loot2', col:5, row:6, w:72, h:72, tint:'#a684f0', pulse:true },
+auraFuego:    { sheet:'loot1', col:1, row:3, w:72, h:72, tint:'#ff6b35', pulse:true },
+auraHielo:    { sheet:'loot1', col:2, row:0, w:72, h:72, tint:'#6cb8ff', pulse:true },
+auraVeneno:   { sheet:'loot2', col:4, row:8, w:72, h:72, tint:'#4dd48e', pulse:true },
+escudoMagico: { sheet:'loot1', col:6, row:6, w:80, h:80, tint:'#a684f0', pulse:true },
+shieldBurst:  { sheet:'loot2', col:2, row:4, w:70, h:70, tint:'#a684f0', pulse:true },
+
   };
 
   /* ---------- Mapa rápido de habilidades → sprite ---------- */

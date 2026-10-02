@@ -226,7 +226,7 @@
 
     puntos.forEach((p, i) => {
       const z = zonas[i];
-      const desbloqueada = (st.nivel || 1) >= z.nivel - 2 || (st.enemigosDerrotados || 0) >= z.nivel * 5;
+const desbloqueada = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(z.id) : ((st.nivel || 1) >= z.nivel - 2 || (st.enemigosDerrotados || 0) >= z.nivel * 5);
       const conquistada = z.jefe && (st.jefesDerrotados || []).includes(z.id);
       let cls = "rpg-mm-dot";
       if (z.jefe) cls += " jefe";

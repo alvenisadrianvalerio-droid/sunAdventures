@@ -1,12 +1,16 @@
-const CACHE_NAME = "sunadventures-v41"; // ⬅️ sube versión para forzar update
+const CACHE_NAME = "sunadventures-v50";
 const ASSETS_ESTATICOS = [
   "./","./index.html","./styles.css","./album.css","./juegos.css",
   "./rpg.css","./rpg-loot.css","./temas.css",
+  "./juegos.css",
   "./script.js","./album.js","./icons-emojis.js","./juegos.js",
-  "./ds.js",              // ⬅️ CORREGIDO: era "./db.js" (no existe)
-  "./offline.js","./tienda.js","./perfil.js","./logros-extra.js",
+  "./ds.js","./offline.js","./tienda.js","./perfil.js","./logros-extra.js",
   "./sprites-config.js","./efectos.js","./rpg.js","./rpg-loot.js",
+  "./rpg-canvas.js","./rpg-habilidades.js","./rpg-minimap.js",
+  "./rpg-roguelike.js","./desafios-diarios.js","./mejoras.js","./parches-v2.js","./parches-v3.js",
   "./manifest.json","./img/girasol-loading.png",
+  "./img/tienda/admurin-items.png","./img/tienda/comida-sheet.png","./img/tienda/tienda-sheet.png",
+  "./img/rpg/loot-1.png","./img/rpg/loot-2.png",
 ];
 // ... resto igual
 
@@ -44,7 +48,7 @@ self.addEventListener("fetch", (event) => {
   if (HOSTS_EXTERNOS.some((h) => url.hostname.includes(h))) return;
 
   event.respondWith((async () => {
-    const cached = await caches.match(req);
+    const cached = await caches.match(req, { ignoreSearch: true });
 
     // Documentos: network-first (para tener HTML fresco)
     if (req.destination === "document") {

@@ -1722,14 +1722,15 @@ function limpiarTimers(overlay) {
     { id:"bosque", nombre:"Bosque encantado", fn:juegoBosque, icon:ICONO.bosque },
     { id:"adivina", nombre:"Adivina la mascota", fn:juegoAdivina, icon:ICONO.globo }
   ];
-  window.JUEGOS_EXTRA = JUEGOS;
-  window.abrirJuegoExtra = (id) => { const j = JUEGOS.find(x => x.id === id); if (j) j.fn(); };
+  /* ✅ SOLO 4 JUEGOS PERMITIDOS */
+const JUEGOS_PERMITIDOS = new Set(["adivina","memoria","girasol","pocion"]);
+const JUEGOS_FILTRADOS = JUEGOS.filter(j => JUEGOS_PERMITIDOS.has(j.id));
 
   function inyectarBotones() {
     const menu = qs(".minijuegos-menu");
     if (!menu || menu.dataset.extras === "1") return;
     menu.dataset.extras = "1";
-    JUEGOS.forEach(j => {
+    JUEGOS_FILTRADOS.forEach(j => {
       const b = document.createElement("button");
       b.type = "button"; b.className = "btn-minijuego"; b.dataset.juegoExtra = j.id;
       b.innerHTML = `<span class="btn-minijuego-icon">${j.icon || ""}</span><span class="btn-minijuego-text">${j.nombre}</span>`;
@@ -1740,6 +1741,9 @@ function limpiarTimers(overlay) {
   setTimeout(inyectarBotones, 800);
   window.addEventListener("hashchange", () => setTimeout(inyectarBotones, 300));
   window.JUEGO_FNS = Object.fromEntries(JUEGOS.map(j => [j.id, j.fn]));
+   window.JUEGOS_EXTRA    = [];
+  window.JUEGO_FNS       = {};
+  window.abrirJuegoExtra = () => {};
 
-  console.log("✅ juegos.js cargado —", JUEGOS.length, "juegos únicos");
+  console.log("✅ juegos.js cargado —", JUEGOS_FILTRADOS.length, "juegos activos");
 });

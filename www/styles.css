@@ -678,3 +678,899 @@ body.tema-fondo-fuego .nav-container{background:rgba(26,5,0,.8) !important;borde
   outline-offset: 2px;
   border-radius: 10px;
 }
+/* ============================================
+   RECOMPENSA DIARIA
+   ============================================ */
+.daily-reward-overlay {
+  position: fixed; inset: 0; z-index: 9800;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.75); backdrop-filter: blur(8px);
+  opacity: 0; transition: opacity .25s;
+}
+.daily-reward-overlay.active { opacity: 1; }
+.daily-reward-card {
+  background: linear-gradient(180deg, #12141c, #0b0c12);
+  border: 3px solid var(--accent);
+  border-radius: 24px;
+  padding: 2rem 2.2rem;
+  max-width: 380px; width: 92%;
+  text-align: center;
+  color: var(--text);
+  box-shadow: 0 0 40px rgba(255,217,61,.5), 0 20px 60px rgba(0,0,0,.7);
+  transform: scale(.85); transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+  animation: dailyPulse 2s ease-in-out infinite;
+}
+@keyframes dailyPulse { 0%,100%{box-shadow:0 0 40px rgba(255,217,61,.5),0 20px 60px rgba(0,0,0,.7);} 50%{box-shadow:0 0 70px rgba(255,217,61,.8),0 20px 60px rgba(0,0,0,.7);} }
+.daily-reward-overlay.active .daily-reward-card { transform: scale(1); }
+.daily-reward-icon { font-size: 4rem; margin-bottom: .8rem; animation: bounceIcon .6s ease; }
+@keyframes bounceIcon { 0%{transform:scale(0) rotate(-180deg);} 60%{transform:scale(1.3) rotate(10deg);} 100%{transform:scale(1) rotate(0);} }
+.daily-reward-card h2 { font-size: 1.5rem; color: var(--accent); margin: 0 0 .3rem; font-weight: 900; }
+.daily-reward-streak { opacity: .8; margin-bottom: 1rem; }
+.daily-reward-prizes { display: flex; flex-direction: column; gap: .4rem; margin-bottom: 1.5rem; font-weight: 900; }
+.daily-reward-prizes span { padding: .5rem .8rem; border-radius: 999px; background: rgba(255,217,61,.12); border: 1px solid rgba(255,217,61,.35); }
+
+/* ============================================
+   BURBUJA FLOTANTE TIENDA
+   ============================================ */
+.shop-bubble {
+  position: fixed; bottom: 24px; left: 24px;
+  z-index: 550;
+  display: flex; align-items: center; gap: .6rem;
+  padding: .7rem 1.1rem .7rem .8rem;
+  border-radius: 999px;
+  border: 2px solid rgba(255,217,61,.7);
+  background: linear-gradient(135deg, rgba(255,217,61,.35), rgba(255,217,61,.1));
+  color: var(--accent);
+  font-family: inherit; font-weight: 900; font-size: .9rem;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255,217,61,.4), inset 0 0 0 1px rgba(255,255,255,.15);
+  backdrop-filter: blur(8px);
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s;
+  animation: shopBubble 3s ease-in-out infinite;
+}
+@keyframes shopBubble { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+.shop-bubble:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 14px 36px rgba(255,217,61,.65); }
+.shop-bubble img { display: none; }
+.shop-bubble-icon { width: 1.4rem; height: 1.4rem; display: inline-flex; }
+.shop-bubble-icon svg { width: 100%; height: 100%; }
+.shop-bubble-text { white-space: nowrap; }
+@media (max-width: 600px) {
+  .shop-bubble { padding: .6rem .8rem; font-size: .75rem; bottom: 16px; left: 16px; }
+  .shop-bubble-text { display: none; }
+}
+body.light .shop-bubble { background: linear-gradient(135deg, rgba(212,148,30,.3), rgba(212,148,30,.08)); color: #b57320; }
+
+/* ============================================
+   MEJORAS VISUALES RPG — escudo
+   ============================================ */
+.rpg-hero-info { position: relative; }
+/* ============================================
+   NUEVOS TEMAS DE FONDO
+   ============================================ */
+body.tema-fondo-volcan {
+  --bg-1:#1a0505; --bg-2:#0a0101; --text:#ffe5d0; --accent:#ff4500; --accent-dark:#8b1a00;
+  --tema-card-bg: rgba(60,15,10,.72);
+  --tema-card-bg-hover: rgba(90,25,15,.85);
+  --tema-card-border: rgba(255,69,0,.32);
+  --tema-input-bg: rgba(20,5,5,.85);
+  --tema-input-border: rgba(255,69,0,.35);
+  --tema-panel-bg: #0a0101;
+  --tema-panel-border: rgba(255,69,0,.35);
+  --tema-overlay: rgba(10,2,2,.88);
+  background:#0a0101 !important;
+}
+body.tema-fondo-volcan::before {
+  content:""; position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 110%, rgba(255,69,0,.6), transparent 60%),
+    radial-gradient(circle at 20% 20%, rgba(255,140,0,.25), transparent 50%),
+    radial-gradient(circle at 80% 30%, rgba(200,0,0,.3), transparent 55%),
+    linear-gradient(180deg,#0a0101 0%,#1a0505 60%,#2a0800 100%);
+}
+body.tema-fondo-volcan::after {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-image:
+    radial-gradient(4px 4px at 15% 90%, rgba(255,69,0,.9), transparent 60%),
+    radial-gradient(3px 3px at 45% 85%, rgba(255,140,0,.8), transparent 60%),
+    radial-gradient(5px 5px at 75% 92%, rgba(255,180,60,.85), transparent 60%);
+  background-size: 500px 500px;
+  animation: brasasVolcan 7s linear infinite;
+}
+@keyframes brasasVolcan { from{background-position:0 0;} to{background-position:0 -500px;} }
+
+body.tema-fondo-galaxia {
+  --bg-1:#0a0520; --bg-2:#050210; --text:#e0d6ff; --accent:#c084fc; --accent-dark:#6a2ea2;
+  --tema-card-bg: rgba(30,15,60,.75);
+  --tema-card-bg-hover: rgba(50,25,90,.85);
+  --tema-card-border: rgba(192,132,252,.3);
+  --tema-input-bg: rgba(5,2,15,.85);
+  --tema-input-border: rgba(192,132,252,.32);
+  --tema-panel-bg: #050210;
+  --tema-panel-border: rgba(192,132,252,.32);
+  --tema-overlay: rgba(3,1,10,.9);
+  background:#050210 !important;
+}
+body.tema-fondo-galaxia::before {
+  content:""; position:fixed; inset:-10%; z-index:-2; pointer-events:none;
+  background:
+    radial-gradient(ellipse 40% 20% at 30% 30%, rgba(192,132,252,.3), transparent 60%),
+    radial-gradient(ellipse 30% 15% at 70% 60%, rgba(96,165,250,.25), transparent 60%),
+    radial-gradient(ellipse 50% 30% at 50% 50%, rgba(255,107,157,.15), transparent 70%),
+    linear-gradient(180deg,#0a0520 0%,#050210 100%);
+  filter: blur(20px);
+  animation: galaxiaRot 40s linear infinite;
+}
+@keyframes galaxiaRot { from{transform:rotate(0);} to{transform:rotate(360deg);} }
+body.tema-fondo-galaxia::after {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background-image:
+    radial-gradient(2px 2px at 10% 20%, #fff, transparent 50%),
+    radial-gradient(1.5px 1.5px at 30% 70%, #fff, transparent 50%),
+    radial-gradient(2px 2px at 60% 30%, #fff, transparent 50%),
+    radial-gradient(1.5px 1.5px at 85% 60%, #fff, transparent 50%),
+    radial-gradient(2px 2px at 45% 85%, #fff, transparent 50%);
+  background-size: 400px 400px;
+  animation: estrellasGalaxia 6s ease-in-out infinite;
+}
+@keyframes estrellasGalaxia { 0%,100%{opacity:.7;} 50%{opacity:1;} }
+
+body.tema-fondo-neon {
+  --bg-1:#0a0014; --bg-2:#050008; --text:#f0d4ff; --accent:#ff00ff; --accent-dark:#a000a0;
+  --tema-card-bg: rgba(40,5,55,.75);
+  --tema-card-bg-hover: rgba(70,10,90,.85);
+  --tema-card-border: rgba(255,0,255,.35);
+  --tema-input-bg: rgba(10,0,20,.85);
+  --tema-input-border: rgba(255,0,255,.4);
+  --tema-panel-bg: #050008;
+  --tema-panel-border: rgba(255,0,255,.4);
+  --tema-overlay: rgba(5,0,10,.9);
+  background:#050008 !important;
+}
+body.tema-fondo-neon::before {
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,0,255,.35), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(0,255,255,.3), transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(255,0,150,.2), transparent 60%),
+    linear-gradient(180deg,#0a0014 0%,#050008 100%);
+}
+body.tema-fondo-neon .nav-container {
+  background: rgba(10,0,20,.88) !important;
+  border-bottom: 2px solid rgba(255,0,255,.5) !important;
+  box-shadow: 0 0 24px rgba(255,0,255,.35);
+}
+body.tema-fondo-neon .lobby-title-accent {
+  text-shadow: 0 0 12px #ff00ff, 0 0 24px #ff00ff, 0 0 48px #a000a0;
+}
+/* ============================================
+   FIXES v2 — Menú, Iconos, Escudo, Mapas
+   ============================================ */
+
+/* 1) Dropdown POR ENCIMA de la mascota flotante */
+.user-dropdown { z-index: 9000 !important; }
+.user-info     { z-index: 9001 !important; }
+.nav-container { z-index: 9002 !important; }
+
+/* 2) Botón "Cambiar nombre" tamaño correcto */
+button.user-dropdown-item {
+  font-size: .9rem !important;
+  line-height: 1.2 !important;
+  min-height: 40px !important;
+  height: auto !important;
+  width: 100% !important;
+  padding: .7rem .8rem !important;
+  box-sizing: border-box;
+}
+button.user-dropdown-item .user-dropdown-icon {
+  width: 22px !important;
+  height: 22px !important;
+  flex-shrink: 0 !important;
+}
+button.user-dropdown-item .user-dropdown-icon svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* 3) Zona del RPG: sombra en scroll para que no choque con dropdown */
+.rpg-popup-grupo { z-index: 7000 !important; }
+.rpg-popup-panel { z-index: 7001 !important; }
+
+/* 4) Barra de escudo morada (arriba de la vida) */
+.rpg-hero-info { display: flex; flex-direction: column; gap: .3rem; }
+.rpg-shield-wrap {
+  display: flex; align-items: center; gap: .35rem;
+  font-size: .65rem; font-weight: 900; color: #c4a5ff;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.rpg-shield-wrap .rpg-shield-bar {
+  flex: 1; height: 8px; border-radius: 999px; overflow: hidden;
+  background: rgba(166,132,240,.15);
+  border: 1px solid rgba(166,132,240,.35);
+  position: relative;
+}
+.rpg-shield-wrap .rpg-shield-bar > span {
+  display: block; height: 100%; width: 0%;
+  background: linear-gradient(90deg, #a684f0, #e0c4ff, #a684f0);
+  background-size: 200% 100%;
+  border-radius: inherit;
+  box-shadow: 0 0 10px rgba(166,132,240,.8);
+  transition: width .35s ease;
+  animation: shieldShimmer 2s linear infinite;
+}
+@keyframes shieldShimmer {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 200% 0%; }
+}
+
+/* 5) Mapa de zonas: look mejorado */
+.rpg-popup-svg-wrap {
+  background: linear-gradient(180deg, #fdf6dc 0%, #f0e2bf 100%) !important;
+}
+.rpg-popup-dot {
+  filter: drop-shadow(0 1.5px 1px rgba(0,0,0,.28));
+  transition: all .2s ease;
+}
+.rpg-popup-dot:hover {
+  filter: drop-shadow(0 0 6px rgba(255,217,61,.9)) brightness(1.15);
+}
+.rpg-popup-dot.conquistada {
+  filter: drop-shadow(0 0 8px rgba(255,215,0,1));
+}
+
+/* 6) Mini-mapa del camino: fondo y path más bonitos */
+.rpg-mm-svg-wrap {
+  background: linear-gradient(180deg, #fdf6dc 0%, #f0e2bf 100%) !important;
+}
+.rpg-mm-dot { filter: drop-shadow(0 1.5px 1px rgba(0,0,0,.28)); }
+.rpg-mm-dot:hover { filter: drop-shadow(0 0 6px rgba(255,217,61,.9)) brightness(1.15); }
+.rpg-mm-path { stroke: #a07a3a; stroke-width: 2; opacity: .9; }
+
+/* 7) Tooltip de habilidades (long press) */
+.rpg-hab-tooltip {
+  position: fixed;
+  z-index: 9999;
+  background: linear-gradient(180deg, #1a1c28, #0b0c12);
+  border: 2px solid rgba(255,217,61,.55);
+  border-radius: 12px;
+  padding: .7rem .9rem;
+  max-width: 260px;
+  color: #fff;
+  font-size: .8rem;
+  line-height: 1.4;
+  box-shadow: 0 12px 32px rgba(0,0,0,.7);
+  pointer-events: none;
+  animation: tooltipIn .18s ease;
+}
+@keyframes tooltipIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform:none; } }
+.rpg-hab-tooltip strong {
+  display: block;
+  color: var(--accent);
+  font-size: .85rem;
+  margin-bottom: .25rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.rpg-hab-tooltip .rpg-hab-tooltip-tipo {
+  display: inline-block;
+  font-size: .65rem;
+  font-weight: 900;
+  padding: .15rem .5rem;
+  border-radius: 999px;
+  margin-bottom: .35rem;
+  text-transform: uppercase;
+}
+.rpg-hab-tooltip-tipo.daño            { background: rgba(255,84,112,.2);  color: #ff7a9c; }
+.rpg-hab-tooltip-tipo.daño_indirecto  { background: rgba(255,154,61,.2);  color: #ff9a3d; }
+.rpg-hab-tooltip-tipo.boost           { background: rgba(108,184,255,.2); color: #6cb8ff; }
+.rpg-hab-tooltip-tipo.soporte         { background: rgba(77,212,142,.2);  color: #4dd48e; }
+
+/* 8) Modo claro como tema comprado */
+body.tema-claro {
+  --bg-1:#faf3e0; --bg-2:#fff8eb; --text:#3d2c1e; --accent:#d4941e; --accent-dark:#8b5a14;
+}
+body.tema-claro, body.light {
+  background: linear-gradient(135deg,#fff8eb 0%,#faf3e0 50%,#f5ead1 100%) !important;
+  background-attachment: fixed !important;
+  color: #3d2c1e !important;
+}
+body.tema-claro .nav-container,
+body.light .nav-container {
+  background: rgba(255,248,235,.9) !important;
+  border-bottom-color: rgba(139,90,20,.15) !important;
+}
+/* ============================================
+   FIX "Cambiar nombre" — tamaño normal
+   ============================================ */
+.user-dropdown > button.user-dropdown-item,
+.user-dropdown > a.user-dropdown-item {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: .7rem !important;
+  width: 100% !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  padding: 0 .8rem !important;
+  margin: 0 !important;
+  font-size: .88rem !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
+  border-radius: 10px !important;
+  text-align: left !important;
+}
+.user-dropdown > button.user-dropdown-item > span:last-child {
+  font-size: .88rem !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  text-align: left;
+}
+.user-dropdown > button.user-dropdown-item .user-dropdown-icon {
+  width: 20px !important;
+  height: 20px !important;
+  flex-shrink: 0 !important;
+}
+.user-dropdown > button.user-dropdown-item .user-dropdown-icon svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ============================================
+   SNAKE MINIJUEGO
+   ============================================ */
+.snake-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .9rem;
+  padding: .4rem 0;
+}
+.snake-canvas {
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 1;
+  background:
+    linear-gradient(180deg, rgba(77,212,142,.06), rgba(0,0,0,.4)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 20px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 1px, transparent 1px 20px);
+  border: 2px solid rgba(77,212,142,.45);
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(77,212,142,.2), inset 0 0 40px rgba(0,0,0,.5);
+  display: block;
+  touch-action: none;
+  image-rendering: pixelated;
+}
+.snake-hud {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.snake-hud .jm-hud-card { min-width: 92px; }
+.snake-controles {
+  display: grid;
+  grid-template-columns: repeat(3, 62px);
+  grid-template-rows: repeat(2, 62px);
+  gap: .4rem;
+  justify-content: center;
+  user-select: none;
+}
+.snake-btn {
+  background: linear-gradient(180deg, rgba(77,212,142,.2), rgba(77,212,142,.06));
+  border: 2px solid rgba(77,212,142,.45);
+  color: #7dd67e;
+  border-radius: 12px;
+  font-size: 1.4rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform .12s, background .15s;
+  font-family: inherit;
+}
+.snake-btn:hover { background: rgba(77,212,142,.3); transform: scale(1.05); }
+.snake-btn:active { transform: scale(.94); }
+.snake-btn.arriba  { grid-column: 2; grid-row: 1; }
+.snake-btn.izq     { grid-column: 1; grid-row: 2; }
+.snake-btn.abajo   { grid-column: 2; grid-row: 2; }
+.snake-btn.der     { grid-column: 3; grid-row: 2; }
+.snake-overlay-fin {
+  position: absolute; inset: 0;
+  background: rgba(11,12,18,.9);
+  border-radius: 20px;
+  display: grid; place-items: center;
+  z-index: 30;
+  text-align: center;
+  padding: 1rem;
+}
+/* ============================================
+   FIXES v3 — Victorias, Tienda modal, Push, Buffs
+   ============================================ */
+
+/* ---- 1. Modal de Victoria RPG bonito ---- */
+.rpg-rl-recompensa-card {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,217,61,.15), transparent 60%),
+    linear-gradient(180deg, #14171f, #0a0c14) !important;
+  border: 2px solid rgba(255,217,61,.55) !important;
+  border-radius: 24px !important;
+  padding: 2rem 1.8rem 1.6rem !important;
+  min-width: min(380px, 92vw) !important;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.75),
+    0 0 40px rgba(255,217,61,.25),
+    inset 0 0 0 1px rgba(255,255,255,.06) !important;
+  text-align: center;
+}
+.rpg-rl-recompensa-card h2 {
+  font-size: 1.9rem !important;
+  font-weight: 900 !important;
+  color: var(--accent, #ffd93d) !important;
+  margin: 0 0 1rem !important;
+  letter-spacing: -.01em;
+  text-shadow: 0 2px 14px rgba(255,217,61,.5);
+}
+.rpg-rl-recompensa-card .v3-icon {
+  filter: drop-shadow(0 6px 14px rgba(255,217,61,.6));
+  animation: v3IconPop .5s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes v3IconPop {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  60% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); }
+}
+.rpg-rl-recompensa-card ul,
+.rpg-rl-recompensa-card .v3-reward-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+}
+.rpg-rl-recompensa-card li {
+  padding: .55rem .9rem;
+  background: rgba(255,217,61,.08);
+  border: 1px solid rgba(255,217,61,.25);
+  border-radius: 12px;
+  font-size: .9rem;
+  font-weight: 700;
+  color: #ffe9a0;
+}
+.rpg-rl-recompensa-card .btn-primary {
+  padding: .8rem 2.2rem !important;
+  font-size: 1rem !important;
+  font-weight: 900 !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #ffd93d, #ffae3d) !important;
+  color: #2b2118 !important;
+  box-shadow: 0 6px 20px rgba(255,217,61,.55) !important;
+  transition: transform .2s;
+}
+.rpg-rl-recompensa-card .btn-primary:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 10px 30px rgba(255,217,61,.75) !important;
+}
+
+/* ---- 2. Tienda embebida en modal mascota ---- */
+.tienda-embed {
+  min-height: 200px;
+}
+.tienda-embed .tienda-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important;
+  gap: .55rem !important;
+}
+.tienda-embed .tienda-vacio {
+  padding: 2rem 1rem;
+  text-align: center;
+  opacity: .6;
+  font-style: italic;
+}
+
+/* ---- 3. Botón "Activar notificaciones" ---- */
+.v3-push-btn,
+.chat-push-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: .3rem;
+  width: 100% !important;
+  margin-top: .75rem !important;
+  padding: .75rem 1rem !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, rgba(166,132,240,.25), rgba(166,132,240,.08)) !important;
+  border: 1.5px solid rgba(166,132,240,.55) !important;
+  color: #c4a5ff !important;
+  font-family: inherit !important;
+  font-size: .88rem !important;
+  font-weight: 800 !important;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: all .25s cubic-bezier(.34,1.56,.64,1) !important;
+}
+.v3-push-btn:hover,
+.chat-push-btn:hover {
+  background: linear-gradient(135deg, rgba(166,132,240,.4), rgba(166,132,240,.15)) !important;
+  border-color: #a684f0 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(166,132,240,.4);
+}
+.v3-push-btn.v3-push-ok {
+  background: linear-gradient(135deg, rgba(77,212,142,.25), rgba(77,212,142,.08)) !important;
+  border-color: rgba(77,212,142,.55) !important;
+  color: #7dd67e !important;
+}
+.v3-push-icon svg { width: 100%; height: 100%; display: block; }
+
+/* ---- 4. Buffs vacíos invisibles ---- */
+.rpg-buffs:empty,
+#buffs-heroe:empty,
+#buffs-enemigo:empty {
+  display: none !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ---- 5. Fighter hero sin espacio fantasma ---- */
+#fighter-heroe,
+#fighter-enemigo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .35rem;
+  position: relative;
+}
+#fighter-heroe > *:empty,
+#fighter-enemigo > *:empty {
+  display: none !important;
+}
+
+/* ---- 6. Dropdown: avatar + nombre bien alineados ---- */
+.user-dropdown-header {
+  padding-bottom: .9rem !important;
+}
+.user-dropdown-avatar {
+  width: 38px !important;
+  height: 38px !important;
+  font-size: .9rem !important;
+}
+.user-dropdown-name {
+  font-size: .92rem !important;
+  font-weight: 700 !important;
+}
+
+/* ---- 7. Recompensa diaria — override si el tema oscuro la rompe ---- */
+.daily-reward-card {
+  color: #f0f3fa !important;
+}
+.daily-reward-card h2 { color: #ffd93d !important; }
+body.light .daily-reward-card {
+  color: #3d2c1e !important;
+  background: linear-gradient(180deg, #fffdf7, #fff6e0) !important;
+  border-color: #d4941e !important;
+}
+body.light .daily-reward-card h2 { color: #b57320 !important; }
+body.light .daily-reward-prizes span {
+  background: rgba(212,148,30,.15) !important;
+  border-color: rgba(212,148,30,.4) !important;
+  color: #8b5a14;
+}
+/* ============================================
+   FIX v3.1 — Dropdown ancho controlado
+   El dropdown se desbordaba y estiraba el botón
+   ============================================ */
+
+/* 1) Fijar ancho del contenedor */
+.user-info .user-dropdown,
+#user-dropdown.user-dropdown {
+  width: 290px !important;
+  min-width: 290px !important;
+  max-width: 290px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* 2) Fijar ancho de TODOS los items (link + button) */
+.user-info .user-dropdown .user-dropdown-item,
+#user-dropdown .user-dropdown-item,
+#user-dropdown > button.user-dropdown-item,
+#user-dropdown > a.user-dropdown-item {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: .65rem !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  min-height: 40px !important;
+  height: auto !important;
+  max-height: none !important;
+  padding: .55rem .8rem !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  font-size: .88rem !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  text-align: left !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  border: none !important;
+  white-space: nowrap !important;
+}
+
+/* 3) El texto del item: se recorta si es largo, NO estira el botón */
+.user-info .user-dropdown .user-dropdown-item > span:last-child,
+#user-dropdown > button.user-dropdown-item > span:last-child,
+#user-dropdown > a.user-dropdown-item > span:last-child {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  text-align: left !important;
+}
+
+/* 4) Icono: tamaño fijo, no crece ni encoge */
+.user-info .user-dropdown .user-dropdown-icon,
+#user-dropdown .user-dropdown-icon {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  max-width: 20px !important;
+  flex: 0 0 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: .85;
+}
+.user-info .user-dropdown .user-dropdown-icon svg,
+#user-dropdown .user-dropdown-icon svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* 5) El hover pinta SOLO el item, no más allá */
+.user-info .user-dropdown .user-dropdown-item:hover,
+#user-dropdown .user-dropdown-item:hover {
+  background: rgba(255,217,61,.12) !important;
+  transform: translateX(0) !important;
+}
+.user-info .user-dropdown .user-dropdown-item:hover > span:last-child,
+#user-dropdown .user-dropdown-item:hover > span:last-child {
+  transform: none !important;
+}
+
+/* 6) El header (nombre + avatar) tampoco se estira */
+.user-info .user-dropdown .user-dropdown-header,
+#user-dropdown .user-dropdown-header {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+.user-info .user-dropdown .user-dropdown-info,
+#user-dropdown .user-dropdown-info {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: hidden !important;
+}
+.user-info .user-dropdown .user-dropdown-name,
+#user-dropdown .user-dropdown-name {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* 7) Mobile: 240px */
+@media (max-width: 600px) {
+  .user-info .user-dropdown,
+  #user-dropdown.user-dropdown {
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+  }
+}
+/* ---------- Ocultar cosméticos equipados bajo la mascota ---------- */
+.mascota-skin { display: none !important; }
+
+/* ---------- Panel "Equipo" del RPG ---------- */
+.rpg-equipo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: .7rem;
+}
+.rpg-equipo-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+  padding: .9rem .6rem;
+  border-radius: 14px;
+  background: var(--tema-card-bg, rgba(255,255,255,.04));
+  border: 2px solid var(--tema-card-border, rgba(255,255,255,.08));
+  text-align: center;
+  position: relative;
+  transition: transform .2s, border-color .2s, box-shadow .2s;
+}
+.rpg-equipo-slot.vacio {
+  opacity: .45;
+  border-style: dashed;
+}
+.rpg-equipo-slot:hover:not(.vacio) {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 8px 22px rgba(0,0,0,.35);
+}
+.rpg-equipo-zona {
+  font-size: .65rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: .75;
+}
+.rpg-equipo-icono {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,217,61,.25), rgba(255,217,61,.05));
+  border: 1px solid rgba(255,217,61,.35);
+  color: var(--accent);
+  font-size: 1.6rem;
+}
+.rpg-equipo-icono svg { width: 60%; height: 60%; }
+.rpg-equipo-nombre {
+  font-size: .85rem;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1.2;
+}
+.rpg-equipo-bonus {
+  font-size: .7rem;
+  padding: .2rem .5rem;
+  border-radius: 999px;
+  background: rgba(108,184,255,.15);
+  border: 1px solid rgba(108,184,255,.35);
+  color: #6cb8ff;
+  font-weight: 700;
+}
+.rpg-equipo-vacio-msg {
+  text-align: center;
+  padding: 2rem 1rem;
+  opacity: .55;
+  font-style: italic;
+  grid-column: 1 / -1;
+}
+.rpg-equipo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: .6rem;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.rpg-equipo-titulo {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--accent);
+}
+.rpg-equipo-count {
+  font-size: .8rem;
+  opacity: .7;
+}
+.rpg-equipo-total {
+  grid-column: 1 / -1;
+  padding: .8rem 1rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(166,132,240,.15), rgba(166,132,240,.04));
+  border: 1px solid rgba(166,132,240,.4);
+  text-align: center;
+  font-size: .85rem;
+  font-weight: 700;
+  color: #d4b8ff;
+}
+.rpg-equipo-total strong { color: var(--accent); }
+/* FIX: Eliminar botones "Cambiar nombre" donde sea */
+[data-action="cambiar-nombre"],
+.nav-links button[data-action="cambiar-nombre"],
+.nav-links .nav-link[data-action="cambiar-nombre"],
+.user-dropdown [data-action="cambiar-nombre"] {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+/* ---------- MONEDA PIXEL-ART ---------- */
+.coin-icon {
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  vertical-align: -0.22em;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
+  user-select: none;
+  pointer-events: none;
+  animation: coinShine 3s ease-in-out infinite;
+}
+
+/* Brillo sutil que recorre la moneda */
+@keyframes coinShine {
+  0%, 100% { filter: drop-shadow(0 1px 2px rgba(0,0,0,.4)) brightness(1); }
+  50%      { filter: drop-shadow(0 2px 6px rgba(255,217,61,.7)) brightness(1.15); }
+}
+
+/* Ajustes por contexto para que se vea bien en cada sitio */
+.user-dropdown-item .coin-icon { width: 1.1em; height: 1.1em; vertical-align: -0.2em; }
+.tienda-monedero .coin-icon,
+.mm-monedero .coin-icon,
+.rpg-coins .coin-icon { width: 1.3em; height: 1.3em; vertical-align: -0.28em; }
+.tienda-item-precio .coin-icon { width: 1.1em; height: 1.1em; vertical-align: -0.18em; }
+.player-meta .coin-icon,
+.mascota-notif .coin-icon { width: 1em; height: 1em; vertical-align: -0.15em; }
+.rpg-cofre-precio .coin-icon { width: 1em; height: 1em; vertical-align: -0.15em; }
+.daily-reward-prizes .coin-icon { width: 1.5em; height: 1.5em; vertical-align: -0.35em; margin-right: .25em; }
+
+/* Evitar que [data-icono] le aplique estilos de SVG por error */
+[data-icono="moneda"] .coin-icon {
+  width: 1.15em !important;
+  height: 1.15em !important;
+}
+/* ---------- Cofres con sprite pixel-art ---------- */
+.rpg-cofre-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  /* Compensar padding si no recortas el PNG: */
+  transform: scale(1.35);
+  margin: -.4rem 0 .1rem;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.5)) drop-shadow(0 0 6px var(--cofre-color, #ffd93d));
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), filter .3s;
+  pointer-events: none;
+  user-select: none;
+}
+.rpg-cofre-card:hover .rpg-cofre-img {
+  transform: scale(1.5) rotate(-3deg);
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,.6)) drop-shadow(0 0 12px var(--cofre-color, #ffd93d));
+}
+
+/* Modal de cofre abierto */
+.loot-cofre-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transform: scale(1.35);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.6));
+  pointer-events: none;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* La tarjeta del cofre: ajustamos para que el sprite no se corte */
+.rpg-cofre-card {
+  overflow: hidden;
+  padding: .5rem .5rem .75rem;
+  gap: .15rem;
+}
