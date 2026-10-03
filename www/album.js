@@ -352,8 +352,17 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("sunadventures_uid", session.user.id);
       window.dispatchEvent(new Event("sunadventures:user-ready"));
       const username = usernameDesdeSesion(session);
-      const { data:perfil } = await supabase.from("perfiles").upsert({ id:session.user.id, username }, { onConflict:"id" }).select("id,username").single();
-      perfilActual = perfil || { id: session.user.id, username };
+      const { data:perfilExistente, error:perfilError } = await supabase
+        .from("perfiles").select("id,username").eq("id", session.user.id).maybeSingle();
+      if (perfilError) throw perfilError;
+      if (perfilExistente) {
+        perfilActual = perfilExistente;
+      } else {
+        const { data:perfil, error:crearPerfilError } = await supabase
+          .from("perfiles").insert({ id:session.user.id, username }).select("id,username").single();
+        if (crearPerfilError) throw crearPerfilError;
+        perfilActual = perfil;
+      }
       const { data:membresias } = await supabase.from("grupo_miembros").select("grupo_id, grupos(id,nombre,creado_por)").eq("user_id", session.user.id).limit(20);
       let membresia = (membresias||[]).find(m => m.grupo_id === localStorage.getItem("grupo_activo")) || membresias?.[0];
       if (!membresia) {
@@ -1732,7 +1741,7 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       const logueado = !!session;
       if (btnOpenLogin) btnOpenLogin.style.display = logueado ? "none" : "inline-flex";
       if (userInfo) userInfo.style.display = logueado ? "flex" : "none";
-      if (logueado && userEmail) { const n = session.user.email.split("@")[0]; userEmail.textContent = n; const dn = $("user-dropdown-name"); if (dn) dn.textContent = n; localStorage.setItem("sunadventures_username", n); window._sunUserEmail = session.user.email; }
+      if (logueado && userEmail) { const n = localStorage.getItem("sunadventures_username") || session.user.email.split("@")[0]; userEmail.textContent = n; const dn = $("user-dropdown-name"); if (dn) dn.textContent = n; window._sunUserEmail = session.user.email; }
       if (btnAdd) btnAdd.style.display = logueado ? "inline-block" : "none";
       if (btnAddNota) btnAddNota.style.display = logueado ? "inline-block" : "none";
       if (logueado) {
@@ -1755,7 +1764,6 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
         renderExperiencia();
         if (typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
       } else {
-        localStorage.removeItem("sunadventures_username");
         window._sunUserEmail = "";
         fotos = []; notas = []; playlists = []; eventos = [];
         if (grid) grid.innerHTML = ""; if (empty) empty.classList.remove("hidden");

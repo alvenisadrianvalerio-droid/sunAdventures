@@ -178,11 +178,10 @@ body.light .nav-link.active{background:rgba(212,148,30,.15)}
   color: currentColor;              /* ✅ hereda el color del botón */
 }
 
-.btn-auth-icon svg {
+.btn-auth-icon img {
   width: 100%;
   height: 100%;
-  fill: currentColor;               /* ✅ fuerza relleno */
-  stroke: none;
+  object-fit: contain;
 }
 
 .btn-auth:hover .btn-auth-icon {
@@ -394,14 +393,6 @@ body.light .download-option:hover{background:rgba(212,148,30,.15);border-color:r
   .nav-link{padding:.5rem;border-radius:50%;width:40px;height:40px;justify-content:center}
   .btn-auth-text{display:none}
   .btn-auth{padding:.55rem;width:40px;height:40px;justify-content:center}
-  .btn-auth-icon[data-icono="estrella"] svg { display: none; }
-  .btn-auth-icon[data-icono="estrella"]::after {
-    content: "";
-    display: block;
-    width: 1.35rem;
-    height: 1.35rem;
-    background: url("img/items%20de%20aventura/corona.png") center / contain no-repeat;
-  }
   .user-email{max-width:70px;font-size:.72rem}
   .theme-toggle{width:36px;height:36px;font-size:1rem}
   .user-dropdown{min-width:240px;right:-10px}
