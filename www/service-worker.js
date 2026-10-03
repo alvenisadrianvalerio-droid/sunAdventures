@@ -1,4 +1,4 @@
-const CACHE_NAME = "sunadventures-v80";
+const CACHE_NAME = "sunadventures-v85";
 const ASSETS_ESTATICOS = [
   "./","./index.html","./styles.css","./album.css","./juegos.css",
   "./rpg.css","./rpg-loot.css","./temas.css","./finanzas.css",

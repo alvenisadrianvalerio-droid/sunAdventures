@@ -20,9 +20,70 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const FX = det => window.dispatchEvent(new CustomEvent("rpg:fx",{detail:det}));
   const FX_KEY = id => (window.RpgCanvas?.HABILIDAD_FX?.[id]) || "slash";
 
+  /* ============================================================
+     🎨 SPRITES COMPLEMENTARIOS — Modo Aventura
+     ============================================================ */
+  const SPRITES_DIR_NEW = 'img/sprites%20complementarios/';
+  const SPRITES_DIR_OLD = 'img/items%20de%20aventura/';
+
+  const SPRITE_MAP_ENEMIGOS = {
+    abeja: "araña", mariposa: "flor", caracol: "lentitud", pajaro: "tengu", conejo: "colmillo",
+    lagarto: "dragon", pulpo: "kraken", tortuga: "golem", "dragon-bebe": "dragon",
+    jirafa: "leon", hamburguesa: "icon", girasol: "girasol", hongo: "seta",
+    escorpion: "scorpion", serpiente: "serpiente", escarabajo: "scorpion",
+    "lobo-hielo": "lobo", "oso-polar": "lobo", "elemental-hielo": "hielo",
+    "golem-lava": "golem", salamandra: "dragon", "fenix-joven": "fuego",
+    esqueleto: "calavera", momia: "calavera", gargola: "demonio",
+    "sapo-gigante": "rana", cocodrilo: "dragon", "bruja-pantano": "mago",
+    "golem-cristal": "golem", murcielago: "murcielago", espectro: "fantasma",
+    grifo: "leon", quimera: "oni", "elemental-aire": "orbe",
+    sirena: "kraken", "kraken-joven": "kraken", tiburon: "kraken",
+    "espectro-negro": "fantasma", vampiro: "vampiro", nigromante: "mago",
+    "robot-guardia": "golem", dron: "ojo", "mech-gigante": "golem",
+    "dragon-rojo": "dragon", "senor-abismo": "demonio",
+    "girasol-anciano": "girasol", "arbol-ancestral": "arbol",
+    "reina-cristal": "corona", faraon: "corona", "rey-glaciar": "corona",
+    lich: "calavera", "senor-sombras": "demonio",
+    jaguar: "leon", "mono-loco": "tengu", "serpiente-emplumada": "serpiente",
+    "planta-carnivora": "brote", "tucan-sombrio": "tengu",
+    "chaman-jaguar": "mago", "tigre-espiritu": "leon", "tarantula-gigante": "araña",
+    "senor-selva": "corona",
+    "rana-venenosa": "rana", "cocodrilo-muerto": "zombie", "serpiente-veneno": "serpiente",
+    "espectro-fango": "fantasma", "hechicero-pantano": "mago",
+    "rey-ranas": "rana", "treant-podrido": "arbol", "diosa-pantano": "corona",
+    yeti: "troll", "lobo-blanco": "lobo", "gigante-hielo": "troll",
+    "rey-yeti": "troll", "quimera-nieve": "oni", "dragon-blanco-joven": "dragon",
+    "titan-glaciar": "corona",
+    harpia: "tengu", "angel-caido": "demonio", "halcon-gigante": "tengu",
+    serafin: "estrella", "quimera-alada": "oni", "dragon-tormenta": "dragon",
+    "dios-cielo": "corona",
+    "demonio-menor": "demonio", "alma-perdida": "fantasma", "cerberus-cachorro": "lobo",
+    succubus: "demonio", "espectro-fuego": "fuego", "senor-demonio": "demonio",
+    "lich-infierno": "calavera", "dragon-negro": "dragon",
+    "senor-inframundo": "corona",
+    horror: "demonio", aberracion: "oni", "ojo-vacio": "ojo", tentaculo: "kraken",
+    "sombra-vacia": "fantasma", "caballero-vacio": "espada", "titan-vacio": "golem",
+    "dragon-vacio": "dragon", "el-vacio": "corona"
+  };
+
+  const SPRITE_MAP_REGIONES = {
+    praderas: "girasol", bosque: "arbol", cueva: "orbe", desierto: "fuego",
+    glaciar: "hielo", volcan: "fuego", ruinas: "corona", sombras: "luna",
+    abismo: "corona", selva: "arbol", pantano: "rana", tundra: "hielo",
+    cielo: "estrella", inframundo: "demonio", vacio: "ojo"
+  };
+
+  function spriteHtml(nombre, cls = "rpg-sprite-img", alt = "") {
+    if (!nombre) return "";
+    const ext = (nombre === "mago" || nombre === "murcielago" || nombre === "serpiente" || nombre === "troll") ? ".webp" : ".png";
+    const srcNuevo = `${SPRITES_DIR_NEW}${nombre}${ext}`;
+    const srcViejo = `${SPRITES_DIR_OLD}${nombre}.png`;
+    return `<img class="${cls}" src="${srcNuevo}" alt="${alt}" data-fallback="${srcViejo}" onerror="if(this.dataset.fallback){this.onerror=null;this.src=this.dataset.fallback;}">`;
+  }
+
   /* ---------- 15 REGIONES ---------- */
   const REGIONES = [
-    { id:"praderas", nombre:"Praderas de Girasoles", icono:ICONO.girasol,
+    { id:"praderas", nombre:"Praderas de Girasoles", icono:ICONO.girasol, sprite:"girasol",
       base:["abeja","mariposa","caracol","pajaro","conejo"], elite:["jirafa","oveja","pollito","girasol"],
       jefe:"girasol-anciano", jefeNombre:"El Girasol Ancestral", jefeIcono:ICONO.girasol },
     { id:"bosque", nombre:"Bosque Umbrío", icono:ICONO.bosque,
@@ -151,7 +212,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   })();
 
   const GRUPOS = REGIONES.map((reg, i) => ({
-    id:i, nombre:reg.nombre, icono:reg.icono, jefe:reg.jefeNombre, jefeIcono:reg.jefeIcono, bioma:reg.bioma,
+    id:i, nombre:reg.nombre, icono:reg.icono, sprite: SPRITE_MAP_REGIONES[reg.id] || reg.sprite, jefe:reg.jefeNombre, jefeIcono:reg.jefeIcono, bioma:reg.bioma,
     zonas: ZONAS.filter(z => Math.floor((z.orden-1)/10) === i),
     nivelMin: i*10+1, nivelMax: (i+1)*10
   }));
@@ -269,10 +330,11 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         ${GRUPOS.map(g => {
           const completadas = g.zonas.filter(z => state.zonasConquistadas.includes(z.id)).length;
           const primeraZona = g.zonas[0];
-const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(primeraZona.id) : (state.nivel >= g.nivelMin - 2 || state.enemigosDerrotados >= g.nivelMin * 6);
+          const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(primeraZona.id) : (state.nivel >= g.nivelMin - 2 || state.enemigosDerrotados >= g.nivelMin * 6);
+          const sImg = g.sprite ? spriteHtml(g.sprite, "rpg-grupo-sprite-img", g.nombre) : "";
           return `<button type="button" class="rpg-grupo-card ${desbloqueado?"":"bloqueada"}" data-grupo="${g.id}" style="--bioma-img:url('${g.bioma.imagen}');--bioma-acento:${g.bioma.acento}" ${desbloqueado?"":"disabled"}>
             <span class="rpg-grupo-fondo" aria-hidden="true"></span>
-            <div class="rpg-grupo-icono">${g.icono || ""}</div>
+            <div class="rpg-grupo-icono">${sImg || g.icono || ""}</div>
             <div class="rpg-grupo-nombre">${g.nombre}</div>
             <div class="rpg-grupo-ambiente">${g.bioma.ambiente}</div>
             <div class="rpg-grupo-rango">Nv ${g.nivelMin}–${g.nivelMax}</div>
@@ -323,8 +385,10 @@ const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(p
             const conquistada = state.zonasConquistadas.includes(z.id);
             const tipo = z.jefe ? "Jefe de región" : z.miniJefe ? "Mini-jefe" : z.nivel % 10 >= 6 ? "Encuentro élite" : "Encuentro";
             const cls = ["rpg-popup-dot", "rpg-popup-zone", z.jefe ? "jefe" : z.miniJefe ? "minijefe" : "", !open ? "bloqueada" : "", conquistada ? "conquistada" : ""].filter(Boolean).join(" ");
+            const zSprite = z.jefe ? "corona" : z.miniJefe ? "calavera" : SPRITE_MAP_ENEMIGOS[z.enemigos?.[0]] || (open ? "espada" : null);
+            const zSpriteHtml = zSprite ? spriteHtml(zSprite, "rpg-zone-sprite-thumb", z.nombre) : "";
             return `<button type="button" class="${cls}" data-zona="${z.id}" ${open ? "" : "disabled"}>
-              <span class="rpg-popup-zone-number">${String(i + 1).padStart(2, "0")}</span>
+              <span class="rpg-popup-zone-number">${zSpriteHtml || String(i + 1).padStart(2, "0")}</span>
               <span class="rpg-popup-zone-copy">
                 <span class="rpg-popup-zone-meta"><strong>NIVEL ${z.nivel}</strong><i>${conquistada ? "✓ CONQUISTADA" : tipo}</i></span>
                 <span class="rpg-popup-zone-name">${z.nombre}</span>
@@ -371,8 +435,9 @@ const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(p
   /* ---------- Batalla ---------- */
   function renderBatalla(c) {
     const m = MASCOTAS[localStorage.getItem("mascota_actual")||"mapache"] || MASCOTAS.mapache;
-    const hpPct = clamp(state.hp / hpMax() * 100);
-    const eIcon = ICONO[enemigo.iconoKey] || ICONO.estrella || "";
+    const spriteKey = enemigo.sprite || SPRITE_MAP_ENEMIGOS[enemigo.id];
+    const eSpriteEl = spriteKey ? spriteHtml(spriteKey, "rpg-enemy-sprite-img", enemigo.nombre) : "";
+    const eContent = eSpriteEl || eIcon;
     const mascotaId = localStorage.getItem("mascota_actual") || "mapache";
     const habs = window.RpgHabilidades?.ataquesDesbloqueados(mascotaId, state.nivel) || [];
     const esFase2 = enemigo.phase === 2;
@@ -398,7 +463,7 @@ const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(p
           </div>
           <div class="rpg-vs">VS</div>
           <div class="rpg-fighter" id="fighter-enemigo">
-            <div class="rpg-fighter-sprite enemigo ${esFase2 ? 'fase2' : ''}" id="sprite-enemigo">${eIcon}</div>
+            <div class="rpg-fighter-sprite enemigo ${esFase2 ? 'fase2' : ''}" id="sprite-enemigo">${eContent}</div>
             <div class="rpg-fighter-nombre">${enemigo.nombre} ${enemigo.jefe ? (esFase2 ? '🔥 FASE 2' : '👑') : ''}</div>
             <div class="rpg-fighter-hp" id="hp-enemigo">${Math.round(enemigo.hp)} HP${enemigo.shield > 0 ? ` · 🛡️${enemigo.shield}` : ''}</div>
             <div class="rpg-buffs" id="buffs-enemigo"></div>
@@ -454,8 +519,9 @@ const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(p
     const hp = Math.round(z.hp * (1+v));
     const tier = z.jefe ? 'jefe' : z.miniJefe ? 'elite' : (z.nivel >= 6 && z.nivel % 10 >= 6 && z.nivel % 10 <= 9) ? 'elite' : 'comun';
     const esp = ESPECIALES[tier][rnd(0, ESPECIALES[tier].length-1)];
+    const spriteName = SPRITE_MAP_ENEMIGOS[eId] || (z.jefe ? 'corona' : z.miniJefe ? 'calavera' : 'espada');
     enemigo = {
-      id:eId, iconoKey:eId, nombre:NOMBRES[eId]||eId, hpMax:hp, hp,
+      id:eId, iconoKey:eId, icono:z.icono, sprite:spriteName, nombre:NOMBRES[eId]||eId, hpMax:hp, hp,
       atk:Math.round(z.atk*(1+v)), xp:z.xp, monedas:z.monedas, jefe:!!z.jefe,
       dot:0, dotDur:0, shield:0, phase:1, tier,
       special: esp, specialCD: z.jefe ? 2 : z.miniJefe ? 3 : 4, specialTimer: z.jefe ? 2 : z.miniJefe ? 3 : 4
@@ -784,7 +850,7 @@ const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(p
         break;
       }
     }
-    actualizarHPs();
+    actualizarHPs(); tickBuffs();
     if (state.hp <= 0) return setTimeout(derrota, 500);
     turnoJugador = true; deshab(false);
   }

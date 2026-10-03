@@ -19,33 +19,95 @@
   const confirmar = (o) => window.SunModal ? window.SunModal.confirm(o) : Promise.resolve(confirm(o.message || o.title));
   const BIOMA_IMAGES = new Map();
   const ROGUELIKE_SPRITES = new Map();
-  const RL_SPRITE_DIR = 'img/items%20de%20aventura/';
-  const RL_SPRITE_MAP = {
-    '⚔️':'espada', '⚔':'espada', '🗡️':'espada',
-    '🛡️':'armadura', '🛡':'armadura', '🎯':'estrella',
-    '💰':'icon', '🪙':'icon', '🧪':'pocion', '🔥':'estrella',
-    '👑':'corona', '💀':'calavera', '☠️':'calavera',
-    '💎':'diamante', '🛒':'tienda', '❓':'estrella',
-    '✨':'estrella', '❤️':'estrella', '💗':'estrella',
-    '🩸':'pocion', '💚':'estrella', '🐾':'armadura',
-    '🏃':'espada', '💔':'estrella', '🩹':'pocion',
-    '🐌':'estrella', '🤐':'estrella', '💸':'icon',
-    '👻':'calavera', '🦷':'espada', '🍀':'estrella',
-    '👢':'armadura', '🪞':'estrella', '💍':'corona',
-    '🧿':'estrella', '⚡':'estrella', '🗿':'calavera',
-    '🦁':'calavera', '🧙':'corona', '🧌':'calavera',
-    '🧛':'calavera', '🔮':'estrella', '🐉':'corona',
-    '🦑':'calavera', '👿':'calavera', '👁️':'estrella',
-    '🟢':'estrella', '🐀':'calavera', '🦇':'calavera',
-    '🐸':'calavera', '🍄':'estrella', '🐺':'calavera',
-    '🧼':'estrella', '⚠️':'calavera', '✓':'estrella'
-  };
-  const spriteMarkup = (icon, className = 'rpg-rl-sprite') => {
-    const sprite = RL_SPRITE_MAP[icon];
-    return sprite
-      ? `<img class="${className}" src="${RL_SPRITE_DIR}${sprite}.png" alt="" aria-hidden="true">`
-      : `<span class="${className}" aria-hidden="true">${icon || ''}</span>`;
-  };
+  /* ============================================================
+   🎨 SPRITES — directorio nuevo con fallback al antiguo
+   ============================================================ */
+const RL_SPRITE_DIR_NEW = 'img/sprites%20complementarios/';
+const RL_SPRITE_DIR_OLD = 'img/items%20de%20aventura/';
+
+// Mapa emoji → nombre de archivo .png (SIN extensión)
+// Los archivos deben existir en la carpeta nueva o en la antigua
+const RL_SPRITE_MAP = {
+  // —— Armas / combate ——
+  '⚔️':'espada', '⚔':'espada', '🗡️':'espada', '🗡':'espada',
+  '🛡️':'armadura', '🛡':'armadura',
+  '🏹':'arco', '🪓':'hacha', '🔨':'martillo', '🗿':'golem',
+  // —— Magia ——
+  '✨':'estrella', '🌟':'estrella', '⭐':'estrella', '💫':'estrella',
+  '🔮':'orbe', '🧿':'orbe', '📜':'pergamino', '📖':'libro', '📕':'libro',
+  // —— Pociones / curación ——
+  '🧪':'pocion', '💊':'pocion', '⚗️':'pocion', '🍶':'pocion',
+  '❤️':'corazon', '💗':'corazon', '💚':'corazon', '🩹':'venda', '🩸':'sangre',
+  // —— Dinero / tesoro ——
+  '💰':'icon', '🪙':'icon', '💵':'icon', '💸':'icon',
+  '💎':'diamante', '💍':'anillo', '🪞':'espejo',
+  // —— Objetos clave ——
+  '👑':'corona', '🗝️':'llave', '🔑':'llave', '⏳':'reloj', '⌛':'reloj',
+  '🧲':'iman', '🎯':'diana', '🏆':'trofeo', '🎖️':'medalla',
+  // —— Estado / emociones ——
+  '🔥':'fuego', '❄️':'hielo', '⚡':'rayo', '☠️':'calavera', '💀':'calavera',
+  '👻':'fantasma', '🩻':'fantasma', '😱':'calavera',
+  '🥀':'flor-marchita', '💔':'corazon-roto',
+  // —— Criaturas / enemigos ——
+  '🐉':'dragon', '🐲':'dragon', '🦑':'kraken', '👿':'demonio', '😈':'demonio',
+  '👁️':'ojo', '🧙':'mago', '🧌':'troll', '🧛':'vampiro', '🧟':'zombi',
+  '👹':'oni', '👺':'tengu', '🦁':'leon', '🐺':'lobo', '🦇':'murcielago',
+  '🕷️':'araña', '🦂':'escorpion', '🐍':'serpiente', '🐀':'rata',
+  '🐸':'rana', '🍄':'seta', '🦷':'colmillo', '🐾':'huella',
+  // —— Naturaleza / elementos ——
+  '🍀':'trebol', '🌿':'hierba', '🌱':'brote', '🌳':'arbol',
+  '🟢':'orbe-verde',
+  // —— UI / acciones ——
+  '🏃':'huida', '🚶':'paso', '🧼':'limpieza', '💤':'sueño',
+  '🐌':'lentitud', '🤐':'mudez', '👢':'botas',
+  '🛒':'tienda', '❓':'estrella', '⚠️':'calavera', '✓':'estrella',
+  '🔔':'campana', '📅':'calendario', '⏰':'reloj',
+  '🧊':'hielo', '🌸':'flor', '🌻':'girasol', '🌙':'luna', '☀️':'sol'
+};
+
+/* Devuelve el HTML de un sprite.
+   Intenta primero el directorio NUEVO, y si falla, el ANTIGUO. */
+const spriteMarkup = (icon, className = 'rpg-rl-sprite') => {
+  const file = RL_SPRITE_MAP[icon];
+  if (!file) return `<span class="${className}" aria-hidden="true">${icon || ''}</span>`;
+  const nuevo = `${RL_SPRITE_DIR_NEW}${file}.png`;
+  const viejo = `${RL_SPRITE_DIR_OLD}${file}.png`;
+  return `<img class="${className}" src="${nuevo}" data-fallback="${viejo}" alt="" aria-hidden="true"
+          onerror="if(this.dataset.fallback){this.onerror=null;this.src=this.dataset.fallback;}">`;
+};
+
+/* Sustituye TODOS los emojis de un elemento por sus sprites.
+   Útil para títulos y descripciones que vienen como texto plano. */
+function sustituirEmojis(root) {
+  if (!root) return;
+  const emojis = Object.keys(RL_SPRITE_MAP).sort((a, b) => b.length - a.length);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+  const nodes = [];
+  let n;
+  while ((n = walker.nextNode())) nodes.push(n);
+  nodes.forEach(node => {
+    const txt = node.nodeValue;
+    if (!txt || !txt.trim()) return;
+    const hallados = emojis.filter(e => txt.includes(e));
+    if (!hallados.length) return;
+    const frag = document.createDocumentFragment();
+    let resto = txt;
+    while (resto.length) {
+      let posMin = -1, sel = null;
+      for (const e of hallados) {
+        const p = resto.indexOf(e);
+        if (p !== -1 && (posMin === -1 || p < posMin)) { posMin = p; sel = e; }
+      }
+      if (posMin === -1) { frag.appendChild(document.createTextNode(resto)); break; }
+      if (posMin > 0) frag.appendChild(document.createTextNode(resto.slice(0, posMin)));
+      const wrap = document.createElement("span");
+      wrap.innerHTML = spriteMarkup(sel, "rpg-rl-inline-emoji");
+      if (wrap.firstChild) frag.appendChild(wrap.firstChild);
+      resto = resto.slice(posMin + sel.length);
+    }
+    node.parentNode?.replaceChild(frag, node);
+  });
+}
 
   /* ============================================================
      CONSTANTES
@@ -327,7 +389,12 @@
       let sprite = ROGUELIKE_SPRITES.get(tipo.sprite);
       if (!sprite) {
         sprite = new Image();
-        sprite.src = `${RL_SPRITE_DIR}${tipo.sprite}.png`;
+        sprite.onerror = () => {
+          if (sprite.src.indexOf(RL_SPRITE_DIR_OLD) === -1) {
+            sprite.src = `${RL_SPRITE_DIR_OLD}${tipo.sprite}.png`;
+          }
+        };
+        sprite.src = `${RL_SPRITE_DIR_NEW}${tipo.sprite}.png`;
         ROGUELIKE_SPRITES.set(tipo.sprite, sprite);
       }
       if (sprite.complete && sprite.naturalWidth) {
@@ -1128,10 +1195,12 @@
       }
       state.enemigo = null;
       guardarRun(state);
-      const lineas = [`+${oroGanado} oro`, `+${e.xp} XP`];
-      if (premioRacha) lineas.push(`🔥 Racha x${state.racha}: +20 oro y una poción`);
-      if (subido) lineas.push(`⬆️ Nivel ${state.nivel}`);
-      if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}`);
+      const COIN = '<img class="rpg-rl-inline-icon" src="img/items%20de%20aventura/icon.png" alt="">';
+const STAR = '<img class="rpg-rl-inline-icon" src="img/items%20de%20aventura/estrella.png" alt="">';
+const lineas = [`+${oroGanado} ${COIN} oro`, `+${e.xp} ${STAR} XP`];
+if (premioRacha) lineas.push(`🔥 Racha x${state.racha}: +20 ${COIN} y una 🧪`);
+if (subido) lineas.push(`⬆️ Nivel ${state.nivel}`);
+if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}`);
       mostrarRecompensa('¡Victoria!', lineas, () => renderPanel());
     }, 900);
   }
@@ -1175,12 +1244,12 @@
     guardarRun(state);
     setTimeout(() => {
       mostrarRecompensa('🏆 ¡VICTORIA!', [
-        `Conquistaste los ${PISOS_MAX} pisos`,
-        `Nivel final: ${state.nivel}`,
-        `${state.reliquias.length} reliquias`,
-        `${state.maldiciones.length} maldiciones`,
-        `+500 oro bonus`
-      ], () => { limpiarRun(); state = null; renderPanel(); });
+  `Conquistaste los ${PISOS_MAX} pisos`,
+  `Nivel final: ${state.nivel}`,
+  `${state.reliquias.length} reliquias`,
+  `${state.maldiciones.length} maldiciones`,
+  `+500 ${COIN} bonus`
+], () => { limpiarRun(); state = null; renderPanel(); });
     }, 700);
   }
 
@@ -1501,10 +1570,17 @@
     this.sprites = { hero: null, enemy: null };
     const m = MASCOTAS[state.mascota] || {};
     if (m.imagen) { const i = new Image(); i.onload = () => { this.sprites.hero = i; }; i.src = m.imagen; }
-    const enemySprite = state.enemigo?.tier === 'jefe' ? 'corona' : state.enemigo?.tier === 'elite' ? 'calavera' : 'espada';
+    const e = state.enemigo || {};
+    const enemySprite = (e.ico && RL_SPRITE_MAP[e.ico]) || e.id || (e.tier === 'jefe' ? 'corona' : e.tier === 'elite' ? 'calavera' : 'espada');
+    const ext = (enemySprite === 'mago' || enemySprite === 'murcielago' || enemySprite === 'serpiente' || enemySprite === 'troll') ? '.webp' : '.png';
     const enemyImage = new Image();
     enemyImage.onload = () => { this.sprites.enemy = enemyImage; };
-    enemyImage.src = `${RL_SPRITE_DIR}${enemySprite}.png`;
+    enemyImage.onerror = () => {
+      if (enemyImage.src.indexOf(RL_SPRITE_DIR_OLD) === -1) {
+        enemyImage.src = `${RL_SPRITE_DIR_OLD}${enemySprite}.png`;
+      }
+    };
+    enemyImage.src = `${RL_SPRITE_DIR_NEW}${enemySprite}${ext}`;
     this.raf = requestAnimationFrame(this._loop);
   }
   BatallaCanvas.prototype.playAttack = function (fxKey, dmg, crit) {

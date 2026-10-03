@@ -493,7 +493,13 @@
           <button type="button" class="btn-primary" id="snk-otra">Otra vez</button>
         </div>`;
       panel.appendChild(r);
-      r.querySelector("#snk-otra").addEventListener("click", () => { o.remove(); setTimeout(juegoSnake, 100); });
+      r.querySelector("#snk-otra").addEventListener("click", () => {
+        clearInterval(intervalo);
+        clearInterval(o._tk);
+        document.removeEventListener("keydown", o._onKey);
+        o.remove();
+        setTimeout(juegoSnake, 100);
+      });
     }
 
     function setDir(d) {

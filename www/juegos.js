@@ -59,26 +59,37 @@ function programarIntervalo(overlay, fn, delay) {
 
   // ============ HELPERS ============
   function crearOverlay(id, html) {
-  document.getElementById(id)?.remove();
-  const o = document.createElement("div");
-  o.id = id; o.className = "minijuego-overlay";
-  o.innerHTML = `<div class="minijuego-panel"><button class="minijuego-cerrar" data-close-juego aria-label="Cerrar">×</button>${html}</div>`;
-  document.body.appendChild(o);
+    document.getElementById(id)?.remove();
+    const o = document.createElement("div");
+    o.id = id; o.className = "minijuego-overlay";
+    o.innerHTML = `<div class="minijuego-panel"><button class="minijuego-cerrar" data-close-juego aria-label="Cerrar">×</button>${html}</div>`;
+    document.body.appendChild(o);
 
-  const cerrar = () => {
-    limpiarTimers(o);       // ⬅️ mata intervals pendientes
-    o.classList.remove("active");
-    setTimeout(() => o.remove(), 250);
-  };
+    const cerrar = () => {
+      limpiarTimers(o);       // ⬅️ mata intervals pendientes
+      clearTimeout(window._casTO);
+      o.classList.remove("active");
+      setTimeout(() => o.remove(), 250);
+    };
 
-  o.addEventListener("click", e => {
-    if (e.target === o || e.target.hasAttribute("data-close-juego")) cerrar();
-  });
+    o.addEventListener("click", e => {
+      if (e.target === o || e.target.hasAttribute("data-close-juego")) cerrar();
+    });
 
-  // Expón un hook para que cada juego registre sus timers
-  o._cerrar = cerrar;
-  return o;
-}
+    // Auto-limpieza si el elemento es removido directamente del DOM
+    const obs = new MutationObserver(() => {
+      if (!o.isConnected) {
+        limpiarTimers(o);
+        clearTimeout(window._casTO);
+        obs.disconnect();
+      }
+    });
+    obs.observe(document.body, { childList: true, subtree: true });
+
+    // Expón un hook para que cada juego registre sus timers
+    o._cerrar = cerrar;
+    return o;
+  }
 
   const HUD = (items) => `<div class="jm-hud">${items.map(i => `
     <div class="jm-hud-card${i.cls ? " " + i.cls : ""}">
