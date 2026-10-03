@@ -1,0 +1,109 @@
+/* ============================================================
+   MI MÚSICA — Reproductor local + playlists compartidas
+   ============================================================ */
+.ml-section { padding: 2rem 1.2rem 8rem; max-width: 1100px; margin: 0 auto; }
+.ml-header { text-align: center; margin-bottom: 1.5rem; }
+.ml-title { font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 900; margin: 0; color: var(--text); }
+.ml-subtitle { opacity: .7; font-style: italic; margin: .3rem 0 0; }
+.ml-tabs { display: flex; gap: .4rem; padding: .35rem; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; margin-bottom: 1.2rem; }
+.ml-tab { flex: 1; min-height: 42px; border: none; background: transparent; color: var(--text); font-family: inherit; font-weight: 800; font-size: .88rem; border-radius: 10px; cursor: pointer; opacity: .6; transition: all .2s; }
+.ml-tab:hover { opacity: .9; background: rgba(255,217,61,.08); }
+.ml-tab.active { opacity: 1; background: linear-gradient(135deg, rgba(255,217,61,.25), rgba(255,217,61,.1)); color: var(--accent); }
+.ml-panel { display: none; }
+.ml-panel.active { display: block; animation: mlFade .25s ease; }
+@keyframes mlFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* Barra superior: añadir + buscar */
+.ml-toolbar { display: flex; gap: .6rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+.ml-toolbar input { flex: 1 1 200px; padding: .7rem .9rem; border-radius: 12px; border: 1.5px solid rgba(255,255,255,.12); background: rgba(0,0,0,.3); color: var(--text); font-family: inherit; font-size: .9rem; outline: none; }
+.ml-toolbar input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,217,61,.15); }
+.ml-btn { display: inline-flex; align-items: center; gap: .5rem; padding: .7rem 1.2rem; border-radius: 12px; border: none; background: linear-gradient(135deg, #ffd93d, #ff9f2e); color: #2b2118; font-family: inherit; font-size: .88rem; font-weight: 900; cursor: pointer; box-shadow: 0 6px 18px rgba(255,217,61,.35); transition: transform .2s, box-shadow .25s; white-space: nowrap; }
+.ml-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(255,217,61,.55); }
+.ml-btn.sec { background: rgba(255,255,255,.06); color: var(--text); border: 1px solid rgba(255,255,255,.14); box-shadow: none; }
+.ml-btn.sec:hover { background: rgba(255,255,255,.12); box-shadow: none; }
+
+/* Lista de pistas */
+.ml-lista { display: flex; flex-direction: column; gap: .4rem; }
+.ml-track { display: grid; grid-template-columns: 38px 1fr auto auto; align-items: center; gap: .55rem; padding: .55rem .7rem; border-radius: 12px; background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.05); transition: background .15s, border-color .15s, transform .15s; }
+.ml-track:hover { background: rgba(255,217,61,.08); border-color: rgba(255,217,61,.3); }
+.ml-track.reproduciendo { background: linear-gradient(135deg, rgba(255,217,61,.18), rgba(255,217,61,.06)); border-color: var(--accent); }
+.ml-track-play { width: 34px; height: 34px; border-radius: 50%; border: none; background: linear-gradient(135deg, #ffd93d, #ff9f2e); color: #2b2118; cursor: pointer; display: grid; place-items: center; font-size: .85rem; font-weight: 900; box-shadow: 0 4px 12px rgba(255,217,61,.35); transition: transform .15s; flex-shrink: 0; }
+.ml-track-play:hover { transform: scale(1.08); }
+.ml-track-info { display: flex; flex-direction: column; gap: .1rem; min-width: 0; }
+.ml-track-titulo { font-weight: 800; font-size: .9rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ml-track-artista { font-size: .72rem; opacity: .6; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ml-track-add, .ml-track-del { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; background: rgba(255,255,255,.06); color: var(--text); display: grid; place-items: center; font-size: 1rem; opacity: .7; transition: all .15s; flex-shrink: 0; }
+.ml-track-add:hover { background: rgba(166,132,240,.25); color: #c4a5ff; opacity: 1; }
+.ml-track-del:hover { background: rgba(255,84,112,.25); color: #ff7a9c; opacity: 1; }
+
+.ml-vacio { padding: 2.5rem 1rem; text-align: center; opacity: .55; font-style: italic; font-size: .9rem; line-height: 1.6; }
+
+/* Playlists grid */
+.ml-playlists { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; }
+.ml-playlist { position: relative; padding: 1rem; border-radius: 16px; background: linear-gradient(145deg, rgba(255,217,61,.12), rgba(255,217,61,.03)); border: 1px solid rgba(255,217,61,.28); cursor: pointer; transition: transform .2s, box-shadow .25s; overflow: hidden; }
+.ml-playlist:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(255,217,61,.18); }
+.ml-playlist-nombre { font-size: 1.05rem; font-weight: 900; color: var(--text); margin: 0 0 .2rem; }
+.ml-playlist-desc { font-size: .78rem; opacity: .65; font-style: italic; margin: 0 0 .6rem; }
+.ml-playlist-count { font-size: .72rem; color: var(--accent); font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
+.ml-playlist-play { display: inline-flex; align-items: center; gap: .35rem; margin-top: .7rem; padding: .4rem .8rem; border-radius: 999px; background: rgba(255,217,61,.2); border: 1px solid rgba(255,217,61,.4); color: var(--accent); font-weight: 900; font-size: .75rem; }
+.ml-playlist-del { position: absolute; top: .6rem; right: .6rem; width: 26px; height: 26px; border-radius: 50%; border: none; background: rgba(0,0,0,.4); color: #fff; cursor: pointer; opacity: 0; transition: opacity .2s; }
+.ml-playlist:hover .ml-playlist-del { opacity: 1; }
+
+/* Modal playlist */
+.ml-modal { position: fixed; inset: 0; z-index: 9500; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.72); backdrop-filter: blur(6px); padding: 1rem; }
+.ml-modal.active { display: flex; }
+.ml-modal-card { width: min(420px, 94vw); max-height: 88vh; overflow-y: auto; padding: 1.6rem 1.4rem 1.2rem; border-radius: 20px; background: linear-gradient(180deg, #14161f, #0b0c12); border: 2px solid rgba(255,217,61,.4); color: var(--text); box-shadow: 0 25px 60px rgba(0,0,0,.7); position: relative; animation: mlModalPop .3s cubic-bezier(.34,1.56,.64,1); }
+@keyframes mlModalPop { from { opacity: 0; transform: scale(.9) translateY(12px); } to { opacity: 1; transform: none; } }
+.ml-modal-card h3 { margin: 0 0 1rem; color: var(--accent); font-size: 1.2rem; font-weight: 900; }
+.ml-modal-card label { display: flex; flex-direction: column; gap: .35rem; margin-bottom: .8rem; }
+.ml-modal-card label span { font-size: .7rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); opacity: .85; }
+.ml-modal-card input, .ml-modal-card textarea { font-family: inherit; font-size: .9rem; padding: .7rem .9rem; border-radius: 10px; border: 1.5px solid rgba(255,255,255,.14); background: rgba(0,0,0,.3); color: var(--text); outline: none; }
+.ml-modal-card input:focus, .ml-modal-card textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,217,61,.15); }
+.ml-modal-actions { display: flex; gap: .5rem; justify-content: flex-end; margin-top: 1rem; }
+.ml-modal-close { position: absolute; top: .7rem; right: .7rem; width: 30px; height: 30px; border-radius: 50%; border: none; background: rgba(255,255,255,.06); color: var(--text); cursor: pointer; }
+.ml-modal-tracks { max-height: 260px; overflow-y: auto; margin-top: .8rem; display: flex; flex-direction: column; gap: .3rem; }
+.ml-modal-track { display: grid; grid-template-columns: 20px 1fr auto; gap: .5rem; align-items: center; padding: .5rem .6rem; border-radius: 8px; background: rgba(255,255,255,.03); font-size: .82rem; }
+.ml-modal-track input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); }
+.ml-modal-track-info { display: flex; flex-direction: column; min-width: 0; }
+.ml-modal-track-titulo { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ml-modal-track-artista { font-size: .68rem; opacity: .55; }
+.ml-modal-track-dur { font-size: .7rem; opacity: .6; }
+
+/* Mini player (dentro del tab) */
+.ml-player { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(140%); width: min(720px, calc(100vw - 24px)); display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: .7rem 1rem; border-radius: 22px; background: rgba(14,15,22,.94); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,.1); box-shadow: 0 14px 40px rgba(0,0,0,.55); z-index: 850; transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
+.ml-player.visible { transform: translateX(-50%) translateY(0); }
+.ml-player-info { display: flex; align-items: center; gap: .8rem; min-width: 0; flex: 1 1 200px; }
+.ml-player-cover { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #ffd93d, #ff9f2e); color: #2b2118; display: grid; place-items: center; font-size: 1.2rem; flex-shrink: 0; }
+.ml-player-meta { display: flex; flex-direction: column; min-width: 0; }
+.ml-player-titulo { font-size: .88rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+.ml-player-artista { font-size: .72rem; opacity: .6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ml-player-controls { display: flex; align-items: center; gap: .2rem; }
+.ml-player-controls button { width: 34px; height: 34px; border-radius: 50%; border: none; background: transparent; color: var(--text); font-size: 1rem; cursor: pointer; opacity: .75; transition: opacity .2s, background .2s, transform .15s; }
+.ml-player-controls button:hover { opacity: 1; background: rgba(255,255,255,.08); transform: scale(1.05); }
+.ml-player-controls .ml-player-play { width: 42px; height: 42px; background: linear-gradient(135deg, #ffd93d, #ff9f2e); color: #2b2118; opacity: 1; box-shadow: 0 4px 14px rgba(255,217,61,.45); font-size: 1rem; font-weight: 900; }
+.ml-player-controls .ml-player-play:hover { transform: scale(1.08); }
+.ml-player-progress { grid-column: 1 / -1; display: flex; align-items: center; gap: .5rem; }
+.ml-player-time { font-size: .65rem; opacity: .6; min-width: 32px; text-align: center; font-variant-numeric: tabular-nums; }
+.ml-player-seek { flex: 1; height: 4px; -webkit-appearance: none; appearance: none; border-radius: 999px; background: rgba(255,255,255,.14); outline: none; cursor: pointer; }
+.ml-player-seek::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid #fff; cursor: pointer; }
+.ml-player-seek::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 2px solid #fff; cursor: pointer; }
+.ml-player-close { position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; border-radius: 50%; border: none; background: #ff5470; color: #fff; font-weight: 900; cursor: pointer; box-shadow: 0 4px 10px rgba(255,84,112,.5); }
+body.light .ml-player { background: rgba(255,253,247,.94); border-color: rgba(139,90,20,.15); }
+body.light .ml-modal-card { background: linear-gradient(180deg, #fffdf7, #fff8eb); color: #3d2c1e; }
+body.light .ml-modal-card h3 { color: #b57320; }
+body.light .ml-track { background: rgba(139,90,20,.04); border-color: rgba(139,90,20,.1); }
+body.light .ml-track-titulo { color: #3d2c1e; }
+
+/* Aviso legal */
+.ml-aviso { margin: 1.2rem 0; padding: 1rem 1.1rem; border-radius: 14px; background: linear-gradient(135deg, rgba(77,212,142,.1), rgba(77,212,142,.03)); border-left: 4px solid #4dd48e; font-size: .82rem; line-height: 1.55; }
+.ml-aviso strong { color: #4dd48e; }
+
+@media (max-width: 640px) {
+  .ml-section { padding: 1.2rem .8rem 10rem; }
+  .ml-track { grid-template-columns: 34px 1fr auto; gap: .4rem; padding: .5rem; }
+  .ml-track-add { display: none; }
+  .ml-player { grid-template-columns: 1fr auto; gap: 8px; padding: .55rem .7rem; }
+  .ml-player-info { grid-column: 1 / -1; }
+  .ml-player-controls button { width: 30px; height: 30px; }
+  .ml-player-controls .ml-player-play { width: 38px; height: 38px; }
+}

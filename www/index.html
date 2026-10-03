@@ -27,12 +27,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="styles.css?v=121">
-  <link rel="stylesheet" href="album.css?v=119">
+  <link rel="stylesheet" href="album.css?v=120">
   <link rel="stylesheet" href="juegos.css?v=119">
   <link rel="stylesheet" href="rpg.css?v=4">
   <link rel="stylesheet" href="rpg-loot.css?v=4">
   <link rel="stylesheet" href="temas.css?v=1">
   <link rel="stylesheet" href="finanzas.css?v=5">
+  <link rel="stylesheet" href="player-extras.css?v=1">
+  <link rel="stylesheet" href="musica-local.css?v=1">
   <style>
     svg {
       max-width: 100%;
@@ -95,7 +97,6 @@
                     <a href="#mapa" class="user-dropdown-item" data-view-link="mapa"><span class="user-dropdown-icon" data-icono="mapa"></span><span>Mapa</span></a>
                     <a href="#logros" class="user-dropdown-item" data-view-link="logros"><span class="user-dropdown-icon" data-icono="trofeo"></span><span>Logros</span></a>
                     <a href="#notas" class="user-dropdown-item" data-view-link="notas"><span class="user-dropdown-icon" data-icono="nota"></span><span>Notitas</span></a>
-                    <a href="#playlists" class="user-dropdown-item" data-view-link="playlists"><span class="user-dropdown-icon" data-icono="musica"></span><span>Playlists</span></a>
                     <div class="user-dropdown-divider"></div>
                     <button class="user-dropdown-item" data-action="perfil"><span class="user-dropdown-icon" data-icono="persona"></span><span>Mi perfil</span></button>
                     <button class="user-dropdown-item" data-action="cambiar-nombre"><span class="user-dropdown-icon" data-icono="lapiz"></span></button>
@@ -131,7 +132,6 @@
           <a href="#notas" class="lobby-btn" data-view-link="notas"><span class="lobby-btn-icon"
               data-icono="nota"></span><span class="lobby-btn-text"><strong>Notitas para ti</strong><small>Pensamientos
                 que quiero guardar</small></span></a>
-          <a href="#playlists" class="lobby-btn" data-view-link="playlists"><span class="lobby-btn-icon"
               data-icono="musica"></span><span class="lobby-btn-text"><strong>Nuestras Playlists</strong><small>Las
                 canciones de nosotros</small></span></a>
           <a href="#mascotas" class="lobby-btn" data-view-link="mascotas"><span class="lobby-btn-icon"
@@ -228,21 +228,6 @@
       <p class="notas-empty-hint">Escribe la primera.</p>
     </div>
   </section>
-
-  <!-- ============ PLAYLISTS ============ -->
-  <section id="playlists" class="playlists-section view" data-view="playlists">
-    <div class="playlists-header">
-      <h2 class="playlists-title">Nuestras playlists</h2>
-      <p class="playlists-subtitle">Las canciones que nos suenan a nosotros</p>
-    </div>
-    <div class="playlists-actions"><button id="btn-add-playlist" class="btn-primary"><span>+</span> Añadir
-        playlist</button></div>
-    <div id="playlists-grid" class="playlists-grid"></div>
-    <div id="playlists-empty" class="playlists-empty">
-      <p>Aún no hay playlists.</p>
-    </div>
-  </section>
-
   <!-- ============ MASCOTAS ============ -->
   <section id="mascotas" class="mascotas-section view" data-view="mascotas">
     <div class="mascotas-header">
@@ -537,63 +522,6 @@
       </form>
     </div>
   </div>
-
-  <!-- ============ MODAL PLAYLIST ============ -->
-  <div id="playlist-modal" class="modal" aria-hidden="true">
-    <div class="modal-backdrop" data-close-playlist-modal></div>
-    <div class="modal-content">
-      <h3 class="modal-title">Nueva playlist</h3>
-      <form id="playlist-form" class="modal-form">
-        <div class="form-field">
-          <span class="form-label">Icono</span>
-          <div class="emoji-picker" id="emoji-picker">
-            <button type="button" class="emoji-option activo" data-emoji="music" data-icono="musica"></button>
-            <button type="button" class="emoji-option" data-emoji="note" data-icono="nota"></button>
-            <button type="button" class="emoji-option" data-emoji="sparkle" data-icono="estrella"></button>
-            <button type="button" class="emoji-option" data-emoji="sunflower" data-icono="girasol"></button>
-            <button type="button" class="emoji-option" data-emoji="heart" data-icono="corazon"></button>
-            <button type="button" class="emoji-option" data-emoji="calendar" data-icono="calendario"></button>
-          </div>
-        </div>
-        <label class="form-field"><span class="form-label">Nombre</span><input type="text" id="playlist-nombre"
-            maxlength="40" placeholder="Nuestra playlist..." required></label>
-        <label class="form-field"><span class="form-label">Descripción (opcional)</span><input type="text"
-            id="playlist-descripcion" maxlength="80" placeholder="Para cuando..."></label>
-        <div class="form-field"><span class="form-label">Color</span>
-          <div class="color-picker">
-            <button type="button" class="color-option color-amarillo activo" data-color="amarillo"></button>
-            <button type="button" class="color-option color-rosa" data-color="rosa"></button>
-            <button type="button" class="color-option color-lila" data-color="lila"></button>
-            <button type="button" class="color-option color-menta" data-color="menta"></button>
-            <button type="button" class="color-option color-cielo" data-color="cielo"></button>
-          </div>
-        </div>
-        <div class="modal-actions"><button type="button" class="btn-secondary" data-close-playlist-modal>Mejor
-            luego</button><button type="submit" class="btn-primary">Guardar playlist</button></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ============ MODAL CANCIONES ============ -->
-  <div id="canciones-modal" class="modal" aria-hidden="true">
-    <div class="modal-backdrop" data-close-canciones-modal></div>
-    <div class="modal-content">
-      <h3 id="canciones-modal-title" class="modal-title">Canciones</h3>
-      <p id="canciones-modal-desc" class="canciones-modal-desc"></p>
-      <div id="canciones-lista" class="canciones-lista"></div>
-      <div class="cancion-tabs" role="tablist">
-        <button type="button" class="cancion-tab active" data-tab="una">Una a una</button>
-        <button type="button" class="cancion-tab" data-tab="pegar">Pegar varias</button>
-        <button type="button" class="cancion-tab" data-tab="subir">Subir archivos</button>
-      </div>
-      <div class="cancion-panel active" data-panel="una">
-        <form id="cancion-form" class="modal-form cancion-form">
-          <div class="cancion-form-row"><input type="text" id="cancion-titulo" placeholder="Título" maxlength="60"
-              required><input type="text" id="cancion-artista" placeholder="Artista (opcional)" maxlength="40"></div>
-          <input type="url" id="cancion-url" placeholder="Link (Spotify / YouTube) — opcional">
-          <button type="submit" class="btn-primary">+ Añadir canción</button>
-        </form>
-      </div>
       <div class="cancion-panel" data-panel="pegar">
         <div class="cancion-pegar">
           <p class="cancion-pegar-hint">Pega tu lista o carga un archivo (.txt, .csv, .m3u):</p>
@@ -774,28 +702,40 @@ Artista - Canción
     </div>
   </div>
 
-  <!-- ============ PLAYER ============ -->
-  <div id="player-bar" class="player-bar" aria-hidden="true">
-    <button id="player-close" class="player-close" title="Cerrar">×</button>
-    <div class="player-info">
-      <div class="player-cover"><span id="player-cover-icon" data-icono="musica"></span></div>
-      <div class="player-meta"><span class="player-title" id="player-bar-title">—</span><span class="player-artist"
-          id="player-bar-artist"></span></div>
+ <div id="player-bar" class="player-bar" aria-hidden="true">
+  <button id="player-close" class="player-close" title="Cerrar">×</button>
+
+  <div class="player-info">
+    <div class="player-cover"><span id="player-cover-icon" data-icono="musica"></span></div>
+    <div class="player-meta">
+      <span class="player-title" id="player-bar-title">—</span>
+      <span class="player-artist" id="player-bar-artist"></span>
     </div>
-    <div class="player-controls">
-      <button id="player-shuffle" class="player-btn-sm" title="Aleatorio">⤨</button>
-      <button id="player-prev" class="player-btn" title="Anterior">⏮</button>
-      <button id="player-play" class="player-btn player-btn-play" title="Reproducir">▶</button>
-      <button id="player-next" class="player-btn" title="Siguiente">⏭</button>
-      <button id="player-repeat" class="player-btn-sm" title="Repetir">↻</button>
-    </div>
-    <div class="player-progress"><span class="player-time" id="player-current">0:00</span><input type="range"
-        id="player-seek" class="player-seek" min="0" max="100" value="0" step="0.1"><span class="player-time"
-        id="player-duration">0:00</span></div>
-    <div class="player-volume"><button id="player-volume-btn" class="player-btn-sm" title="Silenciar">♪</button><input
-        type="range" id="player-volume" class="player-volume-slider" min="0" max="1" step="0.01" value="0.8"></div>
-    <audio id="global-audio" preload="metadata"></audio>
   </div>
+
+  <div class="player-controls">
+    <button id="player-shuffle" class="player-btn-sm" title="Aleatorio">⤨</button>
+    <button id="player-prev"    class="player-btn"    title="Anterior">⏮</button>
+    <button id="player-play"    class="player-btn player-btn-play" title="Reproducir">▶</button>
+    <button id="player-next"    class="player-btn"    title="Siguiente">⏭</button>
+    <button id="player-repeat"  class="player-btn-sm" title="Repetir">↻</button>
+  </div>
+
+  <div id="provider-player" class="provider-player" hidden></div>
+
+  <div class="player-progress">
+    <span class="player-time" id="player-current">0:00</span>
+    <input type="range" id="player-seek" class="player-seek" min="0" max="100" value="0" step="0.1">
+    <span class="player-time" id="player-duration">0:00</span>
+  </div>
+
+  <div class="player-volume">
+    <button id="player-volume-btn" class="player-btn-sm" title="Silenciar">♪</button>
+    <input type="range" id="player-volume" class="player-volume-slider" min="0" max="1" step="0.01" value="0.8">
+  </div>
+
+  <audio id="global-audio" preload="metadata"></audio>
+</div>
 
  <!-- ============ MASCOTA FLOTANTE ============ -->
 <div class="mascota-wrapper" id="mascota-wrapper">
@@ -891,9 +831,10 @@ Artista - Canción
   <script src="ds.js"></script>
   <script src="offline.js"></script>
   <script src="sun-modal.js"></script>
-  <script src="album.js"></script>
-  <script src="preferences.js"></script>
-  <script src="finanzas.js"></script>
+  <script src="album.js?v=120"></script>
+  <script src="musica-local.js?v=1"></script>
+  <script src="preferences.js?v=2"></script>
+  <script src="finanzas.js?v=6"></script>
   <script src="sprites-config.js"></script>
   <script src="tienda.js"></script>     <!-- ⬅️ tienda ANTES -->
   <script src="script.js"></script>     <!-- ⬅️ script DESPUÉS -->
@@ -910,7 +851,10 @@ Artista - Canción
   <script src="mejoras.js"></script>
   <script src="efectos.js"></script>
   <script src="parches-v2.js"></script>
+  <script src="watch-party.js"></script>
   <script src="parches-v3.js"></script>
+  <script src="youtube-spotify-metadata.js"></script>
+  <script src="player-extras.js?v=1"></script>
 </body>
 
 </html>

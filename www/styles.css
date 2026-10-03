@@ -1625,3 +1625,423 @@ img, video, iframe, canvas { max-width: 100%; }
   .mascota-wrapper { width: 48px; height: 48px; right: 0; }
   .mascota { width: 40px; height: 40px; }
 }
+/* ============================================
+   WATCH PARTY
+   ============================================ */
+.wp-banner {
+  position: fixed;
+  top: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8500;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .6rem 1rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255,84,112,.92), rgba(200,20,60,.92));
+  color: #fff;
+  font-size: .85rem;
+  font-weight: 700;
+  box-shadow: 0 10px 28px rgba(255,84,112,.5);
+  backdrop-filter: blur(8px);
+}
+.wp-live-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 0 rgba(255,255,255,.8);
+  animation: wpLive 1.6s infinite;
+}
+@keyframes wpLive {
+  0%   { box-shadow: 0 0 0 0 rgba(255,255,255,.8); }
+  70%  { box-shadow: 0 0 0 10px rgba(255,255,255,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+}
+.wp-btn {
+  padding: .35rem .85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.5);
+  background: rgba(0,0,0,.2);
+  color: #fff;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: .75rem;
+  cursor: pointer;
+  transition: background .2s, transform .15s;
+}
+.wp-btn:hover { background: rgba(0,0,0,.35); transform: translateY(-1px); }
+.wp-stop { background: rgba(0,0,0,.4); }
+
+.wp-toast {
+  position: fixed; top: 9rem; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(11,12,18,.95);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  padding: .7rem 1.2rem;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: .85rem;
+  z-index: 9999;
+  animation: wpToast 3.2s ease forwards;
+}
+@keyframes wpToast {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+  10%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+  90%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+/* ============================================
+   MEJORA UX — Formulario añadir canción
+   ============================================ */
+/* ============================================
+   FORMULARIO AÑADIR CANCIÓN — Rediseño
+   ============================================ */
+#cancion-form {
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(255,217,61,.06), rgba(255,217,61,.015));
+  border: 1px solid rgba(255,217,61,.18);
+  box-shadow: 0 8px 22px rgba(0,0,0,.18), inset 0 1px rgba(255,255,255,.04);
+}
+
+body.light #cancion-form {
+  background: linear-gradient(145deg, rgba(212,148,30,.06), rgba(212,148,30,.02));
+  border-color: rgba(212,148,30,.22);
+  box-shadow: 0 8px 22px rgba(139,90,20,.08);
+}
+
+.cancion-form-row {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: .55rem;
+}
+
+/* ---------- Inputs base ---------- */
+#cancion-form input[type="text"],
+#cancion-form input[type="url"] {
+  width: 100%;
+  font: inherit;
+  font-size: .9rem;
+  padding: .72rem .95rem;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255,255,255,.1);
+  background: rgba(0,0,0,.3);
+  color: var(--text);
+  outline: none;
+  transition: border-color .2s, background .2s, box-shadow .2s, transform .15s;
+}
+
+#cancion-form input::placeholder {
+  color: rgba(255,255,255,.38);
+  font-style: italic;
+}
+
+#cancion-form input[type="text"]:focus,
+#cancion-form input[type="url"]:focus {
+  border-color: var(--accent);
+  background: rgba(0,0,0,.45);
+  box-shadow: 0 0 0 3px rgba(255,217,61,.16);
+}
+
+body.light #cancion-form input[type="text"],
+body.light #cancion-form input[type="url"] {
+  background: rgba(255,255,255,.85);
+  border-color: rgba(139,90,20,.15);
+  color: #3d2c1e;
+}
+
+body.light #cancion-form input::placeholder { color: rgba(61,44,30,.4); }
+
+/* ---------- Input URL con icono Spotify ---------- */
+.cancion-url-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cancion-url-icon {
+  position: absolute;
+  left: .8rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  display: grid;
+  place-items: center;
+  color: #1ed760;
+  filter: drop-shadow(0 0 6px rgba(30,215,96,.35));
+  pointer-events: none;
+  transition: transform .2s;
+}
+
+.cancion-url-icon svg { width: 100%; height: 100%; }
+
+.cancion-url-wrap input[type="url"] {
+  padding-left: 2.5rem;
+  border-color: rgba(30,215,96,.32);
+  background-image: linear-gradient(90deg, rgba(30,215,96,.07), transparent 60%);
+}
+
+.cancion-url-wrap input[type="url"]:focus {
+  border-color: #1ed760;
+  box-shadow: 0 0 0 3px rgba(30,215,96,.18);
+}
+
+.cancion-url-wrap input[type="url"]:focus + .cancion-url-icon,
+.cancion-url-wrap input[type="url"]:focus ~ .cancion-url-icon {
+  transform: scale(1.15);
+}
+
+.cancion-url-wrap input[type="url"]:not(:placeholder-shown) {
+  border-color: #1ed760;
+  background-image: linear-gradient(90deg, rgba(30,215,96,.15), transparent 65%);
+}
+
+.cancion-url-wrap:focus-within .cancion-url-icon {
+  transform: scale(1.18) rotate(-6deg);
+}
+
+/* ---------- Botón principal ---------- */
+.cancion-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  width: 100%;
+  padding: .85rem 1.2rem;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #ffe066 0%, #ffc93d 45%, #ff9f2e 100%);
+  color: #2b2118;
+  font-family: inherit;
+  font-size: .95rem;
+  font-weight: 900;
+  letter-spacing: .01em;
+  cursor: pointer;
+  box-shadow:
+    0 6px 20px rgba(255,217,61,.38),
+    0 0 0 1px rgba(255,255,255,.15) inset,
+    0 1px 0 rgba(255,255,255,.5) inset;
+  transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .25s;
+  position: relative;
+  overflow: hidden;
+}
+
+.cancion-add-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform .6s;
+  pointer-events: none;
+}
+
+.cancion-add-btn:hover::before { transform: translateX(100%); }
+
+.cancion-add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 28px rgba(255,217,61,.55),
+    0 0 0 1px rgba(255,255,255,.2) inset,
+    0 1px 0 rgba(255,255,255,.55) inset;
+}
+
+.cancion-add-btn:active { transform: translateY(0) scale(.985); }
+
+.cancion-add-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: rgba(43,33,24,.18);
+  font-size: 1.05rem;
+  font-weight: 900;
+  line-height: 1;
+  color: #2b2118;
+  transition: transform .25s;
+}
+
+.cancion-add-btn:hover .cancion-add-icon {
+  transform: rotate(90deg) scale(1.1);
+  background: rgba(43,33,24,.25);
+}
+
+.cancion-add-label { line-height: 1; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 520px) {
+  .cancion-form-row { grid-template-columns: 1fr; gap: .5rem; }
+  #cancion-form { padding: .8rem; }
+  .cancion-add-btn { padding: .8rem 1rem; font-size: .9rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cancion-add-btn,
+  .cancion-add-btn::before,
+  .cancion-url-icon { transition: none; }
+}
+
+
+#cancion-url {
+  background-image: linear-gradient(90deg, transparent, transparent);
+  position: relative;
+}
+#cancion-url::placeholder {
+  color: rgba(255,217,61,.55);
+}
+
+/* Etiqueta visual para el campo URL */
+#cancion-url {
+  border: 2px dashed rgba(255,217,61,.45);
+}
+#cancion-url:focus {
+  border-style: solid;
+  border-color: var(--accent);
+}
+#cancion-url:not(:placeholder-shown) {
+  border-color: #1ed760;
+  border-style: solid;
+}
+
+#wp-share { font-size: 1rem; }
+#wp-share:hover { background: rgba(255,84,112,.25) !important; }
+/* ============================================================
+   PLAYER — Cover animado + botón cerrar rediseñado
+   ============================================================ */
+
+/* ---------- Cover con degradado animado + brillo ---------- */
+.player-cover {
+  width: 58px !important;
+  height: 58px !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, #ffd93d 0%, #ffae3d 40%, #ff7a9c 75%, #a684f0 100%) !important;
+  background-size: 220% 220% !important;
+  animation: coverFlow 9s ease infinite;
+  color: #1a1408 !important;
+  box-shadow:
+    0 8px 22px rgba(255,217,61,.4),
+    0 0 0 1px rgba(255,255,255,.28) inset,
+    0 1px 0 rgba(255,255,255,.4) inset !important;
+  position: relative;
+  overflow: hidden;
+  transition: transform .3s;
+}
+
+.player-cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.65), transparent 60%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Destello giratorio cuando suena música */
+.player-cover::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,.4) 30deg, transparent 70deg);
+  opacity: 0;
+  transition: opacity .5s;
+  pointer-events: none;
+  z-index: 1;
+}
+body.player-playing .player-cover::after {
+  opacity: .55;
+  animation: coverSpin 4s linear infinite;
+}
+
+.player-cover svg,
+.player-cover img {
+  position: relative;
+  z-index: 2;
+  transition: transform .3s;
+}
+
+body.player-playing .player-cover svg {
+  animation: coverBounce 1.4s ease-in-out infinite;
+}
+
+@keyframes coverFlow {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+@keyframes coverSpin {
+  to { transform: rotate(360deg); }
+}
+@keyframes coverBounce {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50%      { transform: scale(1.14) rotate(-6deg); }
+}
+
+/* ---------- Botón cerrar rediseñado ---------- */
+.player-close {
+  position: absolute !important;
+  top: -12px !important;
+  right: -12px !important;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  border: 2px solid rgba(255,255,255,.4) !important;
+  background: linear-gradient(135deg, #ff7a9c 0%, #e0476b 60%, #c41e3a 100%) !important;
+  color: #fff !important;
+  font-size: 1.05rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+  display: grid !important;
+  place-items: center !important;
+  box-shadow:
+    0 6px 20px rgba(255,84,112,.55),
+    0 0 0 3px rgba(255,84,112,.15),
+    0 1px 0 rgba(255,255,255,.4) inset !important;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s, background .3s !important;
+  z-index: 5 !important;
+  isolation: isolate;
+}
+
+/* Halo pulsante suave */
+.player-close::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,84,112,.55), transparent 70%);
+  opacity: 0;
+  z-index: -1;
+  animation: closeGlow 2.4s ease-in-out infinite;
+}
+
+.player-close:hover {
+  transform: rotate(90deg) scale(1.15) !important;
+  background: linear-gradient(135deg, #ff8fab 0%, #ff5470 60%, #e0476b 100%) !important;
+  box-shadow:
+    0 12px 30px rgba(255,84,112,.75),
+    0 0 0 5px rgba(255,84,112,.22),
+    0 1px 0 rgba(255,255,255,.5) inset !important;
+}
+
+.player-close:active {
+  transform: rotate(90deg) scale(1) !important;
+}
+
+@keyframes closeGlow {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50%      { opacity: .8; transform: scale(1.4); }
+}
+
+body.light .player-close {
+  border-color: rgba(255,255,255,.7) !important;
+}
+
+/* Móvil: reducimos un poco */
+@media (max-width: 720px) {
+  .player-cover { width: 48px !important; height: 48px !important; }
+  .player-close { width: 30px !important; height: 30px !important; top: -10px !important; right: -10px !important; }
+}

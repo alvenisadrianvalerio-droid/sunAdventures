@@ -1,15 +1,25 @@
-/* ÁLBUM + NOTAS + PLAYLISTS + CALENDARIO + PLAYER + CHAT v2 */
+/* ============================================================
+   ÁLBUM + NOTAS + PLAYLISTS + CALENDARIO + PLAYER LOCAL + CHAT
+   v4 — Solo archivos locales para el reproductor.
+   Los enlaces externos (Spotify/YouTube) se abren en pestaña nueva.
+   ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
+  /* ---------- Configuración ---------- */
   const SUPABASE_URL = "https://fsobpmulnvajwlrgkoxr.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzb2JwbXVsbnZhandscmdrb3hyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyODMyOTgsImV4cCI6MjEwNTg1OTI5OH0.j7Q8Zv02QhXxC9v-7MS1ZWeZyd18dN0TKFrbEhDs96Y";
-  const BUCKET_NAME = "album", BUCKET_CANCIONES = "canciones";
-  const URL_EXPIRY = 3600, URL_EXPIRY_CANCIONES = 14400, DURACION_CACHE_URL = (URL_EXPIRY - 60) * 1000;
+  const BUCKET_NAME = "album";
+  const BUCKET_CANCIONES = "canciones";
+  const URL_EXPIRY = 3600;
+  const URL_EXPIRY_CANCIONES = 14400;
+  const DURACION_CACHE_URL = (URL_EXPIRY - 60) * 1000;
   const CENSURA_KEY = "sunadventures_censura_activa";
   const PUSH_VAPID_PUBLIC_KEY = "BGLQw2FyE65Bd8m2BcucYBvgCPrfJQEDfDr-VE2EalHz4LzcKBwjtysfCrWxyIhYULhmTNroGxJZCCnqtjrCrog";
-  const AUDIO_EXTS = ["mp3","m4a","wav","ogg","flac","aac","opus"], VIDEO_EXTS = ["mp4","webm","mov","mkv"];
+  const AUDIO_EXTS = ["mp3", "m4a", "wav", "ogg", "flac", "aac", "opus"];
+  const VIDEO_EXTS = ["mp4", "webm", "mov", "mkv"];
   const MESES_LARGOS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const MESES_CORTOS = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
   const LIMITE_CONCURRENCIA_URLS = 6;
+
   const confirmar = o => window.SunModal ? window.SunModal.confirm(o) : Promise.resolve(confirm(o.message || o.title));
   const alertar = o => window.SunModal ? window.SunModal.alert(o) : (alert(o.message || o.title), Promise.resolve());
 
@@ -24,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (ls?.classList.contains("active")) { ls.classList.remove("active"); ls.setAttribute("aria-hidden","true"); }
   }, 10000);
 
+  /* ---------- Iconos SVG ---------- */
   const SVG = {
     trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>',
     edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>',
@@ -52,26 +63,52 @@ document.addEventListener("DOMContentLoaded", () => {
     tap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v7"/><path d="M13 13V9a2 2 0 0 1 4 0v6"/><path d="M17 12a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6h-3a6 6 0 0 1-6-6v-3a2 2 0 0 1 4 0"/></svg>'
   };
 
+  /* ---------- Helpers ---------- */
   const $ = id => document.getElementById(id);
   const getUserIdSafe = () => window._sunUserId || localStorage.getItem("sunadventures_uid") || "local";
   window._getUserIdSafe = getUserIdSafe;
   const parseCoord = v => (v === null || v === undefined || v === "") ? null : (Number.isFinite(Number(v)) ? Number(v) : null);
   const escapeHtml = t => String(t).replace(/[&<>'"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;" }[c]));
   const ext = n => (n.split(".").pop() || "").toLowerCase();
-  const esAudio = e => AUDIO_EXTS.includes(e), esVideo = e => VIDEO_EXTS.includes(e);
+
+  function identificarEnlaceMusical(raw) {
+    try {
+      const url = new URL(raw);
+      if (url.protocol !== "https:") return null;
+      const host = url.hostname.toLowerCase();
+      if (["youtube.com","www.youtube.com","m.youtube.com","music.youtube.com","youtu.be"].includes(host)) {
+        const partes = url.pathname.split("/").filter(Boolean);
+        const id = host === "youtu.be" ? partes[0] : ["embed","shorts","live"].includes(partes[0]) ? partes[1] : url.searchParams.get("v");
+        return id && /^[A-Za-z0-9_-]{11}$/.test(id) ? { tipo:"youtube", id } : null;
+      }
+      if (host === "open.spotify.com") {
+        const partes = url.pathname.split("/").filter(Boolean);
+        const tipoIndex = partes[0]?.startsWith("intl-") ? 1 : 0;
+        const tipo = partes[tipoIndex] === "embed" ? partes[tipoIndex + 1] : partes[tipoIndex];
+        const id = partes[tipoIndex] === "embed" ? partes[tipoIndex + 2] : partes[tipoIndex + 1];
+        if (["track","album","playlist","episode","show"].includes(tipo) && /^[A-Za-z0-9]{10,64}$/.test(id || "")) {
+          return { tipo:"spotify", entidad:tipo, id };
+        }
+      }
+    } catch {}
+    return null;
+  }
+
+  const esAudio = e => AUDIO_EXTS.includes(e);
+  const esVideo = e => VIDEO_EXTS.includes(e);
   const fmtFecha = iso => { const d = new Date(iso + "T00:00:00"); return isNaN(d) ? iso : `${String(d.getDate()).padStart(2,"0")} · ${MESES_CORTOS[d.getMonth()]} · ${d.getFullYear()}`; };
   const fmtFechaNota = iso => { const d = new Date(iso); return isNaN(d) ? "" : `${String(d.getDate()).padStart(2,"0")} ${MESES_CORTOS[d.getMonth()]} ${d.getFullYear()}`; };
   const fmtTiempo = s => (!isFinite(s) || s < 0) ? "0:00" : `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,"0")}`;
-  const fmtTam = b => b < 1024 ? b+" B" : b < 1048576 ? (b/1024).toFixed(1)+" KB" : (b/1048576).toFixed(1)+" MB";
+  const fmtTam = b => b < 1024 ? b + " B" : b < 1048576 ? (b/1024).toFixed(1) + " KB" : (b/1048576).toFixed(1) + " MB";
   const fechaISO = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   const hoyISO = () => fechaISO(new Date());
 
+  /* ---------- DOM refs ---------- */
   const grid = $("album-grid"), empty = $("album-empty"), btnAdd = $("btn-add-photo"), modal = $("photo-modal"), modalTitle = $("modal-title"), form = $("photo-form");
   const inputPhoto = $("input-photo"), inputPhotoCampo = inputPhoto?.closest(".form-field"), inputDate = $("input-date"), inputNote = $("input-note");
   const preview = $("photo-preview"), photoPreviewInfo = $("photo-preview-info"), submitBtn = form?.querySelector('button[type="submit"]');
   const btnPhotoLocation = $("btn-photo-location"), photoLocationStatus = $("photo-location-status"), inputLat = $("input-lat"), inputLng = $("input-lng");
   const aventurasMap = $("aventuras-map"), mapaEmpty = $("mapa-empty"), chatMessages = $("chat-messages"), chatStatus = $("chat-status"), chatForm = $("chat-form"), chatInput = $("chat-input"), btnEnablePush = $("btn-enable-push");
-  let fotoPreviewObjectUrl = null;
   const notasGrid = $("notas-grid"), notasEmpty = $("notas-empty"), btnAddNota = $("btn-add-nota"), notaModal = $("nota-modal"), notaForm = $("nota-form"), notaModalTitle = $("nota-modal-title");
   const notaTitulo = $("nota-titulo"), notaContenido = $("nota-contenido"), notaPreview = $("nota-preview");
   const notaTituloCampo = notaTitulo?.closest(".form-field"), notaColorCampo = document.querySelector("#nota-form .color-picker")?.closest(".form-field"), notaSubmitBtn = notaForm?.querySelector('button[type="submit"]');
@@ -85,6 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const playerBar = $("player-bar"), playerBarTitle = $("player-bar-title"), playerBarArtist = $("player-bar-artist"), playerCoverIcon = $("player-cover-icon"), playerPlay = $("player-play");
   const playerNext = $("player-next"), playerPrev = $("player-prev"), playerShuffle = $("player-shuffle"), playerRepeat = $("player-repeat"), playerSeek = $("player-seek");
   const playerCurrent = $("player-current"), playerDuration = $("player-duration"), playerVolumeBtn = $("player-volume-btn"), playerVolume = $("player-volume"), playerClose = $("player-close"), globalAudio = $("global-audio");
+  const providerPlayer = $("provider-player"), playerProgress = document.querySelector(".player-progress");
   const loadingScreen = $("loading-screen"), loadingText = $("loading-text");
   const authModal = $("auth-modal"), btnOpenLogin = $("btn-open-login"), authForm = $("auth-form"), authUsername = $("auth-username"), authPassword = $("auth-password"), authPasswordConfirm = $("auth-password-confirm");
   const confirmField = $("confirm-password-field"), authSubmit = $("auth-submit"), authTitle = $("auth-title"), authSubtitle = $("auth-subtitle"), authToggleText = $("auth-toggle-text"), authToggleBtn = $("auth-toggle-btn"), authError = $("auth-error");
@@ -94,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const logrosPersonalesGrid = $("logros-personales-grid"), logrosGrupoGrid = $("logros-grupo-grid"), logrosDesbloqueados = $("logros-desbloqueados"), logroToast = $("logro-toast");
   const experienciaTitulo = $("experiencia-titulo"), experienciaXp = $("experiencia-xp"), experienciaProgreso = $("experiencia-progreso"), experienciaSiguiente = $("experiencia-siguiente");
 
+  /* ---------- Estado ---------- */
   let fotos = [], notas = [], notaEditando = null, fotoEditando = null;
   let colorSeleccionado = "amarillo", modoRegistro = false, grupoActivo = null, perfilActual = null, visitasConsecutivas = 0;
   let playlists = [], playlistEditando = null, emojiSeleccionado = "music", colorPlaylistSeleccionado = "amarillo";
@@ -110,6 +149,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const mostrarLoading = (msg = "Cargando...") => { if (!loadingScreen) return; if (loadingText) loadingText.textContent = msg; loadingScreen.classList.add("active"); loadingScreen.setAttribute("aria-hidden","false"); };
   const ocultarLoading = () => { if (!loadingScreen) return; loadingScreen.classList.remove("active"); loadingScreen.setAttribute("aria-hidden","true"); };
 
+  /* ============================================================
+     LOGROS + EXPERIENCIA
+     ============================================================ */
   const IMAGENES_MASCOTA = {
     mapache:"img/mapache.png", girasol:"img/mascota-girasol.png", gatito:"img/siamesa.png",
     "gatito-negro":"img/gatito-negro.png", hamburguesa:"img/hamburguesa.png", oveja:"img/oveja.png",
@@ -128,12 +170,18 @@ document.addEventListener("DOMContentLoaded", () => {
     { id:"todos-los-logros", tipo:"grupo", icono:SVG.crown, nombre:"Leyenda absoluta", descripcion:"Completa todos los demás logros", meta:1, esFinal:true, medir:()=>LOGROS.filter(l=>!l.esFinal).every(l=>l.medir()>=l.meta)?1:0 }
   ];
   const MASCOTAS_LOGROS = [
-    { id:"mapache", nombre:"el Mapache", icono:SVG.heart }, { id:"girasol", nombre:"el Girasol", icono:SVG.sunflower },
-    { id:"gatito", nombre:"la Siamesa", icono:SVG.heart }, { id:"gatito-negro", nombre:"el Gato Negro", icono:SVG.heart },
-    { id:"hamburguesa", nombre:"Hamburguesa", icono:SVG.heart }, { id:"oveja", nombre:"la Oveja", icono:SVG.heart },
-    { id:"pollito", nombre:"el Pollito", icono:SVG.heart }, { id:"jirafa", nombre:"la Jirafa", icono:SVG.heart },
-    { id:"unicornio", nombre:"el Unicornio", icono:SVG.sparkle }, { id:"conejo", nombre:"el Conejito", icono:SVG.heart },
-    { id:"dragon-bebe", nombre:"el Dragón Bebé", icono:SVG.fire }, { id:"dragon-anciano", nombre:"el Dragón Anciano", icono:SVG.crown }
+    { id:"mapache", nombre:"el Mapache", icono:SVG.heart },
+    { id:"girasol", nombre:"el Girasol", icono:SVG.sunflower },
+    { id:"gatito", nombre:"la Siamesa", icono:SVG.heart },
+    { id:"gatito-negro", nombre:"el Gato Negro", icono:SVG.heart },
+    { id:"hamburguesa", nombre:"Hamburguesa", icono:SVG.heart },
+    { id:"oveja", nombre:"la Oveja", icono:SVG.heart },
+    { id:"pollito", nombre:"el Pollito", icono:SVG.heart },
+    { id:"jirafa", nombre:"la Jirafa", icono:SVG.heart },
+    { id:"unicornio", nombre:"el Unicornio", icono:SVG.sparkle },
+    { id:"conejo", nombre:"el Conejito", icono:SVG.heart },
+    { id:"dragon-bebe", nombre:"el Dragón Bebé", icono:SVG.fire },
+    { id:"dragon-anciano", nombre:"el Dragón Anciano", icono:SVG.crown }
   ];
   MASCOTAS_LOGROS.forEach(m => {
     const sprite = IMAGENES_MASCOTA[m.id];
@@ -251,11 +299,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch { visitasConsecutivas = 0; }
   }
 
-  /* ---------- LOGROS — render incremental ---------- */
-  const _logroState = {
-    personal:{ grid:null, cards:new Map(), firma:"" },
-    grupo:{ grid:null, cards:new Map(), firma:"" }
-  };
+  const _logroState = { personal:{ grid:null, cards:new Map(), firma:"" }, grupo:{ grid:null, cards:new Map(), firma:"" } };
   const _firmaLogros = lista => lista.map(l => l.id).join("|");
   function _construirCard(logro) {
     const card = document.createElement("article");
@@ -341,6 +385,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.querySelector("[data-view].active")?.dataset.view === "logros") renderLogros({ notificar:true });
   });
 
+  /* ============================================================
+     GRUPO / AUTH
+     ============================================================ */
   const usernameDesdeSesion = s => (s?.user?.email?.split("@")[0] || "usuario").toLowerCase().replace(/[^a-z0-9_]/g,"_").slice(0,20).padEnd(3,"_");
 
   async function asegurarGrupoActivo() {
@@ -352,14 +399,11 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("sunadventures_uid", session.user.id);
       window.dispatchEvent(new Event("sunadventures:user-ready"));
       const username = usernameDesdeSesion(session);
-      const { data:perfilExistente, error:perfilError } = await supabase
-        .from("perfiles").select("id,username").eq("id", session.user.id).maybeSingle();
+      const { data:perfilExistente, error:perfilError } = await supabase.from("perfiles").select("id,username").eq("id", session.user.id).maybeSingle();
       if (perfilError) throw perfilError;
-      if (perfilExistente) {
-        perfilActual = perfilExistente;
-      } else {
-        const { data:perfil, error:crearPerfilError } = await supabase
-          .from("perfiles").insert({ id:session.user.id, username }).select("id,username").single();
+      if (perfilExistente) perfilActual = perfilExistente;
+      else {
+        const { data:perfil, error:crearPerfilError } = await supabase.from("perfiles").insert({ id:session.user.id, username }).select("id,username").single();
         if (crearPerfilError) throw crearPerfilError;
         perfilActual = perfil;
       }
@@ -488,20 +532,23 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) { console.warn("friendSearch:", err); }
   });
 
+  /* ============================================================
+     FOTOS
+     ============================================================ */
   async function cargarFotos() {
-  try {
-    const { data:{ session } } = await supabase.auth.getSession();
-    if (!session) { fotos = []; return; }
-    if (!grupoActivo) await asegurarGrupoActivo();
-    if (!grupoActivo) { fotos = []; return; }
-    const { data, error } = await supabase.from("fotos")
-      .select("id,path,fecha,nota,lat,lng,lugar,grupo_id")
-      .eq("grupo_id", grupoActivo.id)
-      .order("created_at", { ascending:false });
-    if (error) { console.warn("cargarFotos error:", error); fotos = []; return; }
-    fotos = (data||[]).map(f => ({ id:f.id, path:f.path, fecha:f.fecha, nota:f.nota, lat:f.lat, lng:f.lng, lugar:f.lugar, grupo_id:f.grupo_id }));
-  } catch (err) { console.warn("cargarFotos:", err); fotos = []; }
-}
+    try {
+      const { data:{ session } } = await supabase.auth.getSession();
+      if (!session) { fotos = []; return; }
+      if (!grupoActivo) await asegurarGrupoActivo();
+      if (!grupoActivo) { fotos = []; return; }
+      const { data, error } = await supabase.from("fotos")
+        .select("id,path,fecha,nota,lat,lng,lugar,grupo_id")
+        .eq("grupo_id", grupoActivo.id)
+        .order("created_at", { ascending:false });
+      if (error) { console.warn("cargarFotos error:", error); fotos = []; return; }
+      fotos = (data||[]).map(f => ({ id:f.id, path:f.path, fecha:f.fecha, nota:f.nota, lat:f.lat, lng:f.lng, lugar:f.lugar, grupo_id:f.grupo_id }));
+    } catch (err) { console.warn("cargarFotos:", err); fotos = []; }
+  }
 
   const añadirFotoTabla = async (path, fecha, nota, lat, lng) => {
     const { data:{ session } } = await supabase.auth.getSession();
@@ -608,7 +655,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (fotoParaEditar) { if (inputDate) inputDate.value = fotoParaEditar.fecha || ""; if (inputNote) inputNote.value = fotoParaEditar.nota || ""; if (inputLat) inputLat.value = fotoParaEditar.lat || ""; if (inputLng) inputLng.value = fotoParaEditar.lng || ""; }
       else if (inputDate) inputDate.value = new Date().toISOString().split("T")[0];
       actualizarEstadoUbicacion();
-      if (fotoPreviewObjectUrl) { URL.revokeObjectURL(fotoPreviewObjectUrl); fotoPreviewObjectUrl = null; }
       if (preview) mostrarContenidoVistaPrevia(fotoParaEditar ? await obtenerUrlFirmada(fotoParaEditar.path) : null);
       if (modalTitle) modalTitle.textContent = fotoParaEditar ? "Editar recuerdo" : "Nuevo recuerdo";
       if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = fotoParaEditar ? "Actualizar recuerdo" : "Guardar recuerdo"; }
@@ -623,7 +669,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (inputPhoto) inputPhoto.required = true;
       if (inputPhotoCampo) inputPhotoCampo.hidden = false;
       if (modalTitle) modalTitle.textContent = "Nuevo recuerdo";
-      if (fotoPreviewObjectUrl) { URL.revokeObjectURL(fotoPreviewObjectUrl); fotoPreviewObjectUrl = null; }
     } catch (err) { console.warn("cerrarModal:", err); }
   }
 
@@ -659,7 +704,9 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) { console.warn("renderMapa:", err); }
   }
 
-  /* ---------- CHAT ---------- */
+  /* ============================================================
+     CHAT
+     ============================================================ */
   function renderMensajeChat(m, mapaPerfiles) {
     if (!chatMessages) return;
     const perfil = mapaPerfiles?.[m.user_id] || {};
@@ -766,8 +813,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (sub) {
         const currentKey = sub.options.applicationServerKey;
         const currentBytes = currentKey ? new Uint8Array(currentKey) : null;
-        const sameKey = currentBytes?.length === applicationServerKey.length &&
-          currentBytes.every((value, index) => value === applicationServerKey[index]);
+        const sameKey = currentBytes?.length === applicationServerKey.length && currentBytes.every((value, index) => value === applicationServerKey[index]);
         if (!sameKey) {
           if (!await sub.unsubscribe()) throw new Error("No se pudo actualizar la suscripción de notificaciones.");
           sub = null;
@@ -780,15 +826,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (error) throw error;
       if (btnEnablePush) btnEnablePush.textContent = "Notificaciones activadas";
       return true;
-    } catch (err) {
-      console.warn("activarPush:", err);
-      throw err;
-    }
+    } catch (err) { console.warn("activarPush:", err); throw err; }
   }
   window._activarNotificacionesPush = activarPush;
   btnEnablePush?.addEventListener("click", () => activarPush().catch(e => alertar({ title:"Error", message:"No se pudieron activar: " + e.message, variant:"danger" })));
 
-  /* ---------- FOTOS ---------- */
+  /* ---------- Formulario foto ---------- */
   if (btnAdd) btnAdd.addEventListener("click", () => abrirModal());
   modal?.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", cerrarModal));
 
@@ -797,10 +840,8 @@ document.addEventListener("DOMContentLoaded", () => {
   inputNote?.addEventListener("input", () => { const date = preview?.querySelector(".photo-preview-date"), note = preview?.querySelector(".photo-preview-note"); actualizarContenidoVistaPrevia(date, note); actualizarVistaPreviaFotoInfo(); });
 
   function mostrarVistaPreviaFoto(file) {
-    if (fotoPreviewObjectUrl) URL.revokeObjectURL(fotoPreviewObjectUrl);
     if (!file) { mostrarContenidoVistaPrevia(null); return; }
-    fotoPreviewObjectUrl = URL.createObjectURL(file);
-    mostrarContenidoVistaPrevia(fotoPreviewObjectUrl);
+    mostrarContenidoVistaPrevia(URL.createObjectURL(file));
   }
   function mostrarContenidoVistaPrevia(url) {
     if (!preview) return;
@@ -874,31 +915,23 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) { alertar({ title:"Error", message:"No se pudo eliminar: " + (err.message||err), variant:"danger" }); }
   }
 
-  /* ---------- NOTAS ---------- */
- async function cargarNotas() {
-  try {
-    const { data:{ session } } = await supabase.auth.getSession();
-    if (!session?.user) { notas = []; return; }
-    if (!grupoActivo) await asegurarGrupoActivo();
-    if (!grupoActivo) { notas = []; return; }
-    const { data, error } = await supabase.from("notas")
-      .select("id,titulo,contenido,color,created_at,grupo_id")
-      .eq("grupo_id", grupoActivo.id)
-      .order("created_at", { ascending:false });
-    if (error) { console.warn("cargarNotas error:", error); notas = []; return; }
-    notas = (data||[]).map(n => ({
-      id: n.id,
-      titulo: n.titulo,
-      contenido: n.contenido,
-      color: n.color || "amarillo",
-      created_at: n.created_at,
-      grupo_id: n.grupo_id
-    }));
-  } catch (err) {
-    console.warn("cargarNotas:", err);
-    notas = [];
+  /* ============================================================
+     NOTAS
+     ============================================================ */
+  async function cargarNotas() {
+    try {
+      const { data:{ session } } = await supabase.auth.getSession();
+      if (!session?.user) { notas = []; return; }
+      if (!grupoActivo) await asegurarGrupoActivo();
+      if (!grupoActivo) { notas = []; return; }
+      const { data, error } = await supabase.from("notas")
+        .select("id,titulo,contenido,color,created_at,grupo_id")
+        .eq("grupo_id", grupoActivo.id)
+        .order("created_at", { ascending:false });
+      if (error) { console.warn("cargarNotas error:", error); notas = []; return; }
+      notas = (data||[]).map(n => ({ id:n.id, titulo:n.titulo, contenido:n.contenido, color:n.color || "amarillo", created_at:n.created_at, grupo_id:n.grupo_id }));
+    } catch (err) { console.warn("cargarNotas:", err); notas = []; }
   }
-}
   const añadirNotaTabla = async (titulo, contenido, color) => { const { data:{ session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("notas").insert({ user_id:session.user.id, grupo_id:grupoActivo.id, titulo:titulo||null, contenido, color:color||"amarillo" }).select().single(); if (error) throw error; return data; };
   const eliminarNotaTabla = async id => { const { error } = await supabase.from("notas").delete().eq("id", id); if (error) throw error; };
   const actualizarNotaTabla = async (id, titulo, contenido, color) => { const { data, error } = await supabase.from("notas").update({ titulo:titulo||null, contenido, color:color||"amarillo" }).eq("id", id).select().single(); if (error) throw error; return data; };
@@ -1005,7 +1038,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (idx !== -1) notas[idx] = { id:act.id, titulo:act.titulo, contenido:act.contenido, color:act.color, created_at:act.created_at };
         } else {
           const colorFinal = colorSeleccionado || document.querySelector(".color-option.activo")?.dataset.color || "amarillo";
-const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
+          const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
           notas.unshift({ id:nueva.id, titulo:nueva.titulo, contenido:nueva.contenido, color:nueva.color, created_at:nueva.created_at });
         }
         cerrarNotaModal(); renderNotas(); window.dispatchEvent(new Event("sunadventures:progress"));
@@ -1013,33 +1046,28 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
     } catch (err) { console.warn("nota submit:", err); }
   });
 
-  /* ---------- PLAYLISTS + CANCIONES ---------- */
+  /* ============================================================
+     PLAYLISTS
+     ============================================================ */
   async function cargarPlaylists() {
-  try {
-    const { data:{ session } } = await supabase.auth.getSession();
-    if (!session?.user) { playlists = []; return; }
-    if (!grupoActivo) await asegurarGrupoActivo();
-    if (!grupoActivo) { playlists = []; return; }
-    const { data, error } = await supabase.from("playlists")
-      .select("id,nombre,descripcion,emoji,color,canciones,created_at,grupo_id")
-      .eq("grupo_id", grupoActivo.id)
-      .order("created_at", { ascending:false });
-    if (error) { console.warn("cargarPlaylists error:", error); playlists = []; return; }
-    playlists = (data||[]).map(p => ({
-      id: p.id,
-      nombre: p.nombre,
-      descripcion: p.descripcion,
-      emoji: p.emoji || "music",
-      color: p.color || "amarillo",
-      canciones: Array.isArray(p.canciones) ? p.canciones : [],
-      created_at: p.created_at,
-      grupo_id: p.grupo_id
-    }));
-  } catch (err) {
-    console.warn("cargarPlaylists:", err);
-    playlists = [];
+    try {
+      const { data:{ session } } = await supabase.auth.getSession();
+      if (!session?.user) { playlists = []; return; }
+      if (!grupoActivo) await asegurarGrupoActivo();
+      if (!grupoActivo) { playlists = []; return; }
+      const { data, error } = await supabase.from("playlists")
+        .select("id,nombre,descripcion,emoji,color,canciones,created_at,grupo_id")
+        .eq("grupo_id", grupoActivo.id)
+        .order("created_at", { ascending:false });
+      if (error) { console.warn("cargarPlaylists error:", error); playlists = []; return; }
+      playlists = (data||[]).map(p => ({
+        id: p.id, nombre: p.nombre, descripcion: p.descripcion,
+        emoji: p.emoji || "music", color: p.color || "amarillo",
+        canciones: Array.isArray(p.canciones) ? p.canciones : [],
+        created_at: p.created_at, grupo_id: p.grupo_id
+      }));
+    } catch (err) { console.warn("cargarPlaylists:", err); playlists = []; }
   }
-}
   const añadirPlaylistTabla = async (nombre, descripcion, emoji, color) => { const { data:{ session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("playlists").insert({ user_id:session.user.id, grupo_id:grupoActivo.id, nombre, descripcion:descripcion||null, emoji:emoji||"music", color:color||"amarillo", canciones:[] }).select().single(); if (error) throw error; return data; };
   const eliminarPlaylistTabla = async id => { const { error } = await supabase.from("playlists").delete().eq("id", id); if (error) throw error; };
   const guardarCancionesTabla = async (id, canciones) => { const { error } = await supabase.from("playlists").update({ canciones }).eq("id", id); if (error) throw error; };
@@ -1076,7 +1104,12 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       const count = document.createElement("span"); count.className = "playlist-card-count";
       count.textContent = n === 0 ? "Sin canciones" : n === 1 ? "1 canción" : `${n} canciones`;
       card.appendChild(count);
-      if (n > 0) { const prev = document.createElement("div"); prev.className = "playlist-card-preview"; prev.textContent = pl.canciones.slice(0,3).map(c => c.titulo + (c.artista ? " · " + c.artista : "")).join("\n"); card.appendChild(prev); }
+      if (n > 0) {
+        const prev = document.createElement("div");
+        prev.className = "playlist-card-preview";
+        prev.textContent = pl.canciones.slice(0,3).map(c => c.titulo + (c.artista ? " · " + c.artista : "")).join("\n");
+        card.appendChild(prev);
+      }
       card.addEventListener("click", () => abrirCancionesModal(pl.id));
       return card;
     } catch (err) { console.warn("crearPlaylistCard:", err); return document.createElement("div"); }
@@ -1129,7 +1162,13 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       if (!cancionesLista) return;
       const pl = playlists.find(p => p.id === playlistEditando);
       cancionesLista.innerHTML = "";
-      if (!pl || pl.canciones.length === 0) { const v = document.createElement("div"); v.className = "canciones-lista-vacia"; v.textContent = "Aún no hay canciones. ¡Añade la primera!"; cancionesLista.appendChild(v); return; }
+      if (!pl || pl.canciones.length === 0) {
+        const v = document.createElement("div");
+        v.className = "canciones-lista-vacia";
+        v.textContent = "Aún no hay canciones. Sube tus archivos de audio locales.";
+        cancionesLista.appendChild(v);
+        return;
+      }
       const frag = document.createDocumentFragment();
       pl.canciones.forEach((c, i) => frag.appendChild(crearCancionItem(c, i)));
       cancionesLista.appendChild(frag);
@@ -1139,19 +1178,57 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
 
   function crearCancionItem(cancion, index) {
     try {
-      const item = document.createElement("div"); item.className = "cancion-item"; item.dataset.index = index;
-      const info = document.createElement("div"); info.className = "cancion-item-info";
-      const t = document.createElement("span"); t.className = "cancion-item-titulo"; t.textContent = cancion.titulo;
+      const item = document.createElement("div");
+      item.className = "cancion-item";
+      item.dataset.index = index;
+
+      const info = document.createElement("div");
+      info.className = "cancion-item-info";
+      const t = document.createElement("span");
+      t.className = "cancion-item-titulo";
+      t.textContent = cancion.titulo;
       info.appendChild(t);
-      if (cancion.artista) { const a = document.createElement("span"); a.className = "cancion-item-artista"; a.textContent = cancion.artista; info.appendChild(a); }
-      item.appendChild(info);
-      if (cancion.url) {
-        if (cancion.url.startsWith("storage:")) item.appendChild(crearBtn("cancion-item-link", SVG.play, "Reproducir", () => iniciarColaDesdePlaylist(playlistEditando, index)));
-        else { const link = document.createElement("a"); link.className = "cancion-item-link"; link.href = cancion.url; link.target = "_blank"; link.rel = "noopener noreferrer"; link.title = "Abrir enlace"; link.innerHTML = SVG.external; item.appendChild(link); }
+      if (cancion.artista) {
+        const a = document.createElement("span");
+        a.className = "cancion-item-artista";
+        a.textContent = cancion.artista;
+        info.appendChild(a);
       }
+      item.appendChild(info);
+
+      if (cancion.url) {
+        const esLocal = cancion.url.startsWith("storage:");
+        const enlace = identificarEnlaceMusical(cancion.url);
+
+        if (esLocal) {
+          // ✅ Archivo local → botón play dentro del reproductor
+          const btnPlay = crearBtn("cancion-item-link", SVG.play, "Reproducir en la app", () =>
+            iniciarColaDesdePlaylist(playlistEditando, index)
+          );
+          item.appendChild(btnPlay);
+        } else {
+          // 🔗 Enlace externo → abrir en pestaña nueva
+          const link = document.createElement("a");
+          link.className = "cancion-item-link";
+          link.href = cancion.url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.title = enlace?.tipo === "youtube"
+            ? "Abrir en YouTube"
+            : enlace?.tipo === "spotify"
+              ? "Abrir en Spotify"
+              : "Abrir enlace externo";
+          link.innerHTML = SVG.external;
+          item.appendChild(link);
+        }
+      }
+
       item.appendChild(crearBtn("cancion-item-delete", SVG.close, "Quitar canción", () => eliminarCancion(index)));
       return item;
-    } catch (err) { console.warn("crearCancionItem:", err); return document.createElement("div"); }
+    } catch (err) {
+      console.warn("crearCancionItem:", err);
+      return document.createElement("div");
+    }
   }
 
   async function eliminarCancion(index) {
@@ -1159,7 +1236,9 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       const pl = playlists.find(p => p.id === playlistEditando);
       if (!pl) return;
       const c = pl.canciones[index];
-      if (c?.url?.startsWith("storage:")) { try { await supabase.storage.from(BUCKET_CANCIONES).remove([c.url.replace(/^storage:/, "")]); } catch {} }
+      if (c?.url?.startsWith("storage:")) {
+        try { await supabase.storage.from(BUCKET_CANCIONES).remove([c.url.replace(/^storage:/, "")]); } catch {}
+      }
       const nuevas = pl.canciones.filter((_, i) => i !== index);
       await guardarCancionesTabla(pl.id, nuevas);
       pl.canciones = nuevas;
@@ -1171,7 +1250,11 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
   btnAddPlaylist?.addEventListener("click", abrirPlaylistModal);
   playlistModal?.querySelectorAll("[data-close-playlist-modal]").forEach(el => el.addEventListener("click", cerrarPlaylistModal));
   cancionesModal?.querySelectorAll("[data-close-canciones-modal]").forEach(el => el.addEventListener("click", cerrarCancionesModal));
-  document.addEventListener("keydown", e => { if (e.key !== "Escape") return; if (cancionesModal?.classList.contains("active")) cerrarCancionesModal(); else if (playlistModal?.classList.contains("active")) cerrarPlaylistModal(); });
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    if (cancionesModal?.classList.contains("active")) cerrarCancionesModal();
+    else if (playlistModal?.classList.contains("active")) cerrarPlaylistModal();
+  });
   document.querySelectorAll("#emoji-picker .emoji-option").forEach(opt => opt.addEventListener("click", () => { document.querySelectorAll("#emoji-picker .emoji-option").forEach(o => o.classList.remove("activo")); opt.classList.add("activo"); emojiSeleccionado = opt.dataset.emoji; }));
   document.querySelectorAll("#playlist-form .color-option").forEach(opt => opt.addEventListener("click", () => { document.querySelectorAll("#playlist-form .color-option").forEach(o => o.classList.remove("activo")); opt.classList.add("activo"); colorPlaylistSeleccionado = opt.dataset.color; }));
 
@@ -1189,13 +1272,27 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
     } catch (err) { console.warn("playlist submit:", err); }
   });
 
+  /* ---------- Formulario "una a una" ---------- */
   cancionForm?.addEventListener("submit", async e => {
     e.preventDefault();
     try {
       const pl = playlists.find(p => p.id === playlistEditando);
       if (!pl) return;
-      const titulo = cancionTitulo?.value.trim() || "", artista = cancionArtista?.value.trim() || "", url = cancionUrl?.value.trim() || "";
+      const titulo = cancionTitulo?.value.trim() || "";
+      const artista = cancionArtista?.value.trim() || "";
+      const url = cancionUrl?.value.trim() || "";
       if (!titulo) return alertar({ title:"Falta el título", message:"Ponle un título a la canción.", icon:"🎵" });
+
+      // Validar URL si la hay: solo Spotify o YouTube
+      if (url && !identificarEnlaceMusical(url)) {
+        return alertar({
+          title: "Enlace no válido",
+          message: "Solo aceptamos enlaces de <strong>Spotify</strong> o <strong>YouTube</strong>.<br>Si tienes un archivo propio, súbelo en la pestaña «Subir archivos».",
+          variant: "warning",
+          icon: "🔗"
+        });
+      }
+
       const nuevas = [...pl.canciones, { titulo, artista, url }];
       await guardarCancionesTabla(pl.id, nuevas);
       pl.canciones = nuevas;
@@ -1204,11 +1301,13 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
     } catch (err) { alertar({ title:"Error", message:"No se pudo añadir: " + (err.message||err), variant:"danger" }); }
   });
 
+  /* ---------- Pegar varias ---------- */
   const cancionesPegarTexto = $("cancion-pegar-texto"), cancionesPegarPreview = $("cancion-pegar-preview"), btnImportarCanciones = $("btn-importar-canciones");
-  const cancionPegarArchivo = $("cancion-pegar-archivo"), btnCargarArchivo = $("btn-cargar-archivo"), cancionSubirArchivo = $("cancion-subir-archivo");
-  const btnSeleccionarArchivos = $("btn-seleccionar-archivos"), cancionSubirDropzone = $("cancion-subir-dropzone"), cancionSubirLista = $("cancion-subir-lista"), btnSubirCanciones = $("btn-subir-canciones");
-
-  document.querySelectorAll(".cancion-tab").forEach(tab => tab.addEventListener("click", () => { document.querySelectorAll(".cancion-tab").forEach(t => t.classList.toggle("active", t === tab)); document.querySelectorAll(".cancion-panel").forEach(p => p.classList.toggle("active", p.dataset.panel === tab.dataset.tab)); }));
+  const cancionPegarArchivo = $("cancion-pegar-archivo"), btnCargarArchivo = $("btn-cargar-archivo");
+  document.querySelectorAll(".cancion-tab").forEach(tab => tab.addEventListener("click", () => {
+    document.querySelectorAll(".cancion-tab").forEach(t => t.classList.toggle("active", t === tab));
+    document.querySelectorAll(".cancion-panel").forEach(p => p.classList.toggle("active", p.dataset.panel === tab.dataset.tab));
+  }));
 
   function resetCancionTabs() {
     try {
@@ -1238,8 +1337,17 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       const m = linea.match(/\s*[\(\[]?(https?:\/\/[^\s\)\]]+)[\)\]]?\s*$/i);
       if (m) { url = m[1]; linea = linea.replace(m[0], "").trim(); }
       const sep = seps.find(s => linea.includes(s));
-      if (sep) { const partes = linea.split(sep).map(p => p.trim()).filter(Boolean); if (partes.length >= 2) { const [titulo, artista] = orden === "artista-titulo" ? [partes.slice(1).join(" - "), partes[0]] : [partes[0], partes.slice(1).join(" - ")]; resultado.push({ titulo, artista, url }); return; } }
-      resultado.push({ titulo:linea, artista:"", url });
+      if (sep) {
+        const partes = linea.split(sep).map(p => p.trim()).filter(Boolean);
+        if (partes.length >= 2) {
+          const [titulo, artista] = orden === "artista-titulo"
+            ? [partes.slice(1).join(" - "), partes[0]]
+            : [partes[0], partes.slice(1).join(" - ")];
+          resultado.push({ titulo, artista, url });
+          return;
+        }
+      }
+      resultado.push({ titulo: linea, artista: "", url });
     });
     return resultado;
   }
@@ -1252,10 +1360,23 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       cancionesPegarPreview.innerHTML = "";
       if (canciones.length === 0) { cancionesPegarPreview.classList.remove("visible"); return; }
       cancionesPegarPreview.classList.add("visible");
-      const cab = document.createElement("span"); cab.className = "cancion-pegar-preview-num"; cab.textContent = `${canciones.length} canción${canciones.length === 1 ? "" : "es"} detectada${canciones.length === 1 ? "" : "s"}`;
+      const cab = document.createElement("span");
+      cab.className = "cancion-pegar-preview-num";
+      cab.textContent = `${canciones.length} canción${canciones.length === 1 ? "" : "es"} detectada${canciones.length === 1 ? "" : "s"}`;
       cancionesPegarPreview.appendChild(cab);
-      canciones.slice(0,5).forEach(c => { const item = document.createElement("div"); item.className = "cancion-pegar-preview-item"; item.textContent = "• " + c.titulo + (c.artista ? " — " + c.artista : "") + (c.url ? " (con enlace)" : ""); cancionesPegarPreview.appendChild(item); });
-      if (canciones.length > 5) { const m = document.createElement("div"); m.className = "cancion-pegar-preview-item"; m.style.opacity = "0.5"; m.textContent = `… y ${canciones.length - 5} más`; cancionesPegarPreview.appendChild(m); }
+      canciones.slice(0, 5).forEach(c => {
+        const item = document.createElement("div");
+        item.className = "cancion-pegar-preview-item";
+        item.textContent = "• " + c.titulo + (c.artista ? " — " + c.artista : "") + (c.url ? " (con enlace)" : "");
+        cancionesPegarPreview.appendChild(item);
+      });
+      if (canciones.length > 5) {
+        const m = document.createElement("div");
+        m.className = "cancion-pegar-preview-item";
+        m.style.opacity = "0.5";
+        m.textContent = `… y ${canciones.length - 5} más`;
+        cancionesPegarPreview.appendChild(m);
+      }
     } catch (err) { console.warn("actualizarPreviewPegar:", err); }
   }
 
@@ -1280,7 +1401,14 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
     } catch (err) { console.warn("importar:", err); }
   });
 
-  const leerArchivoTexto = file => new Promise((resolve, reject) => { try { const r = new FileReader(); r.onload = e => resolve(e.target.result || ""); r.onerror = reject; r.readAsText(file, "UTF-8"); } catch (err) { reject(err); } });
+  const leerArchivoTexto = file => new Promise((resolve, reject) => {
+    try {
+      const r = new FileReader();
+      r.onload = e => resolve(e.target.result || "");
+      r.onerror = reject;
+      r.readAsText(file, "UTF-8");
+    } catch (err) { reject(err); }
+  });
 
   function aplicarArchivosCargados(textos, nombres) {
     try {
@@ -1289,8 +1417,10 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       if (!completo.trim()) return alertar({ title:"Archivos vacíos", message:"Los archivos no contenían texto.", icon:"📄" });
       const yaHay = cancionesPegarTexto.value.trim().length > 0;
       let final;
-      if (yaHay) { const añadir = confirm(`Ya hay texto. ¿AÑADIR los ${nombres.length} archivo(s)? (Cancelar = reemplazar)`); final = añadir ? cancionesPegarTexto.value.trimEnd() + "\n" + completo : completo; }
-      else final = completo;
+      if (yaHay) {
+        const añadir = confirm(`Ya hay texto. ¿AÑADIR los ${nombres.length} archivo(s)? (Cancelar = reemplazar)`);
+        final = añadir ? cancionesPegarTexto.value.trimEnd() + "\n" + completo : completo;
+      } else final = completo;
       cancionesPegarTexto.value = final;
       actualizarPreviewPegar(); mostrarInfoArchivosTexto(nombres);
     } catch (err) { console.warn("aplicarArchivosCargados:", err); }
@@ -1301,7 +1431,9 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       if (!cancionesPegarPreview) return;
       cancionesPegarPreview.querySelector(".cancion-pegar-archivos")?.remove();
       const info = document.createElement("div"); info.className = "cancion-pegar-archivos";
-      const t = document.createElement("span"); t.className = "cancion-pegar-archivos-titulo"; t.textContent = `${nombres.length} archivo${nombres.length === 1 ? "" : "s"} cargado${nombres.length === 1 ? "" : "s"}:`;
+      const t = document.createElement("span");
+      t.className = "cancion-pegar-archivos-titulo";
+      t.textContent = `${nombres.length} archivo${nombres.length === 1 ? "" : "s"} cargado${nombres.length === 1 ? "" : "s"}:`;
       info.appendChild(t);
       nombres.forEach(n => { const s = document.createElement("span"); s.className = "cancion-pegar-archivo-nombre"; s.textContent = "• " + n; info.appendChild(s); });
       cancionesPegarPreview.insertBefore(info, cancionesPegarPreview.firstChild);
@@ -1321,26 +1453,43 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
 
   if (cancionesPegarTexto) {
     ["dragenter","dragover"].forEach(evt => cancionesPegarTexto.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); cancionesPegarTexto.classList.add("drag-over"); }));
-    ["dragleave","drop"].forEach(evt => cancionesPegarTexto.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); if (evt === "dragleave" && e.relatedTarget && cancionesPegarTexto.contains(e.relatedTarget)) return; cancionesPegarTexto.classList.remove("drag-over"); }));
+    ["dragleave","drop"].forEach(evt => cancionesPegarTexto.addEventListener(evt, e => {
+      e.preventDefault(); e.stopPropagation();
+      if (evt === "dragleave" && e.relatedTarget && cancionesPegarTexto.contains(e.relatedTarget)) return;
+      cancionesPegarTexto.classList.remove("drag-over");
+    }));
     cancionesPegarTexto.addEventListener("drop", async e => {
       try {
         const archivos = Array.from(e.dataTransfer?.files || []);
         if (!archivos.length) return;
         const textos = [], nombres = [];
-        for (const a of archivos) { if (!/\.(txt|csv|m3u|m3u8)$/i.test(a.name) && !a.type.startsWith("text/")) continue; try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size/1024).toFixed(1)} KB)`); } catch {} }
+        for (const a of archivos) {
+          if (!/\.(txt|csv|m3u|m3u8)$/i.test(a.name) && !a.type.startsWith("text/")) continue;
+          try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size/1024).toFixed(1)} KB)`); } catch {}
+        }
         if (!textos.length) return alertar({ title:"Formatos no válidos", message:"Solo .txt, .csv, .m3u o .m3u8.", icon:"📄" });
         aplicarArchivosCargados(textos, nombres);
       } catch (err) { console.warn("drop archivos:", err); }
     });
   }
 
+  /* ---------- Subir archivos propios ---------- */
+  const cancionSubirArchivo = $("cancion-subir-archivo");
+  const btnSeleccionarArchivos = $("btn-seleccionar-archivos");
+  const cancionSubirDropzone = $("cancion-subir-dropzone");
+  const cancionSubirLista = $("cancion-subir-lista");
+  const btnSubirCanciones = $("btn-subir-canciones");
+
   const tituloDesdeArchivo = nombre => {
     try {
       const base = nombre.replace(/\.[^.]+$/, "");
       const sep = [" - "," – "," — "].find(s => base.includes(s));
-      if (sep) { const p = base.split(sep).map(x => x.trim()).filter(Boolean); return { titulo:p[0] || base, artista:p.slice(1).join(" - ") || "" }; }
-      return { titulo:base, artista:"" };
-    } catch { return { titulo:nombre, artista:"" }; }
+      if (sep) {
+        const p = base.split(sep).map(x => x.trim()).filter(Boolean);
+        return { titulo: p[0] || base, artista: p.slice(1).join(" - ") || "" };
+      }
+      return { titulo: base, artista: "" };
+    } catch { return { titulo: nombre, artista: "" }; }
   };
 
   function agregarArchivosACola(files) {
@@ -1370,8 +1519,10 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
         const n = document.createElement("span"); n.className = "cancion-subir-item-nombre"; n.textContent = item.file.name;
         const s = document.createElement("span"); s.className = "cancion-subir-item-size"; s.textContent = fmtTam(item.file.size);
         info.append(n, s);
-        const status = document.createElement("span"); status.className = "cancion-subir-item-status " + item.estado; status.textContent = textos[item.estado] || item.estado;
-        const btn = document.createElement("button"); btn.type = "button"; btn.className = "cancion-subir-item-remove"; btn.innerHTML = SVG.close; btn.title = "Quitar";
+        const status = document.createElement("span"); status.className = "cancion-subir-item-status " + item.estado;
+        status.textContent = textos[item.estado] || item.estado;
+        const btn = document.createElement("button");
+        btn.type = "button"; btn.className = "cancion-subir-item-remove"; btn.innerHTML = SVG.close; btn.title = "Quitar";
         btn.addEventListener("click", () => { archivosPendientes = archivosPendientes.filter(x => x.id !== item.id); renderColaArchivos(); actualizarBotonSubir(); });
         el.append(icon, info, status, btn); frag.appendChild(el);
       });
@@ -1385,14 +1536,21 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
 
   if (cancionSubirDropzone) {
     ["dragenter","dragover"].forEach(evt => cancionSubirDropzone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); cancionSubirDropzone.classList.add("drag-over"); }));
-    ["dragleave","drop"].forEach(evt => cancionSubirDropzone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); if (evt === "dragleave" && e.relatedTarget && cancionSubirDropzone.contains(e.relatedTarget)) return; cancionSubirDropzone.classList.remove("drag-over"); }));
+    ["dragleave","drop"].forEach(evt => cancionSubirDropzone.addEventListener(evt, e => {
+      e.preventDefault(); e.stopPropagation();
+      if (evt === "dragleave" && e.relatedTarget && cancionSubirDropzone.contains(e.relatedTarget)) return;
+      cancionSubirDropzone.classList.remove("drag-over");
+    }));
     cancionSubirDropzone.addEventListener("drop", e => { const files = e.dataTransfer?.files; if (files?.length) agregarArchivosACola(files); });
   }
 
   async function subirArchivoACanciones(item, userId) {
     const e = ext(item.file.name) || "bin";
     const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${e}`;
-    const { error } = await supabase.storage.from(BUCKET_CANCIONES).upload(path, item.file, { contentType:item.file.type || "application/octet-stream", upsert:false });
+    const { error } = await supabase.storage.from(BUCKET_CANCIONES).upload(path, item.file, {
+      contentType: item.file.type || "application/octet-stream",
+      upsert: false
+    });
     if (error) throw error;
     return path;
   }
@@ -1405,32 +1563,85 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       if (!session) return alertar({ title:"Inicia sesión", message:"Necesitas una cuenta para subir archivos.", icon:"🔐" });
       const pendientes = archivosPendientes.filter(a => a.estado === "pending");
       if (!pendientes.length) return;
-      const ok = await confirmar({ title:"¿Subir archivos?", message:`Se subirán <strong>${pendientes.length}</strong> archivo(s) a <em>"${pl.nombre}"</em>.`, variant:"success", icon:"🎵", confirmText:"Subir", cancelText:"Cancelar" });
+
+      // ⚖️ Aviso legal: solo música propia
+      const ok = await confirmar({
+        title: "⚖️ Sube solo música legal",
+        message: `Sube únicamente audios <strong>tuyos</strong> o de <strong>dominio público</strong>.<br><br>Se subirán <strong>${pendientes.length}</strong> archivo(s) a <em>"${pl.nombre}"</em>.`,
+        variant: "warning",
+        icon: "🎵",
+        confirmText: "Confirmo, subir",
+        cancelText: "Cancelar"
+      });
       if (!ok) return;
-      btnSubirCanciones.disabled = true; btnSubirCanciones.textContent = "Subiendo...";
-      const nuevas = []; let exitos = 0, fallos = 0;
+
+      btnSubirCanciones.disabled = true;
+      btnSubirCanciones.textContent = "Subiendo...";
+      const nuevas = [];
+      let exitos = 0, fallos = 0;
       for (const item of pendientes) {
         item.estado = "uploading"; renderColaArchivos();
-        try { const path = await subirArchivoACanciones(item, session.user.id); const meta = tituloDesdeArchivo(item.file.name); nuevas.push({ titulo:meta.titulo, artista:meta.artista, url:"storage:"+path }); item.estado = "done"; exitos++; }
-        catch { item.estado = "error"; fallos++; }
+        try {
+          const path = await subirArchivoACanciones(item, session.user.id);
+          const meta = tituloDesdeArchivo(item.file.name);
+          nuevas.push({ titulo: meta.titulo, artista: meta.artista, url: "storage:" + path });
+          item.estado = "done"; exitos++;
+        } catch { item.estado = "error"; fallos++; }
         renderColaArchivos();
       }
       try {
-        if (nuevas.length > 0) { const actualizadas = [...pl.canciones, ...nuevas]; await guardarCancionesTabla(pl.id, actualizadas); pl.canciones = actualizadas; renderCancionesLista(); renderPlaylists(); }
+        if (nuevas.length > 0) {
+          const actualizadas = [...pl.canciones, ...nuevas];
+          await guardarCancionesTabla(pl.id, actualizadas);
+          pl.canciones = actualizadas;
+          renderCancionesLista(); renderPlaylists();
+        }
         archivosPendientes = archivosPendientes.filter(a => a.estado !== "done");
         renderColaArchivos();
-        alertar({ title: fallos === 0 ? "¡Subida completa!" : "Subida parcial", message: fallos === 0 ? `${exitos} archivo(s) subidos correctamente.` : `Subidos ${exitos}, fallaron ${fallos}.`, variant: fallos === 0 ? "success" : "warning", icon:"🎵" });
-      } catch (err) { alertar({ title:"Error", message:"Error guardando en la playlist: " + (err.message||err), variant:"danger" }); }
-      finally { btnSubirCanciones.disabled = false; btnSubirCanciones.textContent = "Subir todas"; actualizarBotonSubir(); }
+        alertar({
+          title: fallos === 0 ? "¡Subida completa!" : "Subida parcial",
+          message: fallos === 0
+            ? `${exitos} archivo(s) subidos correctamente.`
+            : `Subidos ${exitos}, fallaron ${fallos}.`,
+          variant: fallos === 0 ? "success" : "warning",
+          icon: "🎵"
+        });
+      } catch (err) {
+        alertar({ title:"Error", message:"Error guardando en la playlist: " + (err.message||err), variant:"danger" });
+      } finally {
+        btnSubirCanciones.disabled = false;
+        btnSubirCanciones.textContent = "Subir todas";
+        actualizarBotonSubir();
+      }
     } catch (err) { console.warn("subir canciones:", err); }
   });
 
-  /* ---------- PLAYER ---------- */
-  const mostrarPlayerBar = () => { if (!playerBar) return; playerBar.classList.add("visible"); playerBar.setAttribute("aria-hidden","false"); document.body.classList.add("player-abierto"); };
-  const ocultarPlayerBar = () => { if (!playerBar) return; playerBar.classList.remove("visible"); playerBar.setAttribute("aria-hidden","true"); document.body.classList.remove("player-abierto"); };
-  const actualizarIconoVolumen = () => { if (!playerVolumeBtn) return; if (globalAudio.muted || volumenActual === 0) playerVolumeBtn.innerHTML = SVG.volMute; else if (volumenActual < 0.4) playerVolumeBtn.innerHTML = SVG.volLow; else playerVolumeBtn.innerHTML = SVG.volHigh; };
-  const actualizarBotonPlay = () => { if (!playerPlay) return; playerPlay.innerHTML = reproduciendo ? SVG.pause : SVG.play; playerPlay.title = reproduciendo ? "Pausar" : "Reproducir"; };
-  if (globalAudio) { globalAudio.volume = volumenActual; if (playerVolume) playerVolume.value = volumenActual; actualizarIconoVolumen(); }
+  /* ============================================================
+     PLAYER — 100% local
+     ============================================================ */
+  const mostrarPlayerBar = () => {
+    if (!playerBar) return;
+    playerBar.classList.add("visible");
+    playerBar.setAttribute("aria-hidden", "false");
+    document.body.classList.add("player-abierto");
+  };
+  const actualizarIconoVolumen = () => {
+    if (!playerVolumeBtn) return;
+    if (globalAudio.muted || volumenActual === 0) playerVolumeBtn.innerHTML = SVG.volMute;
+    else if (volumenActual < 0.4) playerVolumeBtn.innerHTML = SVG.volLow;
+    else playerVolumeBtn.innerHTML = SVG.volHigh;
+  };
+  const actualizarBotonPlay = () => {
+    if (!playerPlay) return;
+    playerPlay.innerHTML = reproduciendo ? SVG.pause : SVG.play;
+    playerPlay.title = reproduciendo ? "Pausar" : "Reproducir";
+    document.body.classList.toggle("player-playing", reproduciendo);
+  };
+  if (globalAudio) {
+    globalAudio.volume = volumenActual;
+    if (playerVolume) playerVolume.value = volumenActual;
+    actualizarIconoVolumen();
+  }
   window.addEventListener("sunadventures:volume-change", event => {
     const volume = Number(event.detail?.volume);
     if (!Number.isFinite(volume)) return;
@@ -1447,31 +1658,61 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
 
   async function activarWakeLock() {
     if (!("wakeLock" in navigator)) return;
-    try { if (window._wakeLock) await window._wakeLock.release(); window._wakeLock = await navigator.wakeLock.request("screen"); } catch (err) { console.warn("Wake Lock:", err); }
+    try { if (window._wakeLock) await window._wakeLock.release(); window._wakeLock = await navigator.wakeLock.request("screen"); } catch {}
   }
-  async function liberarWakeLock() { if (window._wakeLock) { try { await window._wakeLock.release(); } catch {} window._wakeLock = null; } }
+  async function liberarWakeLock() {
+    if (window._wakeLock) { try { await window._wakeLock.release(); } catch {} window._wakeLock = null; }
+  }
 
   function actualizarMediaSession(item) {
     if (!("mediaSession" in navigator)) return;
     try {
-      navigator.mediaSession.metadata = new MediaMetadata({ title:item.titulo || "Sin título", artist:item.artista || "Four Sunflowers", album:"Nuestras playlists", artwork:[{ src:"img/girasol.jpg", sizes:"512x512", type:"image/jpeg" }] });
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: item.titulo || "Sin título",
+        artist: item.artista || "Four Sunflowers",
+        album: "Nuestras playlists",
+        artwork: [{ src: "img/girasol.jpg", sizes: "512x512", type: "image/jpeg" }]
+      });
       navigator.mediaSession.setActionHandler("play", reanudarReproduccion);
       navigator.mediaSession.setActionHandler("pause", pausarReproduccion);
       navigator.mediaSession.setActionHandler("previoustrack", anteriorCancion);
       navigator.mediaSession.setActionHandler("nexttrack", () => siguienteCancion(true));
-      navigator.mediaSession.setActionHandler("seekbackward", () => { if (globalAudio) globalAudio.currentTime = Math.max(0, globalAudio.currentTime - 10); });
-      navigator.mediaSession.setActionHandler("seekforward", () => { if (globalAudio) globalAudio.currentTime = Math.min(globalAudio.duration || 0, globalAudio.currentTime + 10); });
       navigator.mediaSession.playbackState = "playing";
-    } catch (err) { console.warn("Media Session:", err); }
+    } catch {}
   }
 
+  /**
+   * Inicia la cola solo con canciones locales (storage:).
+   * Si la canción pulsada es un enlace externo → se abre en pestaña nueva.
+   */
   function iniciarColaDesdePlaylist(playlistId, indiceInicial) {
     try {
       const pl = playlists.find(p => p.id === playlistId);
       if (!pl) return;
-      if (!pl.canciones[indiceInicial]?.url?.startsWith("storage:")) return;
-      colaReproduccion = []; let idxEnCola = -1;
-      pl.canciones.forEach((c, i) => { if (c.url?.startsWith("storage:")) { colaReproduccion.push({ titulo:c.titulo, artista:c.artista || "", url:c.url, playlistId }); if (i === indiceInicial) idxEnCola = colaReproduccion.length - 1; } });
+      const inicial = pl.canciones[indiceInicial];
+      if (!inicial) return;
+
+      // Enlaces externos (Spotify/YouTube) → abrir en pestaña nueva
+      if (inicial.url && !inicial.url.startsWith("storage:")) {
+        window.open(inicial.url, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      // Construir cola SOLO con archivos locales
+      colaReproduccion = [];
+      let idxEnCola = -1;
+      pl.canciones.forEach((c, i) => {
+        if (c.url?.startsWith("storage:")) {
+          colaReproduccion.push({
+            titulo: c.titulo || "Sin título",
+            artista: c.artista || "",
+            url: c.url,
+            playlistId
+          });
+          if (i === indiceInicial) idxEnCola = colaReproduccion.length - 1;
+        }
+      });
+
       if (idxEnCola < 0) return;
       indiceReproduccion = idxEnCola;
       reproducirIndiceActual();
@@ -1480,34 +1721,107 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
 
   async function reproducirIndiceActual() {
     try {
-      if (!globalAudio) return;
-      if (indiceReproduccion < 0 || indiceReproduccion >= colaReproduccion.length) return pausarReproduccion();
+      if (indiceReproduccion < 0 || indiceReproduccion >= colaReproduccion.length) {
+        return pausarReproduccion();
+      }
       const item = colaReproduccion[indiceReproduccion];
-      if (!item?.url?.startsWith("storage:")) return;
-      const path = item.url.replace(/^storage:/, "");
-      let audioUrl = null;
-      if (window.SunOffline) audioUrl = await window.SunOffline.obtenerCancionOffline(item.url);
-      if (!audioUrl) { const { data, error } = await supabase.storage.from(BUCKET_CANCIONES).createSignedUrl(path, URL_EXPIRY_CANCIONES); if (error || !data?.signedUrl) throw error || new Error("Sin URL"); audioUrl = data.signedUrl; }
-      globalAudio.src = audioUrl; globalAudio.currentTime = 0;
+      if (!item) return;
+
+      // Solo archivos locales
+      if (!item.url?.startsWith("storage:")) {
+        return siguienteCancion(true);
+      }
+
+      pausarReproduccion();
+      globalAudio?.removeAttribute("src");
+      globalAudio?.load();
+
       if (playerBarTitle) playerBarTitle.textContent = item.titulo;
       if (playerBarArtist) playerBarArtist.textContent = item.artista || "";
-      if (playerCoverIcon) playerCoverIcon.innerHTML = esVideo(ext(path)) ? SVG.image : SVG.music;
-      mostrarPlayerBar(); actualizarEstadoReproduciendo();
-      try { await globalAudio.play(); reproduciendo = true; actualizarBotonPlay(); actualizarMediaSession(item); } catch { reproduciendo = false; actualizarBotonPlay(); }
-    } catch (err) { console.warn("reproducirIndiceActual:", err); setTimeout(() => siguienteCancion(true), 500); }
+      if (playerCoverIcon) playerCoverIcon.innerHTML = SVG.music;
+      mostrarPlayerBar();
+      actualizarEstadoReproduciendo();
+
+      const path = item.url.replace(/^storage:/, "");
+      let audioUrl = null;
+
+      // Preferimos copia offline (si existe)
+      if (window.SunOffline) audioUrl = await window.SunOffline.obtenerCancionOffline(item.url);
+
+      // Si no, pedimos signed URL al bucket
+      if (!audioUrl) {
+        const { data, error } = await supabase.storage
+          .from(BUCKET_CANCIONES)
+          .createSignedUrl(path, URL_EXPIRY_CANCIONES);
+        if (error || !data?.signedUrl) throw error || new Error("Sin URL");
+        audioUrl = data.signedUrl;
+      }
+
+      globalAudio.src = audioUrl;
+      globalAudio.currentTime = 0;
+
+      if (playerCoverIcon) {
+        playerCoverIcon.innerHTML = esVideo(ext(path)) ? SVG.image : SVG.music;
+      }
+      playerCurrent.textContent = "0:00";
+      playerDuration.textContent = "0:00";
+      delete playerDuration.dataset.seconds;
+
+      try {
+        await globalAudio.play();
+        reproduciendo = true;
+        actualizarBotonPlay();
+        actualizarMediaSession(item);
+      } catch {
+        reproduciendo = false;
+        actualizarBotonPlay();
+      }
+    } catch (err) {
+      console.warn("reproducirIndiceActual:", err);
+      setTimeout(() => siguienteCancion(true), 500);
+    }
   }
 
-  const pausarReproduccion = () => { if (!globalAudio) return; globalAudio.pause(); reproduciendo = false; actualizarBotonPlay(); liberarWakeLock(); };
-  const reanudarReproduccion = () => { if (!globalAudio?.src) return; globalAudio.play().then(() => { reproduciendo = true; actualizarBotonPlay(); activarWakeLock(); }).catch(() => {}); };
+  const pausarReproduccion = () => {
+    globalAudio?.pause();
+    reproduciendo = false;
+    actualizarBotonPlay();
+    liberarWakeLock();
+  };
+
+  const reanudarReproduccion = () => {
+    if (!globalAudio?.src) return;
+    globalAudio.play()
+      .then(() => { reproduciendo = true; actualizarBotonPlay(); activarWakeLock(); })
+      .catch(err => console.warn("No se pudo reanudar el audio:", err));
+  };
 
   function siguienteCancion(autoplay = true) {
     try {
       if (!colaReproduccion.length) return;
       if (modoRepetir === "one") return reproducirIndiceActual();
-      if (modoAleatorio) { let n; if (colaReproduccion.length === 1) n = 0; else { do { n = Math.floor(Math.random() * colaReproduccion.length); } while (n === indiceReproduccion); } indiceReproduccion = n; }
-      else { indiceReproduccion++; if (indiceReproduccion >= colaReproduccion.length) { if (modoRepetir === "all") indiceReproduccion = 0; else { indiceReproduccion = colaReproduccion.length - 1; pausarReproduccion(); return; } } }
+      if (modoAleatorio) {
+        let n;
+        if (colaReproduccion.length === 1) n = 0;
+        else { do { n = Math.floor(Math.random() * colaReproduccion.length); } while (n === indiceReproduccion); }
+        indiceReproduccion = n;
+      } else {
+        indiceReproduccion++;
+        if (indiceReproduccion >= colaReproduccion.length) {
+          if (modoRepetir === "all") indiceReproduccion = 0;
+          else {
+            indiceReproduccion = colaReproduccion.length - 1;
+            pausarReproduccion();
+            return;
+          }
+        }
+      }
       if (autoplay) reproducirIndiceActual();
-      else { const item = colaReproduccion[indiceReproduccion]; if (playerBarTitle) playerBarTitle.textContent = item.titulo; if (playerBarArtist) playerBarArtist.textContent = item.artista || ""; }
+      else {
+        const item = colaReproduccion[indiceReproduccion];
+        if (playerBarTitle) playerBarTitle.textContent = item.titulo;
+        if (playerBarArtist) playerBarArtist.textContent = item.artista || "";
+      }
     } catch (err) { console.warn("siguienteCancion:", err); }
   }
 
@@ -1516,7 +1830,8 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       if (!colaReproduccion.length) return;
       if (globalAudio && globalAudio.currentTime > 3) { globalAudio.currentTime = 0; return; }
       if (modoAleatorio) return siguienteCancion();
-      indiceReproduccion--; if (indiceReproduccion < 0) indiceReproduccion = colaReproduccion.length - 1;
+      indiceReproduccion--;
+      if (indiceReproduccion < 0) indiceReproduccion = colaReproduccion.length - 1;
       reproducirIndiceActual();
     } catch (err) { console.warn("anteriorCancion:", err); }
   }
@@ -1525,14 +1840,34 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
   playerNext?.addEventListener("click", () => siguienteCancion(true));
   playerPrev?.addEventListener("click", anteriorCancion);
   playerShuffle?.addEventListener("click", () => { modoAleatorio = !modoAleatorio; playerShuffle.classList.toggle("activo", modoAleatorio); });
-  playerRepeat?.addEventListener("click", () => { modoRepetir = modoRepetir === "off" ? "all" : modoRepetir === "all" ? "one" : "off"; playerRepeat.classList.toggle("activo", modoRepetir !== "off"); playerRepeat.innerHTML = modoRepetir === "one" ? SVG.repeatOne : SVG.repeat; });
+  playerRepeat?.addEventListener("click", () => {
+    modoRepetir = modoRepetir === "off" ? "all" : modoRepetir === "all" ? "one" : "off";
+    playerRepeat.classList.toggle("activo", modoRepetir !== "off");
+    playerRepeat.innerHTML = modoRepetir === "one" ? SVG.repeatOne : SVG.repeat;
+  });
   playerClose?.addEventListener("click", () => {
     pausarReproduccion();
     if (globalAudio) { globalAudio.src = ""; globalAudio.currentTime = 0; }
     colaReproduccion = []; indiceReproduccion = -1;
-    ocultarPlayerBar(); actualizarEstadoReproduciendo(); liberarWakeLock();
+    playerBar?.classList.remove("visible");
+    playerBar?.setAttribute("aria-hidden","true");
+    document.body.classList.remove("player-abierto", "player-playing");
+    actualizarEstadoReproduciendo();
+    liberarWakeLock();
   });
-  playerVolumeBtn?.addEventListener("click", () => { if (!globalAudio) return; if (globalAudio.muted || globalAudio.volume === 0) { globalAudio.muted = false; globalAudio.volume = volumenActual || 0.8; } else { silenciadoAntes = globalAudio.volume; globalAudio.volume = 0; globalAudio.muted = true; } actualizarIconoVolumen(); if (playerVolume) playerVolume.value = globalAudio.volume; });
+  playerVolumeBtn?.addEventListener("click", () => {
+    if (!globalAudio) return;
+    if (globalAudio.muted || globalAudio.volume === 0) {
+      globalAudio.muted = false;
+      globalAudio.volume = volumenActual || 0.8;
+    } else {
+      silenciadoAntes = globalAudio.volume;
+      globalAudio.volume = 0;
+      globalAudio.muted = true;
+    }
+    actualizarIconoVolumen();
+    if (playerVolume) playerVolume.value = globalAudio.volume;
+  });
   playerVolume?.addEventListener("input", () => {
     if (!globalAudio) return;
     const v = parseFloat(playerVolume.value);
@@ -1543,11 +1878,22 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
 
   globalAudio?.addEventListener("play", () => { reproduciendo = true; actualizarBotonPlay(); activarWakeLock(); });
   globalAudio?.addEventListener("pause", () => { reproduciendo = false; actualizarBotonPlay(); });
-  globalAudio?.addEventListener("timeupdate", () => { if (!globalAudio) return; const ct = globalAudio.currentTime || 0, dur = globalAudio.duration || 0; if (playerCurrent) playerCurrent.textContent = fmtTiempo(ct); if (playerDuration) playerDuration.textContent = fmtTiempo(dur); if (playerSeek && dur > 0) { playerSeek.max = 100; playerSeek.value = (ct / dur) * 100; } });
-  globalAudio?.addEventListener("loadedmetadata", () => { if (playerDuration) playerDuration.textContent = fmtTiempo(globalAudio.duration || 0); });
+  globalAudio?.addEventListener("timeupdate", () => {
+    if (!globalAudio) return;
+    const ct = globalAudio.currentTime || 0, dur = globalAudio.duration || 0;
+    if (playerCurrent) playerCurrent.textContent = fmtTiempo(ct);
+    if (playerDuration) playerDuration.textContent = fmtTiempo(dur);
+    if (playerSeek && dur > 0) { playerSeek.max = 100; playerSeek.value = (ct / dur) * 100; }
+  });
+  globalAudio?.addEventListener("loadedmetadata", () => {
+    if (playerDuration) playerDuration.textContent = fmtTiempo(globalAudio.duration || 0);
+  });
   globalAudio?.addEventListener("ended", () => siguienteCancion(true));
   globalAudio?.addEventListener("error", () => setTimeout(() => siguienteCancion(true), 300));
-  playerSeek?.addEventListener("input", () => { if (!globalAudio || !isFinite(globalAudio.duration)) return; globalAudio.currentTime = (parseFloat(playerSeek.value) / 100) * globalAudio.duration; });
+  playerSeek?.addEventListener("input", () => {
+    const ratio = parseFloat(playerSeek.value) / 100;
+    if (globalAudio && isFinite(globalAudio.duration)) globalAudio.currentTime = ratio * globalAudio.duration;
+  });
 
   function actualizarEstadoReproduciendo() {
     try {
@@ -1562,7 +1908,26 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
     } catch (err) { console.warn("actualizarEstadoReproduciendo:", err); }
   }
 
-  /* ---------- EVENTOS / CALENDARIO ---------- */
+  /* ---------- Hooks para watch-party ---------- */
+  window._playerQueue = () => ({ cola: [...colaReproduccion], indice: indiceReproduccion });
+  window._wpColaActual = () => colaReproduccion[indiceReproduccion] || null;
+  Object.defineProperty(window, "globalAudio", { get: () => globalAudio, configurable: true });
+  Object.defineProperty(window, "proveedorActual", { get: () => "local", configurable: true });
+  window._wpReproducirUrl = url => {
+    if (!url?.startsWith("storage:")) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+    const pl = playlists.find(p => p.canciones.some(c => c.url === url));
+    if (!pl) return;
+    const idx = pl.canciones.findIndex(c => c.url === url);
+    playlistEditando = pl.id;
+    iniciarColaDesdePlaylist(pl.id, idx);
+  };
+
+  /* ============================================================
+     EVENTOS / CALENDARIO
+     ============================================================ */
   async function cargarEventos() {
     try {
       const { data:{ session } } = await supabase.auth.getSession();
@@ -1572,7 +1937,16 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       eventos = (data||[]).map(e => ({ id:e.id, titulo:e.titulo, descripcion:e.descripcion, fecha:e.fecha, color:e.color||"amarillo", recordatorio_dias:e.recordatorio_dias ?? 1, recurrente:!!e.recurrente }));
     } catch (err) { console.warn("cargarEventos:", err); eventos = []; }
   }
-  const añadirEventoTabla = async (titulo, descripcion, fecha, color, recordatorio, recurrente) => { const { data:{ session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("eventos").insert({ user_id:session.user.id, titulo, descripcion:descripcion||null, fecha, color:color||"amarillo", recordatorio_dias:recordatorio, recurrente }).select().single(); if (error) throw error; return data; };
+  const añadirEventoTabla = async (titulo, descripcion, fecha, color, recordatorio, recurrente) => {
+    const { data:{ session } } = await supabase.auth.getSession();
+    if (!session) throw new Error("No hay sesión");
+    const { data, error } = await supabase.from("eventos").insert({
+      user_id:session.user.id, titulo, descripcion:descripcion||null, fecha,
+      color:color||"amarillo", recordatorio_dias:recordatorio, recurrente
+    }).select().single();
+    if (error) throw error;
+    return data;
+  };
   const eliminarEventoTabla = async id => { const { error } = await supabase.from("eventos").delete().eq("id", id); if (error) throw error; };
 
   function renderCalendario() {
@@ -1599,7 +1973,16 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
         if (iso === hoy) celda.classList.add("hoy");
         const span = document.createElement("span"); span.className = "cal-dia-numero"; span.textContent = num; celda.appendChild(span);
         const evs = eventosDelDia(iso);
-        if (evs.length) { const dots = document.createElement("div"); dots.className = "cal-dia-eventos"; evs.slice(0,4).forEach(ev => { const d = document.createElement("span"); d.className = `cal-evento-punto color-${ev.color}`; dots.appendChild(d); }); celda.appendChild(dots); }
+        if (evs.length) {
+          const dots = document.createElement("div");
+          dots.className = "cal-dia-eventos";
+          evs.slice(0, 4).forEach(ev => {
+            const d = document.createElement("span");
+            d.className = `cal-evento-punto color-${ev.color}`;
+            dots.appendChild(d);
+          });
+          celda.appendChild(dots);
+        }
         celda.addEventListener("click", () => abrirEventoModal(iso));
         frag.appendChild(celda);
       }
@@ -1608,14 +1991,30 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
     } catch (err) { console.warn("renderCalendario:", err); }
   }
   function eventosDelDia(iso) { return eventos.filter(ev => { if (!ev.recurrente) return ev.fecha === iso; const [, mEv, dEv] = ev.fecha.split("-"); const [, mIso, dIso] = iso.split("-"); return mEv === mIso && dEv === dIso; }); }
-  function proximaFechaEvento(ev) { const hoy = new Date(); hoy.setHours(0,0,0,0); const [y, m, d] = ev.fecha.split("-").map(Number); if (ev.recurrente) { const este = new Date(hoy.getFullYear(), m-1, d); return este < hoy ? new Date(hoy.getFullYear()+1, m-1, d) : este; } return new Date(y, m-1, d); }
-  const diasHasta = fecha => { const h = new Date(); h.setHours(0,0,0,0); const f = new Date(fecha); f.setHours(0,0,0,0); return Math.round((f-h)/86400000); };
+  function proximaFechaEvento(ev) {
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    const [y, m, d] = ev.fecha.split("-").map(Number);
+    if (ev.recurrente) {
+      const este = new Date(hoy.getFullYear(), m-1, d);
+      return este < hoy ? new Date(hoy.getFullYear()+1, m-1, d) : este;
+    }
+    return new Date(y, m-1, d);
+  }
+  const diasHasta = fecha => {
+    const h = new Date(); h.setHours(0,0,0,0);
+    const f = new Date(fecha); f.setHours(0,0,0,0);
+    return Math.round((f - h) / 86400000);
+  };
 
   function renderProximos() {
     try {
       if (!calProximos) return;
       calProximos.innerHTML = "";
-      const conFecha = eventos.map(ev => ({ ev, p:proximaFechaEvento(ev) })).filter(x => diasHasta(x.p) >= 0).sort((a,b) => a.p - b.p).slice(0,8);
+      const conFecha = eventos
+        .map(ev => ({ ev, p: proximaFechaEvento(ev) }))
+        .filter(x => diasHasta(x.p) >= 0)
+        .sort((a, b) => a.p - b.p)
+        .slice(0, 8);
       if (!conFecha.length) { calProximosVacio?.classList.remove("hidden"); return; }
       calProximosVacio?.classList.add("hidden");
       const frag = document.createDocumentFragment();
@@ -1626,7 +2025,8 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
 
   function crearItemProximo(ev, proxima) {
     try {
-      const item = document.createElement("div"); item.className = "cal-proximo-item color-" + ev.color;
+      const item = document.createElement("div");
+      item.className = "cal-proximo-item color-" + ev.color;
       const fb = document.createElement("div"); fb.className = "cal-proximo-fecha";
       const dia = document.createElement("span"); dia.className = "cal-proximo-dia"; dia.textContent = proxima.getDate();
       const mes = document.createElement("span"); mes.className = "cal-proximo-mes"; mes.textContent = MESES_LARGOS[proxima.getMonth()].slice(0,3);
@@ -1643,7 +2043,11 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       else cuando.textContent = `En ${Math.round(diff/30)} meses`;
       const btn = crearBtn("cal-proximo-delete", SVG.close, "Eliminar fecha", e => { e.stopPropagation(); eliminarEvento(ev.id); });
       item.append(fb, info, cuando, btn);
-      item.addEventListener("click", () => { mesMostrado = new Date(proxima.getFullYear(), proxima.getMonth(), 1); renderCalendario(); document.querySelector(".calendario-wrapper")?.scrollIntoView({ behavior:"smooth", block:"start" }); });
+      item.addEventListener("click", () => {
+        mesMostrado = new Date(proxima.getFullYear(), proxima.getMonth(), 1);
+        renderCalendario();
+        document.querySelector(".calendario-wrapper")?.scrollIntoView({ behavior:"smooth", block:"start" });
+      });
       return item;
     } catch (err) { console.warn("crearItemProximo:", err); return document.createElement("div"); }
   }
@@ -1662,20 +2066,30 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       setTimeout(() => eventoTitulo?.focus(), 100);
     } catch (err) { console.warn("abrirEventoModal:", err); }
   }
-  function cerrarEventoModal() { try { if (!eventoModal) return; eventoModal.classList.remove("active"); eventoModal.setAttribute("aria-hidden","true"); document.body.style.overflow = ""; } catch {} }
+  function cerrarEventoModal() {
+    try {
+      if (!eventoModal) return;
+      eventoModal.classList.remove("active"); eventoModal.setAttribute("aria-hidden","true"); document.body.style.overflow = "";
+    } catch {}
+  }
 
   async function eliminarEvento(id) {
     try {
       const ok = await confirmar({ title:"¿Eliminar esta fecha?", message:"El evento se borrará del calendario.", variant:"danger", icon:"📅", confirmText:"Sí, eliminar", cancelText:"Cancelar" });
       if (!ok) return;
-      await eliminarEventoTabla(id); eventos = eventos.filter(e => e.id !== id); renderCalendario();
+      await eliminarEventoTabla(id);
+      eventos = eventos.filter(e => e.id !== id);
+      renderCalendario();
     } catch (err) { alertar({ title:"Error", message:"No se pudo eliminar: " + (err.message||err), variant:"danger" }); }
   }
 
   btnAddEvento?.addEventListener("click", () => abrirEventoModal());
   eventoModal?.querySelectorAll("[data-close-evento-modal]").forEach(el => el.addEventListener("click", cerrarEventoModal));
   document.addEventListener("keydown", e => { if (e.key === "Escape" && eventoModal?.classList.contains("active")) cerrarEventoModal(); });
-  document.querySelectorAll("#evento-form .color-option").forEach(opt => opt.addEventListener("click", () => { document.querySelectorAll("#evento-form .color-option").forEach(o => o.classList.remove("activo")); opt.classList.add("activo"); colorEventoSeleccionado = opt.dataset.color; }));
+  document.querySelectorAll("#evento-form .color-option").forEach(opt => opt.addEventListener("click", () => {
+    document.querySelectorAll("#evento-form .color-option").forEach(o => o.classList.remove("activo"));
+    opt.classList.add("activo"); colorEventoSeleccionado = opt.dataset.color;
+  }));
   calPrev?.addEventListener("click", () => { mesMostrado.setMonth(mesMostrado.getMonth() - 1); renderCalendario(); });
   calNext?.addEventListener("click", () => { mesMostrado.setMonth(mesMostrado.getMonth() + 1); renderCalendario(); });
 
@@ -1690,15 +2104,27 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
         await pedirPermisoNotificacionesSilencioso();
         const nuevo = await añadirEventoTabla(titulo, descripcion, fecha, colorEventoSeleccionado, recordatorio, recurrente);
         eventos.push({ id:nuevo.id, titulo:nuevo.titulo, descripcion:nuevo.descripcion, fecha:nuevo.fecha, color:nuevo.color, recordatorio_dias:nuevo.recordatorio_dias, recurrente:nuevo.recurrente });
-        eventos.sort((a,b) => a.fecha.localeCompare(b.fecha));
+        eventos.sort((a, b) => a.fecha.localeCompare(b.fecha));
         cerrarEventoModal(); renderCalendario(); comprobarRecordatorios();
-      } catch (err) { alertar({ title:"No se pudo guardar", message:err.message || String(err), variant:"danger" }); if (eventoSubmitBtn) { eventoSubmitBtn.disabled = false; eventoSubmitBtn.textContent = "Guardar fecha"; } }
+      } catch (err) {
+        alertar({ title:"No se pudo guardar", message:err.message || String(err), variant:"danger" });
+        if (eventoSubmitBtn) { eventoSubmitBtn.disabled = false; eventoSubmitBtn.textContent = "Guardar fecha"; }
+      }
     } catch (err) { console.warn("evento submit:", err); }
   });
 
   const NOTIF_PREFIX = "notif_ev_";
   const notifSoportadas = () => "Notification" in window;
-  async function pedirPermisoNotificacionesSilencioso() { try { if (!notifSoportadas()) return false; if (Notification.permission === "granted") return true; if (Notification.permission === "denied") return false; const r = await Notification.requestPermission(); actualizarBotonNotifPermiso(); return r === "granted"; } catch { return false; } }
+  async function pedirPermisoNotificacionesSilencioso() {
+    try {
+      if (!notifSoportadas()) return false;
+      if (Notification.permission === "granted") return true;
+      if (Notification.permission === "denied") return false;
+      const r = await Notification.requestPermission();
+      actualizarBotonNotifPermiso();
+      return r === "granted";
+    } catch { return false; }
+  }
   async function pedirPermisoNotificacionesManual() {
     try {
       if (!notifSoportadas()) return alertar({ title:"No compatible", message:"Tu navegador no soporta notificaciones.", icon:"🔕" });
@@ -1708,7 +2134,10 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       else if (r === "denied") alertar({ title:"Bloqueadas", message:"Has bloqueado las notificaciones. Actívalas desde la configuración del navegador.", variant:"warning", icon:"🔕" });
     } catch (err) { console.warn("pedirPermiso:", err); }
   }
-  const actualizarBotonNotifPermiso = () => { if (!btnNotifPermiso) return; btnNotifPermiso.style.display = (!notifSoportadas() || Notification.permission !== "default") ? "none" : "inline-flex"; };
+  const actualizarBotonNotifPermiso = () => {
+    if (!btnNotifPermiso) return;
+    btnNotifPermiso.style.display = (!notifSoportadas() || Notification.permission !== "default") ? "none" : "inline-flex";
+  };
   btnNotifPermiso?.addEventListener("click", pedirPermisoNotificacionesManual);
 
   function comprobarRecordatorios() {
@@ -1725,7 +2154,9 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
         if (diff === 0) cuerpo = "¡Es hoy! " + (ev.descripcion || "");
         else if (diff === 1) cuerpo = "Es mañana " + (ev.descripcion || "");
         else cuerpo = `Faltan ${diff} días · ` + (ev.descripcion || "");
-        try { new Notification(ev.titulo, { body:cuerpo.trim(), icon:"img/girasol.jpg", tag:`evento-${ev.id}` }); } catch {}
+        try {
+          new Notification(ev.titulo, { body: cuerpo.trim(), icon: "img/girasol.jpg", tag: `evento-${ev.id}` });
+        } catch {}
       });
     } catch (err) { console.warn("comprobarRecordatorios:", err); }
   }
@@ -1735,29 +2166,39 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
 
   mostrarLoading("Cargando recuerdos...");
 
-  /* ---------- AUTH UI ---------- */
+  /* ============================================================
+     AUTH UI
+     ============================================================ */
   async function updateAuthUI(session) {
     try {
       const logueado = !!session;
       if (btnOpenLogin) btnOpenLogin.style.display = logueado ? "none" : "inline-flex";
       if (userInfo) userInfo.style.display = logueado ? "flex" : "none";
-      if (logueado && userEmail) { const n = localStorage.getItem("sunadventures_username") || session.user.email.split("@")[0]; userEmail.textContent = n; const dn = $("user-dropdown-name"); if (dn) dn.textContent = n; window._sunUserEmail = session.user.email; }
+      if (logueado && userEmail) {
+        const n = localStorage.getItem("sunadventures_username") || session.user.email.split("@")[0];
+        userEmail.textContent = n;
+        const dn = $("user-dropdown-name"); if (dn) dn.textContent = n;
+        window._sunUserEmail = session.user.email;
+      }
       if (btnAdd) btnAdd.style.display = logueado ? "inline-block" : "none";
       if (btnAddNota) btnAddNota.style.display = logueado ? "inline-block" : "none";
       if (logueado) {
         await asegurarGrupoActivo();
         try {
           const { data:perfil } = await supabase.from("perfiles").select("username,avatar_url").eq("id", session.user.id).single();
-          if (perfil?.avatar_url) { const av = document.querySelector(".user-avatar"); if (av) av.innerHTML = `<img src="${perfil.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`; }
-          if (perfil?.username) { localStorage.setItem("sunadventures_username", perfil.username); const ue = $("user-email"); if (ue) ue.textContent = perfil.username; const udn = $("user-dropdown-name"); if (udn) udn.textContent = perfil.username; }
+          if (perfil?.avatar_url) {
+            const av = document.querySelector(".user-avatar");
+            if (av) av.innerHTML = `<img src="${perfil.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+          }
+          if (perfil?.username) {
+            localStorage.setItem("sunadventures_username", perfil.username);
+            const ue = $("user-email"); if (ue) ue.textContent = perfil.username;
+            const udn = $("user-dropdown-name"); if (udn) udn.textContent = perfil.username;
+          }
         } catch {}
-        if (logueado) {
-  // ✅ FIX: guardar uid SIEMPRE
-  localStorage.setItem("sunadventures_uid", session.user.id);
-  window._sunUserId = session.user.id;
-  // ✅ FIX: notificar a todos los módulos
-  window.dispatchEvent(new Event("sunadventures:user-ready"));
-}
+        localStorage.setItem("sunadventures_uid", session.user.id);
+        window._sunUserId = session.user.id;
+        window.dispatchEvent(new Event("sunadventures:user-ready"));
         registrarVisita();
         await Promise.all([cargarFotos(), cargarNotas(), cargarPlaylists(), cargarEventos()]);
         await Promise.all([render(), Promise.resolve(renderNotas()), Promise.resolve(renderPlaylists()), Promise.resolve(renderCalendario()), Promise.resolve(renderLogros())]);
@@ -1779,10 +2220,14 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
     } catch (err) { console.error("updateAuthUI:", err); }
     finally { ocultarLoading(); }
   }
-  supabase.auth.onAuthStateChange((_e, session) => { colaSesion = colaSesion.then(() => updateAuthUI(session)).catch(err => console.error(err)); });
+  supabase.auth.onAuthStateChange((_e, session) => {
+    colaSesion = colaSesion.then(() => updateAuthUI(session)).catch(err => console.error(err));
+  });
   setTimeout(async () => {
-    try { const { data:{ session } } = await supabase.auth.getSession(); colaSesion = colaSesion.then(() => updateAuthUI(session)).catch(err => console.error(err)); }
-    catch (err) { console.error("getSession:", err); ocultarLoading(); }
+    try {
+      const { data:{ session } } = await supabase.auth.getSession();
+      colaSesion = colaSesion.then(() => updateAuthUI(session)).catch(err => console.error(err));
+    } catch (err) { console.error("getSession:", err); ocultarLoading(); }
   }, 100);
 
   function abrirAuthModal() {
@@ -1816,7 +2261,16 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
   }
   const mostrarError = msg => { if (authError) { authError.textContent = msg; authError.style.display = "block"; } };
   const ocultarError = () => { if (authError) { authError.style.display = "none"; authError.textContent = ""; } };
-  const traducirError = msg => { if (!msg) return "Algo salió mal."; if (msg.includes("Invalid login credentials")) return "Usuario o contraseña incorrectos."; if (msg.includes("Email not confirmed")) return "Debes confirmar tu cuenta antes de entrar."; if (msg.includes("User already registered")) return "Ya existe una cuenta con ese usuario."; if (msg.includes("Password should be")) return "La contraseña debe tener al menos 6 caracteres."; if (msg.includes("Unable to validate email")) return "El usuario no es válido."; if (msg.includes("rate limit")) return "Demasiados intentos. Espera un momento."; return msg; };
+  const traducirError = msg => {
+    if (!msg) return "Algo salió mal.";
+    if (msg.includes("Invalid login credentials")) return "Usuario o contraseña incorrectos.";
+    if (msg.includes("Email not confirmed")) return "Debes confirmar tu cuenta antes de entrar.";
+    if (msg.includes("User already registered")) return "Ya existe una cuenta con ese usuario.";
+    if (msg.includes("Password should be")) return "La contraseña debe tener al menos 6 caracteres.";
+    if (msg.includes("Unable to validate email")) return "El usuario no es válido.";
+    if (msg.includes("rate limit")) return "Demasiados intentos. Espera un momento.";
+    return msg;
+  };
 
   btnOpenLogin?.addEventListener("click", abrirAuthModal);
   authModal?.querySelectorAll("[data-close-auth]").forEach(el => el.addEventListener("click", cerrarAuthModal));
@@ -1831,14 +2285,22 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       if (!usuario || !password) return mostrarError("Rellena todos los campos.");
       if (!/^[a-z0-9_-]{3,20}$/.test(usuario)) return mostrarError("El usuario debe tener 3-20 caracteres (letras, números, _ o -).");
       const email = `${usuario}@foursunflowers.local`;
-      if (modoRegistro) { if (password.length < 6) return mostrarError("La contraseña debe tener al menos 6 caracteres."); if (password !== authPasswordConfirm?.value) return mostrarError("Las contraseñas no coinciden."); }
+      if (modoRegistro) {
+        if (password.length < 6) return mostrarError("La contraseña debe tener al menos 6 caracteres.");
+        if (password !== authPasswordConfirm?.value) return mostrarError("Las contraseñas no coinciden.");
+      }
       if (authSubmit) { authSubmit.disabled = true; authSubmit.textContent = modoRegistro ? "Creando cuenta..." : "Entrando..."; }
       mostrarLoading(modoRegistro ? "Creando tu cuenta..." : "Entrando...");
       try {
         if (modoRegistro) {
           const { data, error } = await supabase.auth.signUp({ email, password });
           if (error) throw error;
-          if (data.user && !data.session) { ocultarLoading(); mostrarError("Cuenta creada. Revisa tu correo para confirmarla."); if (authSubmit) { authSubmit.disabled = false; authSubmit.textContent = "Crear cuenta"; } return; }
+          if (data.user && !data.session) {
+            ocultarLoading();
+            mostrarError("Cuenta creada. Revisa tu correo para confirmarla.");
+            if (authSubmit) { authSubmit.disabled = false; authSubmit.textContent = "Crear cuenta"; }
+            return;
+          }
         } else {
           const { error } = await supabase.auth.signInWithPassword({ email, password });
           if (error) throw error;
@@ -1846,16 +2308,33 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
         const recordar = $("auth-recordar");
         if (recordar?.checked) localStorage.setItem("sunadventures_usuario_recordado", usuario);
         else localStorage.removeItem("sunadventures_usuario_recordado");
-      } catch (err) { ocultarLoading(); mostrarError(traducirError(err.message)); if (authSubmit) { authSubmit.disabled = false; authSubmit.textContent = modoRegistro ? "Crear cuenta" : "Entrar"; } }
+      } catch (err) {
+        ocultarLoading();
+        mostrarError(traducirError(err.message));
+        if (authSubmit) { authSubmit.disabled = false; authSubmit.textContent = modoRegistro ? "Crear cuenta" : "Entrar"; }
+      }
     } catch (err) { console.warn("auth submit:", err); }
   });
 
-  logoutBtn?.addEventListener("click", async () => { try { mostrarLoading("Saliendo..."); await supabase.auth.signOut(); } catch (err) { console.warn("logout:", err); ocultarLoading(); } });
+  logoutBtn?.addEventListener("click", async () => {
+    try { mostrarLoading("Saliendo..."); await supabase.auth.signOut(); } catch (err) { console.warn("logout:", err); ocultarLoading(); }
+  });
 
-  const abrirMenuPerfil = () => { if (!userDropdown || !userMenuToggle) return; userDropdown.classList.add("open"); userDropdown.setAttribute("aria-hidden","false"); userMenuToggle.setAttribute("aria-expanded","true"); userInfo?.classList.add("open"); };
-  const cerrarMenuPerfil = () => { if (!userDropdown || !userMenuToggle) return; userDropdown.classList.remove("open"); userDropdown.setAttribute("aria-hidden","true"); userMenuToggle.setAttribute("aria-expanded","false"); userInfo?.classList.remove("open"); };
+  const abrirMenuPerfil = () => {
+    if (!userDropdown || !userMenuToggle) return;
+    userDropdown.classList.add("open"); userDropdown.setAttribute("aria-hidden","false");
+    userMenuToggle.setAttribute("aria-expanded","true"); userInfo?.classList.add("open");
+  };
+  const cerrarMenuPerfil = () => {
+    if (!userDropdown || !userMenuToggle) return;
+    userDropdown.classList.remove("open"); userDropdown.setAttribute("aria-hidden","true");
+    userMenuToggle.setAttribute("aria-expanded","false"); userInfo?.classList.remove("open");
+  };
   userMenuToggle?.addEventListener("click", e => { e.stopPropagation(); userDropdown?.classList.contains("open") ? cerrarMenuPerfil() : abrirMenuPerfil(); });
-  document.addEventListener("click", e => { if (!userDropdown?.classList.contains("open")) return; if (userInfo && !userInfo.contains(e.target)) cerrarMenuPerfil(); });
+  document.addEventListener("click", e => {
+    if (!userDropdown?.classList.contains("open")) return;
+    if (userInfo && !userInfo.contains(e.target)) cerrarMenuPerfil();
+  });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && userDropdown?.classList.contains("open")) cerrarMenuPerfil(); });
 
   userDropdown?.querySelectorAll("[data-action]").forEach(item => {
@@ -1867,17 +2346,20 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       else if (a === "offline") {
         const uso = await window.SunOffline.estadoUso();
         const msg = (uso.imagenes || uso.canciones)
-          ? `Ya tienes descargado:\n📸 ${uso.imagenes} imágenes\n🎵 ${uso.canciones} canciones\n💾 ${uso.tamanoMB} MB\n\n¿Descargar de nuevo todo lo nuevo?`
+          ? `Ya tienes descargado:<br>📸 ${uso.imagenes} imágenes<br>🎵 ${uso.canciones} canciones<br>💾 ${uso.tamanoMB} MB<br><br>¿Descargar de nuevo todo lo nuevo?`
           : "¿Descargar todas las imágenes y canciones para uso sin conexión?";
-        const ok = await confirmar({ title:"Descargar contenido", message:msg.replace(/\n/g,"<br>"), variant:"success", icon:"📥", confirmText:"Descargar", cancelText:"Cancelar" });
+        const ok = await confirmar({ title:"Descargar contenido", message:msg, variant:"success", icon:"📥", confirmText:"Descargar", cancelText:"Cancelar" });
         if (ok) await window.SunOffline.descargarTodo();
       }
       cerrarMenuPerfil();
     });
   });
 
-  const VISTAS = ["inicio","album","mapa","chat","logros","notas","playlists","calendario","mascotas","finanzas", ...(window._extraVistas || [])];
-  const rutaDesdeHash = () => { const h = (location.hash || "").replace(/^#/, "").trim(); return VISTAS.includes(h) ? h : "inicio"; };
+const VISTAS = () => ["inicio","album","mapa","chat","logros","notas","playlists","calendario","mascotas","finanzas", ...(window._extraVistas || [])];
+  const rutaDesdeHash = () => {
+    const h = (location.hash || "").replace(/^#/, "").trim();
+    return VISTAS.includes(h) ? h : "inicio";
+  };
 
   function mostrarVista(nombre) {
     try {
@@ -1894,7 +2376,7 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
     } catch (err) { console.warn("mostrarVista:", err); }
   }
 
-  /* ---------- PEGAR IMAGEN EN MODAL FOTO ---------- */
+  /* ---------- Pegar imagen en el modal de foto ---------- */
   function notifPegado() {
     let el = $("foto-pegada-toast");
     if (!el) {
@@ -1937,6 +2419,6 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
       mostrarVistaPreviaFoto(f); actualizarVistaPreviaFotoInfo(); notifPegado();
     });
   }
- 
-  console.log("✅ album.js v2 cargado (modales custom + optimizado)");
+
+  console.log("✅ album.js v4 cargado — player local + playlists legales");
 });

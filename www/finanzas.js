@@ -239,7 +239,7 @@
   }
 
   function quoteHistoryKey(currency) {
-    return `sunadventures_fx_history_${currency}`;
+    return `sunadventures_fx_history_v2_${currency}`;
   }
 
   function loadQuoteHistory(currency) {
@@ -255,7 +255,7 @@
   function saveQuoteSample(quotes) {
     const now = Date.now();
     const history = loadQuoteHistory(quotes.currency).filter(row => row.t > now - 24 * 60 * 60 * 1000);
-    const sample = { t:now, usd:quotes.usd.value, usdt:quotes.usdt?.value ?? null };
+    const sample = { t:now, usd:quotes.usd.value, usdt:quotes.usdt?.localPerUsdt ?? null };
     if (history.length && now - history[history.length - 1].t < 60_000) history[history.length - 1] = sample;
     else history.push(sample);
     try {
@@ -303,8 +303,8 @@
       : `${escapeHtml(quotes.usd.source)} · ${escapeHtml(quotes.usd.asOf)}`;
     const rows = [`<article class="finanzas-quote-value"><span>${code === "VES" ? copy.usdLabel : `${code} / USD`}</span><strong>${usdTitle}</strong><small>${usdDetail}${usdTrend ? ` · ${usdTrend}` : ""}</small></article>`];
     if (quotes.usdt) {
-      const usdtTrend = trend(quotes.usdt.value, previous?.usdt);
-      rows.push(`<article class="finanzas-quote-value"><span>${copy.usdtLabel}</span><strong>${quoteText(copy.usdtPerLocal, { rate:quoteNumber(quotes.usdt.value) })}</strong><small>${quoteText(copy.vesPerUsdt, { rate:quoteNumber(quotes.usdt.localPerUsdt, 4) })} · ${escapeHtml(quotes.usdt.source)} · ${copy.buy} ${quoteNumber(quotes.usdt.buyLocalPerUsdt, 2)} / ${copy.sell} ${quoteNumber(quotes.usdt.sellLocalPerUsdt, 2)}${usdtTrend ? ` · ${usdtTrend}` : ""}</small></article>`);
+      const usdtTrend = trend(quotes.usdt.localPerUsdt, previous?.usdt);
+      rows.push(`<article class="finanzas-quote-value"><span>${copy.usdtLabel}</span><strong>${quoteText(copy.usdtPerLocal, { rate:quoteNumber(quotes.usdt.localPerUsdt, 2) })}</strong><small>${quoteText(copy.vesPerUsdt, { rate:quoteNumber(quotes.usdt.value, 6) })} · ${escapeHtml(quotes.usdt.source)} · ${copy.buy} ${quoteNumber(quotes.usdt.buyLocalPerUsdt, 2)} / ${copy.sell} ${quoteNumber(quotes.usdt.sellLocalPerUsdt, 2)}${usdtTrend ? ` · ${usdtTrend}` : ""}</small></article>`);
     }
     ui.quoteValues.innerHTML = rows.join("");
     ui.quoteChart.innerHTML = sparkline(history, code) || `<span class="finanzas-quote-chart-empty">El gráfico se formará con las próximas cotizaciones.</span>`;

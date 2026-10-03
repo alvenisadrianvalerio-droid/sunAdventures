@@ -154,6 +154,142 @@
     "Nuestras playlists":["Our playlists","Nossas playlists","我们的播放列表","私たちのプレイリスト","우리의 재생 목록","Le nostre playlist","Nos playlists"],
     "Las canciones que nos suenan a nosotros":["Songs that sound like us","As músicas que têm a nossa cara","属于我们的旋律","私たちらしい曲","우리다운 노래","Le canzoni che ci rappresentano","Les chansons qui nous ressemblent"],
     "Añadir playlist":["Add playlist","Adicionar playlist","添加播放列表","プレイリストを追加","재생 목록 추가","Aggiungi playlist","Ajouter une playlist"],
+    "Nuestras Playlists":["Our playlists","Nossas playlists","我们的播放列表","私たちのプレイリスト","우리의 재생 목록","Le nostre playlist","Nos playlists"],
+    "Nueva playlist":["New playlist","Nova playlist","新播放列表","新しいプレイリスト","새 재생 목록","Nuova playlist","Nouvelle playlist"],
+    "Descripción (opcional)":["Description (optional)","Descrição (opcional)","描述（可选）","説明（任意）","설명 (선택 사항)","Descrizione (facoltativa)","Description (facultative)"],
+    "Guardar playlist":["Save playlist","Salvar playlist","保存播放列表","プレイリストを保存","재생 목록 저장","Salva playlist","Enregistrer la playlist"],
+    "Canciones":["Songs","Músicas","歌曲","曲","노래","Canzoni","Chansons"],
+    "Una a una":["One at a time","Uma por vez","逐首添加","1曲ずつ","하나씩","Una alla volta","Une par une"],
+    "Pegar varias":["Paste multiple","Colar várias","批量粘贴","複数貼り付け","여러 곡 붙여넣기","Incolla più brani","Coller plusieurs titres"],
+    "Subir archivos":["Upload files","Enviar arquivos","上传文件","ファイルをアップロード","파일 업로드","Carica file","Importer des fichiers"],
+    "+ Añadir canción":["+ Add song","+ Adicionar música","+ 添加歌曲","+ 曲を追加","+ 노래 추가","+ Aggiungi brano","+ Ajouter une chanson"],
+    "Pega tu lista o carga un archivo (.txt, .csv, .m3u):":["Paste your list or upload a file (.txt, .csv, .m3u):","Cole sua lista ou carregue um arquivo (.txt, .csv, .m3u):","粘贴列表或上传文件（.txt、.csv、.m3u）：","リストを貼り付けるかファイル（.txt、.csv、.m3u）をアップロード：","목록을 붙여넣거나 파일(.txt, .csv, .m3u)을 업로드하세요:","Incolla la lista o carica un file (.txt, .csv, .m3u):","Collez votre liste ou importez un fichier (.txt, .csv, .m3u) :"],
+    "Canción - Artista Artista - Canción 1. Canción - Artista":["Song - Artist Artist - Song 1. Song - Artist","Música - Artista Artista - Música 1. Música - Artista","歌曲 - 艺术家 艺术家 - 歌曲 1. 歌曲 - 艺术家","曲 - アーティスト アーティスト - 曲 1. 曲 - アーティスト","노래 - 아티스트 아티스트 - 노래 1. 노래 - 아티스트","Brano - Artista Artista - Brano 1. Brano - Artista","Chanson - Artiste Artiste - Chanson 1. Chanson - Artiste"],
+    "Orden:":["Order:","Ordem:","顺序：","順序：","순서:","Ordine:","Ordre :"],
+    "Título - Artista":["Title - Artist","Título - Artista","歌曲 - 艺术家","曲 - アーティスト","제목 - 아티스트","Titolo - Artista","Titre - Artiste"],
+    "Artista - Título":["Artist - Title","Artista - Título","艺术家 - 歌曲","アーティスト - 曲","아티스트 - 제목","Artista - Titolo","Artiste - Titre"],
+    "Importar todas":["Import all","Importar todas","全部导入","すべてインポート","모두 가져오기","Importa tutto","Tout importer"],
+    "Sube tus canciones (MP3, MP4, M4A, WAV, OGG, FLAC...).":["Upload your songs (MP3, MP4, M4A, WAV, OGG, FLAC...).","Envie suas músicas (MP3, MP4, M4A, WAV, OGG, FLAC...).","上传歌曲（MP3、MP4、M4A、WAV、OGG、FLAC 等）。","曲をアップロード（MP3、MP4、M4A、WAV、OGG、FLAC など）。","노래 업로드 (MP3, MP4, M4A, WAV, OGG, FLAC...).","Carica i brani (MP3, MP4, M4A, WAV, OGG, FLAC...).","Importez vos chansons (MP3, MP4, M4A, WAV, OGG, FLAC...)."],
+    "Arrastra aquí tus archivos":["Drop your files here","Arraste seus arquivos aqui","将文件拖到这里","ここにファイルをドラッグ","파일을 여기에 끌어다 놓으세요","Trascina qui i file","Déposez vos fichiers ici"],
+    "Subir todas":["Upload all","Enviar todos","全部上传","すべてアップロード","모두 업로드","Carica tutto","Tout importer"],
+    "Aún no hay fotos. Sube la primera.":["No photos yet. Upload the first one.","Ainda não há fotos. Envie a primeira.","还没有照片。上传第一张吧。","写真はまだありません。最初の1枚を追加しましょう。","아직 사진이 없어요. 첫 사진을 올려보세요.","Ancora nessuna foto. Carica la prima.","Pas encore de photos. Ajoutez la première."],
+    "Metas":["Goals","Metas","目标","目標","목표","Obiettivi","Objectifs"],
+    "Novatos":["Beginners","Iniciantes","新手","初心者","초보자","Principianti","Débutants"],
+    "100 XP para Enamorados.":["100 XP to become Sweethearts.","100 XP para se tornarem Apaixonados.","再获得 100 XP 成为恋人。","恋人になるまであと100 XP。","연인이 되려면 XP 100이 더 필요해요.","100 XP per diventare Innamorati.","100 XP pour devenir Amoureux."],
+    "EUR · Euro":["EUR · Euro","EUR · Euro","EUR · 欧元","EUR · ユーロ","EUR · 유로","EUR · Euro","EUR · Euro"],
+    "USD · Dólar":["USD · US dollar","USD · Dólar","USD · 美元","USD · 米ドル","USD · 미국 달러","USD · Dollaro","USD · Dollar"],
+    "MXN · Peso mexicano":["MXN · Mexican peso","MXN · Peso mexicano","MXN · 墨西哥比索","MXN · メキシコペソ","MXN · 멕시코 페소","MXN · Peso messicano","MXN · Peso mexicain"],
+    "ARS · Peso argentino":["ARS · Argentine peso","ARS · Peso argentino","ARS · 阿根廷比索","ARS · アルゼンチンペソ","ARS · 아르헨티나 페소","ARS · Peso argentino","ARS · Peso argentin"],
+    "COP · Peso colombiano":["COP · Colombian peso","COP · Peso colombiano","COP · 哥伦比亚比索","COP · コロンビアペソ","COP · 콜롬비아 페소","COP · Peso colombiano","COP · Peso colombien"],
+    "CLP · Peso chileno":["CLP · Chilean peso","CLP · Peso chileno","CLP · 智利比索","CLP · チリペソ","CLP · 칠레 페소","CLP · Peso cileno","CLP · Peso chilien"],
+    "PEN · Sol":["PEN · Sol","PEN · Sol","PEN · 索尔","PEN · ソル","PEN · 솔","PEN · Sol","PEN · Sol"],
+    "VES · Bolívar venezolano":["VES · Venezuelan bolívar","VES · Bolívar venezuelano","VES · 委内瑞拉玻利瓦尔","VES · ベネズエラ・ボリバル","VES · 베네수엘라 볼리바르","VES · Bolívar venezuelano","VES · Bolívar vénézuélien"],
+    "Las canciones de nosotros":["Our songs","As nossas músicas","我们的歌曲","私たちの曲","우리의 노래","Le nostre canzoni","Nos chansons"],
+    "Nuestras mascotas":["Our pets","Nossos mascotes","我们的宠物","私たちのペット","우리의 반려동물","I nostri animali","Nos animaux"],
+    "Las compañeras de nuestra historia":["The companions in our story","As companheiras da nossa história","陪伴我们故事的伙伴","私たちの物語の仲間たち","우리 이야기의 동반자","Le compagne della nostra storia","Les compagnes de notre histoire"],
+    "Descargar la App":["Download the app","Baixar o app","下载应用","アプリをダウンロード","앱 다운로드","Scarica l'app","Télécharger l’application"],
+    "Android, iOS o escritorio":["Android, iOS, or desktop","Android, iOS ou computador","Android、iOS 或桌面端","Android、iOS、またはデスクトップ","Android, iOS 또는 데스크톱","Android, iOS o desktop","Android, iOS ou ordinateur"],
+    "Te amo.":["I love you.","Eu te amo.","我爱你。","愛してる。","사랑해.","Ti amo.","Je t’aime."],
+    "Habla con tu grupo o en privado":["Chat with your group or privately","Converse com seu grupo ou em privado","与群组聊天或私聊","グループまたは個別にチャット","그룹 또는 개인 채팅","Chatta con il gruppo o in privato","Discutez avec le groupe ou en privé"],
+    "Grupo":["Group","Grupo","群组","グループ","그룹","Gruppo","Groupe"],
+    "Privado":["Private","Privado","私聊","プライベート","비공개","Privato","Privé"],
+    "Hablar con:":["Chat with:","Conversar com:","聊天对象：","チャット相手：","대화 상대:","Parla con:","Discuter avec :"],
+    "Conectando...":["Connecting...","Conectando...","正在连接…","接続中…","연결 중...","Connessione...","Connexion..."],
+    "Activar notificaciones":["Enable notifications","Ativar notificações","开启通知","通知を有効にする","알림 켜기","Attiva notifiche","Activer les notifications"],
+    "Mapa de aventuras":["Adventure map","Mapa de aventuras","冒险地图","冒険マップ","모험 지도","Mappa delle avventure","Carte des aventures"],
+    "Todos los lugares donde hemos estado":["Everywhere we've been","Todos os lugares onde estivemos","我们去过的所有地方","訪れたすべての場所","우리가 다녀온 모든 장소","Tutti i luoghi che abbiamo visitato","Tous les endroits où nous sommes allés"],
+    "Añade una foto con ubicación para verla aquí.":["Add a photo with a location to see it here.","Adicione uma foto com localização para vê-la aqui.","添加带位置的照片即可在此查看。","位置情報付きの写真を追加すると、ここに表示されます。","위치가 포함된 사진을 추가하면 여기에 표시됩니다.","Aggiungi una foto con posizione per vederla qui.","Ajoutez une photo géolocalisée pour la voir ici."],
+    "Cada pequeño recuerdo cuenta":["Every little memory matters","Cada pequena lembrança importa","每一段小回忆都很珍贵","小さな思い出も大切","작은 추억도 소중해요","Ogni piccolo ricordo conta","Chaque petit souvenir compte"],
+    "logros personales desbloqueados":["personal achievements unlocked","conquistas pessoais desbloqueadas","项个人成就已解锁","個人の実績を解除","개의 개인 업적 달성","obiettivi personali sbloccati","succès personnels débloqués"],
+    "Logros de mi cuenta":["My achievements","Conquistas da minha conta","我的成就","自分の実績","내 업적","I miei obiettivi","Mes succès"],
+    "Logros del grupo":["Group achievements","Conquistas do grupo","群组成就","グループの実績","그룹 업적","Obiettivi del gruppo","Succès du groupe"],
+    "Nuestro álbum":["Our album","Nosso álbum","我们的相册","私たちのアルバム","우리의 앨범","Il nostro album","Notre album"],
+    "Cada foto guarda un momento que no queremos olvidar.":["Every photo holds a moment we don't want to forget.","Cada foto guarda um momento que não queremos esquecer.","每张照片都珍藏着我们不想忘记的时刻。","どの写真にも忘れたくない瞬間が残っています。","사진마다 잊고 싶지 않은 순간이 담겨 있어요.","Ogni foto conserva un momento che non vogliamo dimenticare.","Chaque photo garde un moment que nous ne voulons pas oublier."],
+    "Añadir un recuerdo":["Add a memory","Adicionar uma lembrança","添加回忆","思い出を追加","추억 추가","Aggiungi un ricordo","Ajouter un souvenir"],
+    "Añadir notita":["Add a note","Adicionar bilhetinho","添加便笺","メモを追加","메모 추가","Aggiungi un biglietto","Ajouter un petit mot"],
+    "Aquí empieza nuestra historia.":["Our story starts here.","Nossa história começa aqui.","我们的故事从这里开始。","ここから私たちの物語が始まります。","우리의 이야기가 여기서 시작돼요.","La nostra storia inizia qui.","Notre histoire commence ici."],
+    "Aún no hay notitas.":["No notes yet.","Ainda não há bilhetinhos.","还没有便笺。","メモはまだありません。","아직 메모가 없어요.","Ancora nessun biglietto.","Pas encore de petits mots."],
+    "Escribe la primera.":["Write the first one.","Escreva o primeiro.","写下第一条吧。","最初のメモを書いてみましょう。","첫 메모를 작성해 보세요.","Scrivi il primo.","Écrivez le premier."],
+    "0 de 2 minijuegos distintos":["0 of 2 different mini-games","0 de 2 minijogos diferentes","已玩 0/2 种不同小游戏","異なるミニゲーム 0/2","서로 다른 미니게임 0/2","0 di 2 minigiochi diversi","0 sur 2 mini-jeux différents"],
+    "Aún no has desbloqueado ninguna mascota.":["You haven't unlocked any pets yet.","Você ainda não desbloqueou nenhum mascote.","你还没有解锁任何宠物。","まだペットを解放していません。","아직 잠금 해제한 반려동물이 없어요.","Non hai ancora sbloccato animali.","Vous n’avez encore débloqué aucun animal."],
+    "Nueva notita":["New note","Novo bilhetinho","新便笺","新しいメモ","새 메모","Nuovo biglietto","Nouveau petit mot"],
+    "Título (opcional)":["Title (optional)","Título (opcional)","标题（可选）","タイトル（任意）","제목 (선택 사항)","Titolo (facoltativo)","Titre (facultatif)"],
+    "Notita":["Note","Bilhetinho","便笺","メモ","메모","Biglietto","Petit mot"],
+    "Color":["Color","Cor","颜色","色","색상","Colore","Couleur"],
+    "Vista previa":["Preview","Pré-visualização","预览","プレビュー","미리보기","Anteprima","Aperçu"],
+    "Mejor luego":["Maybe later","Talvez depois","以后再说","後で","나중에","Magari dopo","Plus tard"],
+    "Guardar notita":["Save note","Salvar bilhetinho","保存便笺","メモを保存","메모 저장","Salva biglietto","Enregistrer le petit mot"],
+    "Miembros":["Members","Membros","成员","メンバー","구성원","Membri","Membres"],
+    "Invitaciones recibidas":["Received invitations","Convites recebidos","收到的邀请","受け取った招待","받은 초대","Inviti ricevuti","Invitations reçues"],
+    "Repite la contraseña":["Confirm password","Repita a senha","再次输入密码","パスワードを再入力","비밀번호 확인","Ripeti la password","Répétez le mot de passe"],
+    "Recordar mi usuario":["Remember my username","Lembrar meu usuário","记住用户名","ユーザー名を記憶","아이디 기억하기","Ricorda il mio nome utente","Se souvenir de mon identifiant"],
+    "¿Olvidaste tu contraseña?":["Forgot your password?","Esqueceu sua senha?","忘记密码？","パスワードをお忘れですか？","비밀번호를 잊으셨나요?","Hai dimenticato la password?","Mot de passe oublié ?"],
+    "¿Aún no tienes cuenta?":["Don't have an account yet?","Ainda não tem uma conta?","还没有账号？","まだアカウントをお持ちでないですか？","아직 계정이 없으신가요?","Non hai ancora un account?","Vous n’avez pas encore de compte ?"],
+    "Nuevo recuerdo":["New memory","Nova lembrança","新回忆","新しい思い出","새 추억","Nuovo ricordo","Nouveau souvenir"],
+    "La foto":["The photo","A foto","照片","写真","사진","La foto","La photo"],
+    "¿Cuándo fue?":["When was it?","Quando foi?","是什么时候？","いつのこと？","언제였나요?","Quando è successo?","Quand était-ce ?"],
+    "¿Qué quieres recordar?":["What do you want to remember?","O que você quer lembrar?","你想记住什么？","何を覚えておきたいですか？","무엇을 기억하고 싶나요?","Cosa vuoi ricordare?","De quoi voulez-vous vous souvenir ?"],
+    "Ubicación (opcional)":["Location (optional)","Localização (opcional)","位置（可选）","場所（任意）","위치 (선택 사항)","Posizione (facoltativa)","Lieu (facultatif)"],
+    "Usar mi ubicación":["Use my location","Usar minha localização","使用我的位置","現在地を使う","내 위치 사용","Usa la mia posizione","Utiliser ma position"],
+    "No se guardará hasta que tú lo elijas.":["It won't be saved until you choose to.","Nada será salvo até você escolher.","只有你选择后才会保存。","選択するまで保存されません。","선택하기 전에는 저장되지 않아요.","Non verrà salvato finché non lo scegli.","Rien ne sera enregistré avant votre choix."],
+    "Guardar recuerdo":["Save memory","Salvar lembrança","保存回忆","思い出を保存","추억 저장","Salva ricordo","Enregistrer le souvenir"],
+    "Icono":["Icon","Ícone","图标","アイコン","아이콘","Icona","Icône"],
+    "Nombre":["Name","Nome","名称","名前","이름","Nome","Nom"],
+    "Nombre de usuario":["Username","Nome de usuário","用户名","ユーザー名","사용자 이름","Nome utente","Nom d’utilisateur"],
+    "Notas":["Notes","Notas","便笺","メモ","메모","Note","Notes"],
+    "Memoria":["Memory","Memória","记忆","記憶","기억","Memoria","Mémoire"],
+    "Estado":["Status","Status","状态","状態","상태","Stato","État"],
+    "Inventario":["Inventory","Inventário","背包","インベントリ","인벤토리","Inventario","Inventaire"],
+    "Cuidado":["Care","Cuidado","照顾","お世話","돌보기","Cura","Soins"],
+    "Más":["More","Mais","更多","もっと","더 보기","Altro","Plus"],
+    "Hambre":["Hunger","Fome","饥饿","空腹","배고픔","Fame","Faim"],
+    "Felicidad":["Happiness","Felicidade","快乐","幸福度","행복","Felicità","Bonheur"],
+    "Energía":["Energy","Energia","能量","エネルギー","에너지","Energia","Énergie"],
+    "Arrastra a la mascota":["Drag the pet","Arraste o mascote","拖动宠物","ペットをドラッグ","반려동물을 드래그하세요","Trascina l'animale","Faites glisser l’animal"],
+    "Mimos":["Cuddles","Carinho","抚摸","なでる","쓰다듬기","Coccole","Câlins"],
+    "Dormir":["Sleep","Dormir","睡觉","寝る","잠자기","Dormire","Dormir"],
+    "Jugar — Atrapa el girasol":["Play — Catch the sunflower","Jogar — Pegue o girassol","玩耍 — 接住向日葵","遊ぶ — ひまわりキャッチ","놀기 — 해바라기 잡기","Gioca — Acchiappa il girasole","Jouer — Attrape le tournesol"],
+    "Amistades":["Friends","Amizades","好友","友達","친구","Amicizie","Amis"],
+    "Cambiar mascota:":["Change pet:","Trocar mascote:","更换宠物：","ペットを変更：","반려동물 변경:","Cambia animale:","Changer d’animal :"],
+    "Cada girasol guarda un pedacito de nosotros":["Every sunflower holds a little piece of us","Cada girassol guarda um pedacinho de nós","每朵向日葵都珍藏着我们的一部分","どのひまわりにも私たちのかけらが残っています","해바라기마다 우리의 조각이 담겨 있어요","Ogni girasole custodisce un pezzetto di noi","Chaque tournesol garde un petit morceau de nous"],
+    "Recuperar contraseña":["Reset password","Recuperar senha","重置密码","パスワードを再設定","비밀번호 재설정","Recupera password","Réinitialiser le mot de passe"],
+    "Escribe tu nombre de usuario y te generaremos un código.":["Enter your username and we'll generate a code.","Digite seu nome de usuário e geraremos um código.","输入用户名，我们会生成一个验证码。","ユーザー名を入力するとコードを発行します。","사용자 이름을 입력하면 코드를 발급해 드립니다.","Inserisci il nome utente e genereremo un codice.","Saisissez votre nom d’utilisateur pour générer un code."],
+    "Generar código":["Generate code","Gerar código","生成验证码","コードを生成","코드 생성","Genera codice","Générer un code"],
+    "Introduce el código":["Enter the code","Digite o código","输入验证码","コードを入力","코드 입력","Inserisci il codice","Saisir le code"],
+    "Escribe el código de 6 dígitos que te hemos mostrado.":["Enter the 6-digit code we showed you.","Digite o código de 6 dígitos que mostramos.","输入我们显示的 6 位验证码。","表示された6桁のコードを入力してください。","표시된 6자리 코드를 입력하세요.","Inserisci il codice di 6 cifre che ti abbiamo mostrato.","Saisissez le code à 6 chiffres affiché."],
+    "Código":["Code","Código","验证码","コード","코드","Codice","Code"],
+    "Continuar":["Continue","Continuar","继续","続行","계속","Continua","Continuer"],
+    "Nueva contraseña":["New password","Nova senha","新密码","新しいパスワード","새 비밀번호","Nuova password","Nouveau mot de passe"],
+    "Elige una contraseña segura (mínimo 6 caracteres).":["Choose a secure password (at least 6 characters).","Escolha uma senha segura (mínimo de 6 caracteres).","设置安全密码（至少 6 个字符）。","安全なパスワードを設定してください（6文字以上）。","안전한 비밀번호를 설정하세요 (6자 이상).","Scegli una password sicura (almeno 6 caratteri).","Choisissez un mot de passe sécurisé (6 caractères minimum)."],
+    "Cambiar contraseña":["Change password","Alterar senha","更改密码","パスワードを変更","비밀번호 변경","Cambia password","Changer le mot de passe"],
+    "Tu contraseña se ha actualizado. Ya puedes iniciar sesión.":["Your password has been updated. You can now sign in.","Sua senha foi atualizada. Agora você pode entrar.","密码已更新，现在可以登录。","パスワードを更新しました。ログインできます。","비밀번호가 업데이트되었습니다. 이제 로그인할 수 있어요.","La password è stata aggiornata. Ora puoi accedere.","Votre mot de passe a été mis à jour. Vous pouvez vous connecter."],
+    "Entendido":["Got it","Entendi","知道了","了解","확인","Capito","Compris"],
+    "Un titulito...":["A little title...","Um tituzinho...","起个小标题…","ちょっとしたタイトル…","짧은 제목...","Un titolino...","Un petit titre..."],
+    "Buscar por nombre":["Search by name","Buscar por nome","按名称搜索","名前で検索","이름으로 검색","Cerca per nome","Rechercher par nom"],
+    "tu usuario":["your username","seu usuário","你的用户名","ユーザー名","사용자 이름","il tuo nome utente","votre nom d’utilisateur"],
+    "Mínimo 6 caracteres":["At least 6 characters","Mínimo de 6 caracteres","至少 6 个字符","6文字以上","6자 이상","Almeno 6 caratteri","6 caractères minimum"],
+    "Repite tu contraseña":["Confirm your password","Repita sua senha","再次输入密码","パスワードを再入力","비밀번호를 다시 입력하세요","Ripeti la password","Répétez votre mot de passe"],
+    "Cuéntame algo bonito...":["Tell me something lovely...","Me conte algo bonito...","告诉我一些美好的事…","素敵なことを聞かせて…","좋은 이야기를 들려주세요...","Raccontami qualcosa di bello...","Racontez-moi quelque chose de joli..."],
+    "Nuestra playlist...":["Our playlist...","Nossa playlist...","我们的播放列表…","私たちのプレイリスト…","우리의 재생 목록...","La nostra playlist...","Notre playlist..."],
+    "Para cuando...":["For when...","Para quando...","适合在……时听","こんな時に…","이럴 때 듣기...","Per quando...","Pour quand..."],
+    "Artista (opcional)":["Artist (optional)","Artista (opcional)","艺术家（可选）","アーティスト（任意）","아티스트 (선택 사항)","Artista (facoltativo)","Artiste (facultatif)"],
+    "Link (Spotify / YouTube) — opcional":["Link (Spotify / YouTube) — optional","Link (Spotify / YouTube) — opcional","链接（Spotify / YouTube）— 可选","リンク（Spotify / YouTube）— 任意","링크 (Spotify / YouTube) — 선택 사항","Link (Spotify / YouTube) — facoltativo","Lien (Spotify / YouTube) — facultatif"],
+    "Pega aquí tus canciones...":["Paste your songs here...","Cole suas músicas aqui...","在这里粘贴歌曲…","ここに曲を貼り付けてください…","여기에 노래를 붙여넣으세요...","Incolla qui le tue canzoni...","Collez vos chansons ici..."],
+    "tu_nombre":["your_name","seu_nome","你的名字","あなたの名前","사용자 이름","il_tuo_nome","votre_nom"],
+    "Cambiar foto":["Change photo","Trocar foto","更换照片","写真を変更","사진 변경","Cambia foto","Changer la photo"],
+    "Aleatorio":["Shuffle","Aleatório","随机播放","シャッフル","무작위 재생","Casuale","Aléatoire"],
+    "Reproducir":["Play","Reproduzir","播放","再生","재생","Riproduci","Lire"],
+    "Repetir":["Repeat","Repetir","循环","リピート","반복","Ripeti","Répéter"],
+    "Silenciar":["Mute","Silenciar","静音","ミュート","음소거","Silenzia","Couper le son"],
+    "Progreso del reto diario":["Daily challenge progress","Progresso do desafio diário","每日挑战进度","毎日のチャレンジ進捗","일일 도전 진행 상황","Progresso della sfida giornaliera","Progression du défi quotidien"],
+    "Moneda de visualización":["Display currency","Moeda de exibição","显示货币","表示通貨","표시 통화","Valuta di visualizzazione","Devise d’affichage"],
+    "Mini gráfico del precio de la moneda":["Mini chart of the currency price","Mini gráfico do preço da moeda","货币价格迷你图表","通貨価格のミニチャート","통화 가격 미니 차트","Mini grafico del prezzo della valuta","Mini graphique du cours de la devise"],
+    "Mostrar contraseña":["Show password","Mostrar senha","显示密码","パスワードを表示","비밀번호 표시","Mostra password","Afficher le mot de passe"],
+    "Secciones de mascota":["Pet sections","Seções do mascote","宠物栏目","ペットの項目","반려동물 섹션","Sezioni dell'animale","Sections de l’animal"],
+    "Tu mascota":["Your pet","Seu mascote","你的宠物","あなたのペット","반려동물","Il tuo animale","Votre animal"],
+    "Abrir tienda":["Open shop","Abrir loja","打开商店","ショップを開く","상점 열기","Apri negozio","Ouvrir la boutique"],
+    "Tienda":["Shop","Loja","商店","ショップ","상점","Negozio","Boutique"],
+    "Entrando...":["Signing in...","Entrando...","正在进入…","ログイン中...","접속 중...","Accesso in corso...","Connexion..."],
     "Hecho con":["Made with","Feito com","用心制作","心を込めて","마음으로 만들었어요","Fatto con","Fait avec"],
     "por":["by","por","作者","制作者","제작","da","par"],
     "Balance":["Balance","Saldo","余额","残高","잔액","Saldo","Solde"],
@@ -250,30 +386,26 @@
         if (child.nodeType === Node.TEXT_NODE && child.nodeValue.trim()) translateNode(child, language);
       });
     });
-    const attributeNodes = [];
-    if (root.nodeType === Node.ELEMENT_NODE && root.matches("[data-i18n-aria]")) attributeNodes.push(root);
-    root.querySelectorAll?.("[data-i18n-aria]").forEach(node => attributeNodes.push(node));
-    attributeNodes.forEach(node => {
-      const source = node.dataset.i18nAria;
-      const translated = language === "es" ? source : TRANSLATION_MAP[source]?.[language];
-      if (translated && node.getAttribute("aria-label") !== translated) node.setAttribute("aria-label", translated);
-    });
     const localizedNodes = [];
-    if (root.nodeType === Node.ELEMENT_NODE && root.matches("[placeholder],[title],[aria-label]")) localizedNodes.push(root);
-    root.querySelectorAll?.("[placeholder],[title],[aria-label]").forEach(node => localizedNodes.push(node));
+    const attributeSelector = "[placeholder],[title],[aria-label],[data-i18n-placeholder],[data-i18n-title],[data-i18n-aria]";
+    if (root.nodeType === Node.ELEMENT_NODE && root.matches(attributeSelector)) localizedNodes.push(root);
+    root.querySelectorAll?.(attributeSelector).forEach(node => localizedNodes.push(node));
     localizedNodes.forEach(node => ["placeholder", "title", "aria-label"].forEach(attribute => {
-      if (node.hasAttribute(`data-i18n-${attribute}`)) return;
+      const marker = attribute === "aria-label" ? "i18nAria" : `i18n${attribute[0].toUpperCase()}${attribute.slice(1)}`;
+      const explicitSource = node.dataset[marker];
       const value = node.getAttribute(attribute);
-      if (!value) return;
-      let source = Object.hasOwn(TRANSLATION_MAP, value) ? value : null;
-      if (!source) {
-        source = Object.entries(TRANSLATION_MAP).find(([, translations]) =>
-          Object.values(translations).includes(value)
-        )?.[0];
+      let source = explicitSource && Object.hasOwn(TRANSLATION_MAP, explicitSource) ? explicitSource : null;
+      if (!source && value) {
+        source = Object.hasOwn(TRANSLATION_MAP, value) ? value : null;
+        if (!source) {
+          source = Object.entries(TRANSLATION_MAP).find(([, translations]) =>
+            Object.values(translations).includes(value)
+          )?.[0];
+        }
       }
       if (!source) return;
       const translated = language === "es" ? source : TRANSLATION_MAP[source]?.[language];
-      if (translated && translated !== value) node.setAttribute(attribute, translated);
+      if (translated && value !== translated) node.setAttribute(attribute, translated);
     }));
   }
 
