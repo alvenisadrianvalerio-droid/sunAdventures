@@ -72,25 +72,26 @@
 
   /* ---------- Cofres (con sprites) ---------- */
   const COFRES = {
+    // Orden visual correcto: madera (marrón), hierro (verdoso), dorado (dorado)
     madera: {
       nombre:"Cofre de Madera", precio:100,
       rarBoosts:{comun:.70,raro:.22,epico:.065,legendario:.013,mitico:.002},
       calBoosts:{normal:.78,reforzado:.18,impecable:.035,ancestral:.005},
-      emoji:"📦", imagen:"img/cofres/madera.png", color:"#a0522d",
+      emoji:"📦", imagen:"img/rpg/items/cofre-madera.png?v=2", color:"#a0522d",
       cantMin:1, cantMax:2
     },
     hierro: {
       nombre:"Cofre de Hierro", precio:3000,
       rarBoosts:{comun:.55,raro:.30,epico:.115,legendario:.03,mitico:.005},
       calBoosts:{normal:.62,reforzado:.26,impecable:.10,ancestral:.02},
-      emoji:"🗃️", imagen:"img/cofres/hierro.png", color:"#718093",
+      emoji:"🗃️", imagen:"img/rpg/items/cofre-hierro.png?v=2", color:"#718093",
       cantMin:2, cantMax:3
     },
     dorado: {
       nombre:"Cofre Dorado", precio:15000,
       rarBoosts:{comun:.35,raro:.35,epico:.20,legendario:.085,mitico:.015},
       calBoosts:{normal:.42,reforzado:.33,impecable:.20,ancestral:.05},
-      emoji:"🏆", imagen:"img/cofres/dorado.png", color:"#ffd93d",
+      emoji:"🏆", imagen:"img/rpg/items/cofre-dorado.png?v=2", color:"#ffd93d",
       cantMin:3, cantMax:5
     },
     alba: {

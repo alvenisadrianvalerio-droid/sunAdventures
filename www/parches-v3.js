@@ -45,53 +45,6 @@
     });
   }
   /* ============================================================
-     3) 🛒 TIENDA — Tab dentro del modal mascota FUNCIONAL
-     ============================================================ */
-  function abrirTiendaEnModal() {
-    const modal = $("mascota-modal");
-    if (!modal) return;
-    const embed = $("tienda-embed");
-    if (!embed) return;
-
-    // Si Tienda aún no está cargada, reintentamos
-    if (!window.Tienda?.montar) {
-      setTimeout(abrirTiendaEnModal, 300);
-      return;
-    }
-
-    // Forzar render cada vez (por si el embed quedó vacío)
-    if (!embed.querySelector(".tienda-grid")) {
-      try { window.Tienda.montar(embed); } catch (e) { console.warn("Tienda montar:", e); }
-    }
-    // Asegurar que el panel está visible
-    qsa("[data-mm-panel]", modal).forEach(p => {
-      p.classList.toggle("active", p.dataset.mmPanel === "tienda");
-    });
-  }
-
-  // Interceptar clicks en la tab "Tienda" con captura
-  document.addEventListener("click", (e) => {
-    const tab = e.target.closest('[data-mm-tab="tienda"]');
-    if (!tab) return;
-    // Esperar a que el handler normal cambie las clases y luego forzar render
-    setTimeout(abrirTiendaEnModal, 50);
-    setTimeout(abrirTiendaEnModal, 300);
-  }, true);
-
-  // Refuerzo: cada vez que el modal mascota se abra, si hay tab tienda activa, renderizar
-  const mmObs = new MutationObserver(() => {
-    const modal = $("mascota-modal");
-    if (modal?.classList.contains("active")) {
-      const tabTienda = modal.querySelector('[data-mm-tab="tienda"].active');
-      if (tabTienda) abrirTiendaEnModal();
-    }
-  });
-  setTimeout(() => {
-    const modal = $("mascota-modal");
-    if (modal) mmObs.observe(modal, { attributes: true, subtree: true, attributeFilter: ["class"] });
-  }, 800);
-
-  /* ============================================================
      4) 🔔 BOTÓN "Activar notificaciones" — styling bonito
      ============================================================ */
   function estilizarPushBtn() {
@@ -307,7 +260,7 @@ function limpiarBotonCambiarNombre() {
     b.type = "button";
     b.className = "rpg-tab";
     b.dataset.rpgTab = "equipo";
-    b.innerHTML = `<span class="rpg-tab-icon">🎒</span><span class="rpg-tab-text">Equipo</span>`;
+    b.innerHTML = `<span class="rpg-tab-icon" aria-hidden="true"><img src="img/items%20de%20aventura/armadura.png" alt=""></span><span class="rpg-tab-text">Equipo</span>`;
     tabs.appendChild(b);
   }
 
@@ -443,7 +396,7 @@ function limpiarArtefactosMascota() {
       if (el.querySelector("img.coin-icon")) return; // ya está
       if (el.querySelector("svg")) {
         // Reemplazar SVG por la nueva imagen
-        el.innerHTML = `<img src="img/coin.png" alt="SunCoin" class="coin-icon">`;
+        el.innerHTML = `<img src="img/items%20de%20aventura/icon.png" alt="SunCoin" class="coin-icon">`;
       }
     });
 
@@ -456,7 +409,7 @@ function limpiarArtefactosMascota() {
         const html = svg.outerHTML;
         if (html.includes("ffd93d") || html.includes("moneda")) {
           const img = document.createElement("img");
-          img.src = "img/coin.png";
+          img.src = "img/items%20de%20aventura/icon.png";
           img.alt = "SunCoin";
           img.className = "coin-icon";
           svg.replaceWith(img);

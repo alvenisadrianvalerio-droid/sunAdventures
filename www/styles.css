@@ -256,6 +256,8 @@ body.light .user-dropdown-item.active{background:rgba(212,148,30,.18)}
 .experiencia-topline .ui-icon{display:inline-flex;align-items:center;justify-content:center;width:1.2em;height:1.2em;font-size:1.2em;vertical-align:middle;color:var(--accent)}
 .experiencia-topline .ui-icon svg{width:100%;height:100%}
 .experiencia-topline strong{color:var(--accent);white-space:nowrap}
+.experiencia-xp-total{display:inline-flex;align-items:center;gap:.35rem}
+.xp-icon{display:inline-block;width:1.45em;height:1.45em;object-fit:contain;vertical-align:middle;image-rendering:auto;filter:drop-shadow(0 1px 3px rgba(255,217,61,.55));}
 .experiencia-barra{height:8px;margin:.65rem 0 .4rem;overflow:hidden;border-radius:999px;background:rgba(255,255,255,.12)}
 .experiencia-barra span{display:block;width:0;height:100%;border-radius:inherit;background:var(--accent);transition:width .4s}
 .experiencia-card small{opacity:.7}
@@ -386,12 +388,20 @@ body.light .download-option:hover{background:rgba(212,148,30,.15);border-color:r
   .lobby-art .girasol{width:clamp(90px,20vw,130px)}
   .lobby-content{max-width:100%}
 }
-@media (max-width:600px){
+@media (max-width:700px){
   .nav-container{padding:.7rem .9rem;gap:.5rem}
   .nav-link-text{display:none}
   .nav-link{padding:.5rem;border-radius:50%;width:40px;height:40px;justify-content:center}
   .btn-auth-text{display:none}
   .btn-auth{padding:.55rem;width:40px;height:40px;justify-content:center}
+  .btn-auth-icon[data-icono="estrella"] svg { display: none; }
+  .btn-auth-icon[data-icono="estrella"]::after {
+    content: "";
+    display: block;
+    width: 1.35rem;
+    height: 1.35rem;
+    background: url("img/items%20de%20aventura/corona.png") center / contain no-repeat;
+  }
   .user-email{max-width:70px;font-size:.72rem}
   .theme-toggle{width:36px;height:36px;font-size:1rem}
   .user-dropdown{min-width:240px;right:-10px}
@@ -424,6 +434,11 @@ body.light .download-option:hover{background:rgba(212,148,30,.15);border-color:r
 /* ⚡ OPT: reducir animaciones si el usuario lo prefiere */
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+html.animations-disabled *,html.animations-disabled *::before,html.animations-disabled *::after{
+  animation:none!important;
+  transition:none!important;
+  scroll-behavior:auto!important;
 }
 
 /* ============================================
@@ -730,9 +745,7 @@ body.tema-fondo-fuego .nav-container{background:rgba(26,5,0,.8) !important;borde
 }
 @keyframes shopBubble { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
 .shop-bubble:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 14px 36px rgba(255,217,61,.65); }
-.shop-bubble img { display: none; }
-.shop-bubble-icon { width: 1.4rem; height: 1.4rem; display: inline-flex; }
-.shop-bubble-icon svg { width: 100%; height: 100%; }
+.shop-bubble-icon { width: 1.4rem; height: 1.4rem; display: inline-block; object-fit: contain; image-rendering: auto; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
 .shop-bubble-text { white-space: nowrap; }
 @media (max-width: 600px) {
   .shop-bubble { padding: .6rem .8rem; font-size: .75rem; bottom: 16px; left: 16px; }
@@ -872,8 +885,8 @@ button.user-dropdown-item .user-dropdown-icon svg {
 }
 
 /* 3) Zona del RPG: sombra en scroll para que no choque con dropdown */
-.rpg-popup-grupo { z-index: 7000 !important; }
-.rpg-popup-panel { z-index: 7001 !important; }
+.rpg-popup-grupo { z-index: 10001 !important; }
+.rpg-popup-panel { z-index: 10002 !important; }
 
 /* 4) Barra de escudo morada (arriba de la vida) */
 .rpg-hero-info { display: flex; flex-direction: column; gap: .3rem; }
@@ -916,14 +929,6 @@ button.user-dropdown-item .user-dropdown-icon svg {
 .rpg-popup-dot.conquistada {
   filter: drop-shadow(0 0 8px rgba(255,215,0,1));
 }
-
-/* 6) Mini-mapa del camino: fondo y path más bonitos */
-.rpg-mm-svg-wrap {
-  background: linear-gradient(180deg, #fdf6dc 0%, #f0e2bf 100%) !important;
-}
-.rpg-mm-dot { filter: drop-shadow(0 1.5px 1px rgba(0,0,0,.28)); }
-.rpg-mm-dot:hover { filter: drop-shadow(0 0 6px rgba(255,217,61,.9)) brightness(1.15); }
-.rpg-mm-path { stroke: #a07a3a; stroke-width: 2; opacity: .9; }
 
 /* 7) Tooltip de habilidades (long press) */
 .rpg-hab-tooltip {
@@ -1043,7 +1048,7 @@ body.light .nav-container {
   box-shadow: 0 0 30px rgba(77,212,142,.2), inset 0 0 40px rgba(0,0,0,.5);
   display: block;
   touch-action: none;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 .snake-hud {
   display: flex;
@@ -1051,7 +1056,10 @@ body.light .nav-container {
   flex-wrap: wrap;
   justify-content: center;
 }
+.snake-hud .jm-hud-icon { width: 30px; height: 30px; flex: 0 0 30px; }
 .snake-hud .jm-hud-card { min-width: 92px; }
+.snake-hud-svg { width: 22px; height: 22px; display: block; }
+.snake-burger-icon { width: 32px; height: 32px; flex: 0 0 32px; object-fit: contain; image-rendering: auto; filter: drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
 .snake-controles {
   display: grid;
   grid-template-columns: repeat(3, 62px);
@@ -1500,11 +1508,9 @@ body.light .daily-reward-prizes span {
 /* ---------- MONEDA PIXEL-ART ---------- */
 .coin-icon {
   display: inline-block;
-  width: 1.15em;
-  height: 1.15em;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
+  width: 1.4em;
+  height: 1.4em;
+  image-rendering: auto;
   vertical-align: -0.22em;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
   user-select: none;
@@ -1519,20 +1525,28 @@ body.light .daily-reward-prizes span {
 }
 
 /* Ajustes por contexto para que se vea bien en cada sitio */
-.user-dropdown-item .coin-icon { width: 1.1em; height: 1.1em; vertical-align: -0.2em; }
+.user-dropdown-item .coin-icon { width: 1.25em; height: 1.25em; vertical-align: -0.2em; }
 .tienda-monedero .coin-icon,
 .mm-monedero .coin-icon,
-.rpg-coins .coin-icon { width: 1.3em; height: 1.3em; vertical-align: -0.28em; }
-.tienda-item-precio .coin-icon { width: 1.1em; height: 1.1em; vertical-align: -0.18em; }
+.rpg-coins .coin-icon { width: 1.5em; height: 1.5em; vertical-align: -0.28em; }
+.tienda-item-precio .coin-icon { width: 1.25em; height: 1.25em; vertical-align: -0.18em; }
 .player-meta .coin-icon,
-.mascota-notif .coin-icon { width: 1em; height: 1em; vertical-align: -0.15em; }
-.rpg-cofre-precio .coin-icon { width: 1em; height: 1em; vertical-align: -0.15em; }
-.daily-reward-prizes .coin-icon { width: 1.5em; height: 1.5em; vertical-align: -0.35em; margin-right: .25em; }
+.mascota-notif .coin-icon { width: 1.2em; height: 1.2em; vertical-align: -0.15em; }
+.rpg-cofre-precio .coin-icon { width: 1.2em; height: 1.2em; vertical-align: -0.15em; }
+.daily-reward-prizes .coin-icon { width: 1.7em; height: 1.7em; vertical-align: -0.35em; margin-right: .25em; }
+
+@media (min-width: 701px) {
+  .coin-icon {
+    image-rendering: auto;
+    -moz-crisp-edges: auto;
+    crisp-edges: auto;
+  }
+}
 
 /* Evitar que [data-icono] le aplique estilos de SVG por error */
 [data-icono="moneda"] .coin-icon {
-  width: 1.15em !important;
-  height: 1.15em !important;
+  width: 1.4em !important;
+  height: 1.4em !important;
 }
 /* ---------- Cofres con sprite pixel-art ---------- */
 .rpg-cofre-img {
@@ -1573,4 +1587,50 @@ body.light .daily-reward-prizes span {
   overflow: hidden;
   padding: .5rem .5rem .75rem;
   gap: .15rem;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body { min-width: 0; overflow-x: clip; }
+img, video, iframe, canvas { max-width: 100%; }
+[data-view], .view, .modal-content { min-width: 0; }
+
+@media (max-width: 600px) {
+  .nav-container {
+    padding: max(.55rem, env(safe-area-inset-top, 0px)) clamp(.45rem, 3vw, .8rem) .55rem;
+    gap: .35rem;
+  }
+
+  .nav-links { min-width: 0; gap: .15rem; }
+  .nav-link { flex: 0 0 36px; }
+  .nav-actions { flex: 0 0 auto; }
+
+  .user-info .user-dropdown,
+  #user-dropdown.user-dropdown {
+    right: max(0px, env(safe-area-inset-right, 0px));
+    width: min(240px, calc(100vw - 1rem)) !important;
+    min-width: min(240px, calc(100vw - 1rem)) !important;
+    max-width: calc(100vw - 1rem) !important;
+  }
+
+  .mascota-wrapper { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .shop-bubble { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+
+  body:has(.chat-section.active) .mascota-wrapper,
+  body:has(.chat-section.active) .shop-bubble,
+  body:has(.modal.active) .mascota-wrapper,
+  body:has(.modal.active) .shop-bubble {
+    display: none !important;
+  }
+
+  body:has(.mascotas-section.active) .mascota-wrapper { display: none !important; }
+}
+
+@media (max-width: 360px) {
+  .nav-container { padding-inline: .4rem; }
+  .nav-links { gap: .05rem; }
+  .nav-link { flex-basis: 32px; width: 32px; height: 32px; padding: .35rem; }
+  .btn-auth { width: 36px; height: 36px; }
+  .theme-toggle { width: 32px; height: 32px; }
+  .mascota-wrapper { width: 48px; height: 48px; right: 0; }
+  .mascota { width: 40px; height: 40px; }
 }

@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SunAdventures · Nuestro rincón</title>
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
@@ -26,12 +26,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="styles.css?v=115">
-  <link rel="stylesheet" href="album.css?v=115">
-  <link rel="stylesheet" href="juegos.css?v=116">
-  <link rel="stylesheet" href="rpg.css?v=1">
-  <link rel="stylesheet" href="rpg-loot.css?v=1">
+  <link rel="stylesheet" href="styles.css?v=120">
+  <link rel="stylesheet" href="album.css?v=119">
+  <link rel="stylesheet" href="juegos.css?v=119">
+  <link rel="stylesheet" href="rpg.css?v=4">
+  <link rel="stylesheet" href="rpg-loot.css?v=4">
   <link rel="stylesheet" href="temas.css?v=1">
+  <link rel="stylesheet" href="finanzas.css?v=3">
   <style>
     svg {
       max-width: 100%;
@@ -74,9 +75,10 @@
         <a href="#album" class="nav-link" data-view-link="album"><span class="ui-icon nav-link-icon" data-icono="camara"></span><span class="nav-link-text">Álbum</span></a>
         <a href="#chat" class="nav-link" data-view-link="chat"><span class="ui-icon nav-link-icon" data-icono="chat"></span><span class="nav-link-text">Chat</span></a>
         <a href="#mascotas" class="nav-link" data-view-link="mascotas"><span class="ui-icon nav-link-icon" data-icono="huella"></span><span class="nav-link-text">Mascotas</span></a>
+        <a href="#finanzas" class="nav-link" data-view-link="finanzas" aria-label="Finanzas" data-i18n-aria="Finanzas"><span class="ui-icon nav-link-icon" data-icono="finanzas" aria-hidden="true"></span><span class="nav-link-text">Finanzas</span></a>
       </nav>
       <div class="nav-actions">
-        <button id="btn-open-login" class="btn-auth"><span class="btn-auth-icon" data-icono="estrella"></span><span
+        <button id="btn-open-login" class="btn-auth" aria-label="Entrar"><span class="btn-auth-icon" data-icono="estrella"></span><span
             class="btn-auth-text">Entrar</span></button>
         <div id="user-info" class="user-info" style="display:none;">
           <button id="user-menu-toggle" class="user-pill" aria-haspopup="true">
@@ -118,8 +120,7 @@
         <p class="lobby-dedicatoria">Un rincón para guardar lo nuestro <span class="ui-icon"
             data-icono="girasol"></span></p>
         <div class="experiencia-card">
-          <div class="experiencia-topline"><span id="experiencia-titulo">Novatos</span><strong id="experiencia-xp">0
-              XP</strong></div>
+          <div class="experiencia-topline"><span id="experiencia-titulo">Novatos</span><strong class="experiencia-xp-total"><img class="xp-icon" src="img/items%20de%20aventura/estrella.png" alt="" aria-hidden="true"><span id="experiencia-xp">0 XP</span></strong></div>
           <div class="experiencia-barra"><span id="experiencia-progreso"></span></div>
           <small id="experiencia-siguiente">100 XP para Enamorados.</small>
         </div>
@@ -249,11 +250,11 @@
       <p class="mascotas-subtitle">Cada una guarda un pedacito de nuestra historia.</p>
     </div>
     <div class="minijuegos-menu">
-      <button class="btn-minijuego" id="btn-juego-girasol"><span class="btn-minijuego-icon"
+      <button class="btn-minijuego" id="btn-juego-girasol" data-juego="girasol"><span class="btn-minijuego-icon"
           data-icono="girasol"></span><span class="btn-minijuego-text">Atrapa el girasol</span></button>
-      <button class="btn-minijuego" id="btn-juego-memoria"><span class="btn-minijuego-icon"
+      <button class="btn-minijuego" id="btn-juego-memoria" data-juego="memoria"><span class="btn-minijuego-icon"
           data-icono="imagen"></span><span class="btn-minijuego-text">Memoria</span></button>
-      <button class="btn-minijuego" id="btn-juego-adivina"><span class="btn-minijuego-icon"
+      <button class="btn-minijuego" id="btn-juego-adivina" data-juego="adivina"><span class="btn-minijuego-icon"
           data-icono="globo"></span><span class="btn-minijuego-text">Adivina la mascota</span></button>
     </div>
     <section class="desafio-diario" id="desafio-minijuegos" aria-labelledby="desafio-minijuegos-titulo"
@@ -271,13 +272,108 @@
       </div>
       <div class="desafio-diario-pie">
         <span id="desafio-minijuegos-estado">0 de 2 minijuegos distintos</span>
-        <span class="desafio-diario-premio">🏆 +20 SunCoins · ✨ +25 XP</span>
+        <span class="desafio-diario-premio">
+          <img class="desafio-diario-premio-icon coin-icon" src="img/items%20de%20aventura/icon.png" alt="" aria-hidden="true"> +20 SunCoins ·
+          <img class="desafio-diario-premio-icon" src="img/items%20de%20aventura/estrella.png" alt="" aria-hidden="true"> +25 XP
+        </span>
       </div>
       <p class="desafio-diario-juegos" id="desafio-minijuegos-juegos">Completa cualquier minijuego para empezar.</p>
     </section>
+
     <div class="mascotas-grid" id="mascotas-grid"></div>
     <div id="mascotas-empty" class="mascotas-empty hidden">
       <p>Aún no has desbloqueado ninguna mascota.</p>
+    </div>
+  </section>
+
+  <section id="finanzas" class="finanzas-section view" data-view="finanzas">
+    <div class="finanzas-shell">
+      <header class="finanzas-header">
+        <div>
+          <p class="finanzas-kicker">Cuidemos lo que construimos</p>
+          <h1>Finanzas</h1>
+          <p class="finanzas-intro">Tus gastos, acuerdos y metas en un solo lugar.</p>
+        </div>
+        <label class="finanzas-currency">
+          <span>Moneda</span>
+          <select id="finanzas-moneda" aria-label="Moneda de visualización">
+            <option value="EUR">EUR · Euro</option>
+            <option value="USD">USD · Dólar</option>
+            <option value="MXN">MXN · Peso mexicano</option>
+            <option value="ARS">ARS · Peso argentino</option>
+            <option value="COP">COP · Peso colombiano</option>
+            <option value="CLP">CLP · Peso chileno</option>
+            <option value="PEN">PEN · Sol</option>
+            <option value="VES">VES · Bolívar venezolano</option>
+          </select>
+        </label>
+      </header>
+      <p id="finanzas-error" class="finanzas-alert" role="status" aria-live="polite" hidden></p>
+      <div id="finanzas-login" class="finanzas-login" hidden>
+        <span class="finanzas-login-icon" aria-hidden="true">↗</span>
+        <h2>Inicia sesión para empezar</h2>
+        <p>Los movimientos se guardan de forma segura y puedes compartir los de Pareja con tu grupo.</p>
+        <button id="finanzas-login-btn" class="btn-primary" type="button">Entrar o crear cuenta</button>
+      </div>
+      <div id="finanzas-app" hidden>
+        <section class="finanzas-quote-card" aria-labelledby="finanzas-quote-title">
+          <div class="finanzas-quote-heading">
+            <div>
+              <span class="finanzas-eyebrow">MERCADO DE DIVISAS</span>
+              <h2 id="finanzas-quote-title">Precio frente al dólar</h2>
+            </div>
+            <span id="finanzas-quote-updated" class="finanzas-quote-updated" aria-live="polite">Consultando cotización…</span>
+          </div>
+          <div id="finanzas-quote-values" class="finanzas-quote-values" aria-live="polite"></div>
+          <div id="finanzas-quote-chart" class="finanzas-quote-chart" role="img" aria-label="Mini gráfico del precio de la moneda"></div>
+          <p id="finanzas-quote-status" class="finanzas-quote-status"></p>
+          <label class="finanzas-price-alert">
+            <input id="finanzas-price-alert-toggle" type="checkbox">
+            <span>
+              <strong>Aviso discreto en el escritorio</strong>
+              <small>Silencioso, solo ante cambios de 0,1 % o más y como máximo cada 15 minutos.</small>
+            </span>
+          </label>
+          <small id="finanzas-price-alert-status" class="finanzas-reminder-status" role="status" aria-live="polite"></small>
+        </section>
+        <section class="finanzas-reminder" aria-labelledby="finanzas-reminder-title">
+          <div class="finanzas-reminder-copy">
+            <span class="finanzas-eyebrow">RECORDATORIO DIARIO</span>
+            <h2 id="finanzas-reminder-title">Recordatorios diarios</h2>
+            <p>Recibe un aviso si todavía no registraste los gastos de hoy.</p>
+          </div>
+          <form id="finanzas-reminder-form" class="finanzas-reminder-form">
+            <label class="finanzas-reminder-option">
+              <input id="finanzas-reminder-personal" type="checkbox" checked>
+              <span>Finanzas personales</span>
+            </label>
+            <label class="finanzas-reminder-option">
+              <input id="finanzas-reminder-group" type="checkbox" checked>
+              <span>Finanzas del grupo</span>
+            </label>
+            <label class="finanzas-reminder-time">
+              <span>Hora del aviso</span>
+              <input id="finanzas-reminder-time" type="time" value="20:00" required>
+            </label>
+            <p id="finanzas-reminder-timezone" class="finanzas-reminder-timezone"></p>
+            <button id="finanzas-reminder-save" class="btn-primary" type="submit">Guardar recordatorios</button>
+            <small id="finanzas-reminder-status" class="finanzas-reminder-status" role="status" aria-live="polite"></small>
+          </form>
+        </section>
+        <nav class="finanzas-tabs" aria-label="Secciones de finanzas">
+          <button type="button" class="finanzas-tab active" data-finanzas-tab="personal">Personal</button>
+          <button type="button" class="finanzas-tab" data-finanzas-tab="pareja">Pareja</button>
+          <button type="button" class="finanzas-tab" data-finanzas-tab="reportes">Reportes</button>
+        </nav>
+        <div class="finanzas-toolbar">
+          <label>
+            <span>Período</span>
+            <input id="finanzas-periodo" type="month">
+          </label>
+          <button id="finanzas-recargar" class="btn-secondary" type="button">Actualizar</button>
+        </div>
+        <main id="finanzas-panel" class="finanzas-panel"></main>
+      </div>
     </div>
   </section>
 
@@ -336,10 +432,27 @@
   <div id="settings-modal" class="modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-settings></div>
     <div class="modal-content settings-modal-content">
-      <h3 class="modal-title">Ajustes</h3>
-      <label class="settings-toggle"><input id="toggle-censura" type="checkbox"><span><strong>Censurar malas
-            palabras</strong><small>Revisa los mensajes antes de guardarlos.</small></span></label>
-      <p class="settings-note">La revisión solo se aplica a mensajes nuevos.</p>
+      <h3 class="modal-title" data-i18n="Ajustes">Ajustes</h3>
+      <label class="settings-select">
+        <span><strong data-i18n="Idioma">Idioma</strong><small data-i18n="Elige el idioma de la aplicación.">Elige el idioma de la aplicación.</small></span>
+        <select id="settings-language" aria-label="Idioma" data-i18n-aria="Idioma">
+          <option value="es">Español</option>
+          <option value="en">English</option>
+          <option value="pt">Português</option>
+          <option value="zh">中文</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+          <option value="it">Italiano</option>
+          <option value="fr">Français</option>
+        </select>
+      </label>
+      <label class="settings-toggle"><input id="toggle-animaciones" type="checkbox"><span><strong data-i18n="Desactivar animaciones">Desactivar animaciones</strong><small data-i18n="Reduce los movimientos y efectos visuales de la aplicación.">Reduce los movimientos y efectos visuales de la aplicación.</small></span></label>
+      <label class="settings-volume">
+        <span><strong data-i18n="Volumen de la aplicación">Volumen de la aplicación</strong><output id="settings-volume-value">80%</output></span>
+        <input id="settings-volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volumen de la aplicación" data-i18n-aria="Volumen de la aplicación">
+      </label>
+      <label class="settings-toggle"><input id="toggle-censura" type="checkbox"><span><strong data-i18n="Censurar malas palabras">Censurar malas palabras</strong><small data-i18n="Revisa los mensajes antes de guardarlos.">Revisa los mensajes antes de guardarlos.</small></span></label>
+      <p class="settings-note" data-i18n="La revisión solo se aplica a mensajes nuevos.">La revisión solo se aplica a mensajes nuevos.</p>
       <div class="modal-actions"><button type="button" class="btn-secondary" data-close-settings>Cerrar</button></div>
     </div>
   </div>
@@ -528,16 +641,15 @@ Artista - Canción
       </div>
 
       <!-- Pestañas -->
-      <div class="mm-tabs" role="tablist">
-        <button type="button" class="mm-tab active" data-mm-tab="estado" role="tab">Estado</button>
-        <button type="button" class="mm-tab" data-mm-tab="inventario" role="tab">Inventario</button>
-        <button type="button" class="mm-tab" data-mm-tab="cuidado" role="tab">Cuidado</button>
-        <button type="button" class="mm-tab" data-mm-tab="tienda" role="tab">Tienda</button>
-        <button type="button" class="mm-tab" data-mm-tab="acciones" role="tab">Más</button>
+      <div class="mm-tabs" role="tablist" aria-label="Secciones de mascota">
+        <button type="button" class="mm-tab active" id="mm-tab-estado" data-mm-tab="estado" role="tab" aria-controls="mm-panel-estado" aria-selected="true" tabindex="0">Estado</button>
+        <button type="button" class="mm-tab" id="mm-tab-inventario" data-mm-tab="inventario" role="tab" aria-controls="mm-panel-inventario" aria-selected="false" tabindex="-1">Inventario</button>
+        <button type="button" class="mm-tab" id="mm-tab-cuidado" data-mm-tab="cuidado" role="tab" aria-controls="mm-panel-cuidado" aria-selected="false" tabindex="-1">Cuidado</button>
+        <button type="button" class="mm-tab" id="mm-tab-acciones" data-mm-tab="acciones" role="tab" aria-controls="mm-panel-acciones" aria-selected="false" tabindex="-1">Más</button>
       </div>
 
       <!-- Panel: ESTADO -->
-      <div class="mm-panel active" data-mm-panel="estado">
+      <div class="mm-panel active" id="mm-panel-estado" data-mm-panel="estado" role="tabpanel" aria-labelledby="mm-tab-estado" tabindex="0">
         <div class="mm-monedero">
           <span class="mm-monedero-icon" data-icono="moneda"></span>
           <span class="mm-monedero-label">SunCoins</span>
@@ -565,25 +677,20 @@ Artista - Canción
         </div>
       </div>
 
-      <!-- ✅ Panel: TIENDA (embebida) — AHORA ES HERMANO, NO HIJO -->
-      <div class="mm-panel" data-mm-panel="tienda">
-        <div id="tienda-embed" class="tienda-embed"></div>
-      </div>
-
       <!-- Panel: INVENTARIO -->
-      <div class="mm-panel" data-mm-panel="inventario">
+      <div class="mm-panel" id="mm-panel-inventario" data-mm-panel="inventario" role="tabpanel" aria-labelledby="mm-tab-inventario" tabindex="0" hidden>
         <div class="mm-seccion-titulo"><span>Inventario</span><span class="mm-seccion-hint">Arrastra a la mascota</span>
         </div>
         <div class="mascota-inventario" id="mm-inventario"></div>
       </div>
 
       <!-- Panel: CUIDADO -->
-      <div class="mm-panel" data-mm-panel="cuidado">
+      <div class="mm-panel" id="mm-panel-cuidado" data-mm-panel="cuidado" role="tabpanel" aria-labelledby="mm-tab-cuidado" tabindex="0" hidden>
         <div class="cuidado-diario" id="mm-cuidado-diario"></div>
       </div>
 
       <!-- Panel: ACCIONES -->
-      <div class="mm-panel" data-mm-panel="acciones">
+      <div class="mm-panel" id="mm-panel-acciones" data-mm-panel="acciones" role="tabpanel" aria-labelledby="mm-tab-acciones" tabindex="0" hidden>
         <div class="mm-acciones">
           <button type="button" class="mm-accion mm-accion-mimos" data-accion="mimos"><span class="mm-accion-icono"
               data-icono="mimar"></span><span>Mimos</span><span class="mascota-accion-progreso"
@@ -631,8 +738,8 @@ Artista - Canción
           <div class="perfil-stat"><strong id="perfil-stat-notas">0</strong><span>Notas</span></div>
           <div class="perfil-stat"><strong id="perfil-stat-canciones">0</strong><span>Canciones</span></div>
           <div class="perfil-stat"><strong id="perfil-stat-logros">0</strong><span>Logros</span></div>
-          <div class="perfil-stat"><strong id="perfil-stat-xp">0</strong><span>XP</span></div>
-          <div class="perfil-stat"><strong id="perfil-stat-mon">0</strong><span>SunCoins</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-xp">0</strong><span class="perfil-stat-label"><img class="xp-icon" src="img/items%20de%20aventura/estrella.png" alt="" aria-hidden="true">XP</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-mon">0</strong><span class="perfil-stat-label"><img class="coin-icon" src="img/items%20de%20aventura/icon.png" alt="" aria-hidden="true">SunCoins</span></div>
         </div>
 
         <div class="modal-actions" style="width:100%;">
@@ -690,8 +797,7 @@ Artista - Canción
 </div>
 <!-- ============ BURBUJA TIENDA FLOTANTE ============ -->
 <button id="shop-bubble" class="shop-bubble" type="button" aria-label="Abrir tienda">
-  <img src="img/tienda/admurin-items.png" alt="Tienda" onerror="this.style.display='none'">
-  <span class="shop-bubble-icon" data-icono="tienda"></span>
+  <img class="shop-bubble-icon" src="img/items%20de%20aventura/tienda.png" alt="" aria-hidden="true">
   <span class="shop-bubble-text">Tienda</span>
 </button>
   <!-- ============ MODAL RECUPERAR CONTRASEÑA ============ -->
@@ -777,6 +883,8 @@ Artista - Canción
   <script src="offline.js"></script>
   <script src="sun-modal.js"></script>
   <script src="album.js"></script>
+  <script src="preferences.js"></script>
+  <script src="finanzas.js"></script>
   <script src="sprites-config.js"></script>
   <script src="tienda.js"></script>     <!-- ⬅️ tienda ANTES -->
   <script src="script.js"></script>     <!-- ⬅️ script DESPUÉS -->

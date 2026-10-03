@@ -111,9 +111,8 @@
      ============================================================ */
   function checkMascota() {
     const enRpg = location.hash === "#rpg" || document.querySelector('[data-view="rpg"].active');
-    const w = $("mascota-wrapper"), sb = $("shop-bubble");
+    const w = $("mascota-wrapper");
     if (w) { w.style.opacity = enRpg ? "0" : "1"; w.style.pointerEvents = enRpg ? "none" : ""; w.style.transition = "opacity .3s"; }
-    if (sb) { sb.style.opacity = enRpg ? "0" : "1"; sb.style.pointerEvents = enRpg ? "none" : ""; sb.style.transition = "opacity .3s"; }
   }
   window.addEventListener("hashchange", checkMascota);
   setInterval(checkMascota, 500);
@@ -236,11 +235,8 @@
     sb._p = true;
     sb.addEventListener("click", (e) => {
       e.preventDefault();
-      const modal = $("mascota-modal");
-      if (modal?.classList.contains("active")) {
-        const tab = document.querySelector('[data-mm-tab="tienda"]'); if (tab) tab.click();
-        const embed = $("tienda-embed"); if (embed) window.Tienda?.montar?.(embed);
-      } else window.Tienda?.abrir?.();
+      e.stopPropagation();
+      window.Tienda?.abrir?.();
     }, true);
   }
 
@@ -319,11 +315,11 @@
       <div class="minijuego-panel">
         <button class="minijuego-cerrar" data-close-snake>×</button>
         <h2 class="minijuego-titulo">Serpiente del Jardín</h2>
-        <p class="minijuego-desc">Come girasoles 🌻 · Crece · ¡No choques!</p>
+        <p class="minijuego-desc">Come hamburguesas · Crece · ¡No choques!</p>
         <div class="snake-hud">
-          <div class="jm-hud-card"><span class="jm-hud-icon">🌻</span><div class="jm-hud-info"><span class="jm-hud-label">Comidos</span><strong id="snk-puntos">0</strong></div></div>
-          <div class="jm-hud-card"><span class="jm-hud-icon">📏</span><div class="jm-hud-info"><span class="jm-hud-label">Largo</span><strong id="snk-largo">3</strong></div></div>
-          <div class="jm-hud-card jm-hud-time"><span class="jm-hud-icon">⚡</span><div class="jm-hud-info"><span class="jm-hud-label">Velocidad</span><strong id="snk-vel">1</strong></div></div>
+          <div class="jm-hud-card"><span class="jm-hud-icon"><img class="snake-burger-icon" src="img/items%20de%20aventura/hamburguesa.png" alt=""></span><div class="jm-hud-info"><span class="jm-hud-label">Comidos</span><strong id="snk-puntos">0</strong></div></div>
+          <div class="jm-hud-card"><span class="jm-hud-icon"><svg class="snake-hud-svg" viewBox="0 0 24 24" role="img" aria-label="Largo"><path d="M4 5v14M20 5v14M4 8h5M4 12h3M4 16h5M15 8h5M17 12h3M15 16h5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg></span><div class="jm-hud-info"><span class="jm-hud-label">Largo</span><strong id="snk-largo">3</strong></div></div>
+          <div class="jm-hud-card jm-hud-time"><span class="jm-hud-icon"><svg class="snake-hud-svg" viewBox="0 0 24 24" role="img" aria-label="Velocidad"><path d="M13.5 2 5 13h6l-.5 9L19 10h-6l.5-8Z" fill="currentColor" stroke="currentColor" stroke-linejoin="round" stroke-width="1.2"/></svg></span><div class="jm-hud-info"><span class="jm-hud-label">Velocidad</span><strong id="snk-vel">1</strong></div></div>
         </div>
         <div class="snake-wrap">
           <canvas id="snk-canvas" class="snake-canvas" width="420" height="420"></canvas>
@@ -364,6 +360,9 @@
     let comida = null, puntos = 0, activo = true;
     let velocidad = 160;
     let intervalo = null;
+    const burgerSprite = new Image();
+    burgerSprite.src = "img/items%20de%20aventura/hamburguesa.png";
+    burgerSprite.addEventListener("load", () => { if (o.isConnected) draw(); }, { once:true });
 
     function nuevaComida() {
       let tries = 0;
@@ -377,6 +376,8 @@
       // Fondo
       ctx.fillStyle = "rgba(8,20,12,.85)";
       ctx.fillRect(0, 0, cv.width, cv.height);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
 
       // Rejilla
       ctx.strokeStyle = "rgba(77,212,142,.07)";
@@ -386,17 +387,25 @@
         ctx.beginPath(); ctx.moveTo(0, i*CELL); ctx.lineTo(cv.width, i*CELL); ctx.stroke();
       }
 
-      // Comida (girasol)
+      // Comida (sprite de hamburguesa)
       if (comida) {
         const cx = comida.x*CELL + CELL/2, cy = comida.y*CELL + CELL/2;
-        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, CELL);
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, CELL * 1.5);
         g.addColorStop(0, "#ffe066");
         g.addColorStop(1, "rgba(255,180,30,0)");
         ctx.fillStyle = g;
-        ctx.fillRect(comida.x*CELL - 4, comida.y*CELL - 4, CELL + 8, CELL + 8);
-        ctx.font = `${CELL-2}px serif`;
-        ctx.textAlign = "center"; ctx.textBaseline = "middle";
-        ctx.fillText("🌻", cx, cy + 1);
+        ctx.fillRect(cx - CELL * 1.5, cy - CELL * 1.5, CELL * 3, CELL * 3);
+        if (burgerSprite.complete && burgerSprite.naturalWidth) {
+          const foodSize = CELL * 1.5;
+          ctx.drawImage(burgerSprite, cx - foodSize / 2, cy - foodSize / 2, foodSize, foodSize);
+        } else {
+          const scale = CELL / 20 * 1.4;
+          ctx.fillStyle = "#e7a53d";
+          ctx.beginPath(); ctx.ellipse(cx, cy - 4 * scale, 7 * scale, 4 * scale, 0, Math.PI, 0); ctx.fill();
+          ctx.fillStyle = "#7a3f22"; ctx.fillRect(cx - 7 * scale, cy - 2 * scale, 14 * scale, 2 * scale);
+          ctx.fillStyle = "#56bd62"; ctx.fillRect(cx - 6 * scale, cy, 12 * scale, 2 * scale);
+          ctx.fillStyle = "#d98a32"; ctx.fillRect(cx - 7 * scale, cy + 2 * scale, 14 * scale, 3 * scale);
+        }
       }
 
       // Serpiente
@@ -467,7 +476,7 @@
       activo = false;
       clearInterval(intervalo);
       const m = Math.max(1, puntos * 4);
-      try { window._darPremio?.(m, Math.min(20, puntos * 2), `¡${puntos} girasoles! +${m}`); } catch {}
+      try { window._darPremio?.(m, Math.min(20, puntos * 2), `¡${puntos} hamburguesas! +${m}`); } catch {}
       snd("derrota");
 
       const panel = o.querySelector(".minijuego-panel");
@@ -478,7 +487,7 @@
         <h2>${puntos >= 20 ? "¡Maestro serpiente!" : puntos >= 10 ? "¡Buen bocado!" : "¡Ups!"}</h2>
         <p>Comiste</p>
         <span class="minijuego-mensaje-num">${puntos}</span>
-        <p>girasoles</p>
+        <p>hamburguesas</p>
         <p style="color:#4dd48e;font-weight:bold;">+${m} 🪙</p>
         <div class="minijuego-botones">
           <button type="button" class="btn-primary" id="snk-otra">Otra vez</button>
@@ -530,7 +539,7 @@
     b.type = "button";
     b.className = "btn-minijuego";
     b.dataset.juego = "snake";
-    b.innerHTML = `<span class="btn-minijuego-icon" style="font-size:1.6rem;">🐍</span><span class="btn-minijuego-text">Serpiente</span>`;
+    b.innerHTML = `<span class="btn-minijuego-icon">${window.ICONO?.serpiente || ""}</span><span class="btn-minijuego-text">Serpiente</span>`;
     b.addEventListener("click", juegoSnake);
     menu.appendChild(b);
   }

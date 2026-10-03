@@ -304,12 +304,18 @@ neon:{nombre:"Fondo Neón",precio:20000,icono:"rayoDoble",sheet:"tienda",sprite:
 
   /* ---------- Audio ---------- */
   let ac = null;
+  const appSoundVolume = () => {
+    const value = Number(localStorage.getItem("app_volume") ?? "0.8");
+    return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0.8;
+  };
   const getAC = () => {
     if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch { return null; } }
     if (ac.state === "suspended") ac.resume().catch(() => {});
     return ac;
   };
   const tono = (f, d, t = "sine", v = 0.15, dl = 0, ff = null) => {
+    v *= appSoundVolume();
+    if (v <= 0) return;
     const c = getAC(); if (!c) return;
     const ti = c.currentTime + dl;
     const o = c.createOscillator(), g = c.createGain();
@@ -322,6 +328,8 @@ neon:{nombre:"Fondo Neón",precio:20000,icono:"rayoDoble",sheet:"tienda",sprite:
     o.start(ti); o.stop(ti + d + 0.05);
   };
   const ruido = (d = 0.15, v = 0.2) => {
+    v *= appSoundVolume();
+    if (v <= 0) return;
     const c = getAC(); if (!c) return;
     const ti = c.currentTime, s = c.sampleRate * d;
     const b = c.createBuffer(1, s, c.sampleRate), da = b.getChannelData(0);
@@ -512,8 +520,6 @@ neon:{nombre:"Fondo Neón",precio:20000,icono:"rayoDoble",sheet:"tienda",sprite:
       actualizarModalMascota();
       renderInv(); renderCuidado(); renderCambiarMascota();
       window.dispatchEvent(new Event("sunadventures:mascota-cambiada"));
-      const embed = $("tienda-embed");
-      if (embed && window.Tienda?.montar) window.Tienda.montar(embed);
     };
     window.cerrarMascotaModal = () => {
       const m = $("mascota-modal"); if (!m) return;
@@ -849,20 +855,44 @@ neon:{nombre:"Fondo Neón",precio:20000,icono:"rayoDoble",sheet:"tienda",sprite:
       qs('[data-accion="mimos"]',   mModal)?.addEventListener("click", e => { e.stopPropagation(); hacerMimos(); });
       qs('[data-accion="dormir"]',  mModal)?.addEventListener("click", e => { e.stopPropagation(); dormir(); });
       qs('[data-accion="jugar"]',   mModal)?.addEventListener("click", e => { e.stopPropagation(); juegoGirasol(); });
-      qs('[data-accion="tienda"]',  mModal)?.addEventListener("click", e => { e.stopPropagation(); window.Tienda?.abrir(); });
       qs('[data-accion="amistad"]', mModal)?.addEventListener("click", e => { e.stopPropagation(); abrirAmistad(); });
     }
+
+    const activarPestanaMascota = (modal, tab) => {
+      const target = tab.dataset.mmTab;
+      qsa("[data-mm-tab]", modal).forEach(t => {
+        const activa = t === tab;
+        t.classList.toggle("active", activa);
+        t.setAttribute("aria-selected", String(activa));
+        t.tabIndex = activa ? 0 : -1;
+      });
+      qsa("[data-mm-panel]", modal).forEach(p => {
+        const activa = p.dataset.mmPanel === target;
+        p.classList.toggle("active", activa);
+        p.hidden = !activa;
+      });
+      if (target === "inventario") renderInv?.();
+    };
 
     document.addEventListener("click", e => {
       const tab = e.target.closest("[data-mm-tab]");
       if (!tab) return;
-      const target = tab.dataset.mmTab;
       const modal = tab.closest("#mascota-modal");
       if (!modal) return;
-      qsa("[data-mm-tab]", modal).forEach(t => t.classList.toggle("active", t === tab));
-      qsa("[data-mm-panel]", modal).forEach(p => p.classList.toggle("active", p.dataset.mmPanel === target));
-      if (target === "tienda") { const embed = $("tienda-embed"); if (embed && window.Tienda?.montar) window.Tienda.montar(embed); }
-      if (target === "inventario") renderInv?.();
+      activarPestanaMascota(modal, tab);
+    });
+    mModal?.querySelector(".mm-tabs")?.addEventListener("keydown", e => {
+      const tabs = qsa("[data-mm-tab]", mModal);
+      const actual = tabs.indexOf(document.activeElement);
+      let indice = actual;
+      if (e.key === "ArrowRight") indice = (actual + 1) % tabs.length;
+      else if (e.key === "ArrowLeft") indice = (actual - 1 + tabs.length) % tabs.length;
+      else if (e.key === "Home") indice = 0;
+      else if (e.key === "End") indice = tabs.length - 1;
+      else return;
+      e.preventDefault();
+      tabs[indice].focus();
+      activarPestanaMascota(mModal, tabs[indice]);
     });
 
     dropEnMascota();
@@ -884,8 +914,19 @@ neon:{nombre:"Fondo Neón",precio:20000,icono:"rayoDoble",sheet:"tienda",sprite:
     o.id = id; o.className = "minijuego-overlay";
     o.innerHTML = `<div class="minijuego-panel"><button class="minijuego-cerrar" data-close-juego>×</button>${html}</div>`;
     document.body.appendChild(o);
+    const cleanups = new Set();
+    let cerrado = false;
+    o._registrarCleanup = fn => { if (typeof fn === "function") cleanups.add(fn); };
     o.addEventListener("click", e => {
-      if (e.target === o || e.target.hasAttribute("data-close-juego")) { o.classList.remove("active"); setTimeout(() => o.remove(), 250); }
+      if (e.target === o || e.target.hasAttribute("data-close-juego")) {
+        if (!cerrado) {
+          cerrado = true;
+          cleanups.forEach(fn => fn());
+          cleanups.clear();
+        }
+        o.classList.remove("active");
+        setTimeout(() => o.remove(), 250);
+      }
     });
     return o;
   }
@@ -939,6 +980,11 @@ neon:{nombre:"Fondo Neón",precio:20000,icono:"rayoDoble",sheet:"tienda",sprite:
       setTimeout(() => { if (!g.classList.contains("atrapado")) { g.classList.add("escapando"); setTimeout(() => g.remove(), 400); } }, 1000 + Math.random() * 500);
       st = setTimeout(sp, Math.max(200, 500 - (35 - t) * 5));
     };
+    o._registrarCleanup(() => {
+      act = false;
+      clearInterval(tk);
+      clearTimeout(st);
+    });
 
     const term = () => {
       if (finalizado) return;
@@ -989,23 +1035,49 @@ neon:{nombre:"Fondo Neón",precio:20000,icono:"rayoDoble",sheet:"tienda",sprite:
     o.classList.add("active");
     const g = $("jm-grid"), eP = $("jm-parejas"), eI = $("jm-intentos"), eT = $("jm-tiempo"), barra = $("jm-progreso-fill");
     let pr = null, sg = null, bl = false, pa = 0, it = 0, tr = 40;
+    let finalizado = false, ivT = null;
+    const timeouts = new Set();
+    const programar = (fn, ms) => {
+      const id = setTimeout(() => {
+        timeouts.delete(id);
+        if (!finalizado && o.isConnected) fn();
+      }, ms);
+      timeouts.add(id);
+      return id;
+    };
+    const limpiar = () => {
+      finalizado = true;
+      clearInterval(ivT);
+      timeouts.forEach(clearTimeout);
+      timeouts.clear();
+    };
+    o._registrarCleanup(limpiar);
 
-    const ivT = setInterval(() => {
-      tr--;
-      if (eT) { eT.textContent = tr + "s"; eT.classList.toggle("urgente", tr <= 10); }
-      if (tr <= 0) { clearInterval(ivT); terminarPorTiempo(); }
-    }, 1000);
-
-    function terminarPorTiempo() {
+    function terminar(completado) {
+      if (finalizado) return;
+      finalizado = true;
+      clearInterval(ivT);
+      timeouts.forEach(clearTimeout);
+      timeouts.clear();
       [...g.children].forEach(c => c.disabled = true);
-      const m = Math.max(1, pa * 2);
-      darPremio(m, 5, `¡Se acabó! ${pa}/${eleg.length} parejas`);
+      const m = completado ? Math.max(5, 25 - it + Math.max(0, tr)) : Math.max(1, pa * 2);
+      darPremio(m, completado ? 15 : 5, completado
+        ? `¡Memoria completada! +${m}`
+        : `¡Se acabó! ${pa}/${eleg.length} parejas`);
       const p = qs(".minijuego-panel", o), r = document.createElement("div");
       r.className = "minijuego-mensaje jm-final";
-      r.innerHTML = `<div class="jg-final-emoji">${ICONO.reintentar || ""}</div><h2>¡Se acabó!</h2><p>Encontraste <strong>${pa}</strong> de <strong>${eleg.length}</strong> parejas</p><p style="color:#ffd93d;font-weight:bold;">+${m}</p><div class="minijuego-botones"><button type="button" class="btn-primary" id="jm-otra">Otra vez</button></div>`;
+      r.innerHTML = completado
+        ? `<div class="jg-final-emoji">${it <= 12 ? (ICONO.trofeo || "") : it <= 20 ? (ICONO.estrella || "") : (ICONO.imagen || "")}</div><h2>¡Lo lograste!</h2><p>En <strong>${it}</strong> intentos con <strong>${tr}s</strong> restantes</p><p class="jm-recompensa">+${m} · +15 XP</p><div class="minijuego-botones"><button type="button" class="btn-primary" id="jm-otra">Otra vez</button></div>`
+        : `<div class="jg-final-emoji">${ICONO.reintentar || ""}</div><h2>¡Se acabó!</h2><p>Encontraste <strong>${pa}</strong> de <strong>${eleg.length}</strong> parejas</p><p class="jm-recompensa">+${m}</p><div class="minijuego-botones"><button type="button" class="btn-primary" id="jm-otra">Otra vez</button></div>`;
       p.appendChild(r);
       qs("#jm-otra", r).addEventListener("click", () => { o.remove(); juegoMemoria(); });
     }
+
+    ivT = setInterval(() => {
+      tr--;
+      if (eT) { eT.textContent = tr + "s"; eT.classList.toggle("urgente", tr <= 10); }
+      if (tr <= 0) terminar(false);
+    }, 1000);
 
     cart.forEach((c, i) => {
       const el = document.createElement("button");
@@ -1021,33 +1093,18 @@ neon:{nombre:"Fondo Neón",precio:20000,icono:"rayoDoble",sheet:"tienda",sprite:
         snd("blip");
         if (!pr) { pr = el; return; }
         if (pr === el) return;
-        sg = el; it++; eI.textContent = it; bl = true; racha = 0; eRa.textContent = racha;
-vidas--; eV.textContent = vidas;
-snd("derrota");
-// ✅ Revelar sprite
-sprite.style.filter = "blur(0) brightness(1)";
-sprite.style.transform = "scale(1)";
-sprite.style.opacity = "1";
+        sg = el; it++; eI.textContent = it; bl = true;
         if (pr.dataset.id === sg.dataset.id) {
-          setTimeout(() => {
+          programar(() => {
             pr.classList.add("emparejada"); sg.classList.add("emparejada");
             pa++; eP.textContent = pa;
             barra.style.width = (pa / eleg.length * 100) + "%";
             snd("moneda");
             pr = sg = null; bl = false;
-            if (pa === eleg.length) {
-              clearInterval(ivT);
-              const m = Math.max(5, 25 - it + Math.max(0, tr));
-              darPremio(m, 15, `¡Memoria completada! +${m}`);
-              const p = qs(".minijuego-panel", o), r = document.createElement("div");
-              r.className = "minijuego-mensaje jm-final";
-              r.innerHTML = `<div class="jg-final-emoji">${it <= 12 ? (ICONO.trofeo || "") : it <= 20 ? (ICONO.estrella || "") : (ICONO.imagen || "")}</div><h2>¡Lo lograste!</h2><p>En <strong>${it}</strong> intentos con <strong>${tr}s</strong> restantes</p><p style="color:#ffd93d;font-weight:bold;">+${m} · +15</p><div class="minijuego-botones"><button type="button" class="btn-primary" id="jm-otra">Otra vez</button></div>`;
-              p.appendChild(r);
-              qs("#jm-otra", r).addEventListener("click", () => { o.remove(); juegoMemoria(); });
-            }
+            if (pa === eleg.length) terminar(true);
           }, 500);
         } else {
-          setTimeout(() => { pr.classList.remove("volteada"); sg.classList.remove("volteada"); pr = sg = null; bl = false; }, 900);
+          programar(() => { pr.classList.remove("volteada"); sg.classList.remove("volteada"); pr = sg = null; bl = false; }, 900);
         }
       });
       g.appendChild(el);
@@ -1058,7 +1115,7 @@ sprite.style.opacity = "1";
     const pool = Object.keys(MASCOTAS).filter(desbloqueada);
     const pf = pool.length >= 4 ? pool : Object.keys(MASCOTAS);
     const TOTAL = 20, SEG = 5, OPC = 6;
-    let r = 0, a = 0, cor = "", racha = 0, timer = null, tr = SEG, bl = false, vidas = 2;
+    let r = 0, a = 0, cor = "", racha = 0, timer = null, nextTimer = null, tr = SEG, bl = false, vidas = 2, finalizado = false;
     const o = crearOverlay("juego-adivina-overlay", `
       <h2 class="minijuego-titulo">Adivina la mascota · Difícil</h2>
       <p class="minijuego-desc">¿Quién ha dicho esta frase? ¡Solo ${SEG}s por ronda y ${vidas} vidas!</p>
@@ -1078,6 +1135,11 @@ sprite.style.opacity = "1";
     o.classList.add("active");
     const eA = $("ja-aciertos"), eR = $("ja-ronda"), eRa = $("ja-racha"), eT = $("ja-tiempo"), eV = $("ja-vidas");
     const barra = $("ja-progreso-fill"), sprite = $("ja-sprite"), frase = $("ja-frase"), op = $("ja-opciones");
+    o._registrarCleanup(() => {
+      finalizado = true;
+      clearInterval(timer);
+      clearTimeout(nextTimer);
+    });
     const frases = pf.flatMap(id => (FRASES[id] || []).map(f => ({ id, frase: f })));
     let usadas = new Set();
 
@@ -1102,11 +1164,12 @@ sprite.style.opacity = "1";
           vidas--; eV.textContent = vidas;
           snd("derrota");
           [...op.children].forEach(x => { x.disabled = true; if (x.dataset.id === cor) x.classList.add("correcta"); });
-          setTimeout(() => { if (vidas <= 0) return term(); nR(); }, 1200);
+          nextTimer = setTimeout(() => { if (vidas <= 0) return term(); nR(); }, 1200);
         }
       }, 1000);
     }
     const nR = () => {
+      if (finalizado) return;
       r++;
       if (r > TOTAL) return term();
       bl = false;
@@ -1158,9 +1221,11 @@ sprite.style.opacity = "0.25";
         [...op.children].forEach(x => { if (x.dataset.id === cor) x.classList.add("correcta"); });
       }
       [...op.children].forEach(x => x.disabled = true);
-      setTimeout(() => { if (vidas <= 0) return term(); nR(); }, 1100);
+      nextTimer = setTimeout(() => { if (vidas <= 0) return term(); nR(); }, 1100);
     };
     const term = () => {
+      if (finalizado) return;
+      finalizado = true;
       clearInterval(timer);
       const m = a * 3 + Math.floor(racha / 3);
       darPremio(m, Math.min(20, a * 2), `¡${a}/${TOTAL} aciertos! +${m}`);
@@ -1260,7 +1325,7 @@ sprite.style.opacity = "0.25";
       const m = document.createElement("div");
       m.className = "modal active";
       m.setAttribute("aria-hidden", "false");
-      m.innerHTML = `<div class="modal-backdrop" data-close></div><div class="modal-content"><h3 class="modal-title">Descargar SunAdventures</h3><p style="opacity:.8;margin-bottom:.5rem">Llévanos contigo a todas partes</p><div class="download-grid"><a class="download-option" href="app/sunadventures.apk" download><span class="download-option-icon">${SVG.android}</span><span class="download-option-title">Android</span><span class="download-option-hint">Descargar APK</span></a><button class="download-option" data-platform="ios" type="button"><span class="download-option-icon">${SVG.apple}</span><span class="download-option-title">iOS</span><span class="download-option-hint">Añadir a inicio</span></button><button class="download-option" data-platform="windows" type="button"><span class="download-option-icon">${SVG.windows}</span><span class="download-option-title">Windows</span><span class="download-option-hint">Próximamente</span></button><button class="download-option" data-platform="linux" type="button"><span class="download-option-icon">${SVG.linux}</span><span class="download-option-title">Linux</span><span class="download-option-hint">Próximamente</span></button></div><div class="modal-actions" style="margin-top:1.2rem"><button type="button" class="btn-secondary" data-close>Cerrar</button></div></div>`;
+      m.innerHTML = `<div class="modal-backdrop" data-close></div><div class="modal-content"><h3 class="modal-title">Descargar SunAdventures</h3><p style="opacity:.8;margin-bottom:.5rem">Llévanos contigo a todas partes</p><div class="download-grid"><a class="download-option" href="app/sunadventures.apk" download="SunAdventures-1.3.apk"><span class="download-option-icon">${SVG.android}</span><span class="download-option-title">Android</span><span class="download-option-hint">Descargar APK · v1.3</span></a><button class="download-option" data-platform="ios" type="button"><span class="download-option-icon">${SVG.apple}</span><span class="download-option-title">iOS</span><span class="download-option-hint">Añadir a inicio</span></button><button class="download-option" data-platform="windows" type="button"><span class="download-option-icon">${SVG.windows}</span><span class="download-option-title">Windows</span><span class="download-option-hint">Próximamente</span></button><button class="download-option" data-platform="linux" type="button"><span class="download-option-icon">${SVG.linux}</span><span class="download-option-title">Linux</span><span class="download-option-hint">Próximamente</span></button></div><div class="modal-actions" style="margin-top:1.2rem"><button type="button" class="btn-secondary" data-close>Cerrar</button></div></div>`;
       document.body.appendChild(m);
       document.body.style.overflow = "hidden";
       const c = () => { m.remove(); document.body.style.overflow = ""; };
@@ -1447,8 +1512,6 @@ sprite.style.opacity = "0.25";
   window.addEventListener("sunadventures:inventario-refresh", () => { try { window._renderInv?.(); } catch {} });
   window.addEventListener("sunadventures:tienda-compra", () => {
     try {
-      const embed = $("tienda-embed");
-      if (embed && window.Tienda?.render) window.Tienda.render();
       window._actualizarModalMascota?.();
     } catch {}
   });

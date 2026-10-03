@@ -17,21 +17,62 @@
   const SND = t => { try { window._snd?.(t); } catch {} };
   const MASCOTAS = window._MASCOTAS || {};
   const confirmar = (o) => window.SunModal ? window.SunModal.confirm(o) : Promise.resolve(confirm(o.message || o.title));
+  const BIOMA_IMAGES = new Map();
+  const ROGUELIKE_SPRITES = new Map();
+  const RL_SPRITE_DIR = 'img/items%20de%20aventura/';
+  const RL_SPRITE_MAP = {
+    '⚔️':'espada', '⚔':'espada', '🗡️':'espada',
+    '🛡️':'armadura', '🛡':'armadura', '🎯':'estrella',
+    '💰':'icon', '🪙':'icon', '🧪':'pocion', '🔥':'estrella',
+    '👑':'corona', '💀':'calavera', '☠️':'calavera',
+    '💎':'diamante', '🛒':'tienda', '❓':'estrella',
+    '✨':'estrella', '❤️':'estrella', '💗':'estrella',
+    '🩸':'pocion', '💚':'estrella', '🐾':'armadura',
+    '🏃':'espada', '💔':'estrella', '🩹':'pocion',
+    '🐌':'estrella', '🤐':'estrella', '💸':'icon',
+    '👻':'calavera', '🦷':'espada', '🍀':'estrella',
+    '👢':'armadura', '🪞':'estrella', '💍':'corona',
+    '🧿':'estrella', '⚡':'estrella', '🗿':'calavera',
+    '🦁':'calavera', '🧙':'corona', '🧌':'calavera',
+    '🧛':'calavera', '🔮':'estrella', '🐉':'corona',
+    '🦑':'calavera', '👿':'calavera', '👁️':'estrella',
+    '🟢':'estrella', '🐀':'calavera', '🦇':'calavera',
+    '🐸':'calavera', '🍄':'estrella', '🐺':'calavera',
+    '🧼':'estrella', '⚠️':'calavera', '✓':'estrella'
+  };
+  const spriteMarkup = (icon, className = 'rpg-rl-sprite') => {
+    const sprite = RL_SPRITE_MAP[icon];
+    return sprite
+      ? `<img class="${className}" src="${RL_SPRITE_DIR}${sprite}.png" alt="" aria-hidden="true">`
+      : `<span class="${className}" aria-hidden="true">${icon || ''}</span>`;
+  };
 
   /* ============================================================
      CONSTANTES
      ============================================================ */
   const PISOS_MAX = 10;
   const COLS_POR_PISO = 6;
+  const BENDICIONES_INICIALES = {
+    vitalidad: { nombre:'Corazón de roble', detalle:'+25 HP máximo y empiezas curado', icono:'❤️' },
+    fuerza: { nombre:'Filo solar', detalle:'+3 ATK durante toda la run', icono:'⚔️' },
+    pocion: { nombre:'Bolsa de viaje', detalle:'+1 poción al comenzar', icono:'🧪' }
+  };
+  let bendicionElegida = 'vitalidad';
 
   const TIPOS = {
-    combat:  { ico:'⚔️',  nombre:'Combate',  color:'#ff7a9c' },
-    elite:   { ico:'💀',  nombre:'Élite',    color:'#a684f0' },
-    treasure:{ ico:'💎',  nombre:'Tesoro',   color:'#6cb8ff' },
-    shop:    { ico:'🛒',  nombre:'Tienda',   color:'#ffd93d' },
-    rest:    { ico:'🔥',  nombre:'Descanso', color:'#4dd48e' },
-    event:   { ico:'❓',  nombre:'Evento',   color:'#ff9a3d' },
-    boss:    { ico:'👑',  nombre:'Jefe',     color:'#ffae3d' }
+    combat:  { ico:'⚔️', sprite:'espada',  nombre:'Combate',  color:'#ff7a9c' },
+    elite:   { ico:'💀', sprite:'calavera', nombre:'Élite',    color:'#a684f0' },
+    treasure:{ ico:'💎', sprite:'diamante', nombre:'Tesoro',   color:'#6cb8ff' },
+    shop:    { ico:'🛒', sprite:'tienda',   nombre:'Tienda',   color:'#ffd93d' },
+    rest:    { ico:'🔥', sprite:'pocion',   nombre:'Descanso', color:'#4dd48e' },
+    event:   { ico:'❓', sprite:'estrella', nombre:'Evento',   color:'#ff9a3d' },
+    boss:    { ico:'👑', sprite:'corona',   nombre:'Jefe',     color:'#ffae3d' }
+  };
+  const NOMBRES_ESPECIALES = {
+    heal:'Curación oscura', buff:'Furia creciente', debuff:'Debilitamiento',
+    poison:'Veneno', multihit:'Combo de golpes', drain:'Drenaje de vida',
+    shield:'Barrera', firebreath:'Aliento de fuego', summon:'Invocación',
+    curse:'Maldición', apocalypse:'Apocalipsis'
   };
 
   const ENEMIGOS_RL = {
@@ -114,10 +155,10 @@
     return b;
   }
 
-  function nuevoRun(mascotaId) {
+  function nuevoRun(mascotaId, bendicionId = 'vitalidad') {
     const meta = cargarMeta();
     const b = bonosMeta(meta);
-    return {
+    const run = {
       mascota: mascotaId,
       hp: 100 + b.hp, hpMax: 100 + b.hp,
       atk: 10 + b.atk, def: 3 + b.def,
@@ -134,8 +175,20 @@
       turno: 'jugador',
       cd: 0, cdMax: 3, cdReduction: 0, cdPenalty: 0,
       doubleAtk: 0, regen: 0, sangrado: 0,
+      guardia: false, racha: 0,
       log: [], vivo: true, semilla: Date.now()
     };
+    run.bendicionInicial = BENDICIONES_INICIALES[bendicionId] ? bendicionId : 'vitalidad';
+    if (run.bendicionInicial === 'vitalidad') {
+      run.hp += 25;
+      run.hpMax += 25;
+    } else if (run.bendicionInicial === 'fuerza') {
+      run.atk += 3;
+    } else {
+      run.pocionesInicio++;
+      run.pociones++;
+    }
+    return run;
   }
 
   const cargarRun = () => {
@@ -155,6 +208,11 @@
   const limpiarRun = () => { try { localStorage.removeItem(KEY_RUN()); } catch {} };
 
   let state = cargarRun();
+  if (state && typeof state.guardia !== 'boolean') state.guardia = false;
+  if (state && !Number.isFinite(state.racha)) state.racha = 0;
+  if (state?.enemigo && !Number.isFinite(state.enemigo.specialTimer)) {
+    state.enemigo.specialTimer = state.enemigo.specialCD || 3;
+  }
   let _animTimer = null;
 
   /* ============================================================
@@ -201,10 +259,26 @@
       canvas.height = H * dpr;
     }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
     const g = ctx.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, '#0a0e27'); g.addColorStop(1, '#050816');
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    const bioma = window.Rpg?.biomas?.[Math.min(Math.max(mapa.piso - 1, 0), 14)];
+    if (bioma?.imagen) {
+      let imagen = BIOMA_IMAGES.get(bioma.imagen);
+      if (!imagen) {
+        imagen = new Image();
+        imagen.src = bioma.imagen;
+        BIOMA_IMAGES.set(bioma.imagen, imagen);
+      }
+      if (imagen.complete && imagen.naturalWidth) {
+        ctx.drawImage(imagen, 0, 0, W, H);
+        ctx.fillStyle = 'rgba(5,8,20,.62)';
+        ctx.fillRect(0, 0, W, H);
+      }
+    }
 
     ctx.strokeStyle = 'rgba(255,217,61,0.05)'; ctx.lineWidth = 1;
     for (let x = 0; x < W; x += 32) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
@@ -250,10 +324,21 @@
       else { ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fill(); ctx.strokeStyle = 'rgba(255,255,255,0.15)'; }
       ctx.lineWidth = 2.5; ctx.stroke();
 
-      ctx.font = `${radius + 6}px system-ui, sans-serif`;
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#fff';
-      ctx.fillText(tipo.ico, x, y + 1);
+      let sprite = ROGUELIKE_SPRITES.get(tipo.sprite);
+      if (!sprite) {
+        sprite = new Image();
+        sprite.src = `${RL_SPRITE_DIR}${tipo.sprite}.png`;
+        ROGUELIKE_SPRITES.set(tipo.sprite, sprite);
+      }
+      if (sprite.complete && sprite.naturalWidth) {
+        const iconSize = radius * (n.tipo === 'boss' ? 1.35 : 1.2);
+        ctx.drawImage(sprite, x - iconSize / 2, y - iconSize / 2, iconSize, iconSize);
+      } else {
+        ctx.font = `${radius + 6}px system-ui, sans-serif`;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#fff';
+        ctx.fillText(tipo.ico, x, y + 1);
+      }
 
       if (esActual) {
         ctx.beginPath();
@@ -322,7 +407,7 @@
     panel.innerHTML = `
       <div class="rpg-rl-menu">
         <div class="rpg-rl-hero">
-          <div class="rpg-rl-hero-art">${m.imagen ? `<img src="${m.imagen}" alt="">` : '🐾'}</div>
+          <div class="rpg-rl-hero-art">${m.imagen ? `<img src="${m.imagen}" alt="">` : spriteMarkup('🐾')}</div>
           <h2>Modo Roguelike</h2>
           <p>10 pisos · 6 columnas · Maldiciones · Jefes con 2 fases</p>
           <div class="rpg-rl-stats">
@@ -335,10 +420,22 @@
             <span class="rpg-rl-bono-chip">+${b.hp} HP</span>
             <span class="rpg-rl-bono-chip">+${b.atk} ATK</span>
             <span class="rpg-rl-bono-chip">+${b.def} DEF</span>
-            <span class="rpg-rl-bono-chip">+${b.pocion} 🧪</span>
+            <span class="rpg-rl-bono-chip">${spriteMarkup('🧪')} +${b.pocion} pociones</span>
             <span class="rpg-rl-bono-chip">+${Math.round(b.crit*100)}% crit</span>
           </div>
         </div>
+        <fieldset class="rpg-rl-bendiciones">
+          <legend>Elige tu bendición para esta run</legend>
+          <div class="rpg-rl-bendiciones-grid">
+            ${Object.entries(BENDICIONES_INICIALES).map(([id, bendicion]) => `
+              <button type="button" class="rpg-rl-bendicion${bendicionElegida === id ? ' seleccionada' : ''}" data-bendicion="${id}" aria-pressed="${bendicionElegida === id}">
+                ${spriteMarkup(bendicion.icono)}
+                <strong>${bendicion.nombre}</strong>
+                <small>${bendicion.detalle}</small>
+              </button>
+            `).join('')}
+          </div>
+        </fieldset>
         <button type="button" class="btn-primary rpg-rl-start" id="rl-start">▶ Iniciar nueva run</button>
         ${meta.runs > 0 ? `<button type="button" class="btn-secondary" id="rl-reset-meta">Resetear estadísticas</button>` : ''}
         <div class="rpg-rl-info">
@@ -352,8 +449,16 @@
           </ul>
         </div>
       </div>`;
+    qsa('[data-bendicion]', panel).forEach(boton => boton.addEventListener('click', () => {
+      bendicionElegida = boton.dataset.bendicion;
+      qsa('[data-bendicion]', panel).forEach(opcion => {
+        const activa = opcion === boton;
+        opcion.classList.toggle('seleccionada', activa);
+        opcion.setAttribute('aria-pressed', String(activa));
+      });
+    }));
     $('rl-start')?.addEventListener('click', () => {
-      state = nuevoRun(mascotaId);
+      state = nuevoRun(mascotaId, bendicionElegida);
       guardarRun(state);
       SND('victoria');
       renderPanel();
@@ -381,11 +486,12 @@
             <em>${Math.round(state.hp)} / ${state.hpMax} HP</em>
           </div>
           <div class="rpg-rl-hud-chips">
-            <span class="rpg-rl-chip atk">⚔️ ${state.atk}</span>
-            <span class="rpg-rl-chip def">🛡️ ${state.def}</span>
-            <span class="rpg-rl-chip crit">🎯 ${Math.round(state.crit*100)}%</span>
-            <span class="rpg-rl-chip oro">💰 ${state.oro}</span>
-            <span class="rpg-rl-chip poc">🧪 ${state.pociones}</span>
+                <span class="rpg-rl-chip atk">${spriteMarkup('⚔️')} ${state.atk}</span>
+                <span class="rpg-rl-chip def">${spriteMarkup('🛡️')} ${state.def}</span>
+                <span class="rpg-rl-chip crit">${spriteMarkup('🎯')} ${Math.round(state.crit*100)}%</span>
+                <span class="rpg-rl-chip oro">${spriteMarkup('💰')} ${state.oro}</span>
+                <span class="rpg-rl-chip poc">${spriteMarkup('🧪')} ${state.pociones}</span>
+                <span class="rpg-rl-chip racha">${spriteMarkup('🔥')} Racha ${state.racha % 3}/3</span>
           </div>
         </div>
       </div>
@@ -394,7 +500,7 @@
         ${state.reliquias.length
           ? state.reliquias.map(rid => {
               const r = RELIQUIAS.find(x => x.id === rid);
-              return r ? `<span class="rpg-rl-chip-reliquia rar-${r.rar}" title="${r.desc}">${r.ico} ${r.nombre}</span>` : '';
+              return r ? `<span class="rpg-rl-chip-reliquia rar-${r.rar}" title="${r.desc}">${spriteMarkup(r.ico)} ${r.nombre}</span>` : '';
             }).join('')
           : '<span class="rpg-rl-vacio">Sin reliquias todavía…</span>'}
       </div>
@@ -403,7 +509,7 @@
           <span class="rpg-rl-mald-label">Maldiciones activas:</span>
           ${state.maldiciones.map(mid => {
             const mm = MALDICIONES.find(x => x.id === mid);
-            return mm ? `<span class="rpg-rl-chip-maldicion" title="${mm.desc}">${mm.ico} ${mm.nombre}</span>` : '';
+            return mm ? `<span class="rpg-rl-chip-maldicion" title="${mm.desc}">${spriteMarkup(mm.ico)} ${mm.nombre}</span>` : '';
           }).join('')}
         </div>` : ''}
       <button type="button" class="btn-secondary rpg-rl-abandonar" id="rl-abandonar">Abandonar run</button>
@@ -510,24 +616,28 @@
             </div>
           </div>
           <div class="rpg-rl-fighter-info enemigo ${esFase2 ? 'fase2' : ''}">
-            <strong>${e.nombre} ${e.tier === 'jefe' ? (esFase2 ? '🔥 FASE 2' : '👑') : e.tier === 'elite' ? '💀' : ''}</strong>
+            <strong>${e.nombre} ${e.tier === 'jefe' ? (esFase2 ? `${spriteMarkup('🔥')} FASE 2` : spriteMarkup('👑')) : e.tier === 'elite' ? spriteMarkup('💀') : ''}</strong>
             <div class="rpg-rl-barra-hp enemigo ${esFase2 ? 'fase2' : ''}">
               <span style="width:${clamp(e.hp/e.hpMax*100)}%"></span>
               <em>${Math.round(e.hp)} / ${e.hpMax}</em>
             </div>
-            ${e.shield > 0 ? `<small class="rpg-rl-shield">🛡️ Escudo: ${e.shield}</small>` : ''}
+            ${e.shield > 0 ? `<small class="rpg-rl-shield">${spriteMarkup('🛡️')} Escudo: ${e.shield}</small>` : ''}
+            <small class="rpg-rl-intencion" id="rl-intencion">${spriteMarkup('⚠️')} ${NOMBRES_ESPECIALES[e.special] || 'Ataque especial'} en ${e.specialTimer} turno${e.specialTimer === 1 ? '' : 's'}</small>
           </div>
         </div>
         <div class="rpg-rl-acciones">
-          <button type="button" class="rpg-rl-btn atacar" data-accion="atacar"><span>⚔️</span><span>Atacar</span></button>
+          <button type="button" class="rpg-rl-btn atacar" data-accion="atacar">${spriteMarkup('⚔️')}<span>Atacar</span></button>
           <button type="button" class="rpg-rl-btn habilidad ${cdListo ? 'listo' : ''}" data-accion="habilidad" ${cdListo ? '' : 'disabled'}>
-            <span>✨</span><span>${cdListo ? 'Habilidad' : `CD: ${state.cd}`}</span>
+            ${spriteMarkup('✨')}<span>${cdListo ? 'Habilidad' : `CD: ${state.cd}`}</span>
           </button>
           <button type="button" class="rpg-rl-btn pocion" data-accion="pocion" ${state.pociones <= 0 ? 'disabled' : ''}>
-            <span>🧪</span><span>Poción (${state.pociones})</span>
+            ${spriteMarkup('🧪')}<span>Poción (${state.pociones})</span>
+          </button>
+          <button type="button" class="rpg-rl-btn guardia ${state.guardia ? 'activa' : ''}" data-accion="guardia">
+            ${spriteMarkup('🛡️')}<span>${state.guardia ? 'Defensa lista' : 'Defender'}</span>
           </button>
           <button type="button" class="rpg-rl-btn huir" data-accion="huir" ${e.tier === 'jefe' ? 'disabled' : ''}>
-            <span>🏃</span><span>${e.tier === 'jefe' ? 'Sin escape' : 'Huir'}</span>
+            ${spriteMarkup('🏃')}<span>${e.tier === 'jefe' ? 'Sin escape' : 'Huir'}</span>
           </button>
         </div>
         <div class="rpg-rl-log" id="rl-log"></div>
@@ -544,6 +654,7 @@
         case 'atacar':    accionAtacar(animador); break;
         case 'habilidad': accionHabilidad(animador); break;
         case 'pocion':    accionPocion(animador); break;
+        case 'guardia':   accionGuardia(); break;
         case 'huir':      accionHuir(animador); break;
       }
     }));
@@ -576,10 +687,43 @@
     }
   }
 
+  function actualizarIntencion(e) {
+    const el = $('rl-intencion');
+    if (!el || !e) return;
+    el.innerHTML = `${spriteMarkup('⚠️')} ${e.specialTimer <= 0
+      ? `¡${NOMBRES_ESPECIALES[e.special] || 'Ataque especial'} ahora!`
+      : `${NOMBRES_ESPECIALES[e.special] || 'Ataque especial'} en ${e.specialTimer} turno${e.specialTimer === 1 ? '' : 's'}`}`;
+  }
+
   function calcularDmgBase() {
     let dmg = state.atk * (state.atkMult || 1) + rnd(-2, 3);
     if (state.furia && state.hp / state.hpMax < 0.3) dmg *= 1.6;
     return Math.round(dmg);
+  }
+
+  function recibirDanio(cantidad) {
+    let recibido = Math.max(0, Math.round(cantidad));
+    if (state.guardia) {
+      const bloqueado = Math.floor(recibido * 0.5);
+      recibido -= bloqueado;
+      state.guardia = false;
+      logBatalla(`🛡️ ¡Defensa perfecta! Bloqueas ${bloqueado} de daño`);
+    }
+    state.hp = Math.max(0, state.hp - recibido);
+    return recibido;
+  }
+
+  function accionGuardia() {
+    state.guardia = true;
+    logBatalla('🛡️ Te preparas: reducirás a la mitad el próximo daño recibido');
+    SND('blip');
+    const boton = qs('[data-accion="guardia"]');
+    if (boton) {
+      boton.classList.add('activa');
+      const etiqueta = boton.querySelector('span:last-child');
+      if (etiqueta) etiqueta.textContent = 'Defensa lista';
+    }
+    setTimeout(turnoEnemigo, 350);
   }
 
   function accionAtacar(animador) {
@@ -762,8 +906,10 @@
     }
 
     e.specialTimer--;
+    actualizarIntencion(e);
     if (e.specialTimer <= 0) {
       e.specialTimer = e.specialCD;
+      actualizarIntencion({ ...e, specialTimer:0 });
       setTimeout(() => ejecutarEspecial(e), 400);
       return;
     }
@@ -779,10 +925,16 @@
       state.turno = 'jugador';
       guardarRun(state);
       reactivarBotones(qs('.rpg-rl-batalla'));
+      const guardiaBtn = qs('[data-accion="guardia"]');
+      if (guardiaBtn) {
+        guardiaBtn.classList.toggle('activa', state.guardia);
+        const etiqueta = guardiaBtn.querySelector('span:last-child');
+        if (etiqueta) etiqueta.textContent = state.guardia ? 'Defensa lista' : 'Defender';
+      }
       return;
     }
     let dmg = Math.max(1, e.atk - Math.floor(state.def * 0.5) + rnd(-2, 2));
-    state.hp = Math.max(0, state.hp - dmg);
+    dmg = recibirDanio(dmg);
     SND('derrota');
     logBatalla(`💥 ${e.nombre} te ataca por ${dmg}`);
     const anim = $('rl-canvas-batalla')?._batallaAnim;
@@ -823,9 +975,9 @@
         let total = 0;
         for (let i = 0; i < 3; i++) {
           const d = Math.max(1, Math.floor(e.atk * 0.5));
-          state.hp = Math.max(0, state.hp - d);
           total += d;
         }
+        total = recibirDanio(total);
         logBatalla(`💥💥💥 ¡Triple golpe! ${total} daño`);
         anim?.playEnemyAttack(total);
         break;
@@ -837,10 +989,10 @@
       }
       case 'drain': {
         const d = Math.max(1, Math.floor(e.atk * 0.9));
-        state.hp = Math.max(0, state.hp - d);
-        e.hp = clamp(e.hp + Math.round(d * 0.6), 0, e.hpMax);
-        logBatalla(`🩸 ${e.nombre} te drena ${d} HP`);
-        anim?.playEnemyAttack(d);
+        const recibido = recibirDanio(d);
+        e.hp = clamp(e.hp + Math.round(recibido * 0.6), 0, e.hpMax);
+        logBatalla(`🩸 ${e.nombre} te drena ${recibido} HP`);
+        anim?.playEnemyAttack(recibido);
         break;
       }
       case 'shield': {
@@ -850,18 +1002,18 @@
       }
       case 'firebreath': {
         const d = Math.max(1, Math.round(e.atk * 1.4));
-        state.hp = Math.max(0, state.hp - d);
+        const recibido = recibirDanio(d);
         state.sangrado = (state.sangrado || 0) + 2;
-        logBatalla(`🔥 ¡Aliento de fuego! ${d} daño + quemadura`);
-        anim?.playEnemyAttack(d);
+        logBatalla(`🔥 ¡Aliento de fuego! ${recibido} daño + quemadura`);
+        anim?.playEnemyAttack(recibido);
         break;
       }
       case 'summon': {
         const d = Math.max(1, Math.round(e.atk * 0.7));
-        state.hp = Math.max(0, state.hp - d);
+        const recibido = recibirDanio(d);
         e.hp = clamp(e.hp + Math.round(e.hpMax * 0.15), 0, e.hpMax);
-        logBatalla(`💀 ${e.nombre} invoca esqueletos · ${d} daño · se cura`);
-        anim?.playEnemyAttack(d);
+        logBatalla(`💀 ${e.nombre} invoca esqueletos · ${recibido} daño · se cura`);
+        anim?.playEnemyAttack(recibido);
         break;
       }
       case 'curse': {
@@ -871,25 +1023,26 @@
           aplicarMaldicion(mal);
           logBatalla(`💀 ¡MALDICIÓN APLICADA: ${mal.nombre}!`);
         } else {
-          state.hp = Math.max(0, state.hp - Math.round(e.atk * 1.2));
-          logBatalla(`💀 ¡Maldición total! -${Math.round(e.atk * 1.2)} HP`);
+          const recibido = recibirDanio(Math.round(e.atk * 1.2));
+          logBatalla(`💀 ¡Maldición total! -${recibido} HP`);
         }
         break;
       }
       case 'apocalypse': {
         const d = Math.max(1, Math.round(e.atk * 1.8));
-        state.hp = Math.max(0, state.hp - d);
+        const recibido = recibirDanio(d);
         e.shield = Math.round(e.hpMax * 0.15);
-        logBatalla(`☄️ ¡APOCALIPSIS! ${d} daño + escudo`);
-        anim?.playEnemyAttack(d);
+        logBatalla(`☄️ ¡APOCALIPSIS! ${recibido} daño + escudo`);
+        anim?.playEnemyAttack(recibido);
         break;
       }
       default: {
         const d = Math.max(1, Math.floor(e.atk * 1.2));
-        state.hp = Math.max(0, state.hp - d);
-        logBatalla(`⚡ ${e.nombre} usa un ataque especial (${d})`);
+        const recibido = recibirDanio(d);
+        logBatalla(`⚡ ${e.nombre} usa un ataque especial (${recibido})`);
       }
     }
+    actualizarIntencion(e);
     finalizarTurnoEnemigo();
   }
 
@@ -925,6 +1078,12 @@
     state.enBatalla = false;
     const e = state.enemigo;
     let oroGanado = Math.round(rnd(10, 22) * (e.tier === 'jefe' ? 8 : e.tier === 'elite' ? 3.5 : 1) * state.oroMult);
+    state.racha = (state.racha || 0) + 1;
+    const premioRacha = state.racha % 3 === 0;
+    if (premioRacha) {
+      oroGanado += 20;
+      state.pociones++;
+    }
     state.oro += oroGanado;
     state.xp += e.xp;
     let subido = false;
@@ -970,6 +1129,7 @@
       state.enemigo = null;
       guardarRun(state);
       const lineas = [`+${oroGanado} oro`, `+${e.xp} XP`];
+      if (premioRacha) lineas.push(`🔥 Racha x${state.racha}: +20 oro y una poción`);
       if (subido) lineas.push(`⬆️ Nivel ${state.nivel}`);
       if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}`);
       mostrarRecompensa('¡Victoria!', lineas, () => renderPanel());
@@ -1055,7 +1215,7 @@
         <div class="rpg-rl-eleccion-lista">
           ${opciones.map((o, i) => `
             <button type="button" class="rpg-rl-opcion rpg-rl-opcion-reliquia" data-i="${i}">
-              <span class="rpg-rl-opcion-ico">${o.ico}</span>
+              ${spriteMarkup(o.ico, 'rpg-rl-opcion-ico')}
               <strong>${o.titulo}</strong>
               <small>${o.desc}</small>
             </button>`).join('')}
@@ -1109,24 +1269,24 @@
     card.className = 'rpg-rl-recompensa';
     card.innerHTML = `
       <div class="rpg-rl-recompensa-card rpg-rl-tienda">
-        <h2>🛒 Tienda</h2>
+        <h2>${spriteMarkup('🛒', 'rpg-rl-sprite rpg-rl-tienda-title-icon')} Tienda</h2>
         <p>Oro: <strong>${state.oro}</strong></p>
         <div class="rpg-rl-tienda-lista">
           ${items.map((o, i) => `
             <button type="button" class="rpg-rl-tienda-item" data-i="${i}" ${state.oro < o.precio ? 'disabled' : ''}>
-              <span class="rpg-rl-tienda-ico">${o.rel.ico}</span>
+              ${spriteMarkup(o.rel.ico, 'rpg-rl-tienda-ico')}
               <strong>${o.rel.nombre}</strong>
               <small>${o.rel.desc}</small>
               <em>💰 ${o.precio}</em>
             </button>`).join('')}
           <button type="button" class="rpg-rl-tienda-item" data-pocion="1" ${state.oro < precioPocion ? 'disabled' : ''}>
-            <span class="rpg-rl-tienda-ico">🧪</span>
+            ${spriteMarkup('🧪', 'rpg-rl-tienda-ico')}
             <strong>Poción curativa</strong>
             <small>+45% HP máximo</small>
             <em>💰 ${precioPocion}</em>
           </button>
           <button type="button" class="rpg-rl-tienda-item" data-heal="1" ${state.oro < 45 ? 'disabled' : ''}>
-            <span class="rpg-rl-tienda-ico">❤️</span>
+            ${spriteMarkup('❤️', 'rpg-rl-tienda-ico')}
             <strong>Curar 30% HP</strong>
             <small>Recuperación inmediata</small>
             <em>💰 45</em>
@@ -1173,12 +1333,12 @@
         <h2>🔥 Descanso</h2>
         <p>Elige un beneficio</p>
         <div class="rpg-rl-descanso-opts">
-          <button type="button" class="rpg-rl-opcion" data-op="curar"><span>❤️</span><strong>Curar 40% HP</strong></button>
-          <button type="button" class="rpg-rl-opcion" data-op="atk"><span>⚔️</span><strong>+3 ATK</strong></button>
-          <button type="button" class="rpg-rl-opcion" data-op="def"><span>🛡️</span><strong>+2 DEF</strong></button>
-          <button type="button" class="rpg-rl-opcion" data-op="pocion"><span>🧪</span><strong>+1 Poción</strong></button>
-          <button type="button" class="rpg-rl-opcion" data-op="hp"><span>💗</span><strong>+15 HP máx</strong></button>
-          <button type="button" class="rpg-rl-opcion" data-op="crit"><span>🎯</span><strong>+5% crítico</strong></button>
+          <button type="button" class="rpg-rl-opcion" data-op="curar">${spriteMarkup('❤️', 'rpg-rl-opcion-ico')}<strong>Curar 40% HP</strong></button>
+          <button type="button" class="rpg-rl-opcion" data-op="atk">${spriteMarkup('⚔️', 'rpg-rl-opcion-ico')}<strong>+3 ATK</strong></button>
+          <button type="button" class="rpg-rl-opcion" data-op="def">${spriteMarkup('🛡️', 'rpg-rl-opcion-ico')}<strong>+2 DEF</strong></button>
+          <button type="button" class="rpg-rl-opcion" data-op="pocion">${spriteMarkup('🧪', 'rpg-rl-opcion-ico')}<strong>+1 Poción</strong></button>
+          <button type="button" class="rpg-rl-opcion" data-op="hp">${spriteMarkup('💗', 'rpg-rl-opcion-ico')}<strong>+15 HP máx</strong></button>
+          <button type="button" class="rpg-rl-opcion" data-op="crit">${spriteMarkup('🎯', 'rpg-rl-opcion-ico')}<strong>+5% crítico</strong></button>
         </div>
       </div>`;
     panel.appendChild(card);
@@ -1333,12 +1493,18 @@
     canvas.width = this.W * dpr;
     canvas.height = this.H * dpr;
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.ctx.imageSmoothingEnabled = true;
+    this.ctx.imageSmoothingQuality = 'high';
     this.last = performance.now();
     this._loop = this._loop.bind(this);
     canvas._batallaAnim = this;
-    this.sprites = { hero: null };
+    this.sprites = { hero: null, enemy: null };
     const m = MASCOTAS[state.mascota] || {};
     if (m.imagen) { const i = new Image(); i.onload = () => { this.sprites.hero = i; }; i.src = m.imagen; }
+    const enemySprite = state.enemigo?.tier === 'jefe' ? 'corona' : state.enemigo?.tier === 'elite' ? 'calavera' : 'espada';
+    const enemyImage = new Image();
+    enemyImage.onload = () => { this.sprites.enemy = enemyImage; };
+    enemyImage.src = `${RL_SPRITE_DIR}${enemySprite}.png`;
     this.raf = requestAnimationFrame(this._loop);
   }
   BatallaCanvas.prototype.playAttack = function (fxKey, dmg, crit) {
@@ -1435,7 +1601,7 @@
     const x = this.W * 0.22 + (this.heroShake > 0 ? (Math.random() - 0.5) * 12 : 0);
     const y = this.H * 0.55;
     ctx.save(); ctx.translate(x, y);
-    if (this.sprites.hero) { ctx.imageSmoothingEnabled = false; ctx.drawImage(this.sprites.hero, -55, -55, 110, 110); }
+    if (this.sprites.hero) { ctx.imageSmoothingEnabled = true; ctx.drawImage(this.sprites.hero, -55, -55, 110, 110); }
     else { ctx.font = '80px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🐾', 0, 0); }
     ctx.restore();
     ctx.save(); ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(x, y + 60, 45, 10, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
@@ -1451,9 +1617,14 @@
       g.addColorStop(1, 'rgba(255,84,112,0)');
       ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, 100, 0, Math.PI * 2); ctx.fill();
     }
-    ctx.font = '90px system-ui, sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(e.ico || '👹', 0, 0);
+    if (this.sprites.enemy) {
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(this.sprites.enemy, -54, -54, 108, 108);
+    } else {
+      ctx.font = '90px system-ui, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(e.ico || '👹', 0, 0);
+    }
     ctx.restore();
     ctx.save(); ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(x, y + 60, 50, 12, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
   };

@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const BUCKET_NAME = "album", BUCKET_CANCIONES = "canciones";
   const URL_EXPIRY = 3600, URL_EXPIRY_CANCIONES = 14400, DURACION_CACHE_URL = (URL_EXPIRY - 60) * 1000;
   const CENSURA_KEY = "sunadventures_censura_activa";
-  const PUSH_VAPID_PUBLIC_KEY = "BGFg_T3XTTCpN0aIKRXGq3sBvh0RGWOFmxx25tdpQ5OhNgHmuFDJ7TiXLfmgy4ktdqfE81uODV_PLKFqu_vy7_w";
+  const PUSH_VAPID_PUBLIC_KEY = "BGLQw2FyE65Bd8m2BcucYBvgCPrfJQEDfDr-VE2EalHz4LzcKBwjtysfCrWxyIhYULhmTNroGxJZCCnqtjrCrog";
   const AUDIO_EXTS = ["mp3","m4a","wav","ogg","flac","aac","opus"], VIDEO_EXTS = ["mp4","webm","mov","mkv"];
   const MESES_LARGOS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
   const MESES_CORTOS = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const urlsFirmadasCache = new Map();
   let archivosPendientes = [], usuarioActualId = null;
   let colaReproduccion = [], indiceReproduccion = -1, modoAleatorio = false, modoRepetir = "off";
-  let volumenActual = parseFloat(localStorage.getItem("player_volumen") || "0.8");
+  let volumenActual = parseFloat(localStorage.getItem("app_volume") || localStorage.getItem("player_volumen") || "0.8");
   let silenciadoAntes = false, reproduciendo = false;
   let chatSubscription = null, chatModo = "grupo", chatDestinatario = null;
   mesMostrado.setDate(1);
@@ -365,10 +365,19 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("grupo_activo", grupo.id);
       }
       grupoActivo = membresia.grupos || { id:membresia.grupo_id, nombre:"Nuestro grupo de aventuras" };
+      localStorage.setItem("grupo_activo", grupoActivo.id);
+      window.dispatchEvent(new CustomEvent("sunadventures:group-ready", { detail:{ groupId:grupoActivo.id, userId:session.user.id } }));
       await Promise.all(["fotos","notas","playlists"].map(t => supabase.from(t).update({ grupo_id:grupoActivo.id }).eq("user_id", session.user.id).is("grupo_id", null)));
       return grupoActivo;
-    } catch (err) { console.error("asegurarGrupoActivo:", err); grupoActivo = null; return null; }
+    } catch (err) {
+      console.error("asegurarGrupoActivo:", err);
+      grupoActivo = null;
+      window.dispatchEvent(new CustomEvent("sunadventures:group-error", { detail:{ message:err?.message || "Error desconocido" } }));
+      return null;
+    }
   }
+  window._asegurarGrupoActivo = asegurarGrupoActivo;
+  window._getGrupoActivo = () => grupoActivo;
 
   async function cargarMiembrosGrupo() {
     try {
@@ -426,7 +435,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function abrirAjustes() {
     if (!settingsModal) return;
-    try { if (toggleCensura) toggleCensura.checked = localStorage.getItem(CENSURA_KEY) === "true"; settingsModal.classList.add("active"); settingsModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden"; } catch {}
+    try {
+      if (toggleCensura) toggleCensura.checked = localStorage.getItem(CENSURA_KEY) === "true";
+      window.SunPreferences?.setLanguage(window.SunPreferences.getLanguage());
+      window.SunPreferences?.setAnimationsDisabled(localStorage.getItem("sunadventures_animations_disabled") === "true");
+      window.SunPreferences?.setVolume(localStorage.getItem("app_volume") || localStorage.getItem("player_volumen") || "0.8");
+      settingsModal.classList.add("active");
+      settingsModal.setAttribute("aria-hidden","false");
+      document.body.style.overflow = "hidden";
+    } catch (err) { console.error("abrirAjustes:", err); }
   }
   settingsModal?.querySelectorAll("[data-close-settings]").forEach(el => el.addEventListener("click", () => { settingsModal.classList.remove("active"); settingsModal.setAttribute("aria-hidden","true"); document.body.style.overflow = ""; }));
   toggleCensura?.addEventListener("change", () => localStorage.setItem(CENSURA_KEY, String(toggleCensura.checked)));
@@ -731,18 +748,35 @@ document.addEventListener("DOMContentLoaded", () => {
   const convertirClaveBase64 = clave => { const padding = "=".repeat((4-clave.length%4)%4); return Uint8Array.from(atob((clave+padding).replace(/-/g,"+").replace(/_/g,"/")), c => c.charCodeAt(0)); };
   async function activarPush() {
     try {
-      if (!("serviceWorker" in navigator) || !("PushManager" in window)) return alertar({ title:"No compatible", message:"Este navegador no admite notificaciones push.", icon:"🔕" });
+      if (!("serviceWorker" in navigator) || !("PushManager" in window)) throw new Error("Este navegador no admite notificaciones push.");
       const permiso = await Notification.requestPermission();
-      if (permiso !== "granted") return;
+      if (permiso !== "granted") throw new Error("Permite las notificaciones para activar los recordatorios.");
       const registro = await navigator.serviceWorker.ready;
-      const sub = await registro.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:convertirClaveBase64(PUSH_VAPID_PUBLIC_KEY) });
+      const applicationServerKey = convertirClaveBase64(PUSH_VAPID_PUBLIC_KEY);
+      let sub = await registro.pushManager.getSubscription();
+      if (sub) {
+        const currentKey = sub.options.applicationServerKey;
+        const currentBytes = currentKey ? new Uint8Array(currentKey) : null;
+        const sameKey = currentBytes?.length === applicationServerKey.length &&
+          currentBytes.every((value, index) => value === applicationServerKey[index]);
+        if (!sameKey) {
+          if (!await sub.unsubscribe()) throw new Error("No se pudo actualizar la suscripción de notificaciones.");
+          sub = null;
+        }
+      }
+      if (!sub) sub = await registro.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey });
       const { data:{ session } } = await supabase.auth.getSession();
-      if (!session) return alertar({ title:"Inicia sesión", message:"Necesitas una cuenta para activar notificaciones.", icon:"🔐" });
+      if (!session) throw new Error("Inicia sesión para activar notificaciones.");
       const { error } = await supabase.from("push_subscriptions").upsert({ user_id:session.user.id, endpoint:sub.endpoint, subscription:sub.toJSON() }, { onConflict:"endpoint" });
       if (error) throw error;
       if (btnEnablePush) btnEnablePush.textContent = "Notificaciones activadas";
-    } catch (err) { console.warn("activarPush:", err); }
+      return true;
+    } catch (err) {
+      console.warn("activarPush:", err);
+      throw err;
+    }
   }
+  window._activarNotificacionesPush = activarPush;
   btnEnablePush?.addEventListener("click", () => activarPush().catch(e => alertar({ title:"Error", message:"No se pudieron activar: " + e.message, variant:"danger" })));
 
   /* ---------- FOTOS ---------- */
@@ -1388,6 +1422,18 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
   const actualizarIconoVolumen = () => { if (!playerVolumeBtn) return; if (globalAudio.muted || volumenActual === 0) playerVolumeBtn.innerHTML = SVG.volMute; else if (volumenActual < 0.4) playerVolumeBtn.innerHTML = SVG.volLow; else playerVolumeBtn.innerHTML = SVG.volHigh; };
   const actualizarBotonPlay = () => { if (!playerPlay) return; playerPlay.innerHTML = reproduciendo ? SVG.pause : SVG.play; playerPlay.title = reproduciendo ? "Pausar" : "Reproducir"; };
   if (globalAudio) { globalAudio.volume = volumenActual; if (playerVolume) playerVolume.value = volumenActual; actualizarIconoVolumen(); }
+  window.addEventListener("sunadventures:volume-change", event => {
+    const volume = Number(event.detail?.volume);
+    if (!Number.isFinite(volume)) return;
+    volumenActual = Math.max(0, Math.min(1, volume));
+    if (globalAudio) {
+      globalAudio.volume = volumenActual;
+      globalAudio.muted = volumenActual === 0;
+    }
+    if (playerVolume) playerVolume.value = String(volumenActual);
+    localStorage.setItem("player_volumen", String(volumenActual));
+    actualizarIconoVolumen();
+  });
   if (playerRepeat) playerRepeat.innerHTML = SVG.repeat;
 
   async function activarWakeLock() {
@@ -1478,7 +1524,13 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
     ocultarPlayerBar(); actualizarEstadoReproduciendo(); liberarWakeLock();
   });
   playerVolumeBtn?.addEventListener("click", () => { if (!globalAudio) return; if (globalAudio.muted || globalAudio.volume === 0) { globalAudio.muted = false; globalAudio.volume = volumenActual || 0.8; } else { silenciadoAntes = globalAudio.volume; globalAudio.volume = 0; globalAudio.muted = true; } actualizarIconoVolumen(); if (playerVolume) playerVolume.value = globalAudio.volume; });
-  playerVolume?.addEventListener("input", () => { if (!globalAudio) return; const v = parseFloat(playerVolume.value); volumenActual = v; globalAudio.volume = v; globalAudio.muted = v === 0; localStorage.setItem("player_volumen", String(v)); actualizarIconoVolumen(); });
+  playerVolume?.addEventListener("input", () => {
+    if (!globalAudio) return;
+    const v = parseFloat(playerVolume.value);
+    window.dispatchEvent(new CustomEvent("sunadventures:volume-change", { detail:{ volume:v } }));
+    window.SunPreferences?.setVolume(v);
+    actualizarIconoVolumen();
+  });
 
   globalAudio?.addEventListener("play", () => { reproduciendo = true; actualizarBotonPlay(); activarWakeLock(); });
   globalAudio?.addEventListener("pause", () => { reproduciendo = false; actualizarBotonPlay(); });
@@ -1816,7 +1868,7 @@ const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
     });
   });
 
-  const VISTAS = ["inicio","album","mapa","chat","logros","notas","playlists","calendario","mascotas", ...(window._extraVistas || [])];
+  const VISTAS = ["inicio","album","mapa","chat","logros","notas","playlists","calendario","mascotas","finanzas", ...(window._extraVistas || [])];
   const rutaDesdeHash = () => { const h = (location.hash || "").replace(/^#/, "").trim(); return VISTAS.includes(h) ? h : "inicio"; };
 
   function mostrarVista(nombre) {

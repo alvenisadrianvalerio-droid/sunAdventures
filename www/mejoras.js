@@ -322,16 +322,6 @@
   if (sb) {
     sb.addEventListener("click", () => {
       try {
-        const embed = $("tienda-embed");
-        // Si el modal mascota está abierto → montamos en su tab tienda
-        if (document.getElementById("mascota-modal")?.classList.contains("active") && embed) {
-          window.Tienda?.montar?.(embed);
-          // Cambiar a la pestaña tienda
-          const tab = document.querySelector('[data-mm-tab="tienda"]');
-          if (tab) tab.click();
-          return;
-        }
-        // Si no, abrimos el overlay normal
         window.Tienda?.abrir?.();
       } catch (e) { console.warn("shop-bubble:", e); }
     });

@@ -79,6 +79,7 @@
 
   function aplicar() {
     detener();
+    if (localStorage.getItem("sunadventures_animations_disabled") === "true") return;
     try {
       const userId = window._getUserId?.() || localStorage.getItem("sunadventures_uid") || "local";
       const mascota = localStorage.getItem("mascota_actual") || "mapache";
@@ -97,6 +98,7 @@
 
   // Re-aplicar cuando cambie la mascota o el equipamiento
   window.addEventListener("sunadventures:mascota-cambiada", () => setTimeout(aplicar, 100));
+  window.addEventListener("sunadventures:animations-change", () => aplicar());
   window.addEventListener("sunadventures:perfil-actualizado", () => setTimeout(aplicar, 100));
   window.addEventListener("sunadventures:inventario-refresh", () => setTimeout(aplicar, 100));
 

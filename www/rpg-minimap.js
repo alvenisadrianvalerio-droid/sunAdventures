@@ -29,7 +29,7 @@
     }
     .rpg-mm-btn-floating.visible{display:inline-flex}
     .rpg-mm-btn-floating:hover{transform:translateY(-2px);background:linear-gradient(135deg, rgba(255,217,61,.4), rgba(255,217,61,.15));box-shadow:0 8px 26px rgba(255,217,61,.5)}
-    .rpg-mm-btn-floating svg{width:1.1rem;height:1.1rem}
+    .rpg-mm-btn-floating img{width:1.1rem;height:1.1rem;object-fit:contain;image-rendering:auto}
     .rpg-mm-btn-floating .badge{background:rgba(0,0,0,.35);padding:.1rem .45rem;border-radius:999px;font-size:.7rem}
 
     .rpg-mm-overlay{
@@ -43,73 +43,85 @@
 
     .rpg-mm-panel{
       position:relative;
-      width:min(340px,92vw);
+      width:min(820px,94vw);
       max-height:92vh;
-      padding:1rem .9rem .8rem;
-      border-radius:16px;
-      border:3px solid #8b5a2b;
-      background:linear-gradient(180deg,#e8d5a8 0%,#d9c08a 100%);
-      box-shadow:
-        0 20px 60px rgba(0,0,0,.7),
-        0 0 0 4px rgba(60,40,20,.6),
-        inset 0 0 0 2px rgba(255,255,255,.25);
-      display:flex;flex-direction:column;gap:.5rem;
-      animation:mmIn .3s cubic-bezier(.34,1.56,.64,1);
-      image-rendering:pixelated;
+      padding:1rem;
+      border-radius:24px;
+      border:1px solid rgba(255,217,61,.48);
+      background:linear-gradient(150deg,rgba(21,28,49,.99),rgba(7,11,23,.99));
+      box-shadow:0 28px 90px rgba(0,0,0,.75),0 0 40px rgba(255,217,61,.12);
+      display:flex;flex-direction:column;gap:.75rem;
+      animation:mmIn .3s cubic-bezier(.2,.8,.2,1);
     }
-    @keyframes mmIn{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    @keyframes mmIn{from{opacity:0;transform:scale(.97) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
 
     .rpg-mm-close{
-      position:absolute;top:.55rem;right:.55rem;
-      width:30px;height:30px;border-radius:50%;
-      border:2px solid #5a3a1a;background:#d4b078;color:#3a2410;
-      font-size:1.2rem;line-height:1;cursor:pointer;
+      position:absolute;top:.75rem;right:.75rem;
+      width:36px;height:36px;border-radius:50%;
+      border:1px solid rgba(255,255,255,.32);background:rgba(8,12,24,.8);color:#fff;
+      font-size:1.35rem;line-height:1;cursor:pointer;
       display:grid;place-items:center;
       transition:transform .2s,background .2s;z-index:2;font-weight:900;
     }
     .rpg-mm-close:hover{transform:rotate(90deg);background:#ff6b9d;color:#fff}
 
-    .rpg-mm-titulo{display:flex;flex-direction:column;align-items:center;gap:.1rem;padding-bottom:.4rem;border-bottom:2px dashed rgba(90,58,26,.4)}
-    .rpg-mm-titulo span{font-size:.95rem;font-weight:900;color:#5a3a1a;letter-spacing:.04em;text-transform:uppercase}
-    .rpg-mm-titulo small{font-size:.65rem;color:#7a5a2a;font-style:italic}
+    .rpg-mm-titulo{display:flex;flex-direction:column;gap:.25rem;padding:.2rem 3.2rem .75rem .2rem;border-bottom:1px solid rgba(255,255,255,.12)}
+    .rpg-mm-titulo span{font-size:1.15rem;font-weight:950;color:#fff;letter-spacing:.06em;text-transform:uppercase}
+    .rpg-mm-titulo small{font-size:.72rem;color:rgba(235,240,255,.68)}
 
     .rpg-mm-svg-wrap{
-      flex:1;min-height:0;
-      background:#f0e2bf;border-radius:8px;padding:.3rem;
-      border:2px solid rgba(90,58,26,.5);
-      overflow:hidden;display:flex;align-items:center;justify-content:center;
+      flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+      display:flex;flex-direction:column;gap:.7rem;padding:.15rem .2rem .4rem;
     }
-    .rpg-mm-svg{width:100%;height:100%;max-height:70vh;display:block}
-
-    .rpg-mm-path{fill:none;stroke:#8b5a2b;stroke-width:1.6;stroke-dasharray:3 3.2;stroke-linecap:round;opacity:.85}
-
-    .rpg-mm-dot{cursor:pointer;transition:transform .15s,filter .15s;stroke:#5a3a1a;stroke-width:1.3;transform-origin:center}
-    .rpg-mm-dot:hover{filter:brightness(1.2)}
-    .rpg-mm-dot:not(.jefe):not(.minijefe){fill:#fff4d4}
-    .rpg-mm-dot:not(.jefe):not(.minijefe):hover{fill:#ffe89a}
-    .rpg-mm-dot.minijefe{fill:#b58cff;stroke:#4a1e8b;stroke-width:1.6}
-    .rpg-mm-dot.minijefe:hover{fill:#cdb0ff}
-    .rpg-mm-dot.jefe{fill:#ff3366;stroke:#7a0028;stroke-width:2}
-    .rpg-mm-dot.jefe:hover{fill:#ff5588}
-    .rpg-mm-dot.conquistada{filter:drop-shadow(0 0 5px rgba(255,215,0,.9))}
-    .rpg-mm-dot.conquistada:not(.jefe):not(.minijefe){fill:#ffe066}
-    .rpg-mm-dot.bloqueada{fill:#8a7a5a;stroke:#4a3a1a;opacity:.55;cursor:not-allowed}
-    .rpg-mm-dot.bloqueada:hover{filter:none}
-    .rpg-mm-dot.actual{filter:drop-shadow(0 0 6px rgba(255,217,61,.95))}
-
-    .rpg-mm-pulse{fill:none;stroke:#ffd93d;stroke-width:2;opacity:.9;pointer-events:none;transform-origin:center;animation:mmPulse 1.6s ease-out infinite}
-    @keyframes mmPulse{0%{transform:scale(.6);opacity:1}100%{transform:scale(2.4);opacity:0}}
-
+    .rpg-mm-region{
+      --mm-acento:#ffd93d;
+      position:relative;overflow:hidden;flex:none;
+      padding:.65rem;border:1px solid color-mix(in srgb,var(--mm-acento) 40%,transparent);
+      border-radius:17px;background:linear-gradient(110deg,rgba(8,12,24,.92),rgba(12,18,34,.88)),var(--mm-bioma) center 48%/cover;
+      box-shadow:inset 3px 0 var(--mm-acento),0 8px 20px rgba(0,0,0,.2);
+    }
+    .rpg-mm-region.actual{border-color:var(--mm-acento);box-shadow:inset 3px 0 var(--mm-acento),0 0 22px color-mix(in srgb,var(--mm-acento) 24%,transparent)}
+    .rpg-mm-region-head{display:flex;align-items:center;justify-content:space-between;gap:.7rem;margin:0 0 .55rem;padding:0 .2rem}
+    .rpg-mm-region-title{display:flex;align-items:center;gap:.55rem;min-width:0}
+    .rpg-mm-region-title img{width:42px;height:42px;flex:none;object-fit:cover;border-radius:10px;border:1px solid color-mix(in srgb,var(--mm-acento) 65%,white);image-rendering:pixelated}
+    .rpg-mm-region-title span{display:flex;flex-direction:column;gap:.12rem;min-width:0}
+    .rpg-mm-region-title strong{overflow:hidden;color:#fff;font-size:.82rem;font-weight:950;text-overflow:ellipsis;white-space:nowrap}
+    .rpg-mm-region-title small{color:var(--mm-acento);font-size:.59rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .rpg-mm-region-progress{flex:none;color:rgba(235,240,255,.7);font-size:.62rem;font-weight:800}
+    .rpg-mm-zones{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.35rem}
+    .rpg-mm-zone{
+      min-width:0;min-height:41px;display:flex;align-items:center;justify-content:center;gap:.3rem;
+      padding:.35rem .25rem;border:1px solid rgba(255,255,255,.16);border-radius:10px;
+      background:rgba(9,14,28,.78);color:#f5f6ff;font:inherit;font-size:.66rem;font-weight:900;
+      cursor:pointer;transition:transform .15s,border-color .15s,background .15s,box-shadow .15s;
+    }
+    .rpg-mm-zone:hover:not(:disabled),.rpg-mm-zone:focus-visible{transform:translateY(-2px);border-color:var(--mm-acento);background:rgba(18,27,48,.96);box-shadow:0 5px 15px color-mix(in srgb,var(--mm-acento) 22%,transparent)}
+    .rpg-mm-zone.conquistada{border-color:rgba(255,217,61,.65);color:#ffe27a}
+    .rpg-mm-zone.minijefe{border-color:rgba(184,154,255,.7);color:#d4beff}
+    .rpg-mm-zone.jefe{border-color:rgba(255,112,139,.7);color:#ff9bad}
+    .rpg-mm-zone.bloqueada{opacity:.4;filter:saturate(.5);cursor:not-allowed}
+    .rpg-mm-zone:disabled{cursor:not-allowed}
+    .rpg-mm-zone-icon{font-size:.8rem}
     .rpg-mm-leyenda{
-      display:flex;justify-content:space-around;flex-wrap:wrap;gap:.3rem;
-      font-size:.6rem;font-weight:900;color:#5a3a1a;text-transform:uppercase;
-      letter-spacing:.04em;padding-top:.3rem;border-top:2px dashed rgba(90,58,26,.4);
+      display:flex;justify-content:center;flex-wrap:wrap;gap:.8rem;
+      padding-top:.65rem;border-top:1px solid rgba(255,255,255,.12);
+      color:rgba(235,240,255,.72);font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;
     }
-    .rpg-mm-leyenda span{display:inline-flex;align-items:center;gap:.25rem}
-    .rpg-mm-leyenda i{display:inline-block;width:9px;height:9px;border-radius:50%;border:1.5px solid #5a3a1a;background:#fff4d4}
-    .rpg-mm-leyenda .dot-mini{background:#b58cff;border-color:#4a1e8b}
-    .rpg-mm-leyenda .dot-jefe{background:#ff3366;border-color:#7a0028}
+    .rpg-mm-leyenda span{display:inline-flex;align-items:center;gap:.3rem}
+    .rpg-mm-leyenda i{display:inline-block;width:9px;height:9px;border-radius:50%;border:1px solid currentColor;background:#fff4d4}
+    .rpg-mm-leyenda .dot-normal{background:#ffe066}
+    .rpg-mm-leyenda .dot-mini{background:#b58cff}
+    .rpg-mm-leyenda .dot-jefe{background:#ff6f8e}
     .rpg-mm-leyenda .dot-lock{background:#8a7a5a;opacity:.55}
+
+    @media(max-width:520px){
+      .rpg-mm-overlay{padding:.5rem}
+      .rpg-mm-panel{width:96vw;max-height:94vh;padding:.7rem;border-radius:18px}
+      .rpg-mm-region{padding:.5rem}
+      .rpg-mm-zones{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .rpg-mm-zone{min-height:38px}
+      .rpg-mm-region-progress{font-size:.55rem}
+    }
   `;
   const styleEl = document.createElement("style");
   styleEl.id = "rpg-mm-styles";
@@ -123,7 +135,7 @@
     btn.id = "btn-abrir-minimapa";
     btn.type = "button";
     btn.className = "rpg-mm-btn-floating";
-    btn.innerHTML = `<span>🗺️</span><span>Mapa</span><span class="badge" id="rpg-mm-btn-badge">0/0</span>`;
+    btn.innerHTML = `<img src="img/items%20de%20aventura/mapa.png" alt="" aria-hidden="true"><span>Mapa</span><span class="badge" id="rpg-mm-btn-badge">0/0</span>`;
     btn.addEventListener("click", abrirMiniMapa);
     document.body.appendChild(btn);
   }
@@ -158,12 +170,12 @@
         <div class="rpg-mm-panel">
           <button class="rpg-mm-close" aria-label="Cerrar">×</button>
           <div class="rpg-mm-titulo">
-            <span>Camino de Aventuras</span>
+            <span>Ruta de expedición</span>
             <small id="rpg-mm-progreso"></small>
           </div>
           <div class="rpg-mm-svg-wrap" id="rpg-mm-content"></div>
           <div class="rpg-mm-leyenda">
-            <span><i class="dot-normal"></i>Zona</span>
+            <span><i class="dot-normal"></i>Zona conquistada</span>
             <span><i class="dot-mini"></i>Mini-jefe</span>
             <span><i class="dot-jefe"></i>Jefe</span>
             <span><i class="dot-lock"></i>Bloqueada</span>
@@ -186,77 +198,58 @@
     const c = document.getElementById("rpg-mm-content");
     if (!c) return;
 
-    const zonas = window.Rpg?.zonas || [];
+    const grupos = window.Rpg?.grupos || [];
     const st    = window.Rpg?.state?.() || {};
-    if (!zonas.length) {
-      c.innerHTML = `<div style="padding:2rem;text-align:center;color:#5a3a1a;font-weight:900;">Cargando zonas…</div>`;
+    if (!grupos.length) {
+      c.innerHTML = `<div style="padding:2rem;text-align:center;color:#fff;font-weight:900;">Cargando zonas…</div>`;
       return;
     }
 
-    const W = 240, H = 500;
-    const MARGEN_X = 42;
-    const ANCHO = W - MARGEN_X * 2;
-    const N = zonas.length;
-
-    /* Puntos serpenteando */
-    const puntos = [];
-    for (let i = 0; i < N; i++) {
-      const t = i / Math.max(1, N - 1);
-      const onda = Math.sin(i * 0.68) * 0.5 + Math.sin(i * 0.21) * 0.18;
-      const x = MARGEN_X + (onda * 0.5 + 0.5) * ANCHO;
-      const y = H - 28 - t * (H - 56);
-      puntos.push({ x: +x.toFixed(1), y: +y.toFixed(1) });
-    }
-
-    let pathD = "";
-    puntos.forEach((p, i) => { pathD += (i === 0 ? "M " : " L ") + p.x + " " + p.y; });
-
-    const idxActual = st.zonaActual ? zonas.findIndex(z => z.id === st.zonaActual) : -1;
-    const conquistadas = zonas.filter(z => z.jefe && (st.jefesDerrotados || []).includes(z.id)).length;
-    const totalJefes = zonas.filter(z => z.jefe).length;
-
-    let svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="rpg-mm-svg">`;
-    svg += `<defs>
-      <pattern id="mm-grid" width="8" height="8" patternUnits="userSpaceOnUse">
-        <path d="M 8 0 L 0 0 0 8" fill="none" stroke="rgba(120,80,30,.14)" stroke-width="0.5"/>
-      </pattern>
-    </defs>`;
-    svg += `<rect width="${W}" height="${H}" fill="url(#mm-grid)"/>`;
-    svg += `<path d="${pathD}" class="rpg-mm-path"/>`;
-
-    puntos.forEach((p, i) => {
-      const z = zonas[i];
-const desbloqueada = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(z.id) : ((st.nivel || 1) >= z.nivel - 2 || (st.enemigosDerrotados || 0) >= z.nivel * 5);
-      const conquistada = z.jefe && (st.jefesDerrotados || []).includes(z.id);
-      let cls = "rpg-mm-dot";
-      if (z.jefe) cls += " jefe";
-      else if (z.miniJefe) cls += " minijefe";
-      if (!desbloqueada) cls += " bloqueada";
-      if (i === idxActual) cls += " actual";
-      if (conquistada) cls += " conquistada";
-      const r = z.jefe ? 6 : z.miniJefe ? 4.4 : 3.4;
-      svg += `<circle cx="${p.x}" cy="${p.y}" r="${r}" class="${cls}" data-zona="${z.id}" data-i="${i}">
-        <title>${z.nombre} · Nv ${z.nivel}</title>
-      </circle>`;
-    });
-
-    if (idxActual >= 0 && idxActual < puntos.length) {
-      const p = puntos[idxActual];
-      svg += `<circle cx="${p.x}" cy="${p.y}" r="10" class="rpg-mm-pulse"/>`;
-    }
-    svg += `</svg>`;
-    c.innerHTML = svg;
+    const zonas = grupos.flatMap(g => g.zonas || []);
+    const jefes = zonas.filter(z => z.jefe);
+    const jefesDerrotados = jefes.filter(z => (st.jefesDerrotados || []).includes(z.id)).length;
+    const zonasGanadas = new Set(st.zonasConquistadas || []);
+    const escapar = value => String(value ?? "").replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[ch]);
+    const desbloqueada = z => window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(z.id) : ((st.nivel || 1) >= z.nivel - 2 || (st.enemigosDerrotados || 0) >= z.nivel * 5);
+    const gruposHtml = grupos.map((g, gi) => {
+      const bioma = g.bioma || {};
+      const imagen = bioma.imagen || "";
+      const ganadas = (g.zonas || []).filter(z => zonasGanadas.has(z.id)).length;
+      const esActual = (g.zonas || []).some(z => z.id === st.zonaActual);
+      const botonZonas = (g.zonas || []).map(z => {
+        const abierta = desbloqueada(z);
+        const classes = ["rpg-mm-zone"];
+        if (z.jefe) classes.push("jefe");
+        else if (z.miniJefe) classes.push("minijefe");
+        if (!abierta) classes.push("bloqueada");
+        if (zonasGanadas.has(z.id)) classes.push("conquistada");
+        const icono = z.jefe ? "👑" : z.miniJefe ? "★" : "●";
+        const etiqueta = z.jefe ? "Jefe" : z.miniJefe ? "Mini-jefe" : `Zona ${z.nivel}`;
+        return `<button type="button" class="${classes.join(" ")}" data-zona="${escapar(z.id)}" title="${escapar(z.nombre)} · Nv ${z.nivel}" aria-label="${etiqueta}: ${escapar(z.nombre)}, nivel ${z.nivel}${abierta ? "" : ", bloqueada"}" ${abierta ? "" : "disabled"}>
+          <span class="rpg-mm-zone-icon" aria-hidden="true">${escapar(icono)}</span><span>${String(z.nivel).padStart(2, "0")}</span>
+        </button>`;
+      }).join("");
+      return `<section class="rpg-mm-region${esActual ? " actual" : ""}" style="--mm-bioma:url('${escapar(imagen)}');--mm-acento:${escapar(bioma.acento || "#ffd93d")}">
+        <div class="rpg-mm-region-head">
+          <div class="rpg-mm-region-title">
+            ${imagen ? `<img src="${escapar(imagen)}" alt="" loading="lazy">` : ""}
+            <span><small>Región ${String(gi + 1).padStart(2, "0")} · Niveles ${g.nivelMin}–${g.nivelMax}</small><strong>${escapar(g.nombre)}</strong></span>
+          </div>
+          <span class="rpg-mm-region-progress">${ganadas}/10 conquistadas</span>
+        </div>
+        <div class="rpg-mm-zones">${botonZonas}</div>
+      </section>`;
+    }).join("");
+    c.innerHTML = gruposHtml;
 
     const prog = document.getElementById("rpg-mm-progreso");
-    if (prog) prog.textContent = `${conquistadas} / ${totalJefes} jefes · ${st.enemigosDerrotados || 0} enemigos · Nv ${st.nivel || 1}`;
+    if (prog) prog.textContent = `${jefesDerrotados}/${jefes.length} jefes derrotados · ${st.enemigosDerrotados || 0} enemigos · Nivel ${st.nivel || 1}`;
 
-    c.querySelectorAll(".rpg-mm-dot").forEach(dot => {
-      dot.addEventListener("click", () => {
-        const zid = dot.dataset.zona;
+    c.querySelectorAll(".rpg-mm-zone:not(:disabled)").forEach(button => {
+      button.addEventListener("click", () => {
+        const zid = button.dataset.zona;
         const z = zonas.find(x => x.id === zid);
-        if (!z) return;
-        const desbloqueada = (st.nivel || 1) >= z.nivel - 2 || (st.enemigosDerrotados || 0) >= z.nivel * 5;
-        if (!desbloqueada) return;
+        if (!z || !desbloqueada(z)) return;
 
         document.getElementById("rpg-minimapa")?.classList.remove("active");
 

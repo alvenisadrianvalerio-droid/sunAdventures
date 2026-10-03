@@ -406,6 +406,19 @@
   transition: transform .2s, box-shadow .2s;
 }
 .rpg-cofre-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.4), 0 0 16px var(--cofre-color, #ffd93d); }
+.rpg-cofre-img,
+.loot-cofre-img {
+  display: block;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.35));
+}
+.rpg-cofre-card:hover .rpg-cofre-img {
+  transform: translateY(-2px) scale(1.05);
+}
 .rpg-cofre-emoji  { font-size: 2rem; }
 .rpg-cofre-nombre { font-size: .72rem; font-weight: 900; text-align: center; }
 .rpg-cofre-precio { font-size: .7rem; opacity: .8; display: flex; align-items: center; gap: .2rem; }
@@ -551,6 +564,14 @@
   color: inherit;
 }
 .rpg-tab-icon svg { width: 100%; height: 100%; }
+.rpg-tab-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  transform: scale(1.5);
+}
 .rpg-tab-text { line-height: 1; }
 
 .rpg-panel { display: none; }
@@ -568,7 +589,39 @@
 
 /* Responsive */
 @media (max-width: 500px) {
-  .rpg-tab { padding: .6rem .5rem; font-size: .78rem; gap: .3rem; }
-  .rpg-tab-icon { width: 1rem; height: 1rem; }
-  .rpg-tab-text { font-size: .78rem; }
+  .rpg-tabs {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: .15rem;
+    overflow: visible;
+    padding: .25rem;
+  }
+  .rpg-tab {
+    min-width: 0;
+    min-height: 3.25rem;
+    flex-direction: column;
+    gap: .2rem;
+    padding: .35rem .1rem;
+    font-size: .65rem;
+    white-space: normal;
+  }
+  .rpg-tab-icon { width: .95rem; height: .95rem; }
+  .rpg-tab-text {
+    display: block;
+    max-width: 100%;
+    font-size: clamp(.5rem, 2.4vw, .66rem);
+    line-height: 1.05;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (min-width: 701px) {
+  .rpg-tab-icon img,
+  .rpg-cofre-img,
+  .loot-cofre-img {
+    image-rendering: auto;
+    -moz-crisp-edges: auto;
+    crisp-edges: auto;
+  }
 }

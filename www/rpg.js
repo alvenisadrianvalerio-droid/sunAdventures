@@ -69,6 +69,25 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       jefe:"el-vacio", jefeNombre:"El Vacío", jefeIcono:ICONO.corona }
   ];
 
+  const BIOMAS = {
+    praderas:  { imagen:"img/biomas/gen-5480873c-7b50-45b8-a3c1-abc457a2f0fa.png", acento:"#ffd84d", ambiente:"Campo de girasoles" },
+    bosque:    { imagen:"img/biomas/gen-df614595-485a-47f1-a074-7d4b4aa3d08e.png", acento:"#65d68b", ambiente:"Senderos del bosque" },
+    cueva:     { imagen:"img/biomas/gen-e46023c3-4ac1-4361-b312-e6f525bcead6.png", acento:"#81ddff", ambiente:"Cueva de cristal" },
+    desierto:  { imagen:"img/biomas/gen-3b1ee61a-d08b-44bc-a27b-9c56f5e009ef.png", acento:"#ffc36e", ambiente:"Dunas antiguas" },
+    glaciar:   { imagen:"img/biomas/gen-02a9154e-49f2-4451-b734-a787ce316fd5.png", acento:"#a8eaff", ambiente:"Glaciar eterno" },
+    volcan:    { imagen:"img/biomas/gen-6148d727-5f04-4360-b612-587e58fbd20d.png", acento:"#ff7958", ambiente:"Cráter en erupción" },
+    ruinas:    { imagen:"img/biomas/gen-5510680d-7fe8-4834-b72d-04dd75fc60e2.png", acento:"#e9bd78", ambiente:"Ruinas sepultadas" },
+    sombras:   { imagen:"img/biomas/gen-710f318c-55ee-45ba-aad5-7afcca056906.png", acento:"#b89aff", ambiente:"Bosque encantado" },
+    abismo:    { imagen:"img/biomas/gen-7f3a60dc-0b7b-4b78-9ae9-e63140799a1c.png", acento:"#ff8268", ambiente:"Abismo de lava" },
+    selva:     { imagen:"img/biomas/gen-54356df9-2637-441f-96a0-4742f61f6a57.png", acento:"#74dc8a", ambiente:"Selva ancestral" },
+    pantano:   { imagen:"img/biomas/gen-675040d8-722c-4ac6-bf7d-6d236587f618.png", acento:"#76dfc2", ambiente:"Pantano de los espíritus" },
+    tundra:    { imagen:"img/biomas/gen-b8ac5df4-7a81-443c-8cec-4d4f30bef9aa.png", acento:"#caeaff", ambiente:"Bosque de escarcha" },
+    cielo:     { imagen:"img/biomas/gen-ef4c41e3-8713-47f7-acde-eefb81a85d11.png", acento:"#ffb3dc", ambiente:"Jardines celestiales" },
+    inframundo:{ imagen:"img/biomas/gen-f34b37dd-a44a-4ac1-8ef3-a5b18a314480.png", acento:"#ff9a55", ambiente:"Tierras del inframundo" },
+    vacio:     { imagen:"img/biomas/gen-a36ad96d-725f-45b4-8793-4f27add89fb3.png", acento:"#b6a2ff", ambiente:"Ciudad del vacío" }
+  };
+  REGIONES.forEach(reg => { reg.bioma = BIOMAS[reg.id]; });
+
   const NOMBRES = {
     abeja:"Abeja Soldado", mariposa:"Mariposa Sombría", caracol:"Caracol Blindado", pajaro:"Gorrión Guerrero", conejo:"Conejo Espinoso",
     lagarto:"Lagarto Espinoso", pulpo:"Pulpo Abisal", tortuga:"Tortuga de Hierro", "dragon-bebe":"Dragón Bebé",
@@ -132,14 +151,14 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   })();
 
   const GRUPOS = REGIONES.map((reg, i) => ({
-    id:i, nombre:reg.nombre, icono:reg.icono, jefe:reg.jefeNombre, jefeIcono:reg.jefeIcono,
+    id:i, nombre:reg.nombre, icono:reg.icono, jefe:reg.jefeNombre, jefeIcono:reg.jefeIcono, bioma:reg.bioma,
     zonas: ZONAS.filter(z => Math.floor((z.orden-1)/10) === i),
     nivelMin: i*10+1, nivelMax: (i+1)*10
   }));
 
   /* ---------- Estado ---------- */
   const KEY = () => `sa_rpg_${getUserId()}`;
-  const def = () => ({ nivel:1, xp:0, hp:100, enemigosDerrotados:0, jefesDerrotados:[], zonaActual:null, statsBase:{atk:10,def:3} });
+  const def = () => ({ nivel:1, xp:0, hp:100, enemigosDerrotados:0, jefesDerrotados:[], zonasConquistadas:[], zonaActual:null, statsBase:{atk:10,def:3} });
   const cargar = () => { try { const r = localStorage.getItem(KEY()); return r ? { ...def(), ...JSON.parse(r) } : def(); } catch { return def(); } };
   const guardar = s => { try { localStorage.setItem(KEY(), JSON.stringify(s)); } catch {} };
   const statsLoot = () => { try { return JSON.parse(localStorage.getItem(`sa_rpg_stats_${getUserId()}`) || '{"atkBonus":0,"defBonus":0,"hpBonus":0}'); } catch { return { atkBonus:0, defBonus:0, hpBonus:0 }; } };
@@ -148,6 +167,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const tieneBonus = t => bonus().some(x => x.tipo === t);
 
   let state = cargar();
+  if (!Array.isArray(state.zonasConquistadas)) state.zonasConquistadas = [];
   const hpMax       = () => 80 + state.nivel*20 + (statsLoot().hpBonus||0) + bonusTipo("hp_max");
   const atkTotal    = () => state.statsBase.atk + state.nivel*3 + (statsLoot().atkBonus||0) + bonusTipo("atk_fijo");
   const defTotal    = () => state.statsBase.def + state.nivel*2 + (statsLoot().defBonus||0) + bonusTipo("def_fijo");
@@ -161,7 +181,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if ($("rpg")) return;
     const sec = document.createElement("section");
     sec.id = "rpg"; sec.className = "rpg-section view"; sec.dataset.view = "rpg";
-    sec.innerHTML = `<div class="rpg-header"><h2 class="rpg-title">Aventura</h2><p class="rpg-subtitle">15 regiones · 150 zonas · Enemigos con especiales</p></div><div id="rpg-content"></div>`;
+    sec.innerHTML = `<div class="rpg-header"><p class="rpg-subtitle">15 regiones, 150 zonas</p></div><div id="rpg-content"></div>`;
     const f = qs(".site-footer");
     f ? f.parentNode.insertBefore(sec, f) : document.body.appendChild(sec);
   }
@@ -187,16 +207,16 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     c.innerHTML = `
       <div class="rpg-tabs" role="tablist">
         <button type="button" class="rpg-tab ${tab==="zonas"?"active":""}" data-rpg-tab="zonas">
-          <span class="rpg-tab-icon">${ICONO.mapa||""}</span><span class="rpg-tab-text">Zonas</span>
+          <span class="rpg-tab-icon" aria-hidden="true"><img src="img/items%20de%20aventura/pocion.png" alt=""></span><span class="rpg-tab-text">Zonas</span>
         </button>
         <button type="button" class="rpg-tab ${tab==="objetos"?"active":""}" data-rpg-tab="objetos">
-          <span class="rpg-tab-icon">${ICONO.gema||""}</span><span class="rpg-tab-text">Objetos</span>
+          <span class="rpg-tab-icon" aria-hidden="true"><img src="img/items%20de%20aventura/hamburguesa.png" alt=""></span><span class="rpg-tab-text">Objetos</span>
         </button>
         <button type="button" class="rpg-tab ${tab==="cofres"?"active":""}" data-rpg-tab="cofres">
-          <span class="rpg-tab-icon">${ICONO.regalo||""}</span><span class="rpg-tab-text">Cofres</span>
+          <span class="rpg-tab-icon" aria-hidden="true"><img src="img/rpg/items/cofre-madera.png?v=2" alt=""></span><span class="rpg-tab-text">Cofres</span>
         </button>
         <button type="button" class="rpg-tab" data-rpg-tab="roguelike">
-          <span class="rpg-tab-icon">🎲</span><span class="rpg-tab-text">Roguelike</span>
+          <span class="rpg-tab-icon" aria-hidden="true"><img src="img/items%20de%20aventura/dado.png" alt=""></span><span class="rpg-tab-text">Roguelike</span>
         </button>
       </div>
       <div class="rpg-panel ${tab==="zonas"?"active":""}" data-rpg-panel="zonas">${htmlMapa()}</div>
@@ -247,16 +267,17 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       </div>
       <div class="rpg-grupos-grid">
         ${GRUPOS.map(g => {
-          const completadas = g.zonas.filter(z => z.jefe && state.jefesDerrotados.includes(z.id)).length;
+          const completadas = g.zonas.filter(z => state.zonasConquistadas.includes(z.id)).length;
           const primeraZona = g.zonas[0];
 const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(primeraZona.id) : (state.nivel >= g.nivelMin - 2 || state.enemigosDerrotados >= g.nivelMin * 6);
-          const prog = g.zonas.filter(z => state.enemigosDerrotados >= z.nivel * 6 || state.nivel >= z.nivel - 2).length;
-          return `<button type="button" class="rpg-grupo-card ${desbloqueado?"":"bloqueada"}" data-grupo="${g.id}" ${desbloqueado?"":"disabled"}>
+          return `<button type="button" class="rpg-grupo-card ${desbloqueado?"":"bloqueada"}" data-grupo="${g.id}" style="--bioma-img:url('${g.bioma.imagen}');--bioma-acento:${g.bioma.acento}" ${desbloqueado?"":"disabled"}>
+            <span class="rpg-grupo-fondo" aria-hidden="true"></span>
             <div class="rpg-grupo-icono">${g.icono || ""}</div>
             <div class="rpg-grupo-nombre">${g.nombre}</div>
+            <div class="rpg-grupo-ambiente">${g.bioma.ambiente}</div>
             <div class="rpg-grupo-rango">Nv ${g.nivelMin}–${g.nivelMax}</div>
-            <div class="rpg-grupo-progreso"><span style="width:${(prog/10)*100}%"></span></div>
-            <div class="rpg-grupo-badge">${completadas ? "👑" : `${prog}/10`}</div>
+            <div class="rpg-grupo-progreso"><span style="width:${(completadas/10)*100}%"></span></div>
+            <div class="rpg-grupo-badge">${g.zonas.some(z => z.jefe && state.jefesDerrotados.includes(z.id)) ? "👑" : `${completadas}/10`}</div>
           </button>`;
         }).join("")}
       </div>
@@ -279,42 +300,39 @@ const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(p
     m = document.createElement("div");
     m.id = "rpg-popup-grupo"; m.className = "rpg-popup-grupo";
     const zonas = grupo.zonas;
-    const W = 260, H = 560, MX = 60, ANCHO = W - MX*2;
-    const puntos = zonas.map((z, i) => {
-      const t = i / (zonas.length - 1 || 1);
-      const onda = Math.sin(i * 0.9) * 0.5;
-      const x = MX + (onda * 0.5 + 0.5) * ANCHO;
-      const y = H - 40 - t * (H - 80);
-      return { x:+x.toFixed(1), y:+y.toFixed(1), z };
-    });
-    let pathD = ""; puntos.forEach((p, i) => pathD += (i===0?"M ":" L ") + p.x + " " + p.y);
-    let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="rpg-popup-svg">`;
-    svg += `<defs><pattern id="pg-grid" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M 8 0 L 0 0 0 8" fill="none" stroke="rgba(120,80,30,.12)" stroke-width="0.5"/></pattern></defs>`;
-    svg += `<rect width="${W}" height="${H}" fill="url(#pg-grid)"/>`;
-    svg += `<path d="${pathD}" class="rpg-popup-path"/>`;
-    puntos.forEach(p => {
-      const z = p.z;
-      const desbloqueada = state.nivel >= z.nivel - 2 || state.enemigosDerrotados >= z.nivel * 6;
-      const conquistada = z.jefe && state.jefesDerrotados.includes(z.id);
-      let cls = "rpg-popup-dot";
-      if (z.jefe) cls += " jefe"; else if (z.miniJefe) cls += " minijefe";
-      if (!desbloqueada) cls += " bloqueada";
-      if (conquistada) cls += " conquistada";
-      const r = z.jefe ? 10 : z.miniJefe ? 7 : 5.5;
-      svg += `<circle cx="${p.x}" cy="${p.y}" r="${r}" class="${cls}" data-zona="${z.id}"><title>${z.nombre} · Nv ${z.nivel}</title></circle>`;
-      svg += `<text x="${p.x + 14}" y="${p.y + 4}" class="rpg-popup-label">${z.nivel}</text>`;
-    });
-    svg += `</svg>`;
+    const conquistadas = zonas.filter(z => state.zonasConquistadas.includes(z.id)).length;
+    const desbloqueada = z => window._rpgZonaDesbloqueada
+      ? window._rpgZonaDesbloqueada(z.id)
+      : state.nivel >= z.nivel - 2 || state.enemigosDerrotados >= z.nivel * 6;
     m.innerHTML = `
-      <div class="rpg-popup-panel">
+      <div class="rpg-popup-panel" style="--bioma-img:url('${grupo.bioma.imagen}');--bioma-acento:${grupo.bioma.acento}">
         <button class="rpg-popup-close" aria-label="Cerrar">×</button>
-        <div class="rpg-popup-titulo"><span>${grupo.icono || ""} ${grupo.nombre}</span><small>Nv ${grupo.nivelMin}–${grupo.nivelMax} · Jefe: ${grupo.jefe}</small></div>
-        <div class="rpg-popup-svg-wrap">${svg}</div>
-        <div class="rpg-popup-leyenda">
-          <span><i class="dot-normal"></i>Zona</span>
-          <span><i class="dot-mini"></i>Mini-jefe</span>
-          <span><i class="dot-jefe"></i>Jefe</span>
-          <span><i class="dot-lock"></i>Bloqueada</span>
+        <header class="rpg-popup-hero">
+          <img src="${grupo.bioma.imagen}" alt="${grupo.bioma.ambiente}" class="rpg-popup-bioma">
+          <div class="rpg-popup-titulo">
+            <small>EXPEDICIÓN · NV ${grupo.nivelMin}–${grupo.nivelMax}</small>
+            <span>${grupo.nombre}</span>
+            <strong>Jefe de región: ${grupo.jefe}</strong>
+            <div class="rpg-popup-progreso"><span style="width:${conquistadas * 10}%"></span></div>
+            <em>${conquistadas}/10 zonas conquistadas · Primera victoria: +50% XP y monedas</em>
+          </div>
+        </header>
+        <div class="rpg-popup-zonas" aria-label="Zonas de la región">
+          ${zonas.map((z, i) => {
+            const open = desbloqueada(z);
+            const conquistada = state.zonasConquistadas.includes(z.id);
+            const tipo = z.jefe ? "Jefe de región" : z.miniJefe ? "Mini-jefe" : z.nivel % 10 >= 6 ? "Encuentro élite" : "Encuentro";
+            const cls = ["rpg-popup-dot", "rpg-popup-zone", z.jefe ? "jefe" : z.miniJefe ? "minijefe" : "", !open ? "bloqueada" : "", conquistada ? "conquistada" : ""].filter(Boolean).join(" ");
+            return `<button type="button" class="${cls}" data-zona="${z.id}" ${open ? "" : "disabled"}>
+              <span class="rpg-popup-zone-number">${String(i + 1).padStart(2, "0")}</span>
+              <span class="rpg-popup-zone-copy">
+                <span class="rpg-popup-zone-meta"><strong>NIVEL ${z.nivel}</strong><i>${conquistada ? "✓ CONQUISTADA" : tipo}</i></span>
+                <span class="rpg-popup-zone-name">${z.nombre}</span>
+                <small>${!open ? "Sigue avanzando para desbloquearla" : conquistada ? "Vuelve a explorar o sigue al próximo desafío" : "Primera victoria: recompensa extra"}</small>
+              </span>
+              <span class="rpg-popup-zone-arrow">${!open ? "🔒" : conquistada ? "★" : "›"}</span>
+            </button>`;
+          }).join("")}
         </div>
       </div>`;
     document.body.appendChild(m);
@@ -339,6 +357,7 @@ const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(p
       const dot = e.target.closest(".rpg-popup-dot");
       if (dot) {
         e.preventDefault(); e.stopPropagation();
+        if (dot.disabled) { SND("derrota"); return; }
         const z = ZONAS.find(x => x.id === dot.dataset.zona);
         if (!z) return;
         const ok = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(z.id) : (state.nivel >= z.nivel - 2 || state.enemigosDerrotados >= z.nivel * 6);
@@ -863,6 +882,14 @@ const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(p
     const xpB = bonusTipo("xp_extra")/100;
     if (xpB > 0) xp = Math.round(xp * (1+xpB));
     mon += bonusTipo("monedas_victoria");
+    const primeraVictoriaZona = !state.zonasConquistadas.includes(state.zonaActual);
+    const xpPrimeraVictoria = primeraVictoriaZona ? Math.round(xp * 0.5) : 0;
+    const monedasPrimeraVictoria = primeraVictoriaZona ? Math.round(mon * 0.5) : 0;
+    if (primeraVictoriaZona) {
+      state.zonasConquistadas.push(state.zonaActual);
+      xp += xpPrimeraVictoria;
+      mon += monedasPrimeraVictoria;
+    }
     window.dispatchEvent(new CustomEvent("rpg:victoria", { detail:{ enemigo:{ ...enemigo, zona:state.zonaActual, xp, monedas:mon } } }));
     state.enemigosDerrotados++;
     state.xp += xp;
@@ -892,6 +919,7 @@ const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(p
     guardar(state);
     $("rpg-batalla")?.classList.add("ganada");
     log("¡"+nE+" derrotado! +"+xp+" XP, +"+mon+" monedas.", "info");
+    if (primeraVictoriaZona) log(`✨ ¡Zona conquistada por primera vez! +${xpPrimeraVictoria} XP y +${monedasPrimeraVictoria} monedas extra.`, "critico");
     if (sub > 0) log("¡Subiste a nivel "+state.nivel+"!", "critico");
     setTimeout(() => { enemigo = null; buffsHeroe = []; buffsEnemigo = []; state.sangrado = 0; render(); }, 1500);
   }
@@ -930,6 +958,7 @@ const desbloqueado = window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(p
     enemigo: () => enemigo,
     zonas: ZONAS,
     grupos: GRUPOS,
+    biomas: REGIONES.map(reg => reg.bioma),
     abrirPopupGrupo,
     reset: () => { localStorage.removeItem(KEY()); state = def(); render(); }
   };

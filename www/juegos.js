@@ -30,11 +30,31 @@ function registrarTimer(overlay, id) {
 
 function limpiarTimers(overlay) {
   const set = _timersPorOverlay.get(overlay);
-  if (!set) return;
-  set.forEach(id => {
-    if (typeof id === "number") clearInterval(id) || clearTimeout(id);
+  set?.forEach(id => {
+    if (typeof id === "number") {
+      clearInterval(id);
+      clearTimeout(id);
+    }
   });
-  set.clear();
+  set?.clear();
+  overlay._frames?.forEach(cancelAnimationFrame);
+  overlay._frames?.clear();
+}
+
+function programarTimeout(overlay, fn, delay) {
+  let id;
+  id = setTimeout(() => {
+    _timersPorOverlay.get(overlay)?.delete(id);
+    if (overlay.isConnected) fn();
+  }, delay);
+  registrarTimer(overlay, id);
+  return id;
+}
+
+function programarIntervalo(overlay, fn, delay) {
+  const id = setInterval(fn, delay);
+  registrarTimer(overlay, id);
+  return id;
 }
 
   // ============ HELPERS ============
@@ -82,7 +102,18 @@ function limpiarTimers(overlay) {
     return r;
   };
 
-  const loopAnim = (fn) => { const step = (t) => { if (fn(t) !== false) requestAnimationFrame(step); }; requestAnimationFrame(step); };
+  const loopAnim = (fn, overlay) => {
+    if (!overlay._frames) overlay._frames = new Set();
+    let id;
+    const step = t => {
+      overlay._frames.delete(id);
+      if (!overlay.isConnected || fn(t) === false) return;
+      id = requestAnimationFrame(step);
+      overlay._frames.add(id);
+    };
+    id = requestAnimationFrame(step);
+    overlay._frames.add(id);
+  };
 
   const popPuntos = (parent, x, y, txt, color = "#ffd93d") => {
     const p = document.createElement("span");
@@ -120,7 +151,7 @@ function limpiarTimers(overlay) {
     `);
     o.classList.add("active");
     const cont = $("dad-dados"), eP = $("dad-puntos"), eT = $("dad-tiradas"), eR = $("dad-racha"), estado = $("dad-estado"), btn = $("dad-girar");
-    let puntos = 0, tiradas = 0, racha = 0, activo = true, rachaCombos = 0;
+    let puntos = 0, tiradas = 0, racha = 0, activo = true, rachaCombos = 0, animacion = null;
 
     const renderDado = (val) => {
       const pos = { 1:[[50,50]], 2:[[25,25],[75,75]], 3:[[25,25],[50,50],[75,75]],
@@ -136,10 +167,10 @@ function limpiarTimers(overlay) {
       const valores = Array.from({length:5}, () => rndInt(1,6));
       cont.innerHTML = valores.map(() => `<div class="dad-dado">?</div>`).join("");
       let giros = 0;
-      const anim = setInterval(() => {
+      animacion = programarIntervalo(o, () => {
         qsa(".dad-dado", cont).forEach(d => d.textContent = rndInt(1,6));
         if (++giros >= 12) {
-          clearInterval(anim);
+          clearInterval(animacion);
           qsa(".dad-dado", cont).forEach((d, i) => { d.innerHTML = renderDado(valores[i]); d.classList.add("resultado"); });
           const cuenta = {}; valores.forEach(v => cuenta[v] = (cuenta[v]||0)+1);
           const maxRep = Math.max(...Object.values(cuenta));
@@ -166,6 +197,7 @@ function limpiarTimers(overlay) {
       snd("blip");
     }
     function terminar() {
+      activo = false;
       const m = Math.max(1, Math.floor(puntos / 10));
       darPremio(m, Math.min(20, Math.floor(puntos / 20)), `¡${puntos} puntos! +${m}`);
       finalizar(o, { titulo: "¡Buen tiro!", emoji: ICONO.trofeoDiamante || "", subtitulo: "Puntos totales", num: puntos, extra: `+${m}`, onReiniciar: juegoDados });
@@ -290,71 +322,6 @@ function limpiarTimers(overlay) {
       finalizar(o, { titulo: aciertos >= 10 ? "¡Ojo de halcón!" : aciertos >= 6 ? "¡Buen ojo!" : "¡Sigue así!", emoji: ICONO.rayoDoble || "", subtitulo: "Aciertos", num: `${aciertos} / ${TOTAL}`, extra: `+${m}`, onReiniciar: juegoSiluetas });
     }
     nuevaRonda();
-  }
-
-  // ============================================================
-  // 4. PESCA EN EL LAGO
-  // ============================================================
-  function juegoPesca() {
-    const o = crearOverlay("juego-pesca-overlay", `
-      <h2 class="minijuego-titulo">Pesca en el lago</h2>
-      <p class="minijuego-desc">Atrapa peces · Dorados x3 · Combo x5 = ¡bonus!</p>
-      ${HUD([
-        { id:"pes-puntos", label:"Peces", value:"0", icon:ICONO.pez || "" },
-        { id:"pes-combo", label:"Combo", value:"x0", icon:ICONO.fuego || "", cls:"ja-hud-racha" },
-        { id:"pes-tiempo", label:"Tiempo", value:"45s", icon:ICONO.reloj || "", cls:"jm-hud-time" }
-      ])}
-      <div class="pes-lago" id="pes-lago"><div class="pes-agua"></div></div>
-    `);
-    o.classList.add("active");
-    const lago = $("pes-lago"), eP = $("pes-puntos"), eC = $("pes-combo"), eT = $("pes-tiempo");
-    let puntos = 0, combo = 0, t = 45, activo = true, ultimoComboT = 0;
-
-    function spawn() {
-      if (!activo) return;
-      const r = lago.getBoundingClientRect();
-      const roll = Math.random();
-      const tipo = roll < 0.12 ? "estrella" : roll < 0.3 ? "dorado" : "normal";
-      const pez = document.createElement("button");
-      pez.type = "button"; pez.className = "pes-pez";
-      if (tipo !== "normal") pez.classList.add("dorado");
-      pez.dataset.tipo = tipo;
-      pez.innerHTML = tipo === "estrella" ? (ICONO.estrellaDoble || "") : tipo === "dorado" ? (ICONO.trofeoDiamante || "") : (ICONO.pez || "");
-      pez.style.left = rnd(20, r.width - 80) + "px";
-      pez.style.top = (r.height - 30) + "px";
-      lago.appendChild(pez);
-      const dur = rnd(1800, 3500);
-      const ini = performance.now();
-      loopAnim(() => {
-        if (!pez.parentNode || !activo) return false;
-        const p = (performance.now() - ini) / dur;
-        if (p >= 1) { pez.remove(); return false; }
-        pez.style.top = ((r.height - 30) * (1 - p)) + "px";
-        return true;
-      });
-      pez.addEventListener("click", () => {
-        if (!activo || !pez.parentNode) return;
-        const pts = tipo === "estrella" ? 10 : tipo === "dorado" ? 5 : 1;
-        const ahora = Date.now();
-        combo = (ahora - ultimoComboT < 1200) ? combo + 1 : 1;
-        ultimoComboT = ahora;
-        const bonus = combo >= 5 ? Math.floor(combo / 5) * 2 : 0;
-        puntos += pts + bonus;
-        eP.textContent = puntos;
-        eC.textContent = `x${combo}`;
-        popPuntos(lago, parseFloat(pez.style.left) + 20, parseFloat(pez.style.top), `+${pts + bonus}`, tipo === "estrella" ? "#ff7a9c" : "#ffd93d");
-        snd(tipo === "normal" ? "atrapado" : "victoria");
-        pez.remove();
-      });
-      setTimeout(spawn, rnd(400, 800));
-    }
-    setTimeout(spawn, 400);
-    const tk = setInterval(() => { t--; eT.textContent = t + "s"; eT.classList.toggle("urgente", t <= 10); if (t <= 0) { activo = false; clearInterval(tk); terminar(); } }, 1000);
-    function terminar() {
-      const m = Math.max(1, puntos * 2);
-      darPremio(m, Math.min(20, puntos), `¡${puntos} puntos! +${m}`);
-      finalizar(o, { titulo: "¡Buena pesca!", emoji: ICONO.pez || "", subtitulo: "Puntos totales", num: puntos, extra: `+${m}`, onReiniciar: juegoPesca });
-    }
   }
 
   // ============================================================
@@ -1703,7 +1670,6 @@ function limpiarTimers(overlay) {
     { id:"dados", nombre:"Dados locos", fn:juegoDados, icon:ICONO.dado },
     { id:"cartas", nombre:"Cartas giratorias", fn:juegoCartas, icon:ICONO.carta },
     { id:"siluetas", nombre:"Luz y sombra", fn:juegoSiluetas, icon:ICONO.rayoDoble },
-    { id:"pesca", nombre:"Pesca en el lago", fn:juegoPesca, icon:ICONO.pez },
     { id:"mariposas", nombre:"Mariposas del jardín", fn:juegoMariposas, icon:ICONO.mariposa },
     { id:"pocion", nombre:"Poción mágica", fn:juegoPocion, icon:ICONO.pocion },
     { id:"pinguino", nombre:"Pingüino resbaladizo", fn:juegoPinguino, icon:ICONO.montaña },
@@ -1722,9 +1688,8 @@ function limpiarTimers(overlay) {
     { id:"bosque", nombre:"Bosque encantado", fn:juegoBosque, icon:ICONO.bosque },
     { id:"adivina", nombre:"Adivina la mascota", fn:juegoAdivina, icon:ICONO.globo }
   ];
-  /* ✅ SOLO 4 JUEGOS PERMITIDOS */
-const JUEGOS_PERMITIDOS = new Set(["adivina","memoria","girasol","pocion"]);
-const JUEGOS_FILTRADOS = JUEGOS.filter(j => JUEGOS_PERMITIDOS.has(j.id));
+  const JUEGOS_PERMITIDOS = new Set(["dados"]);
+  const JUEGOS_FILTRADOS = JUEGOS.filter(j => JUEGOS_PERMITIDOS.has(j.id));
 
   function inyectarBotones() {
     const menu = qs(".minijuegos-menu");
@@ -1732,7 +1697,7 @@ const JUEGOS_FILTRADOS = JUEGOS.filter(j => JUEGOS_PERMITIDOS.has(j.id));
     menu.dataset.extras = "1";
     JUEGOS_FILTRADOS.forEach(j => {
       const b = document.createElement("button");
-      b.type = "button"; b.className = "btn-minijuego"; b.dataset.juegoExtra = j.id;
+      b.type = "button"; b.className = "btn-minijuego"; b.dataset.juegoExtra = j.id; b.dataset.juego = j.id;
       b.innerHTML = `<span class="btn-minijuego-icon">${j.icon || ""}</span><span class="btn-minijuego-text">${j.nombre}</span>`;
       b.addEventListener("click", () => j.fn());
       menu.appendChild(b);
@@ -1741,9 +1706,6 @@ const JUEGOS_FILTRADOS = JUEGOS.filter(j => JUEGOS_PERMITIDOS.has(j.id));
   setTimeout(inyectarBotones, 800);
   window.addEventListener("hashchange", () => setTimeout(inyectarBotones, 300));
   window.JUEGO_FNS = Object.fromEntries(JUEGOS.map(j => [j.id, j.fn]));
-   window.JUEGOS_EXTRA    = [];
-  window.JUEGO_FNS       = {};
-  window.abrirJuegoExtra = () => {};
 
   console.log("✅ juegos.js cargado —", JUEGOS_FILTRADOS.length, "juegos activos");
 });

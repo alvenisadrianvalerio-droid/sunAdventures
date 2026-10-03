@@ -3,85 +3,118 @@
    ============================================ */
 .minijuegos-menu {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1rem;
-  padding: 1.5rem;
-  background: rgba(255,255,255,.03);
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.1rem;
+  padding: 1.6rem;
+  background: linear-gradient(135deg, rgba(8,13,23,.86), rgba(9,12,19,.93)), url("img/biomas/gen-5480873c-7b50-45b8-a3c1-abc457a2f0fa.png") center/cover;
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,.08);
-  max-width: 1100px;
+  max-width: 1260px;
   margin: 0 auto 2.5rem;
 }
 body.light .minijuegos-menu {
-  background: rgba(255,255,255,.6);
+  background: linear-gradient(135deg, rgba(255,251,239,.88), rgba(255,255,255,.9)), url("img/biomas/gen-df614595-485a-47f1-a074-7d4b4aa3d08e.png") center/cover;
   border-color: rgba(139,90,20,.12);
   box-shadow: 0 8px 30px rgba(139,90,20,.08);
 }
 .btn-minijuego {
+  --game-accent: #ffd93d;
+  --game-biome: url("img/biomas/gen-5480873c-7b50-45b8-a3c1-abc457a2f0fa.png");
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: .55rem; padding: 1rem .7rem;
+  gap: .65rem; padding: 1rem .7rem;
   border-radius: 16px;
-  border: 2px solid rgba(255,217,61,.25);
-  background: linear-gradient(180deg, rgba(255,217,61,.12), rgba(255,217,61,.03));
+  border: 1px solid color-mix(in srgb, var(--game-accent) 52%, transparent);
+  background-image: linear-gradient(140deg, color-mix(in srgb, var(--game-accent) 17%, rgba(10,14,24,.94)), rgba(10,14,24,.82)), var(--game-biome);
+  background-position: center;
+  background-size: cover;
   color: var(--text); cursor: pointer; text-align: center;
-  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), border-color .25s, box-shadow .25s, filter .25s;
   position: relative; overflow: hidden;
-  min-height: 125px; font-family: inherit;
+  min-height: 154px; font-family: inherit;
+  box-shadow: 0 8px 22px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.12);
+  text-shadow: 0 1px 3px rgba(0,0,0,.75);
+  isolation: isolate;
 }
 .btn-minijuego::before {
   content: ""; position: absolute; inset: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(255,217,61,.25), transparent 70%);
-  opacity: 0; transition: opacity .3s ease; pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--game-accent) 34%, transparent), transparent 72%);
+  opacity: .8; transition: opacity .3s ease; pointer-events: none;
 }
 .btn-minijuego:hover {
-  transform: translateY(-6px) scale(1.03);
-  border-color: rgba(255,217,61,.7);
-  background: linear-gradient(180deg, rgba(255,217,61,.22), rgba(255,217,61,.06));
-  box-shadow: 0 14px 32px rgba(255,217,61,.25), 0 0 0 1px rgba(255,217,61,.2) inset;
+  transform: translateY(-5px);
+  border-color: var(--game-accent);
+  box-shadow: 0 16px 32px color-mix(in srgb, var(--game-accent) 22%, rgba(0,0,0,.55)), 0 0 0 1px color-mix(in srgb, var(--game-accent) 28%, transparent) inset;
+  filter: saturate(1.1);
 }
 .btn-minijuego:hover::before { opacity: 1; }
 .btn-minijuego:active { transform: translateY(-2px) scale(.98); }
+.btn-minijuego:focus-visible { outline: 3px solid var(--game-accent); outline-offset: 3px; }
 .btn-minijuego-icon {
-  width: 3rem; height: 3rem;
+  width: 3.25rem; height: 3.25rem;
   display: grid; place-items: center;
   border-radius: 14px;
-  background: radial-gradient(circle at 30% 30%, rgba(255,217,61,.3), rgba(255,217,61,.08));
-  border: 1px solid rgba(255,217,61,.35);
-  color: var(--accent);
+  background: color-mix(in srgb, var(--game-accent) 19%, rgba(8,12,20,.72));
+  border: 1px solid color-mix(in srgb, var(--game-accent) 60%, transparent);
+  color: var(--game-accent);
   transition: all .3s cubic-bezier(.34,1.56,.64,1);
   flex-shrink: 0;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--game-accent) 18%, transparent), inset 0 1px rgba(255,255,255,.2);
 }
-.btn-minijuego-icon svg { width: 60%; height: 60%; }
+.btn-minijuego-icon svg { width: 64%; height: 64%; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
 .btn-minijuego:hover .btn-minijuego-icon {
   transform: scale(1.15) rotate(-8deg);
-  background: radial-gradient(circle at 30% 30%, rgba(255,217,61,.5), rgba(255,217,61,.15));
-  box-shadow: 0 6px 20px rgba(255,217,61,.4);
+  background: color-mix(in srgb, var(--game-accent) 28%, rgba(8,12,20,.7));
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--game-accent) 38%, transparent);
 }
 .btn-minijuego-text {
-  font-size: .82rem; font-weight: bold; line-height: 1.25;
-  max-width: 100%; overflow-wrap: anywhere;
+  font-size: .9rem; font-weight: 900; line-height: 1.25;
+  max-width: 100%; overflow-wrap: anywhere; letter-spacing: .01em;
 }
 body.light .btn-minijuego {
-  background: linear-gradient(180deg, #fffef8, #fdf5e0);
-  border-color: rgba(212,148,30,.3);
-  box-shadow: 0 4px 14px rgba(139,90,20,.1);
+  background-image: linear-gradient(140deg, color-mix(in srgb, var(--game-accent) 15%, rgba(255,252,241,.92)), rgba(255,252,241,.84)), var(--game-biome);
+  color: #382d20;
+  text-shadow: 0 1px 1px rgba(255,255,255,.65);
+  box-shadow: 0 8px 22px rgba(84,60,20,.13), inset 0 1px rgba(255,255,255,.6);
 }
 body.light .btn-minijuego:hover {
-  background: linear-gradient(180deg, #fffffe, #fdf0d0);
-  border-color: rgba(212,148,30,.6);
-  box-shadow: 0 14px 32px rgba(212,148,30,.25);
+  border-color: var(--game-accent);
+  box-shadow: 0 14px 28px color-mix(in srgb, var(--game-accent) 25%, rgba(84,60,20,.18));
 }
 body.light .btn-minijuego-icon {
-  background: radial-gradient(circle at 30% 30%, rgba(212,148,30,.25), rgba(212,148,30,.05));
-  border-color: rgba(212,148,30,.4);
+  background: color-mix(in srgb, var(--game-accent) 20%, rgba(255,255,255,.8));
+  border-color: color-mix(in srgb, var(--game-accent) 62%, transparent);
 }
-
+[data-juego="girasol"] {
+  --game-accent: #ffd84d;
+  --game-biome: url("img/biomas/gen-5480873c-7b50-45b8-a3c1-abc457a2f0fa.png");
+}
+[data-juego="memoria"] {
+  --game-accent: #83dfa0;
+  --game-biome: url("img/biomas/gen-df614595-485a-47f1-a074-7d4b4aa3d08e.png");
+}
+[data-juego="adivina"] {
+  --game-accent: #ffc0e0;
+  --game-biome: url("img/biomas/gen-ef4c41e3-8713-47f7-acde-eefb81a85d11.png");
+}
+[data-juego="snake"] {
+  --game-accent: #85e58d;
+  --game-biome: url("img/biomas/gen-54356df9-2637-441f-96a0-4742f61f6a57.png");
+}
+[data-juego="dados"], [data-juego-extra="dados"] {
+  --game-accent: #f3c978;
+  --game-biome: url("img/biomas/gen-5510680d-7fe8-4834-b72d-04dd75fc60e2.png");
+}
 @media (max-width: 600px) {
-  .minijuegos-menu { grid-template-columns: repeat(2, 1fr); gap: .7rem; padding: 1rem; }
-  .btn-minijuego { min-height: 110px; padding: .8rem .5rem; }
-  .btn-minijuego-icon { width: 2.4rem; height: 2.4rem; }
-  .btn-minijuego-text { font-size: .72rem; }
+  .minijuegos-menu { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; padding: .8rem; }
+  .btn-minijuego { min-height: 122px; padding: .75rem .45rem; border-radius: 14px; }
+  .btn-minijuego-icon { width: 2.7rem; height: 2.7rem; border-radius: 12px; }
+  .btn-minijuego-text { font-size: .78rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-minijuego, .btn-minijuego-icon { transition: none; }
+  .btn-minijuego:hover { transform: none; }
 }
 
 /* ============================================
@@ -231,7 +264,19 @@ body.light .btn-minijuego-icon {
   font-size: .78rem;
   font-weight: 700;
 }
-.desafio-diario-premio { color: var(--accent, #ffd93d); }
+.desafio-diario-premio {
+  display: inline-flex;
+  align-items: center;
+  gap: .2rem;
+  color: var(--accent, #ffd93d);
+}
+.desafio-diario-premio-icon {
+  display: inline-block;
+  width: 1.45em;
+  height: 1.45em;
+  object-fit: contain;
+  vertical-align: middle;
+}
 .desafio-diario.completado {
   border-color: rgba(102, 214, 150, .5);
   background: linear-gradient(135deg, rgba(102, 214, 150, .14), rgba(255, 255, 255, .035));
@@ -250,4 +295,8 @@ body.light .desafio-diario-juegos { color: var(--text-muted, #715d3d); }
 @media (max-width: 520px) {
   .desafio-diario { padding: .9rem; }
   .desafio-diario-pie { flex-direction: column; }
+}
+
+@media (min-width: 701px) {
+  .desafio-diario-premio-icon { image-rendering: auto; }
 }
