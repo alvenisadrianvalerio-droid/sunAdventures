@@ -65,9 +65,10 @@
   const QUOTE_COPY = {
     es:{
       usdPerLocal:"1 {currency} = {rate} USD",
-      usdLabel:"VES / USD · BCV",
+      usdLabel:"USD / VES · BCV",
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
+      bcvDate:"fecha de valor {date}",
       usdtPerLocal:"1 VES = {rate} USDT",
       vesPerUsdt:"1 USDT ≈ {rate} VES",
       buy:"compra",
@@ -80,9 +81,10 @@
     },
     en:{
       usdPerLocal:"1 {currency} = {rate} USD",
-      usdLabel:"VES / USD · BCV",
+      usdLabel:"USD / VES · BCV",
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
+      bcvDate:"value date {date}",
       usdtPerLocal:"1 VES = {rate} USDT",
       vesPerUsdt:"1 USDT ≈ {rate} VES",
       buy:"buy",
@@ -95,9 +97,10 @@
     },
     pt:{
       usdPerLocal:"1 {currency} = {rate} USD",
-      usdLabel:"VES / USD · BCV",
+      usdLabel:"USD / VES · BCV",
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
+      bcvDate:"data-valor {date}",
       usdtPerLocal:"1 VES = {rate} USDT",
       vesPerUsdt:"1 USDT ≈ {rate} VES",
       buy:"compra",
@@ -110,9 +113,10 @@
     },
     zh:{
       usdPerLocal:"1 {currency} = {rate} USD",
-      usdLabel:"VES / USD · BCV",
+      usdLabel:"USD / VES · BCV",
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
+      bcvDate:"价值日期 {date}",
       usdtPerLocal:"1 VES = {rate} USDT",
       vesPerUsdt:"1 USDT ≈ {rate} VES",
       buy:"买入",
@@ -125,9 +129,10 @@
     },
     ja:{
       usdPerLocal:"1 {currency} = {rate} USD",
-      usdLabel:"VES / USD · BCV",
+      usdLabel:"USD / VES · BCV",
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
+      bcvDate:"基準日 {date}",
       usdtPerLocal:"1 VES = {rate} USDT",
       vesPerUsdt:"1 USDT ≈ {rate} VES",
       buy:"購入",
@@ -140,9 +145,10 @@
     },
     ko:{
       usdPerLocal:"1 {currency} = {rate} USD",
-      usdLabel:"VES / USD · BCV",
+      usdLabel:"USD / VES · BCV",
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
+      bcvDate:"기준일 {date}",
       usdtPerLocal:"1 VES = {rate} USDT",
       vesPerUsdt:"1 USDT ≈ {rate} VES",
       buy:"구매",
@@ -155,9 +161,10 @@
     },
     it:{
       usdPerLocal:"1 {currency} = {rate} USD",
-      usdLabel:"VES / USD · BCV",
+      usdLabel:"USD / VES · BCV",
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
+      bcvDate:"data di valuta {date}",
       usdtPerLocal:"1 VES = {rate} USDT",
       vesPerUsdt:"1 USDT ≈ {rate} VES",
       buy:"acquisto",
@@ -170,9 +177,10 @@
     },
     fr:{
       usdPerLocal:"1 {currency} = {rate} USD",
-      usdLabel:"VES / USD · BCV",
+      usdLabel:"USD / VES · BCV",
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
+      bcvDate:"date de valeur {date}",
       usdtPerLocal:"1 VES = {rate} USDT",
       vesPerUsdt:"1 USDT ≈ {rate} VES",
       buy:"achat",
@@ -282,10 +290,14 @@
   function renderQuote(quotes, history, previous) {
     const copy = quoteCopy();
     const code = quotes.currency;
-    const usdTrend = trend(quotes.usd.value, previous?.usd);
-    const usdTitle = quoteText(copy.usdPerLocal, { currency:code, rate:quoteNumber(quotes.usd.value) });
+    const usdValue = code === "VES" ? quotes.usd.localPerUsd : quotes.usd.value;
+    const previousUsdValue = code === "VES" && previous?.usd ? 1 / previous.usd : previous?.usd;
+    const usdTrend = trend(usdValue, previousUsdValue);
+    const usdTitle = code === "VES"
+      ? quoteText(copy.vesPerUsd, { rate:quoteNumber(usdValue, 4) })
+      : quoteText(copy.usdPerLocal, { currency:code, rate:quoteNumber(usdValue) });
     const usdDetail = code === "VES"
-      ? `${quoteText(copy.vesPerUsd, { rate:quoteNumber(quotes.usd.localPerUsd, 4) })} · ${escapeHtml(quotes.usd.source)}`
+      ? `${escapeHtml(quotes.usd.source)} · ${quoteText(copy.bcvDate, { date:quotes.usd.asOf })}`
       : `${escapeHtml(quotes.usd.source)} · ${escapeHtml(quotes.usd.asOf)}`;
     const rows = [`<article class="finanzas-quote-value"><span>${code === "VES" ? copy.usdLabel : `${code} / USD`}</span><strong>${usdTitle}</strong><small>${usdDetail}${usdTrend ? ` · ${usdTrend}` : ""}</small></article>`];
     if (quotes.usdt) {

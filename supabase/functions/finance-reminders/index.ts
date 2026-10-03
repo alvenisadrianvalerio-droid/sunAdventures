@@ -288,11 +288,13 @@ Deno.serve(async request => {
           .select("id,subscription").eq("user_id", alert.user_id);
         if (subscriptionsError) throw subscriptionsError;
 
-        const usdArrow = direction(usdValue, oldUsdAlert);
+        const usdArrow = alert.moneda === "VES"
+          ? direction(quote.usd.localPerUsd, oldUsdAlert ? 1 / oldUsdAlert : null)
+          : direction(usdValue, oldUsdAlert);
         const usdtArrow = usdtValue === null ? "" : direction(usdtValue, oldUsdtAlert);
         const title = alert.moneda === "VES" ? "Cotización VES · BCV / Binance P2P" : `Cotización ${alert.moneda} / USD`;
         const body = alert.moneda === "VES"
-          ? `1 VES = $${formatRate(usdValue)} ${usdArrow} · 1 VES = ${formatRate(usdtValue || 0)} USDT ${usdtArrow}`
+          ? `1 USD = ${formatRate(quote.usd.localPerUsd)} VES ${usdArrow} · 1 VES = ${formatRate(usdtValue || 0)} USDT ${usdtArrow}`
           : `1 ${alert.moneda} = $${formatRate(usdValue)} USD ${usdArrow}`;
         const payload = JSON.stringify({
           title,
