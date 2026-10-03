@@ -32,7 +32,7 @@
   <link rel="stylesheet" href="rpg.css?v=4">
   <link rel="stylesheet" href="rpg-loot.css?v=4">
   <link rel="stylesheet" href="temas.css?v=1">
-  <link rel="stylesheet" href="finanzas.css?v=3">
+  <link rel="stylesheet" href="finanzas.css?v=5">
   <style>
     svg {
       max-width: 100%;
@@ -316,7 +316,7 @@
         <button id="finanzas-login-btn" class="btn-primary" type="button">Entrar o crear cuenta</button>
       </div>
       <div id="finanzas-app" hidden>
-        <section class="finanzas-quote-card" aria-labelledby="finanzas-quote-title">
+        <section id="finanzas-quote-card" class="finanzas-quote-card" aria-labelledby="finanzas-quote-title" hidden>
           <div class="finanzas-quote-heading">
             <div>
               <span class="finanzas-eyebrow">MERCADO DE DIVISAS</span>
@@ -336,7 +336,7 @@
           </label>
           <small id="finanzas-price-alert-status" class="finanzas-reminder-status" role="status" aria-live="polite"></small>
         </section>
-        <section class="finanzas-reminder" aria-labelledby="finanzas-reminder-title">
+        <section id="finanzas-reminder-card" class="finanzas-reminder" aria-labelledby="finanzas-reminder-title" hidden>
           <div class="finanzas-reminder-copy">
             <span class="finanzas-eyebrow">RECORDATORIO DIARIO</span>
             <h2 id="finanzas-reminder-title">Recordatorios diarios</h2>
@@ -360,10 +360,19 @@
             <small id="finanzas-reminder-status" class="finanzas-reminder-status" role="status" aria-live="polite"></small>
           </form>
         </section>
-        <nav class="finanzas-tabs" aria-label="Secciones de finanzas">
-          <button type="button" class="finanzas-tab active" data-finanzas-tab="personal">Personal</button>
-          <button type="button" class="finanzas-tab" data-finanzas-tab="pareja">Pareja</button>
-          <button type="button" class="finanzas-tab" data-finanzas-tab="reportes">Reportes</button>
+        <nav class="finanzas-tabs" aria-label="Apartados de finanzas">
+          <button type="button" class="finanzas-tab active" data-finanzas-section="resumen">Resumen</button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="movimientos">Movimientos</button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="presupuestos">Presupuestos</button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="metas">Metas</button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="categorias">Categorías</button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="reportes">Reportes</button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="cotizaciones">Cotizaciones</button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="recordatorios">Recordatorios</button>
+        </nav>
+        <nav class="finanzas-scopes" aria-label="Ámbito de finanzas">
+          <button type="button" class="finanzas-scope active" data-finanzas-scope="personal" aria-pressed="true">Personal</button>
+          <button type="button" class="finanzas-scope" data-finanzas-scope="pareja" aria-pressed="false">Compartidas</button>
         </nav>
         <div class="finanzas-toolbar">
           <label>

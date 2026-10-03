@@ -103,27 +103,49 @@
 .finanzas-login p { max-width: 390px; margin: .5rem auto 1.3rem; opacity: .72; line-height: 1.6; }
 .finanzas-tabs {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: .35rem;
-  width: min(510px, 100%);
-  margin: 0 auto 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .5rem;
+  width: 100%;
+  margin: 0 0 .65rem;
+  padding: .55rem;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 17px;
+  background: rgba(0,0,0,.16);
+}
+.finanzas-scopes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .5rem;
+  width: min(420px, 100%);
+  margin: 0 0 1rem;
   padding: .35rem;
   border: 1px solid rgba(255,255,255,.09);
   border-radius: 15px;
   background: rgba(0,0,0,.16);
 }
-.finanzas-tab, .finanzas-report-toggle button {
-  min-height: 42px;
+.finanzas-tab, .finanzas-scope {
+  min-width: 0;
+  min-height: 46px;
+  padding: .45rem .55rem;
   border: 0;
   border-radius: 11px;
   background: transparent;
   color: var(--text);
   font: inherit;
+  font-size: .84rem;
   font-weight: 800;
+  line-height: 1.2;
   cursor: pointer;
   opacity: .68;
 }
-.finanzas-tab.active, .finanzas-report-toggle button.active {
+.finanzas-scope {
+  min-height: 40px;
+}
+.finanzas-tab:focus-visible, .finanzas-scope:focus-visible {
+  outline: 2px solid #f7d27c;
+  outline-offset: 2px;
+}
+.finanzas-tab.active, .finanzas-scope.active {
   background: linear-gradient(135deg, #f7d27c, #e9a746);
   color: #35230a;
   opacity: 1;
@@ -132,6 +154,7 @@
 .finanzas-toolbar { justify-content: flex-end; margin: 1rem 0; }
 .finanzas-toolbar label { width: min(180px, 54%); }
 .finanzas-panel { display: grid; gap: 1rem; }
+#finanzas-app [hidden] { display: none !important; }
 .finanzas-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
 .finanzas-metric {
   display: grid;
@@ -277,10 +300,12 @@
 .finanzas-legend > div span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: .8; }
 .finanzas-legend > div strong { white-space: nowrap; }
 body.light .finanzas-card, body.light .finanzas-login { border-color: rgba(73,48,20,.12); background: rgba(255,255,255,.64); }
-body.light .finanzas-tabs, body.light .finanzas-report-toggle { background: rgba(78,48,12,.07); }
+body.light .finanzas-tabs, body.light .finanzas-scopes, body.light .finanzas-report-toggle { background: rgba(78,48,12,.07); }
 body.light .finanzas-metric, body.light .finanzas-goal { border-color: rgba(73,48,20,.1); background: rgba(255,255,255,.5); }
 body.light .finanzas-currency select, body.light .finanzas-toolbar input, body.light .finanzas-form input, body.light .finanzas-form select, body.light .finanzas-inline-form input, body.light .finanzas-inline-form select, body.light .finanzas-contribution-form input { border-color: rgba(73,48,20,.18); }
 @media (max-width: 700px) {
+  .finanzas-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; padding: .45rem; }
+  .finanzas-tab { min-height: 44px; padding: .4rem .35rem; font-size: .78rem; }
   .finanzas-reminder { grid-template-columns: 1fr; }
   .finanzas-quote-values { grid-template-columns: 1fr; }
   .finanzas-header { align-items: flex-start; }
@@ -295,11 +320,17 @@ body.light .finanzas-currency select, body.light .finanzas-toolbar input, body.l
   .finanzas-section { padding-inline: .65rem; }
   .finanzas-header { flex-wrap: wrap; }
   .finanzas-currency { width: 100%; }
+  .finanzas-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .finanzas-tab { font-size: .82rem; }
+  .finanzas-scopes { width: 100%; }
+  .finanzas-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: .55rem; }
+  .finanzas-toolbar label { width: 100%; }
+  .finanzas-toolbar button { min-height: 42px; padding-inline: .75rem; }
   .finanzas-metrics { gap: .45rem; }
   .finanzas-metric { padding: .75rem .6rem; border-radius: 13px; }
   .finanzas-metric > span { font-size: .68rem; }
   .finanzas-metric strong { font-size: 1rem; }
-  .finanzas-form { grid-template-columns: 1fr 1fr; gap: .65rem; }
+  .finanzas-form { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: .65rem; }
   .finanzas-form-wide { grid-column: 1 / -1; }
   .finanzas-form-actions { grid-column: 1 / -1; }
   .finanzas-form-actions button { flex: 1; }
@@ -315,4 +346,10 @@ body.light .finanzas-currency select, body.light .finanzas-toolbar input, body.l
   .finanzas-reminder-form .btn-primary { width: 100%; }
   .finanzas-quote-heading { flex-direction: column; }
   .finanzas-quote-updated { text-align: left; }
+}
+@media (max-width: 340px) {
+  .finanzas-tabs { gap: .3rem; padding: .35rem; }
+  .finanzas-tab { min-height: 42px; font-size: .74rem; }
+  .finanzas-toolbar { grid-template-columns: 1fr; }
+  .finanzas-toolbar button { width: 100%; }
 }

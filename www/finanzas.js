@@ -23,7 +23,9 @@
     quoteUpdated: $("#finanzas-quote-updated"),
     quoteStatus: $("#finanzas-quote-status"),
     priceAlertToggle: $("#finanzas-price-alert-toggle"),
-    priceAlertStatus: $("#finanzas-price-alert-status")
+    priceAlertStatus: $("#finanzas-price-alert-status"),
+    quoteCard: $("#finanzas-quote-card"),
+    reminderCard: $("#finanzas-reminder-card")
   };
   if (!ui.app || !ui.panel) return;
 
@@ -31,8 +33,8 @@
     userId: null,
     groupId: null,
     members: [],
-    tab: "personal",
-    reportScope: "pareja",
+    section: "resumen",
+    scope: "personal",
     period: (() => {
       const now = new Date();
       return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -69,8 +71,8 @@
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
       bcvDate:"fecha de valor {date}",
-      usdtPerLocal:"1 VES = {rate} USDT",
-      vesPerUsdt:"1 USDT ≈ {rate} VES",
+      usdtPerLocal:"1 USDT = {rate} VES",
+      vesPerUsdt:"1 VES ≈ {rate} USDT",
       buy:"compra",
       sell:"venta",
       checked:"Consultado {time}",
@@ -85,8 +87,8 @@
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
       bcvDate:"value date {date}",
-      usdtPerLocal:"1 VES = {rate} USDT",
-      vesPerUsdt:"1 USDT ≈ {rate} VES",
+      usdtPerLocal:"1 USDT = {rate} VES",
+      vesPerUsdt:"1 VES ≈ {rate} USDT",
       buy:"buy",
       sell:"sell",
       checked:"Updated {time}",
@@ -101,8 +103,8 @@
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
       bcvDate:"data-valor {date}",
-      usdtPerLocal:"1 VES = {rate} USDT",
-      vesPerUsdt:"1 USDT ≈ {rate} VES",
+      usdtPerLocal:"1 USDT = {rate} VES",
+      vesPerUsdt:"1 VES ≈ {rate} USDT",
       buy:"compra",
       sell:"venda",
       checked:"Consultado {time}",
@@ -117,8 +119,8 @@
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
       bcvDate:"价值日期 {date}",
-      usdtPerLocal:"1 VES = {rate} USDT",
-      vesPerUsdt:"1 USDT ≈ {rate} VES",
+      usdtPerLocal:"1 USDT = {rate} VES",
+      vesPerUsdt:"1 VES ≈ {rate} USDT",
       buy:"买入",
       sell:"卖出",
       checked:"更新时间 {time}",
@@ -133,8 +135,8 @@
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
       bcvDate:"基準日 {date}",
-      usdtPerLocal:"1 VES = {rate} USDT",
-      vesPerUsdt:"1 USDT ≈ {rate} VES",
+      usdtPerLocal:"1 USDT = {rate} VES",
+      vesPerUsdt:"1 VES ≈ {rate} USDT",
       buy:"購入",
       sell:"売却",
       checked:"更新 {time}",
@@ -149,8 +151,8 @@
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
       bcvDate:"기준일 {date}",
-      usdtPerLocal:"1 VES = {rate} USDT",
-      vesPerUsdt:"1 USDT ≈ {rate} VES",
+      usdtPerLocal:"1 USDT = {rate} VES",
+      vesPerUsdt:"1 VES ≈ {rate} USDT",
       buy:"구매",
       sell:"판매",
       checked:"조회 {time}",
@@ -165,8 +167,8 @@
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
       bcvDate:"data di valuta {date}",
-      usdtPerLocal:"1 VES = {rate} USDT",
-      vesPerUsdt:"1 USDT ≈ {rate} VES",
+      usdtPerLocal:"1 USDT = {rate} VES",
+      vesPerUsdt:"1 VES ≈ {rate} USDT",
       buy:"acquisto",
       sell:"vendita",
       checked:"Aggiornato {time}",
@@ -181,8 +183,8 @@
       usdtLabel:"VES / USDT · P2P",
       vesPerUsd:"1 USD = {rate} VES",
       bcvDate:"date de valeur {date}",
-      usdtPerLocal:"1 VES = {rate} USDT",
-      vesPerUsdt:"1 USDT ≈ {rate} VES",
+      usdtPerLocal:"1 USDT = {rate} VES",
+      vesPerUsdt:"1 VES ≈ {rate} USDT",
       buy:"achat",
       sell:"vente",
       checked:"Consulté à {time}",
@@ -605,7 +607,7 @@
   }
 
   function activeScope() {
-    return state.tab === "reportes" ? state.reportScope : state.tab;
+    return state.scope;
   }
 
   function selectedData() {
@@ -613,11 +615,21 @@
   }
 
   function render() {
-    document.querySelectorAll("[data-finanzas-tab]").forEach(button => {
-      const active = button.dataset.finanzasTab === state.tab;
+    document.querySelectorAll("[data-finanzas-section]").forEach(button => {
+      const active = button.dataset.finanzasSection === state.section;
       button.classList.toggle("active", active);
       button.setAttribute("aria-pressed", String(active));
     });
+    document.querySelectorAll("[data-finanzas-scope]").forEach(button => {
+      const active = button.dataset.finanzasScope === state.scope;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    ui.quoteCard.hidden = state.section !== "cotizaciones";
+    ui.reminderCard.hidden = state.section !== "recordatorios";
+    ui.panel.hidden = state.section === "cotizaciones" || state.section === "recordatorios";
+    ui.period.closest(".finanzas-toolbar").hidden = state.section === "cotizaciones" || state.section === "recordatorios";
+    $(".finanzas-scopes").hidden = state.section === "cotizaciones" || state.section === "recordatorios";
     const settings = state.data[activeScope()]?.settings;
     if (settings) {
       state.currency = settings.moneda;
@@ -630,7 +642,11 @@
         savePriceAlertPreference(true, false, true);
       }
     }
-    if (state.tab === "reportes") renderReports();
+    if (state.section === "cotizaciones" || state.section === "recordatorios") {
+      ui.panel.replaceChildren();
+      return;
+    }
+    if (state.section === "reportes") renderReports();
     else renderDashboard();
   }
 
@@ -783,20 +799,20 @@
     const balance = totals.income - totals.expense;
     const isCouple = scope === "pareja";
     const editing = state.editingId ? data.movements.find(row => row.id === state.editingId) : null;
-    const reportToggle = state.tab === "reportes" ? `<div class="finanzas-report-toggle"><button type="button" data-report-scope="personal" class="${scope === "personal" ? "active" : ""}">Personal</button><button type="button" data-report-scope="pareja" class="${scope === "pareja" ? "active" : ""}">Pareja</button></div>` : "";
     if (isCouple && state.members.length < 2) {
-      ui.panel.innerHTML = `${reportToggle}      <div class="finanzas-empty finanzas-empty-large"><strong>Aún no hay más integrantes</strong><span>Invita a la otra persona a tu grupo desde el menú de perfil → Amigos y grupo para activar los gastos compartidos.</span></div>`;
+      ui.panel.innerHTML = `<div class="finanzas-empty finanzas-empty-large"><strong>Aún no hay más integrantes</strong><span>Invita a la otra persona a tu grupo desde el menú de perfil → Amigos y grupo para activar los gastos compartidos.</span></div>`;
       return;
     }
-    ui.panel.innerHTML = `${reportToggle}
-      <div class="finanzas-metrics">${metricCard("Ingresos", totals.income, "income")}${metricCard("Gastos", totals.expense, "expense")}${metricCard("Disponible", balance, balance >= 0 ? "balance-positive" : "balance-negative", "Ingresos menos gastos")}</div>
-      ${movementForm(scope, editing)}
-      ${isCouple ? settlementCards(rows) : ""}
-      <section class="finanzas-card"><div class="finanzas-card-heading"><div><span class="finanzas-eyebrow">ACTIVIDAD DEL PERÍODO</span><h2>Movimientos</h2></div><span class="finanzas-detail-count">${rows.length}</span></div>${movementsList(scope, rows)}</section>
-      ${budgetPanel(scope)}
-      ${goalsPanel(scope)}
-      ${categoriesPanel(scope)}`;
-    bindDashboardEvents(scope);
+    const metrics = `<div class="finanzas-metrics">${metricCard("Ingresos", totals.income, "income")}${metricCard("Gastos", totals.expense, "expense")}${metricCard("Disponible", balance, balance >= 0 ? "balance-positive" : "balance-negative", "Ingresos menos gastos")}</div>`;
+    const sections = {
+      resumen:`${metrics}${isCouple ? settlementCards(rows) : ""}<section class="finanzas-card finanzas-summary-card"><span class="finanzas-eyebrow">ACCESO RÁPIDO</span><h2>Gestiona tus finanzas</h2><p>Usa los botones de arriba para abrir movimientos, presupuestos, metas, categorías, reportes, cotizaciones o recordatorios.</p></section>`,
+      movimientos:`${movementForm(scope, editing)}<section class="finanzas-card"><div class="finanzas-card-heading"><div><span class="finanzas-eyebrow">ACTIVIDAD DEL PERÍODO</span><h2>Movimientos</h2></div><span class="finanzas-detail-count">${rows.length}</span></div>${movementsList(scope, rows)}</section>`,
+      presupuestos:budgetPanel(scope),
+      metas:goalsPanel(scope),
+      categorias:categoriesPanel(scope)
+    };
+    ui.panel.innerHTML = sections[state.section] || sections.resumen;
+    if (["movimientos","presupuestos","metas","categorias"].includes(state.section)) bindDashboardEvents(scope);
   }
 
   async function refreshData() {
@@ -856,8 +872,9 @@
     });
 
     $$("[data-edit-movement]", ui.panel).forEach(button => button.addEventListener("click", () => {
-      state.tab = button.dataset.scope;
+      state.scope = button.dataset.scope;
       state.editingId = button.dataset.editMovement;
+      state.section = "movimientos";
       render();
       $("#finanzas-movimiento-form", ui.panel)?.scrollIntoView({ behavior:"smooth", block:"center" });
     }));
@@ -946,10 +963,6 @@
         await refreshData();
       });
     }));
-    $$("[data-report-scope]", ui.panel).forEach(button => button.addEventListener("click", () => {
-      state.reportScope = button.dataset.reportScope;
-      render();
-    }));
   }
 
   function $$(selector, root = document) {
@@ -957,8 +970,12 @@
   }
 
   function renderReports() {
-    const scope = state.reportScope;
+    const scope = state.scope;
     const data = state.data[scope];
+    if (!data) {
+      ui.panel.replaceChildren();
+      return;
+    }
     const rows = onlyPeriod(data.movements);
     const totals = splitTransactions(rows);
     const monthly = [];
@@ -987,7 +1004,7 @@
         return `${colors[index % colors.length]} ${start}% ${accumulated}%`;
       }).join(",")})`
       : "conic-gradient(#e8e6df 0 100%)";
-    ui.panel.innerHTML = `<div class="finanzas-report-top"><div><span class="finanzas-eyebrow">VISTA GENERAL</span><h2>Reportes</h2></div><div class="finanzas-report-toggle"><button type="button" data-report-scope="personal" class="${scope === "personal" ? "active" : ""}">Personal</button><button type="button" data-report-scope="pareja" class="${scope === "pareja" ? "active" : ""}">Pareja</button></div></div>
+    ui.panel.innerHTML = `<div class="finanzas-report-top"><div><span class="finanzas-eyebrow">VISTA GENERAL</span><h2>Reportes</h2></div></div>
       <div class="finanzas-metrics">${metricCard("Ingresos", totals.income, "income")}${metricCard("Gastos", totals.expense, "expense")}${metricCard("Balance", totals.income - totals.expense, totals.income >= totals.expense ? "balance-positive" : "balance-negative")}</div>
       <div class="finanzas-report-grid"><section class="finanzas-card"><div class="finanzas-card-heading"><div><span class="finanzas-eyebrow">ÚLTIMOS SEIS MESES</span><h2>Ingresos y gastos</h2></div></div><div class="finanzas-chart-legend"><span><i class="income"></i>Ingresos</span><span><i class="expense"></i>Gastos</span></div><div class="finanzas-chart">${bars}</div></section>
       <section class="finanzas-card"><div class="finanzas-card-heading"><div><span class="finanzas-eyebrow">PERÍODO ACTUAL</span><h2>Gastos por categoría</h2></div></div><div class="finanzas-donut-wrap"><div class="finanzas-donut" style="background:${gradient}"><span>${money(categoryTotal)}</span></div><div class="finanzas-legend">${byCategory.length ? byCategory.map((item, index) => `<div><i style="background:${colors[index % colors.length]}"></i><span>${escapeHtml(item.name)}</span><strong>${money(item.amount)}</strong></div>`).join("") : `<p class="finanzas-empty">Aún no hay gastos categorizados.</p>`}</div></div></section></div>
@@ -997,9 +1014,13 @@
   }
 
   function bindEvents() {
-    $$("[data-finanzas-tab]").forEach(button => button.addEventListener("click", () => {
-      state.tab = button.dataset.finanzasTab;
+    $$("[data-finanzas-section]").forEach(button => button.addEventListener("click", () => {
+      state.section = button.dataset.finanzasSection;
       state.editingId = null;
+      render();
+    }));
+    $$("[data-finanzas-scope]").forEach(button => button.addEventListener("click", () => {
+      state.scope = button.dataset.finanzasScope;
       render();
     }));
     ui.period.addEventListener("change", () => {
