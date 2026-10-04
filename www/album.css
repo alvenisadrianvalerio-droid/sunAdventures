@@ -2566,6 +2566,10 @@ body.light .ja-final {
   text-align: right
 }
 
+.nota-close {
+  display: none !important;
+}
+
 .nota-delete,
 .nota-edit,
 .nota-fullscreen {
@@ -7130,3 +7134,41 @@ body.player-abierto .mascota-wrapper { bottom: 200px; transition: bottom .35s cu
 body.player-abierto.player-provider-abierto .mascota-wrapper { bottom: 420px; }
 body.player-abierto .shop-bubble { bottom: 200px; transition: bottom .35s cubic-bezier(.34,1.56,.64,1); }
 body.player-abierto.player-provider-abierto .shop-bubble { bottom: 420px; }
+
+/* ============================================================
+   🔧 FIX: el botón "cerrar fullscreen" bloqueaba al de eliminar
+   ============================================================ */
+
+/* El botón de cerrar SOLO debe existir en pantalla completa */
+.polaroid-close {
+  display: none !important;
+  pointer-events: none !important;
+}
+.polaroid:fullscreen .polaroid-close {
+  display: grid !important;
+  pointer-events: auto !important;
+}
+
+/* El de eliminar siempre encima de cualquier solape */
+.polaroid-delete { z-index: 7 !important; }
+.polaroid-edit   { z-index: 7 !important; }
+.polaroid-fullscreen { z-index: 7 !important; }
+
+/* En móvil, mostrar los botones permanentemente (no hay hover) */
+@media (hover: none) {
+  .polaroid-delete,
+  .polaroid-edit,
+  .polaroid-fullscreen {
+    opacity: .9 !important;
+  }
+}
+
+/* ============================================================
+   🔧 FIX: modales por encima de mascota, player y notificaciones
+   ============================================================ */
+.modal { z-index: 10000 !important; }
+.modal.active { z-index: 10000 !important; }
+#photo-modal, #nota-modal { z-index: 10001 !important; }
+
+body:has(.modal.active) .mascota-wrapper,
+body:has(.modal.active) .shop-bubble { display: none !important; }

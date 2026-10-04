@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>🎯 Mapeador de Sprites · SunAdventures</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0b0c12;
+            --panel: #14161f;
+            --panel-2: #1a1d28;
+            --border: rgba(255, 217, 61, .25);
+            --border-soft: rgba(255, 255, 255, .1);
+            --text: #e8eef7;
+            --muted: #8c96ab;
+            --accent: #ffd93d;
+            --accent-2: #ffae3d;
+            --green: #4dd48e;
+            --red: #ff5470;
+            --blue: #6cb8ff;
+            --purple: #a684f0;
+            --pink: #ff6b9d;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(ellipse at 20% 0%, rgba(255, 217, 61, .06), transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(166, 132, 240, .05), transparent 50%),
+                var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 1.5rem;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            color: var(--accent);
+            margin: 0 0 .4rem;
+            font-size: 1.6rem;
+        }
+
+        p.sub {
+            opacity: .7;
+            font-style: italic;
+            margin: 0;
+            font-size: .95rem;
+        }
+
+        .aviso {
+            max-width: 1500px;
+            margin: 0 auto 1.5rem;
+            padding: 1rem 1.2rem;
+            background: rgba(255, 217, 61, .08);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            font-size: .92rem;
+            line-height: 1.7;
+        }
+
+        .aviso strong {
+            color: var(--accent);
+        }
+
+        .aviso code {
+            background: rgba(0, 0, 0, .4);
+            padding: .15rem .4rem;
+            border-radius: 5px;
+            font-size: .85em;
+        }
+
+        /* ============ LAYOUT: 3 COLUMNAS EN PANTALLAS GRANDES ============ */
+        .layout {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(400px, .9fr);
+            gap: 1.5rem;
+            align-items: start;
+        }
+
+        /* ---------- Columna izquierda: SHEET ---------- */
+        .sheet-panel {
+            background: var(--panel);
+            border: 1px solid var(--border-soft);
+            border-radius: 16px;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: sticky;
+            top: 1.5rem;
+        }
+
+        .barra {
+            display: flex;
+            gap: .7rem;
+            align-items: end;
+            flex-wrap: wrap;
+            padding: .9rem;
+            background: rgba(255, 217, 61, .05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .barra label {
+            display: flex;
+            flex-direction: column;
+            gap: .3rem;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .barra input[type=number],
+        .barra input[type=text] {
+            padding: .5rem .65rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-soft);
+            background: rgba(0, 0, 0, .35);
+            color: var(--text);
+            font-family: inherit;
+            font-size: .88rem;
+            min-width: 60px;
+        }
+
+        .barra input[type=text] {
+            min-width: 200px;
+        }
+
+        .barra input:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+            border-color: var(--accent);
+        }
+
+        .barra button {
+            padding: .55rem 1rem;
+            border-radius: 9px;
+            border: none;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #2b2118;
+            font-weight: 900;
+            font-family: inherit;
+            font-size: .82rem;
+            cursor: pointer;
+            transition: transform .15s;
+            white-space: nowrap;
+        }
+
+        .barra button:hover {
+            transform: translateY(-1px);
+        }
+
+        .barra button.sec {
+            background: rgba(255, 255, 255, .08);
+            color: var(--text);
+            border: 1px solid var(--border-soft);
+        }
+
+        #sheet-wrap {
+            position: relative;
+            overflow: auto;
+            max-height: calc(100vh - 320px);
+            min-height: 400px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: repeating-conic-gradient(#1a1c25 0% 25%, #232733 0% 50%) 50% / 24px 24px;
+            padding: 10px;
+            cursor: crosshair;
+            user-select: none;
+        }
+
+        #sheet {
+            display: block;
+            image-rendering: pixelated;
+            user-select: none;
+            -webkit-user-drag: none;
+            pointer-events: auto;
+        }
+
+        #grid-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            pointer-events: none;
+        }
+
+        #grid-overlay .gline {
+            position: absolute;
+            background: rgba(255, 217, 61, .45);
+        }
+
+        /* ---------- Columna derecha: EDITOR ---------- */
+        .editor-panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .editor-panel h2 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding-bottom: .6rem;
+            border-bottom: 1px solid var(--border-soft);
+        }
+
+        /* Preview */
+        .preview-block {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            padding: 1rem;
+            background: var(--panel-2);
+            border-radius: 12px;
+            border: 1px solid var(--border-soft);
+        }
+
+        .preview-sprite {
+            width: 96px;
+            height: 96px;
+            background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Crect width='10' height='10' fill='%23eee'/%3E%3Crect x='10' y='10' width='10' height='10' fill='%23eee'/%3E%3C/svg%3E") repeat;
+            border-radius: 10px;
+            image-rendering: pixelated;
+            border: 2px solid var(--accent);
+            flex-shrink: 0;
+            box-shadow: 0 0 20px rgba(255, 217, 61, .25);
+        }
+
+        .preview-info {
+            display: flex;
+            flex-direction: column;
+            gap: .3rem;
+            min-width: 0;
+        }
+
+        .preview-label {
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--muted);
+            font-weight: 700;
+        }
+
+        .preview-coords {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--accent);
+        }
+
+        .preview-status {
+            font-size: .8rem;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        /* Form grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: .4rem;
+        }
+
+        .form-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-field label {
+            font-size: .75rem;
+            font-weight: 800;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-field label small {
+            color: var(--accent);
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 600;
+            font-size: .7rem;
+        }
+
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
+            width: 100%;
+            padding: .7rem .85rem;
+            border-radius: 10px;
+            border: 1.5px solid var(--border-soft);
+            background: rgba(0, 0, 0, .35);
+            color: var(--text);
+            font-family: inherit;
+            font-size: .92rem;
+            transition: border-color .15s, box-shadow .15s;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus,
+        .form-field textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 217, 61, .15);
+        }
+
+        .form-field input::placeholder,
+        .form-field textarea::placeholder {
+            color: rgba(140, 150, 171, .6);
+        }
+
+        .form-field textarea {
+            resize: vertical;
+            min-height: 64px;
+            font-size: .88rem;
+            line-height: 1.5;
+        }
+
+        .form-field select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ffd93d' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right .9rem center;
+            padding-right: 2.5rem;
+        }
+
+        /* Secciones dinámicas */
+        .dyn-section {
+            grid-column: 1 / -1;
+            background: var(--panel-2);
+            border: 1px solid var(--border-soft);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+        }
+
+        .dyn-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: .78rem;
+            font-weight: 900;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .dyn-header .dyn-hint {
+            font-size: .7rem;
+            color: var(--muted);
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: 600;
+        }
+
+        .dyn-list {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+        }
+
+        .dyn-row {
+            display: grid;
+            grid-template-columns: minmax(110px, 1.2fr) minmax(80px, .8fr) auto;
+            gap: .5rem;
+            align-items: center;
+        }
+
+        .dyn-row.hab-row-2 {
+            grid-template-columns: 1fr auto;
+        }
+
+        .dyn-row input,
+        .dyn-row select {
+            padding: .55rem .7rem;
+            border-radius: 8px;
+            border: 1.5px solid var(--border-soft);
+            background: rgba(0, 0, 0, .35);
+            color: var(--text);
+            font-family: inherit;
+            font-size: .85rem;
+            width: 100%;
+        }
+
+        .dyn-row input:focus,
+        .dyn-row select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 217, 61, .15);
+        }
+
+        .dyn-row select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23ffd93d' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right .6rem center;
+            padding-right: 1.8rem;
+        }
+
+        .dyn-del {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 84, 112, .35);
+            background: rgba(255, 84, 112, .1);
+            color: var(--red);
+            font-size: 1rem;
+            font-weight: 900;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: background .15s;
+            flex-shrink: 0;
+        }
+
+        .dyn-del:hover {
+            background: rgba(255, 84, 112, .25);
+        }
+
+        .dyn-add {
+            align-self: flex-start;
+            padding: .5rem .9rem;
+            border-radius: 8px;
+            border: 1px dashed var(--border);
+            background: rgba(255, 217, 61, .05);
+            color: var(--accent);
+            font-family: inherit;
+            font-size: .8rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .dyn-add:hover {
+            background: rgba(255, 217, 61, .15);
+        }
+
+        /* Botón añadir */
+        .btn-add {
+            grid-column: 1 / -1;
+            padding: .95rem 1.2rem;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, var(--green), #2a9d68);
+            color: #062a17;
+            font-weight: 900;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform .15s, box-shadow .2s;
+            box-shadow: 0 6px 20px rgba(77, 212, 142, .35);
+            letter-spacing: .02em;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(77, 212, 142, .55);
+        }
+
+        .btn-add:active {
+            transform: translateY(0);
+        }
+
+        /* Output */
+        .output-block {
+            display: flex;
+            flex-direction: column;
+            gap: .6rem;
+        }
+
+        .output-block h2 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .output-count {
+            font-size: .75rem;
+            padding: .2rem .6rem;
+            border-radius: 999px;
+            background: rgba(77, 212, 142, .15);
+            color: var(--green);
+            border: 1px solid rgba(77, 212, 142, .35);
+            font-weight: 800;
+        }
+
+        #output {
+            width: 100%;
+            min-height: 200px;
+            max-height: 340px;
+            background: #0a0b10;
+            color: #b8c5e0;
+            border: 1px solid var(--border-soft);
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: .8rem;
+            line-height: 1.55;
+            resize: vertical;
+            tab-size: 2;
+        }
+
+        #output:focus {
+            outline: 2px solid var(--accent);
+        }
+
+        .btn-copy {
+            padding: .75rem 1.2rem;
+            border-radius: 10px;
+            border: 1px solid var(--accent);
+            background: rgba(255, 217, 61, .1);
+            color: var(--accent);
+            font-weight: 900;
+            font-family: inherit;
+            font-size: .9rem;
+            cursor: pointer;
+            transition: background .2s, transform .15s;
+        }
+
+        .btn-copy:hover {
+            background: rgba(255, 217, 61, .2);
+            transform: translateY(-1px);
+        }
+
+        .btn-clear {
+            padding: .75rem 1.2rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 84, 112, .4);
+            background: rgba(255, 84, 112, .08);
+            color: var(--red);
+            font-weight: 800;
+            font-family: inherit;
+            font-size: .85rem;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        .btn-clear:hover {
+            background: rgba(255, 84, 112, .18);
+        }
+
+        /* Hab wrapper */
+        .hab-pair {
+            display: flex;
+            flex-direction: column;
+            gap: .35rem;
+            padding-bottom: .5rem;
+            border-bottom: 1px dashed rgba(255, 255, 255, .08);
+        }
+
+        .hab-pair:last-child {
+            border-bottom: none;
+        }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 1100px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sheet-panel {
+                position: static;
+            }
+
+            #sheet-wrap {
+                max-height: 60vh;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dyn-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .dyn-row .dyn-del {
+                grid-column: 1 / -1;
+                justify-self: end;
+            }
+
+            .barra {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .barra label {
+                width: 100%;
+            }
+
+            .barra input[type=text],
+            .barra input[type=number] {
+                width: 100%;
+                min-width: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🎯 Mapeador de Sprites · SunAdventures</h1>
+        <p class="sub">Selecciona cada sprite, define stats y habilidades, y genera el código para
+            <code>sprites-names.js</code>.</p>
+    </header>
+
+    <div class="aviso">
+        <strong>1.</strong> Ajusta <em>columnas</em> y <em>filas</em> hasta que la cuadrícula cuadre con cada
+        sprite.<br>
+        <strong>2.</strong> Haz clic sobre un sprite del sheet para seleccionarlo.<br>
+        <strong>3.</strong> Rellena nombre, rareza, stats y/o habilidades.<br>
+        <strong>4.</strong> Pulsa <em>Añadir a la lista</em>.<br>
+        <strong>5.</strong> Al terminar, copia el código generado y pégalo en <code>sprites-names.js</code>.
+    </div>
+
+    <div class="layout">
+        <!-- ============ COLUMNA IZQUIERDA: SHEET ============ -->
+        <div class="sheet-panel">
+            <div class="barra">
+                <label>Ruta <input id="ruta" type="text" value="img/rpg/loot-1.png"></label>
+                <button id="cargar">Cargar</button>
+                <label>Columnas <input id="cols" type="number" value="8" min="1" max="60"></label>
+                <label>Filas <input id="rows" type="number" value="9" min="1" max="60"></label>
+                <label>Zoom <input id="zoom" type="number" value="4" min="1" max="8" step="1"></label>
+                <button id="aplicar" class="sec">Aplicar</button>
+            </div>
+            <div id="sheet-wrap">
+                <img id="sheet" alt="Sprite sheet">
+                <div id="grid-overlay"></div>
+            </div>
+        </div>
+
+        <!-- ============ COLUMNA DERECHA: EDITOR ============ -->
+        <div class="editor-panel">
+            <h2>📝 Editor de sprite</h2>
+
+            <div class="preview-block">
+                <div class="preview-sprite" id="preview"></div>
+                <div class="preview-info">
+                    <span class="preview-label">Coordenada</span>
+                    <span class="preview-coords" id="current-coords">— , —</span>
+                    <span class="preview-status" id="current-status">Haz clic en un sprite</span>
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <!-- ===== IDENTIDAD ===== -->
+                <div class="form-field full">
+                    <label for="item-nombre">Nombre visible</label>
+                    <input id="item-nombre" type="text" placeholder="Ej. Espada de acero templado" maxlength="50">
+                </div>
+
+                <div class="form-field full">
+                    <label for="item-id">ID interno <small>sin espacios</small></label>
+                    <input id="item-id" type="text" placeholder="Ej. espada-acero" maxlength="40">
+                </div>
+
+                <div class="form-field full">
+                    <label for="item-rar">Rareza</label>
+                    <select id="item-rar">
+                        <option value="comun">⚪ Común</option>
+                        <option value="raro">🔵 Raro</option>
+                        <option value="epico">🟣 Épico</option>
+                        <option value="legendario">🟡 Legendario</option>
+                        <option value="mitico">🌸 Mítico</option>
+                        <option value="tornasol">🌈 Tornasol</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="item-icono">Icono SVG</label>
+                    <input id="item-icono" type="text" placeholder="Ej. espada" value="espada">
+                </div>
+
+                <div class="form-field">
+                    <label for="item-consumible">Consumible</label>
+                    <select id="item-consumible">
+                        <option value="no">No · Pasivo</option>
+                        <option value="si">Sí · Se usa en combate</option>
+                    </select>
+                </div>
+
+                <div class="form-field full">
+                    <label for="item-desc">Descripción</label>
+                    <textarea id="item-desc" placeholder="Ej. Forjada por los herreros del norte..." rows="2"
+                        maxlength="160"></textarea>
+                </div>
+
+                <!-- ===== STATS ===== -->
+                <div class="dyn-section" id="stats-section">
+                    <div class="dyn-header">
+                        <span>⚔️ Stats del objeto</span>
+                        <span class="dyn-hint">Añade los que necesites</span>
+                    </div>
+                    <div class="dyn-list" id="stats-list"></div>
+                    <button type="button" class="dyn-add" id="stats-add">➕ Añadir stat</button>
+                </div>
+
+                <!-- ===== HABILIDADES ===== -->
+                <div class="dyn-section" id="habilidades-section">
+                    <div class="dyn-header">
+                        <span>✨ Habilidades</span>
+                        <span class="dyn-hint">Opcional · solo para armas especiales</span>
+                    </div>
+                    <div class="dyn-list" id="habilidades-list"></div>
+                    <button type="button" class="dyn-add" id="habilidades-add">➕ Añadir habilidad</button>
+                </div>
+
+                <!-- ===== AÑADIR ===== -->
+                <button id="añadir" class="btn-add">➕ Añadir a la lista</button>
+            </div>
+
+            <div class="output-block">
+                <h2>
+                    📋 Código generado
+                    <span class="output-count" id="output-count">0 sprites</span>
+                </h2>
+                <textarea id="output" readonly placeholder="El código aparecerá aquí automáticamente..."></textarea>
+                <div style="display:flex; gap:.6rem;">
+                    <button id="copiar" class="btn-copy" style="flex:1;">📋 Copiar todo</button>
+                    <button id="limpiar" class="btn-clear">🗑️ Limpiar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            const $ = id => document.getElementById(id);
+            const sheet = $("sheet"), overlay = $("grid-overlay"), preview = $("preview");
+            let cols = 8, rows = 9, zoom = 4, current = null;
+            const lista = [];
+
+            /* ============================================================
+               OPCIONES
+               ============================================================ */
+            const STAT_KEYS = [
+                { v: "atk", label: "⚔️ Ataque (ATK)" },
+                { v: "def", label: "🛡️ Defensa (DEF)" },
+                { v: "hp", label: "❤️ Vida (HP)" },
+                { v: "crit", label: "🎯 Crítico (%)" },
+                { v: "esq", label: "💨 Esquivar (%)" },
+                { v: "vel", label: "⚡ Velocidad" },
+                { v: "mana", label: "🔮 Maná" },
+                { v: "lifesteal", label: "🩸 Robo de vida (%)" },
+                { v: "thorns", label: "🌵 Espinas" },
+                { v: "regen", label: "💚 Regeneración / turno" },
+                { v: "xp", label: "✨ XP extra (%)" },
+                { v: "oro", label: "💰 Oro extra (%)" },
+                { v: "suerte", label: "🍀 Suerte" },
+                { v: "fuego", label: "🔥 Daño de fuego" },
+                { v: "hielo", label: "❄️ Daño de hielo" },
+                { v: "rayo", label: "⚡ Daño de rayo" },
+                { v: "veneno", label: "☠️ Daño de veneno" },
+            ];
+
+            const HAB_TIPOS = [
+                { v: "daño", label: "Daño directo" },
+                { v: "daño_indirecto", label: "Daño por turno (DoT)" },
+                { v: "boost", label: "Buff propio" },
+                { v: "debuff", label: "Debuff al rival" },
+                { v: "soporte", label: "Curación / soporte" },
+                { v: "invocacion", label: "Invocación" },
+                { v: "defensa", label: "Defensa / escudo" },
+                { v: "control", label: "Control (aturdir, congelar...)" },
+                { v: "pasiva", label: "Pasiva (siempre activa)" },
+                { v: "ultimate", label: "Ultimate (1 vez por combate)" },
+            ];
+
+            /* ============================================================
+               CARGAR / APLICAR
+               ============================================================ */
+            function cargar() {
+                sheet.src = $("ruta").value + "?t=" + Date.now();
+            }
+
+            function aplicar() {
+                cols = Math.max(1, parseInt($("cols").value) || 8);
+                rows = Math.max(1, parseInt($("rows").value) || 9);
+                zoom = Math.max(1, parseFloat($("zoom").value) || 4);
+                if (!sheet.naturalWidth) return;
+                sheet.style.width = (sheet.naturalWidth * zoom) + "px";
+                sheet.style.height = (sheet.naturalHeight * zoom) + "px";
+                overlay.style.width = sheet.style.width;
+                overlay.style.height = sheet.style.height;
+                pintarGrid();
+                actualizarPreview();
+            }
+
+            function pintarGrid() {
+                overlay.innerHTML = "";
+                const w = sheet.clientWidth, h = sheet.clientHeight;
+                const cw = w / cols, ch = h / rows;
+                if (cw < 4 || ch < 4) return;
+                for (let c = 1; c < cols; c++) {
+                    const d = document.createElement("div");
+                    d.className = "gline";
+                    d.style.cssText = `left:${c * cw}px;top:0;width:1px;height:${h}px;`;
+                    overlay.appendChild(d);
+                }
+                for (let r = 1; r < rows; r++) {
+                    const d = document.createElement("div");
+                    d.className = "gline";
+                    d.style.cssText = `top:${r * ch}px;left:0;height:1px;width:${w}px;`;
+                    overlay.appendChild(d);
+                }
+            }
+
+            function actualizarPreview() {
+                const coordsEl = $("current-coords");
+                const statusEl = $("current-status");
+                if (!current) {
+                    coordsEl.textContent = "— , —";
+                    statusEl.textContent = "Haz clic en un sprite";
+                    preview.style.backgroundImage = "";
+                    return;
+                }
+                const { col, row } = current;
+                const posX = cols > 1 ? (col / (cols - 1)) * 100 : 50;
+                const posY = rows > 1 ? (row / (rows - 1)) * 100 : 50;
+                preview.style.backgroundImage = `url(${sheet.src})`;
+                preview.style.backgroundSize = `${cols * 100}% ${rows * 100}%`;
+                preview.style.backgroundPosition = `${posX}% ${posY}%`;
+                coordsEl.textContent = `${col} , ${row}`;
+                statusEl.textContent = `Celda #${row * cols + col + 1}`;
+            }
+
+            /* ============================================================
+               STATS DINÁMICOS
+               ============================================================ */
+            function crearFilaStat(key = "atk", val = 1) {
+                const row = document.createElement("div");
+                row.className = "dyn-row";
+                row.innerHTML = `
+      <select class="stat-key">
+        ${STAT_KEYS.map(s => `<option value="${s.v}" ${s.v === key ? "selected" : ""}>${s.label}</option>`).join("")}
+      </select>
+      <input type="number" class="stat-val" value="${val}" min="-999" max="9999" step="1" placeholder="Valor">
+      <button type="button" class="dyn-del" title="Eliminar">×</button>
+    `;
+                row.querySelector(".dyn-del").addEventListener("click", () => row.remove());
+                return row;
+            }
+            function addStatRow(key, val) {
+                $("stats-list").appendChild(crearFilaStat(key, val));
+            }
+            $("stats-add").addEventListener("click", () => addStatRow());
+
+            function leerStats() {
+                const stats = {};
+                $("stats-list").querySelectorAll(".dyn-row").forEach(r => {
+                    const key = r.querySelector(".stat-key").value;
+                    const val = parseFloat(r.querySelector(".stat-val").value);
+                    if (!key || !Number.isFinite(val)) return;
+                    stats[key] = (stats[key] || 0) + val;
+                });
+                return stats;
+            }
+            function limpiarStats() {
+                $("stats-list").innerHTML = "";
+            }
+
+            /* ============================================================
+               HABILIDADES DINÁMICAS
+               ============================================================ */
+            function crearParHabilidad(tipo = "daño", nombre = "", desc = "", val = 1) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "hab-pair";
+
+                const fila1 = document.createElement("div");
+                fila1.className = "dyn-row";
+                fila1.innerHTML = `
+      <input type="text" class="hab-nombre" value="${nombre}" placeholder="Nombre (ej. Corte ardiente)" maxlength="40">
+      <select class="hab-tipo">
+        ${HAB_TIPOS.map(t => `<option value="${t.v}" ${t.v === tipo ? "selected" : ""}>${t.label}</option>`).join("")}
+      </select>
+      <button type="button" class="dyn-del" title="Eliminar">×</button>
+    `;
+
+                const fila2 = document.createElement("div");
+                fila2.className = "dyn-row hab-row-2";
+                fila2.style.marginTop = ".35rem";
+                fila2.innerHTML = `
+      <input type="number" class="hab-val" value="${val}" step="0.1" placeholder="Valor / multiplicador">
+      <input type="text" class="hab-desc" value="${desc}" placeholder="Descripción corta (ej. Quema 3 turnos)" maxlength="120">
+    `;
+
+                fila1.querySelector(".dyn-del").addEventListener("click", () => wrapper.remove());
+
+                wrapper.appendChild(fila1);
+                wrapper.appendChild(fila2);
+                return wrapper;
+            }
+
+            function addHabRow(tipo, nombre, desc, val) {
+                $("habilidades-list").appendChild(crearParHabilidad(tipo, nombre, desc, val));
+            }
+            $("habilidades-add").addEventListener("click", () => addHabRow());
+
+            function leerHabilidades() {
+                const out = [];
+                $("habilidades-list").querySelectorAll(".hab-pair").forEach(pair => {
+                    const fila1 = pair.querySelector(".dyn-row");
+                    const fila2 = pair.querySelector(".hab-row-2");
+                    const nombre = fila1.querySelector(".hab-nombre").value.trim();
+                    const tipo = fila1.querySelector(".hab-tipo").value;
+                    const val = parseFloat(fila2.querySelector(".hab-val").value) || 0;
+                    const desc = fila2.querySelector(".hab-desc").value.trim();
+                    if (!nombre && !desc) return;
+                    out.push({ nombre: nombre || "Habilidad", tipo, val, desc });
+                });
+                return out;
+            }
+            function limpiarHabilidades() {
+                $("habilidades-list").innerHTML = "";
+            }
+
+            /* ============================================================
+               CLICK EN EL SHEET — siempre activo
+               ============================================================ */
+            sheet.addEventListener("load", () => {
+                const w = sheet.naturalWidth, h = sheet.naturalHeight;
+                if (w && h) {
+                    $("cols").value = Math.max(1, Math.round(w / 16));
+                    $("rows").value = Math.max(1, Math.round(h / 16));
+                    setTimeout(aplicar, 60);
+                }
+            });
+            sheet.addEventListener("error", () => {
+                $("current-status").textContent = "❌ No se pudo cargar la imagen";
+            });
+
+            function seleccionarSprite(clientX, clientY) {
+                if (!sheet.clientWidth) return;
+                const r = sheet.getBoundingClientRect();
+                const x = clientX - r.left;
+                const y = clientY - r.top;
+                if (x < 0 || y < 0 || x > r.width || y > r.height) return;
+                const cw = sheet.clientWidth / cols;
+                const ch = sheet.clientHeight / rows;
+                current = {
+                    col: Math.max(0, Math.min(cols - 1, Math.floor(x / cw))),
+                    row: Math.max(0, Math.min(rows - 1, Math.floor(y / ch)))
+                };
+                actualizarPreview();
+                if (!$("item-id").value.trim()) {
+                    $("item-id").value = `item-${current.col}-${current.row}`;
+                }
+            }
+
+            // click normal
+            sheet.addEventListener("click", (e) => seleccionarSprite(e.clientX, e.clientY));
+            // también al arrastrar con el ratón pulsado (por si acaso)
+            sheet.addEventListener("mousedown", (e) => {
+                if (e.button === 0) seleccionarSprite(e.clientX, e.clientY);
+            });
+
+            $("cargar").addEventListener("click", cargar);
+            $("aplicar").addEventListener("click", aplicar);
+
+            /* ============================================================
+               AÑADIR A LA LISTA
+               ============================================================ */
+            $("añadir").addEventListener("click", () => {
+                if (!current) {
+                    $("current-status").textContent = "⚠️ Selecciona un sprite primero (haz clic sobre la imagen)";
+                    return;
+                }
+                const nombre = $("item-nombre").value.trim() || `Objeto ${current.col},${current.row}`;
+                const id = $("item-id").value.trim() || `item-${current.col}-${current.row}`;
+                const rar = $("item-rar").value;
+                const icono = $("item-icono").value.trim() || "espada";
+                const desc = $("item-desc").value.trim() || `Un objeto ${rar}.`;
+                const consumible = $("item-consumible").value === "si";
+                const stats = leerStats();
+                const habilidades = leerHabilidades();
+
+                const item = { id, nombre, rar, icono, desc, consumible, stats, habilidades, sprite: [current.col, current.row] };
+
+                const idx = lista.findIndex(i => i.sprite[0] === current.col && i.sprite[1] === current.row);
+                if (idx !== -1) lista[idx] = item;
+                else lista.push(item);
+
+                renderOutput();
+
+                // Resetear formulario
+                $("item-nombre").value = "";
+                $("item-id").value = "";
+                $("item-desc").value = "";
+                $("item-consumible").value = "no";
+                limpiarStats();
+                limpiarHabilidades();
+                // Dejar una fila de stat y una de habilidad listas por defecto
+                addStatRow("atk", 1);
+                addHabRow();
+
+                $("current-status").textContent = `✅ "${nombre}" añadido en [${current.col}, ${current.row}]`;
+            });
+
+            /* ============================================================
+               OUTPUT
+               ============================================================ */
+            function renderOutput() {
+                const lines = lista
+                    .slice()
+                    .sort((a, b) => a.sprite[1] - b.sprite[1] || a.sprite[0] - b.sprite[0])
+                    .map(i => {
+                        const partes = [];
+                        partes.push(`nombre: "${i.nombre}"`);
+                        partes.push(`rar: "${i.rar}"`);
+                        if (i.icono) partes.push(`icono: "${i.icono}"`);
+                        if (i.desc) partes.push(`desc: "${i.desc}"`);
+                        if (i.consumible) partes.push(`consumible: true`);
+
+                        if (Object.keys(i.stats).length) {
+                            const statsStr = Object.entries(i.stats).map(([k, v]) => `${k}: ${v}`).join(", ");
+                            partes.push(`stats: { ${statsStr} }`);
+                        }
+
+                        if (i.habilidades.length) {
+                            const habsStr = i.habilidades.map(h =>
+                                `{ nombre: "${h.nombre}", tipo: "${h.tipo}", val: ${h.val}${h.desc ? `, desc: "${h.desc}"` : ""} }`
+                            ).join(", ");
+                            partes.push(`habilidades: [${habsStr}]`);
+                        }
+
+                        return `  "${i.sprite[0]},${i.sprite[1]}": { ${partes.join(", ")} },`;
+                    }).join("\n");
+                $("output").value = lines ? `// --- MAPEO GENERADO ---\n${lines}` : "";
+                $("output-count").textContent = `${lista.length} sprite${lista.length === 1 ? "" : "s"}`;
+            }
+
+            $("copiar").addEventListener("click", () => {
+                if (!lista.length) { $("current-status").textContent = "⚠️ Añade algún sprite primero"; return; }
+                navigator.clipboard.writeText($("output").value).then(() => {
+                    const btn = $("copiar");
+                    const orig = btn.textContent;
+                    btn.textContent = "✅ ¡Copiado!";
+                    setTimeout(() => btn.textContent = orig, 1500);
+                }).catch(() => {
+                    $("output").select();
+                    document.execCommand("copy");
+                });
+            });
+
+            $("limpiar").addEventListener("click", () => {
+                if (!lista.length) return;
+                if (!confirm("¿Vaciar la lista de sprites mapeados?")) return;
+                lista.length = 0;
+                renderOutput();
+                $("current-status").textContent = "Lista vaciada";
+            });
+
+            /* ============================================================
+               INIT
+               ============================================================ */
+            addStatRow("atk", 1);
+            addHabRow();
+
+            cargar();
+        })();
+    </script>
+</body>
+
+</html>

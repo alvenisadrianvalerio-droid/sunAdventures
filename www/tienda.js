@@ -57,7 +57,14 @@
     tienda: { url: "img/tienda/tienda-sheet.png", cols: 5, rows: 5 }
   };
 
-  function construirPreview(item, esComida) {
+  function construirPreview(item, esComida, id, cat) {
+    if (cat === "fondos") {
+      const clsFondo = `tienda-preview-fondo-${id}`;
+      return `<div class="tienda-item-preview tienda-item-preview-fondo ${clsFondo}">${ICONO[item.icono] || ICONO.estrella || ""}</div>`;
+    }
+    if (item.spriteFile) {
+      return `<div class="tienda-item-preview tienda-item-preview-fondo"><img class="tienda-item-sprite-custom" src="${item.spriteFile}" alt="${item.nombre}" loading="lazy" decoding="async"></div>`;
+    }
     if (Array.isArray(item.sprite) && item.sprite.length === 2) {
       const key = item.sheet || (esComida ? "comida" : "tienda");
       const s = SHEETS[key] || SHEETS.tienda;
@@ -243,7 +250,7 @@
 
     it.innerHTML = `
       <button type="button" class="tienda-fav ${esFav ? "activo" : ""}" title="Favorito">★</button>
-      ${construirPreview(item, esComida)}
+      ${construirPreview(item, esComida, id, categoriaActiva)}
       <span class="tienda-item-nombre">${item.nombre}</span>
       ${desc}
       ${bonusBadge}

@@ -72,7 +72,7 @@ const spriteMarkup = (icon, className = 'rpg-rl-sprite') => {
   if (!file) return `<span class="${className}" aria-hidden="true">${icon || ''}</span>`;
   const nuevo = `${RL_SPRITE_DIR_NEW}${file}.png`;
   const viejo = `${RL_SPRITE_DIR_OLD}${file}.png`;
-  return `<img class="${className}" src="${nuevo}" data-fallback="${viejo}" alt="" aria-hidden="true"
+  return `<img class="${className}" src="${nuevo}" data-fallback="${viejo}" alt="" aria-hidden="true" loading="lazy" decoding="async"
           onerror="if(this.dataset.fallback){this.onerror=null;this.src=this.dataset.fallback;}">`;
 };
 
@@ -640,17 +640,69 @@ function sustituirEmojis(root) {
   /* ============================================================
      COMBATE
      ============================================================ */
+  function obtenerEnemigoAventura(tier, piso) {
+    const regiones = window.Rpg?.regiones;
+    const nombres = window.Rpg?.nombres || {};
+    const spriteMap = window.Rpg?.spriteMapEnemigos || {};
+    const especiales = window.Rpg?.especiales || {
+      comun: ['heal', 'buff', 'debuff', 'poison'],
+      elite: ['multihit', 'drain', 'shield', 'curse'],
+      jefe: ['firebreath', 'summon', 'apocalypse', 'curse']
+    };
+
+    const regIdx = clamp((piso || 1) - 1, 0, (regiones?.length || 1) - 1);
+    const region = regiones?.[regIdx];
+
+    let eId = 'slime';
+    let nombre = 'Monstruo';
+    let ico = '👾';
+
+    if (tier === 'jefe') {
+      eId = region?.jefe || 'dragon';
+      nombre = region?.jefeNombre || nombres[eId] || 'Jefe Primigenio';
+      ico = '👑';
+    } else if (tier === 'elite') {
+      const pool = (region?.elite && region.elite.length) ? region.elite : ['quimera', 'golem', 'nigromante'];
+      eId = pool[rnd(0, pool.length - 1)];
+      nombre = nombres[eId] || eId;
+      ico = '💀';
+    } else {
+      const pool = (region?.base && region.base.length) ? region.base : ['slime', 'rata', 'murcielago'];
+      eId = pool[rnd(0, pool.length - 1)];
+      nombre = nombres[eId] || eId;
+      ico = '⚔️';
+    }
+
+    const sprite = spriteMap[eId] || (tier === 'jefe' ? 'corona' : tier === 'elite' ? 'calavera' : 'espada');
+    const espList = especiales[tier] || ['heal', 'buff'];
+    const special = espList[rnd(0, espList.length - 1)];
+
+    return {
+      id: eId,
+      nombre,
+      sprite,
+      ico,
+      special,
+      hpBase: tier === 'jefe' ? 220 : tier === 'elite' ? 75 : 28,
+      atkBase: tier === 'jefe' ? 24 : tier === 'elite' ? 16 : 8,
+      xpBase: tier === 'jefe' ? 160 : tier === 'elite' ? 45 : 12
+    };
+  }
+
   function iniciarBatalla(tier) {
-    const lista = ENEMIGOS_RL[tier];
-    const base = lista[rnd(0, lista.length - 1)];
+    const adv = obtenerEnemigoAventura(tier, state.piso);
     const escalaHP  = 1 + (state.piso - 1) * 0.65 + (state.nivel - 1) * 0.12;
     const escalaATK = 1 + (state.piso - 1) * 0.50 + (state.nivel - 1) * 0.10;
-    const hpMax = Math.round(base.hp * escalaHP);
+    const hpMax = Math.round(adv.hpBase * escalaHP);
     state.enemigo = {
-      ...base,
+      id: adv.id,
+      nombre: adv.nombre,
+      sprite: adv.sprite,
+      ico: adv.ico,
+      special: adv.special,
       hp: hpMax, hpMax,
-      atk: Math.round(base.atk * escalaATK),
-      xp: Math.round(base.xp * (1 + (state.piso - 1) * 0.35)),
+      atk: Math.round(adv.atkBase * escalaATK),
+      xp: Math.round(adv.xpBase * (1 + (state.piso - 1) * 0.35)),
       tier,
       specialCD: tier === 'jefe' ? 2 : tier === 'elite' ? 3 : 4,
       specialTimer: tier === 'jefe' ? 2 : tier === 'elite' ? 3 : 4,
@@ -1201,7 +1253,7 @@ const lineas = [`+${oroGanado} ${COIN} oro`, `+${e.xp} ${STAR} XP`];
 if (premioRacha) lineas.push(`🔥 Racha x${state.racha}: +20 ${COIN} y una 🧪`);
 if (subido) lineas.push(`⬆️ Nivel ${state.nivel}`);
 if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}`);
-      mostrarRecompensa('¡Victoria!', lineas, () => renderPanel());
+      mostrarRecompensa('¡Victoria!', lineas, () => completarSala());
     }, 900);
   }
 
@@ -1264,14 +1316,21 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
       <div class="rpg-rl-recompensa-card">
         <h2>${titulo}</h2>
         <ul>${lineas.map(l => `<li>${l}</li>`).join('')}</ul>
-        <button type="button" class="btn-primary" id="rl-rec-cont">Continuar</button>
+        <button type="button" class="btn-primary rl-rec-cont-btn">Continuar</button>
       </div>`;
     panel.appendChild(card);
     requestAnimationFrame(() => card.classList.add('active'));
-    $('rl-rec-cont').addEventListener('click', () => {
-      card.classList.remove('active');
-      setTimeout(() => { card.remove(); onClose(); }, 250);
-    });
+    const btn = card.querySelector('.rl-rec-cont-btn');
+    if (btn) {
+      btn.addEventListener('click', () => {
+        btn.disabled = true;
+        card.classList.remove('active');
+        setTimeout(() => {
+          card.remove();
+          if (typeof onClose === 'function') onClose();
+        }, 250);
+      }, { once: true });
+    }
   }
 
   function mostrarEleccion(titulo, opciones) {
@@ -1338,8 +1397,10 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
     card.className = 'rpg-rl-recompensa';
     card.innerHTML = `
       <div class="rpg-rl-recompensa-card rpg-rl-tienda">
-        <h2>${spriteMarkup('🛒', 'rpg-rl-sprite rpg-rl-tienda-title-icon')} Tienda</h2>
-        <p>Oro: <strong>${state.oro}</strong></p>
+        <div class="rpg-rl-tienda-header-bar">
+          <h2 style="margin:0;font-size:1.4rem;">${spriteMarkup('🛒', 'rpg-rl-sprite rpg-rl-tienda-title-icon')} Tienda de Reliquias</h2>
+          <span class="rpg-rl-tienda-oro">${spriteMarkup('💰')} ${state.oro}</span>
+        </div>
         <div class="rpg-rl-tienda-lista">
           ${items.map((o, i) => `
             <button type="button" class="rpg-rl-tienda-item" data-i="${i}" ${state.oro < o.precio ? 'disabled' : ''}>
@@ -1387,10 +1448,14 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
       SND('moneda'); b.disabled = true; b.querySelector('em').textContent = '✓ Comprado';
     }));
 
-    $('rl-tienda-salir')?.addEventListener('click', () => {
-      card.classList.remove('active');
-      setTimeout(() => { card.remove(); completarSala(); }, 250);
-    });
+    const salirBtn = card.querySelector('#rl-tienda-salir');
+    if (salirBtn) {
+      salirBtn.addEventListener('click', () => {
+        salirBtn.disabled = true;
+        card.classList.remove('active');
+        setTimeout(() => { card.remove(); completarSala(); }, 250);
+      }, { once: true });
+    }
   }
 
   function abrirDescanso() {
@@ -1571,7 +1636,7 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
     const m = MASCOTAS[state.mascota] || {};
     if (m.imagen) { const i = new Image(); i.onload = () => { this.sprites.hero = i; }; i.src = m.imagen; }
     const e = state.enemigo || {};
-    const enemySprite = (e.ico && RL_SPRITE_MAP[e.ico]) || e.id || (e.tier === 'jefe' ? 'corona' : e.tier === 'elite' ? 'calavera' : 'espada');
+    const enemySprite = e.sprite || (e.ico && RL_SPRITE_MAP[e.ico]) || e.id || (e.tier === 'jefe' ? 'corona' : e.tier === 'elite' ? 'calavera' : 'espada');
     const ext = (enemySprite === 'mago' || enemySprite === 'murcielago' || enemySprite === 'serpiente' || enemySprite === 'troll') ? '.webp' : '.png';
     const enemyImage = new Image();
     enemyImage.onload = () => { this.sprites.enemy = enemyImage; };

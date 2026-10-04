@@ -16,8 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const PUSH_VAPID_PUBLIC_KEY = "BGLQw2FyE65Bd8m2BcucYBvgCPrfJQEDfDr-VE2EalHz4LzcKBwjtysfCrWxyIhYULhmTNroGxJZCCnqtjrCrog";
   const AUDIO_EXTS = ["mp3", "m4a", "wav", "ogg", "flac", "aac", "opus"];
   const VIDEO_EXTS = ["mp4", "webm", "mov", "mkv"];
-  const MESES_LARGOS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-  const MESES_CORTOS = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+  const MESES_LARGOS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const MESES_CORTOS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
   const LIMITE_CONCURRENCIA_URLS = 6;
 
   const confirmar = o => window.SunModal ? window.SunModal.confirm(o) : Promise.resolve(confirm(o.message || o.title));
@@ -31,36 +31,36 @@ document.addEventListener("DOMContentLoaded", () => {
   window._supabase = supabase;
   window._loadingFailsafe = setTimeout(() => {
     const ls = document.getElementById("loading-screen");
-    if (ls?.classList.contains("active")) { ls.classList.remove("active"); ls.setAttribute("aria-hidden","true"); }
+    if (ls?.classList.contains("active")) { ls.classList.remove("active"); ls.setAttribute("aria-hidden", "true"); }
   }, 10000);
 
   /* ---------- Iconos SVG ---------- */
   const SVG = {
-    trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>',
-    edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>',
-    expand:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>',
-    close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
-    play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
-    pause:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>',
-    repeat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
-    repeatOne:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/><path d="M11 10h1v4"/></svg>',
-    volHigh:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>',
-    volLow:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>',
-    volMute:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12a4.5 4.5 0 0 0-2.5-4v2.1l2.4 2.4c.06-.16.1-.33.1-.5zM19 12c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.8 8.8 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>',
-    external:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>',
-    camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
-    music:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
-    note:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>',
-    calendar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
-    crown:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18l-1.5-9-4.5 4L12 5 9 13 4.5 9 3 18z"/></svg>',
-    fire:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c0 3 3 4 3 8 0 1.5-1 3-3 3s-3-1.5-3-3c0-1 1-2 1-3 0-1-1-2-1-3 2 0 3-1 3-2z"/><path d="M11 19c-3 0-6-2-6-6 0-1 1-3 2-4 0 2 1 3 2 3 0-2 1-3 2-4-1 3 3 5 3 8 0 2-1 3-3 3z"/></svg>',
-    medal:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="15" r="6"/><path d="M9 3l3 6 3-6" stroke="currentColor" stroke-width="2" fill="none"/></svg>',
-    globe:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>',
-    image:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
-    sparkle:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z"/></svg>',
-    sunflower:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2.5"/><ellipse cx="12" cy="5.5" rx="1.7" ry="2.4"/><ellipse cx="12" cy="18.5" rx="1.7" ry="2.4"/><ellipse cx="5.5" cy="12" rx="2.4" ry="1.7"/><ellipse cx="18.5" cy="12" rx="2.4" ry="1.7"/><ellipse cx="7.4" cy="7.4" rx="1.7" ry="2.4" transform="rotate(-45 7.4 7.4)"/><ellipse cx="16.6" cy="7.4" rx="1.7" ry="2.4" transform="rotate(45 16.6 7.4)"/><ellipse cx="7.4" cy="16.6" rx="1.7" ry="2.4" transform="rotate(45 7.4 16.6)"/><ellipse cx="16.6" cy="16.6" rx="1.7" ry="2.4" transform="rotate(-45 16.6 16.6)"/></svg>',
-    heart:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
-    tap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v7"/><path d="M13 13V9a2 2 0 0 1 4 0v6"/><path d="M17 12a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6h-3a6 6 0 0 1-6-6v-3a2 2 0 0 1 4 0"/></svg>'
+    trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>',
+    edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>',
+    expand: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>',
+    close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+    play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+    pause: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>',
+    repeat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
+    repeatOne: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/><path d="M11 10h1v4"/></svg>',
+    volHigh: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>',
+    volLow: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>',
+    volMute: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12a4.5 4.5 0 0 0-2.5-4v2.1l2.4 2.4c.06-.16.1-.33.1-.5zM19 12c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.8 8.8 0 0 0 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06a8.99 8.99 0 0 0 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>',
+    external: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>',
+    camera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+    music: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+    note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>',
+    calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>',
+    crown: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18l-1.5-9-4.5 4L12 5 9 13 4.5 9 3 18z"/></svg>',
+    fire: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c0 3 3 4 3 8 0 1.5-1 3-3 3s-3-1.5-3-3c0-1 1-2 1-3 0-1-1-2-1-3 2 0 3-1 3-2z"/><path d="M11 19c-3 0-6-2-6-6 0-1 1-3 2-4 0 2 1 3 2 3 0-2 1-3 2-4-1 3 3 5 3 8 0 2-1 3-3 3z"/></svg>',
+    medal: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="15" r="6"/><path d="M9 3l3 6 3-6" stroke="currentColor" stroke-width="2" fill="none"/></svg>',
+    globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>',
+    image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
+    sparkle: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z"/></svg>',
+    sunflower: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="2.5"/><ellipse cx="12" cy="5.5" rx="1.7" ry="2.4"/><ellipse cx="12" cy="18.5" rx="1.7" ry="2.4"/><ellipse cx="5.5" cy="12" rx="2.4" ry="1.7"/><ellipse cx="18.5" cy="12" rx="2.4" ry="1.7"/><ellipse cx="7.4" cy="7.4" rx="1.7" ry="2.4" transform="rotate(-45 7.4 7.4)"/><ellipse cx="16.6" cy="7.4" rx="1.7" ry="2.4" transform="rotate(45 16.6 7.4)"/><ellipse cx="7.4" cy="16.6" rx="1.7" ry="2.4" transform="rotate(45 7.4 16.6)"/><ellipse cx="16.6" cy="16.6" rx="1.7" ry="2.4" transform="rotate(-45 16.6 16.6)"/></svg>',
+    heart: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
+    tap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a2 2 0 0 1 4 0v7"/><path d="M13 13V9a2 2 0 0 1 4 0v6"/><path d="M17 12a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6h-3a6 6 0 0 1-6-6v-3a2 2 0 0 1 4 0"/></svg>'
   };
 
   /* ---------- Helpers ---------- */
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const getUserIdSafe = () => window._sunUserId || localStorage.getItem("sunadventures_uid") || "local";
   window._getUserIdSafe = getUserIdSafe;
   const parseCoord = v => (v === null || v === undefined || v === "") ? null : (Number.isFinite(Number(v)) ? Number(v) : null);
-  const escapeHtml = t => String(t).replace(/[&<>'"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;" }[c]));
+  const escapeHtml = t => String(t).replace(/[&<>'"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[c]));
   const ext = n => (n.split(".").pop() || "").toLowerCase();
 
   function identificarEnlaceMusical(raw) {
@@ -76,31 +76,31 @@ document.addEventListener("DOMContentLoaded", () => {
       const url = new URL(raw);
       if (url.protocol !== "https:") return null;
       const host = url.hostname.toLowerCase();
-      if (["youtube.com","www.youtube.com","m.youtube.com","music.youtube.com","youtu.be"].includes(host)) {
+      if (["youtube.com", "www.youtube.com", "m.youtube.com", "music.youtube.com", "youtu.be"].includes(host)) {
         const partes = url.pathname.split("/").filter(Boolean);
-        const id = host === "youtu.be" ? partes[0] : ["embed","shorts","live"].includes(partes[0]) ? partes[1] : url.searchParams.get("v");
-        return id && /^[A-Za-z0-9_-]{11}$/.test(id) ? { tipo:"youtube", id } : null;
+        const id = host === "youtu.be" ? partes[0] : ["embed", "shorts", "live"].includes(partes[0]) ? partes[1] : url.searchParams.get("v");
+        return id && /^[A-Za-z0-9_-]{11}$/.test(id) ? { tipo: "youtube", id } : null;
       }
       if (host === "open.spotify.com") {
         const partes = url.pathname.split("/").filter(Boolean);
         const tipoIndex = partes[0]?.startsWith("intl-") ? 1 : 0;
         const tipo = partes[tipoIndex] === "embed" ? partes[tipoIndex + 1] : partes[tipoIndex];
         const id = partes[tipoIndex] === "embed" ? partes[tipoIndex + 2] : partes[tipoIndex + 1];
-        if (["track","album","playlist","episode","show"].includes(tipo) && /^[A-Za-z0-9]{10,64}$/.test(id || "")) {
-          return { tipo:"spotify", entidad:tipo, id };
+        if (["track", "album", "playlist", "episode", "show"].includes(tipo) && /^[A-Za-z0-9]{10,64}$/.test(id || "")) {
+          return { tipo: "spotify", entidad: tipo, id };
         }
       }
-    } catch {}
+    } catch { }
     return null;
   }
 
   const esAudio = e => AUDIO_EXTS.includes(e);
   const esVideo = e => VIDEO_EXTS.includes(e);
-  const fmtFecha = iso => { const d = new Date(iso + "T00:00:00"); return isNaN(d) ? iso : `${String(d.getDate()).padStart(2,"0")} · ${MESES_CORTOS[d.getMonth()]} · ${d.getFullYear()}`; };
-  const fmtFechaNota = iso => { const d = new Date(iso); return isNaN(d) ? "" : `${String(d.getDate()).padStart(2,"0")} ${MESES_CORTOS[d.getMonth()]} ${d.getFullYear()}`; };
-  const fmtTiempo = s => (!isFinite(s) || s < 0) ? "0:00" : `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,"0")}`;
-  const fmtTam = b => b < 1024 ? b + " B" : b < 1048576 ? (b/1024).toFixed(1) + " KB" : (b/1048576).toFixed(1) + " MB";
-  const fechaISO = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  const fmtFecha = iso => { const d = new Date(iso + "T00:00:00"); return isNaN(d) ? iso : `${String(d.getDate()).padStart(2, "0")} · ${MESES_CORTOS[d.getMonth()]} · ${d.getFullYear()}`; };
+  const fmtFechaNota = iso => { const d = new Date(iso); return isNaN(d) ? "" : `${String(d.getDate()).padStart(2, "0")} ${MESES_CORTOS[d.getMonth()]} ${d.getFullYear()}`; };
+  const fmtTiempo = s => (!isFinite(s) || s < 0) ? "0:00" : `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+  const fmtTam = b => b < 1024 ? b + " B" : b < 1048576 ? (b / 1024).toFixed(1) + " KB" : (b / 1048576).toFixed(1) + " MB";
+  const fechaISO = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const hoyISO = () => fechaISO(new Date());
 
   /* ---------- DOM refs ---------- */
@@ -146,56 +146,56 @@ document.addEventListener("DOMContentLoaded", () => {
   let chatSubscription = null, chatModo = "grupo", chatDestinatario = null;
   mesMostrado.setDate(1);
 
-  const mostrarLoading = (msg = "Cargando...") => { if (!loadingScreen) return; if (loadingText) loadingText.textContent = msg; loadingScreen.classList.add("active"); loadingScreen.setAttribute("aria-hidden","false"); };
-  const ocultarLoading = () => { if (!loadingScreen) return; loadingScreen.classList.remove("active"); loadingScreen.setAttribute("aria-hidden","true"); };
+  const mostrarLoading = (msg = "Cargando...") => { if (!loadingScreen) return; if (loadingText) loadingText.textContent = msg; loadingScreen.classList.add("active"); loadingScreen.setAttribute("aria-hidden", "false"); };
+  const ocultarLoading = () => { if (!loadingScreen) return; loadingScreen.classList.remove("active"); loadingScreen.setAttribute("aria-hidden", "true"); };
 
   /* ============================================================
      LOGROS + EXPERIENCIA
      ============================================================ */
   const IMAGENES_MASCOTA = {
-    mapache:"img/mapache.png", girasol:"img/mascota-girasol.png", gatito:"img/siamesa.png",
-    "gatito-negro":"img/gatito-negro.png", hamburguesa:"img/hamburguesa.png", oveja:"img/oveja.png",
-    pollito:"img/pollito.png", jirafa:"img/jirafa.png", unicornio:"img/unicornio.png",
-    conejo:"img/conejito.png", "dragon-bebe":"img/dragon-bebe.png", "dragon-anciano":"img/dragon-anciano.png"
+    mapache: "img/mapache.png", girasol: "img/mascota-girasol.png", gatito: "img/siamesa.png",
+    "gatito-negro": "img/gatito-negro.png", hamburguesa: "img/hamburguesa.png", oveja: "img/oveja.png",
+    pollito: "img/pollito.png", jirafa: "img/jirafa.png", unicornio: "img/unicornio.png",
+    conejo: "img/conejito.png", "dragon-bebe": "img/dragon-bebe.png", "dragon-anciano": "img/dragon-anciano.png"
   };
 
   const LOGROS = [
-    { id:"primeros-pasos", tipo:"grupo", icono:SVG.medal, nombre:"Primeros pasos", descripcion:"Guarda la primera foto del grupo", meta:1, medir:()=>fotos.length },
-    { id:"fotografos", tipo:"grupo", icono:SVG.camera, nombre:"Fotógrafos", descripcion:"Guarda 50 fotos del grupo", meta:50, medir:()=>fotos.length },
-    { id:"dj", tipo:"grupo", icono:SVG.music, nombre:"DJ", descripcion:"Añade 20 canciones al grupo", meta:20, medir:()=>playlists.reduce((t,p)=>t+p.canciones.length,0) },
-    { id:"poetas", tipo:"grupo", icono:SVG.note, nombre:"Poetas", descripcion:"Escribe 30 notas del grupo", meta:30, medir:()=>notas.length },
-    { id:"racha", icono:SVG.fire, nombre:"Racha de 30 días", descripcion:"Abre la app 30 días seguidos", meta:30, medir:()=>visitasConsecutivas },
-    { id:"trotamundos", tipo:"grupo", icono:SVG.globe, nombre:"Trotamundos", descripcion:"Guarda 10 fotos con ubicación", meta:10, medir:()=>fotos.filter(f=>f.lat!=null&&f.lng!=null).length },
-    { id:"racha-365", icono:SVG.calendar, nombre:"Un año de nosotros", descripcion:"Abre la app 365 días seguidos", meta:365, medir:()=>visitasConsecutivas },
-    { id:"todos-los-logros", tipo:"grupo", icono:SVG.crown, nombre:"Leyenda absoluta", descripcion:"Completa todos los demás logros", meta:1, esFinal:true, medir:()=>LOGROS.filter(l=>!l.esFinal).every(l=>l.medir()>=l.meta)?1:0 }
+    { id: "primeros-pasos", tipo: "grupo", icono: SVG.medal, nombre: "Primeros pasos", descripcion: "Guarda la primera foto del grupo", meta: 1, medir: () => fotos.length },
+    { id: "fotografos", tipo: "grupo", icono: SVG.camera, nombre: "Fotógrafos", descripcion: "Guarda 50 fotos del grupo", meta: 50, medir: () => fotos.length },
+    { id: "dj", tipo: "grupo", icono: SVG.music, nombre: "DJ", descripcion: "Añade 20 canciones al grupo", meta: 20, medir: () => playlists.reduce((t, p) => t + p.canciones.length, 0) },
+    { id: "poetas", tipo: "grupo", icono: SVG.note, nombre: "Poetas", descripcion: "Escribe 30 notas del grupo", meta: 30, medir: () => notas.length },
+    { id: "racha", icono: SVG.fire, nombre: "Racha de 30 días", descripcion: "Abre la app 30 días seguidos", meta: 30, medir: () => visitasConsecutivas },
+    { id: "trotamundos", tipo: "grupo", icono: SVG.globe, nombre: "Trotamundos", descripcion: "Guarda 10 fotos con ubicación", meta: 10, medir: () => fotos.filter(f => f.lat != null && f.lng != null).length },
+    { id: "racha-365", icono: SVG.calendar, nombre: "Un año de nosotros", descripcion: "Abre la app 365 días seguidos", meta: 365, medir: () => visitasConsecutivas },
+    { id: "todos-los-logros", tipo: "grupo", icono: SVG.crown, nombre: "Leyenda absoluta", descripcion: "Completa todos los demás logros", meta: 1, esFinal: true, medir: () => LOGROS.filter(l => !l.esFinal).every(l => l.medir() >= l.meta) ? 1 : 0 }
   ];
   const MASCOTAS_LOGROS = [
-    { id:"mapache", nombre:"el Mapache", icono:SVG.heart },
-    { id:"girasol", nombre:"el Girasol", icono:SVG.sunflower },
-    { id:"gatito", nombre:"la Siamesa", icono:SVG.heart },
-    { id:"gatito-negro", nombre:"el Gato Negro", icono:SVG.heart },
-    { id:"hamburguesa", nombre:"Hamburguesa", icono:SVG.heart },
-    { id:"oveja", nombre:"la Oveja", icono:SVG.heart },
-    { id:"pollito", nombre:"el Pollito", icono:SVG.heart },
-    { id:"jirafa", nombre:"la Jirafa", icono:SVG.heart },
-    { id:"unicornio", nombre:"el Unicornio", icono:SVG.sparkle },
-    { id:"conejo", nombre:"el Conejito", icono:SVG.heart },
-    { id:"dragon-bebe", nombre:"el Dragón Bebé", icono:SVG.fire },
-    { id:"dragon-anciano", nombre:"el Dragón Anciano", icono:SVG.crown }
+    { id: "mapache", nombre: "el Mapache", icono: SVG.heart },
+    { id: "girasol", nombre: "el Girasol", icono: SVG.sunflower },
+    { id: "gatito", nombre: "la Siamesa", icono: SVG.heart },
+    { id: "gatito-negro", nombre: "el Gato Negro", icono: SVG.heart },
+    { id: "hamburguesa", nombre: "Hamburguesa", icono: SVG.heart },
+    { id: "oveja", nombre: "la Oveja", icono: SVG.heart },
+    { id: "pollito", nombre: "el Pollito", icono: SVG.heart },
+    { id: "jirafa", nombre: "la Jirafa", icono: SVG.heart },
+    { id: "unicornio", nombre: "el Unicornio", icono: SVG.sparkle },
+    { id: "conejo", nombre: "el Conejito", icono: SVG.heart },
+    { id: "dragon-bebe", nombre: "el Dragón Bebé", icono: SVG.fire },
+    { id: "dragon-anciano", nombre: "el Dragón Anciano", icono: SVG.crown }
   ];
   MASCOTAS_LOGROS.forEach(m => {
     const sprite = IMAGENES_MASCOTA[m.id];
     const nombreCorto = m.nombre.replace(/^(el|la) /, "");
     LOGROS.push(
-      { id:`mascota-${m.id}`, sprites:[sprite], icono:m.icono, nombre:`Conoce a ${m.nombre}`, descripcion:`Interactúa con ${m.nombre} por primera vez`, meta:1, medir:()=>JSON.parse(localStorage.getItem(`mascotas_conocidas_${getUserIdSafe()}`)||"[]").includes(m.id)?1:0 },
-      { id:`clics-${m.id}`, sprites:[sprite], icono:SVG.tap, nombre:`Fan de ${nombreCorto}`, descripcion:`Dale 100 clics a ${nombreCorto}`, meta:100, medir:()=>Number(localStorage.getItem(`mascota_clicks_${getUserIdSafe()}_${m.id}`)||0) }
+      { id: `mascota-${m.id}`, sprites: [sprite], icono: m.icono, nombre: `Conoce a ${m.nombre}`, descripcion: `Interactúa con ${m.nombre} por primera vez`, meta: 1, medir: () => JSON.parse(localStorage.getItem(`mascotas_conocidas_${getUserIdSafe()}`) || "[]").includes(m.id) ? 1 : 0 },
+      { id: `clics-${m.id}`, sprites: [sprite], icono: SVG.tap, nombre: `Fan de ${nombreCorto}`, descripcion: `Dale 100 clics a ${nombreCorto}`, meta: 100, medir: () => Number(localStorage.getItem(`mascota_clicks_${getUserIdSafe()}_${m.id}`) || 0) }
     );
   });
   window.LOGROS = LOGROS;
   window.renderLogros = renderLogros;
-  Object.defineProperty(window, "_playlists", { get:()=>playlists, configurable:true });
-  Object.defineProperty(window, "_eventos", { get:()=>eventos, configurable:true });
-  Object.defineProperty(window, "_fotos", { get:()=>fotos, configurable:true });
+  Object.defineProperty(window, "_playlists", { get: () => playlists, configurable: true });
+  Object.defineProperty(window, "_eventos", { get: () => eventos, configurable: true });
+  Object.defineProperty(window, "_fotos", { get: () => fotos, configurable: true });
 
   let logroToastTimeout = null;
   const notificarLogro = logro => {
@@ -239,16 +239,16 @@ document.addEventListener("DOMContentLoaded", () => {
     return wrapper;
   };
 
-  const NIVEL_A_ICONO = { sprout:"raiz", heart:"corazon", flame:"fuego", sparkle:"estrella", sunflower:"girasol" };
+  const NIVEL_A_ICONO = { sprout: "raiz", heart: "corazon", flame: "fuego", sparkle: "estrella", sunflower: "girasol" };
   const NIVELES_EXPERIENCIA = [
-    { minimo:0, nombre:"Novatos", icono:"sprout", siguiente:100, siguienteNombre:"Enamorados", siguienteIcono:"heart" },
-    { minimo:100, nombre:"Enamorados", icono:"heart", siguiente:500, siguienteNombre:"Compañeros de vida", siguienteIcono:"flame" },
-    { minimo:500, nombre:"Compañeros de vida", icono:"flame", siguiente:1000, siguienteNombre:"Almas gemelas", siguienteIcono:"sparkle" },
-    { minimo:1000, nombre:"Almas gemelas", icono:"sparkle", siguiente:5000, siguienteNombre:"Leyendas", siguienteIcono:"sunflower" },
-    { minimo:5000, nombre:"Leyendas", icono:"sunflower", siguiente:null, siguienteNombre:"Máximo nivel", siguienteIcono:null }
+    { minimo: 0, nombre: "Novatos", icono: "sprout", siguiente: 100, siguienteNombre: "Enamorados", siguienteIcono: "heart" },
+    { minimo: 100, nombre: "Enamorados", icono: "heart", siguiente: 500, siguienteNombre: "Compañeros de vida", siguienteIcono: "flame" },
+    { minimo: 500, nombre: "Compañeros de vida", icono: "flame", siguiente: 1000, siguienteNombre: "Almas gemelas", siguienteIcono: "sparkle" },
+    { minimo: 1000, nombre: "Almas gemelas", icono: "sparkle", siguiente: 5000, siguienteNombre: "Leyendas", siguienteIcono: "sunflower" },
+    { minimo: 5000, nombre: "Leyendas", icono: "sunflower", siguiente: null, siguienteNombre: "Máximo nivel", siguienteIcono: null }
   ];
   const calcularExperiencia = () => {
-    const base = fotos.length*10 + notas.length*5 + playlists.reduce((t,p)=>t+p.canciones.length,0)*8 + visitasConsecutivas*20;
+    const base = fotos.length * 10 + notas.length * 5 + playlists.reduce((t, p) => t + p.canciones.length, 0) * 8 + visitasConsecutivas * 20;
     const extra = Math.max(0, Number(localStorage.getItem(`sa_experiencia_extra_${getUserIdSafe()}`)) || 0);
     return base + extra;
   };
@@ -286,7 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function registrarVisita() {
     try {
-      const hoy = new Date().toISOString().slice(0,10);
+      const hoy = new Date().toISOString().slice(0, 10);
       const clave = `sunadventures_visitas_${getUserIdSafe()}`;
       const dias = JSON.parse(localStorage.getItem(clave) || "[]");
       if (!dias.includes(hoy)) dias.push(hoy);
@@ -295,11 +295,11 @@ document.addEventListener("DOMContentLoaded", () => {
       visitasConsecutivas = 0;
       const fechas = new Set(ordenados);
       const cursor = new Date();
-      while (fechas.has(cursor.toISOString().slice(0,10))) { visitasConsecutivas++; cursor.setDate(cursor.getDate()-1); }
+      while (fechas.has(cursor.toISOString().slice(0, 10))) { visitasConsecutivas++; cursor.setDate(cursor.getDate() - 1); }
     } catch { visitasConsecutivas = 0; }
   }
 
-  const _logroState = { personal:{ grid:null, cards:new Map(), firma:"" }, grupo:{ grid:null, cards:new Map(), firma:"" } };
+  const _logroState = { personal: { grid: null, cards: new Map(), firma: "" }, grupo: { grid: null, cards: new Map(), firma: "" } };
   const _firmaLogros = lista => lista.map(l => l.id).join("|");
   function _construirCard(logro) {
     const card = document.createElement("article");
@@ -367,11 +367,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let _progressT = null, _progressPend = false;
   function _ejecutarProgress() {
     const vistaActiva = document.querySelector("[data-view].active")?.dataset.view;
-    if (vistaActiva === "logros") renderLogros({ notificar:true });
-    else try { renderLogros({ notificar:false }); } catch {}
+    if (vistaActiva === "logros") renderLogros({ notificar: true });
+    else try { renderLogros({ notificar: false }); } catch { }
     if (vistaActiva === "mascotas" && typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
     if (vistaActiva === "inicio") renderExperiencia();
-    if (typeof window._actualizarModalMascota === "function") { try { window._actualizarModalMascota(); } catch {} }
+    if (typeof window._actualizarModalMascota === "function") { try { window._actualizarModalMascota(); } catch { } }
   }
   window.addEventListener("sunadventures:progress", () => {
     if (_progressT) { _progressPend = true; return; }
@@ -382,50 +382,50 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) return;
-    if (document.querySelector("[data-view].active")?.dataset.view === "logros") renderLogros({ notificar:true });
+    if (document.querySelector("[data-view].active")?.dataset.view === "logros") renderLogros({ notificar: true });
   });
 
   /* ============================================================
      GRUPO / AUTH
      ============================================================ */
-  const usernameDesdeSesion = s => (s?.user?.email?.split("@")[0] || "usuario").toLowerCase().replace(/[^a-z0-9_]/g,"_").slice(0,20).padEnd(3,"_");
+  const usernameDesdeSesion = s => (s?.user?.email?.split("@")[0] || "usuario").toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0, 20).padEnd(3, "_");
 
   async function asegurarGrupoActivo() {
     try {
-      const { data:{ session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) { grupoActivo = null; return null; }
       usuarioActualId = session.user.id;
       window._sunUserId = session.user.id;
       localStorage.setItem("sunadventures_uid", session.user.id);
       window.dispatchEvent(new Event("sunadventures:user-ready"));
       const username = usernameDesdeSesion(session);
-      const { data:perfilExistente, error:perfilError } = await supabase.from("perfiles").select("id,username").eq("id", session.user.id).maybeSingle();
+      const { data: perfilExistente, error: perfilError } = await supabase.from("perfiles").select("id,username").eq("id", session.user.id).maybeSingle();
       if (perfilError) throw perfilError;
       if (perfilExistente) perfilActual = perfilExistente;
       else {
-        const { data:perfil, error:crearPerfilError } = await supabase.from("perfiles").insert({ id:session.user.id, username }).select("id,username").single();
+        const { data: perfil, error: crearPerfilError } = await supabase.from("perfiles").insert({ id: session.user.id, username }).select("id,username").single();
         if (crearPerfilError) throw crearPerfilError;
         perfilActual = perfil;
       }
-      const { data:membresias } = await supabase.from("grupo_miembros").select("grupo_id, grupos(id,nombre,creado_por)").eq("user_id", session.user.id).limit(20);
-      let membresia = (membresias||[]).find(m => m.grupo_id === localStorage.getItem("grupo_activo")) || membresias?.[0];
+      const { data: membresias } = await supabase.from("grupo_miembros").select("grupo_id, grupos(id,nombre,creado_por)").eq("user_id", session.user.id).limit(20);
+      let membresia = (membresias || []).find(m => m.grupo_id === localStorage.getItem("grupo_activo")) || membresias?.[0];
       if (!membresia) {
-        const { data:grupo, error } = await supabase.from("grupos").insert({ nombre:"Nuestro grupo de aventuras", creado_por:session.user.id }).select("id,nombre,creado_por").single();
+        const { data: grupo, error } = await supabase.from("grupos").insert({ nombre: "Nuestro grupo de aventuras", creado_por: session.user.id }).select("id,nombre,creado_por").single();
         if (error) throw error;
-        const { error:e2 } = await supabase.from("grupo_miembros").insert({ grupo_id:grupo.id, user_id:session.user.id, rol:"owner" });
+        const { error: e2 } = await supabase.from("grupo_miembros").insert({ grupo_id: grupo.id, user_id: session.user.id, rol: "owner" });
         if (e2) throw e2;
-        membresia = { grupo_id:grupo.id, grupos:grupo };
+        membresia = { grupo_id: grupo.id, grupos: grupo };
         localStorage.setItem("grupo_activo", grupo.id);
       }
-      grupoActivo = membresia.grupos || { id:membresia.grupo_id, nombre:"Nuestro grupo de aventuras" };
+      grupoActivo = membresia.grupos || { id: membresia.grupo_id, nombre: "Nuestro grupo de aventuras" };
       localStorage.setItem("grupo_activo", grupoActivo.id);
-      window.dispatchEvent(new CustomEvent("sunadventures:group-ready", { detail:{ groupId:grupoActivo.id, userId:session.user.id } }));
-      await Promise.all(["fotos","notas","playlists"].map(t => supabase.from(t).update({ grupo_id:grupoActivo.id }).eq("user_id", session.user.id).is("grupo_id", null)));
+      window.dispatchEvent(new CustomEvent("sunadventures:group-ready", { detail: { groupId: grupoActivo.id, userId: session.user.id } }));
+      await Promise.all(["fotos", "notas", "playlists"].map(t => supabase.from(t).update({ grupo_id: grupoActivo.id }).eq("user_id", session.user.id).is("grupo_id", null)));
       return grupoActivo;
     } catch (err) {
       console.error("asegurarGrupoActivo:", err);
       grupoActivo = null;
-      window.dispatchEvent(new CustomEvent("sunadventures:group-error", { detail:{ message:err?.message || "Error desconocido" } }));
+      window.dispatchEvent(new CustomEvent("sunadventures:group-error", { detail: { message: err?.message || "Error desconocido" } }));
       return null;
     }
   }
@@ -436,10 +436,10 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       if (!grupoActivo || !groupMembersList) return;
       const { data } = await supabase.from("grupo_miembros").select("user_id,rol").eq("grupo_id", grupoActivo.id);
-      const ids = (data||[]).map(m => m.user_id);
-      const { data:perfiles } = ids.length ? await supabase.from("perfiles").select("id,username").in("id", ids) : { data:[] };
+      const ids = (data || []).map(m => m.user_id);
+      const { data: perfiles } = ids.length ? await supabase.from("perfiles").select("id,username").in("id", ids) : { data: [] };
       const frag = document.createDocumentFragment();
-      (perfiles||[]).forEach(perfil => {
+      (perfiles || []).forEach(perfil => {
         const miembro = data.find(i => i.user_id === perfil.id);
         const div = document.createElement("div");
         div.className = "friend-row";
@@ -453,19 +453,19 @@ document.addEventListener("DOMContentLoaded", () => {
   async function cargarInvitaciones() {
     try {
       if (!groupInvitesList) return;
-      const { data:{ session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
-      const { data:invitaciones } = await supabase.from("invitaciones_grupo").select("id,grupo_id,grupos(nombre)").eq("invitado_id", session.user.id).eq("estado", "pendiente");
+      const { data: invitaciones } = await supabase.from("invitaciones_grupo").select("id,grupo_id,grupos(nombre)").eq("invitado_id", session.user.id).eq("estado", "pendiente");
       const frag = document.createDocumentFragment();
-      (invitaciones||[]).forEach(inv => {
+      (invitaciones || []).forEach(inv => {
         const div = document.createElement("div");
         div.className = "friend-row friend-invite";
         div.textContent = `Invitación a ${inv.grupos?.nombre || "un grupo"}`;
         const btn = document.createElement("button");
         btn.type = "button"; btn.className = "btn-secondary"; btn.textContent = "Aceptar";
         btn.addEventListener("click", async () => {
-          await supabase.from("grupo_miembros").insert({ grupo_id:inv.grupo_id, user_id:session.user.id, rol:"miembro" });
-          await supabase.from("invitaciones_grupo").update({ estado:"aceptada" }).eq("id", inv.id);
+          await supabase.from("grupo_miembros").insert({ grupo_id: inv.grupo_id, user_id: session.user.id, rol: "miembro" });
+          await supabase.from("invitaciones_grupo").update({ estado: "aceptada" }).eq("id", inv.id);
           localStorage.setItem("grupo_activo", inv.grupo_id);
           window.location.reload();
         });
@@ -479,12 +479,12 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       if (!friendsModal) return;
       await asegurarGrupoActivo();
-      friendsModal.classList.add("active"); friendsModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
+      friendsModal.classList.add("active"); friendsModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
       if (friendsGroupName) friendsGroupName.textContent = grupoActivo?.nombre || "Grupo privado";
       await cargarMiembrosGrupo(); await cargarInvitaciones();
     } catch (err) { console.warn("abrirAmigosModal:", err); }
   }
-  friendsModal?.querySelectorAll("[data-close-friends]").forEach(el => el.addEventListener("click", () => { friendsModal.classList.remove("active"); friendsModal.setAttribute("aria-hidden","true"); document.body.style.overflow = ""; }));
+  friendsModal?.querySelectorAll("[data-close-friends]").forEach(el => el.addEventListener("click", () => { friendsModal.classList.remove("active"); friendsModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }));
 
   function abrirAjustes() {
     if (!settingsModal) return;
@@ -494,11 +494,11 @@ document.addEventListener("DOMContentLoaded", () => {
       window.SunPreferences?.setAnimationsDisabled(localStorage.getItem("sunadventures_animations_disabled") === "true");
       window.SunPreferences?.setVolume(localStorage.getItem("app_volume") || localStorage.getItem("player_volumen") || "0.8");
       settingsModal.classList.add("active");
-      settingsModal.setAttribute("aria-hidden","false");
+      settingsModal.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
     } catch (err) { console.error("abrirAjustes:", err); }
   }
-  settingsModal?.querySelectorAll("[data-close-settings]").forEach(el => el.addEventListener("click", () => { settingsModal.classList.remove("active"); settingsModal.setAttribute("aria-hidden","true"); document.body.style.overflow = ""; }));
+  settingsModal?.querySelectorAll("[data-close-settings]").forEach(el => el.addEventListener("click", () => { settingsModal.classList.remove("active"); settingsModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }));
   toggleCensura?.addEventListener("change", () => localStorage.setItem(CENSURA_KEY, String(toggleCensura.checked)));
 
   const censurarMensaje = async texto => {
@@ -515,15 +515,15 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const termino = friendSearchInput.value.trim().toLowerCase();
       if (!termino) return;
-      const { data:perfiles } = await supabase.from("perfiles").select("id,username").ilike("username", `%${termino}%`).limit(10);
+      const { data: perfiles } = await supabase.from("perfiles").select("id,username").ilike("username", `%${termino}%`).limit(10);
       const frag = document.createDocumentFragment();
-      (perfiles||[]).filter(p => p.id !== perfilActual?.id).forEach(perfil => {
+      (perfiles || []).filter(p => p.id !== perfilActual?.id).forEach(perfil => {
         const div = document.createElement("div"); div.className = "friend-row";
         const span = document.createElement("span"); span.textContent = `@${perfil.username}`;
         const btn = document.createElement("button");
         btn.type = "button"; btn.className = "btn-secondary"; btn.textContent = "Invitar";
         btn.addEventListener("click", async () => {
-          const { error } = await supabase.from("invitaciones_grupo").insert({ grupo_id:grupoActivo.id, invitado_id:perfil.id, invitado_por:perfilActual.id });
+          const { error } = await supabase.from("invitaciones_grupo").insert({ grupo_id: grupoActivo.id, invitado_id: perfil.id, invitado_por: perfilActual.id });
           btn.textContent = error ? "No disponible" : "Enviada"; btn.disabled = true;
         });
         div.append(span, btn); frag.appendChild(div);
@@ -537,37 +537,37 @@ document.addEventListener("DOMContentLoaded", () => {
      ============================================================ */
   async function cargarFotos() {
     try {
-      const { data:{ session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) { fotos = []; return; }
       if (!grupoActivo) await asegurarGrupoActivo();
       if (!grupoActivo) { fotos = []; return; }
       const { data, error } = await supabase.from("fotos")
         .select("id,path,fecha,nota,lat,lng,lugar,grupo_id")
         .eq("grupo_id", grupoActivo.id)
-        .order("created_at", { ascending:false });
+        .order("created_at", { ascending: false });
       if (error) { console.warn("cargarFotos error:", error); fotos = []; return; }
-      fotos = (data||[]).map(f => ({ id:f.id, path:f.path, fecha:f.fecha, nota:f.nota, lat:f.lat, lng:f.lng, lugar:f.lugar, grupo_id:f.grupo_id }));
+      fotos = (data || []).map(f => ({ id: f.id, path: f.path, fecha: f.fecha, nota: f.nota, lat: f.lat, lng: f.lng, lugar: f.lugar, grupo_id: f.grupo_id }));
     } catch (err) { console.warn("cargarFotos:", err); fotos = []; }
   }
 
   const añadirFotoTabla = async (path, fecha, nota, lat, lng) => {
-    const { data:{ session } } = await supabase.auth.getSession();
+    const { data: { session } } = await supabase.auth.getSession();
     if (!session) throw new Error("No hay sesión");
-    const { data, error } = await supabase.from("fotos").insert({ user_id:session.user.id, grupo_id:grupoActivo.id, path, fecha:fecha||null, nota:nota||null, lat:lat||null, lng:lng||null }).select().single();
+    const { data, error } = await supabase.from("fotos").insert({ user_id: session.user.id, grupo_id: grupoActivo.id, path, fecha: fecha || null, nota: nota || null, lat: lat || null, lng: lng || null }).select().single();
     if (error) throw error;
     return data;
   };
   const eliminarFotoTabla = async id => { const { error } = await supabase.from("fotos").delete().eq("id", id); if (error) throw error; };
-  const actualizarFotoTabla = async (id, fecha, nota, lat, lng) => { const { data, error } = await supabase.from("fotos").update({ fecha:fecha||null, nota:nota||null, lat:lat||null, lng:lng||null }).eq("id", id).select().single(); if (error) throw error; return data; };
+  const actualizarFotoTabla = async (id, fecha, nota, lat, lng) => { const { data, error } = await supabase.from("fotos").update({ fecha: fecha || null, nota: nota || null, lat: lat || null, lng: lng || null }).eq("id", id).select().single(); if (error) throw error; return data; };
 
   async function obtenerUrlFirmada(path) {
     try {
       const g = urlsFirmadasCache.get(path);
       if (g && g.expira > Date.now()) return g.url;
-      if (window.SunOffline) { const off = await window.SunOffline.obtenerImagenOffline(path); if (off) { urlsFirmadasCache.set(path, { url:off, expira:Date.now()+24*3600*1000 }); return off; } }
+      if (window.SunOffline) { const off = await window.SunOffline.obtenerImagenOffline(path); if (off) { urlsFirmadasCache.set(path, { url: off, expira: Date.now() + 24 * 3600 * 1000 }); return off; } }
       const { data, error } = await supabase.storage.from(BUCKET_NAME).createSignedUrl(path, URL_EXPIRY);
       if (error) return null;
-      urlsFirmadasCache.set(path, { url:data.signedUrl, expira:Date.now()+DURACION_CACHE_URL });
+      urlsFirmadasCache.set(path, { url: data.signedUrl, expira: Date.now() + DURACION_CACHE_URL });
       return data.signedUrl;
     } catch (err) { console.warn("obtenerUrlFirmada:", err); return null; }
   }
@@ -581,8 +581,8 @@ document.addEventListener("DOMContentLoaded", () => {
           img.onload = () => {
             try {
               let { width, height } = img;
-              if (width > height && width > maxSize) { height = Math.round((height*maxSize)/width); width = maxSize; }
-              else if (height > maxSize) { width = Math.round((width*maxSize)/height); height = maxSize; }
+              if (width > height && width > maxSize) { height = Math.round((height * maxSize) / width); width = maxSize; }
+              else if (height > maxSize) { width = Math.round((width * maxSize) / height); height = maxSize; }
               const c = document.createElement("canvas"); c.width = width; c.height = height;
               c.getContext("2d").drawImage(img, 0, 0, width, height);
               c.toBlob(b => b ? resolve(b) : reject(new Error("toBlob")), "image/jpeg", 0.85);
@@ -605,7 +605,7 @@ document.addEventListener("DOMContentLoaded", () => {
       empty?.classList.add("hidden");
       const urls = new Map();
       const cola = fotos.slice();
-      await Promise.all(Array.from({ length:LIMITE_CONCURRENCIA_URLS }, async () => {
+      await Promise.all(Array.from({ length: LIMITE_CONCURRENCIA_URLS }, async () => {
         while (cola.length) { const f = cola.shift(); const url = await obtenerUrlFirmada(f.path); if (url) urls.set(f.id, url); }
       }));
       const frag = document.createDocumentFragment();
@@ -616,10 +616,10 @@ document.addEventListener("DOMContentLoaded", () => {
     finally { renderEnCurso = false; if (renderPendiente) { renderPendiente = false; render(); } }
   }
 
-  const activarFullscreen = (el, btn) => { const api = el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen; if (api) { api.call(el); btn?.setAttribute("aria-pressed","true"); return; } alert("Tu navegador no admite pantalla completa aquí."); };
-  const cerrarFullscreen = () => { const api = document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen; if (api && document.fullscreenElement) api.call(document); };
+  const activarFullscreen = (el, btn) => { const api = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen; if (api) { api.call(el); btn?.setAttribute("aria-pressed", "true"); return; } alert("Tu navegador no admite pantalla completa aquí."); };
+  const cerrarFullscreen = () => { const api = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen; if (api && document.fullscreenElement) api.call(document); };
   const fullscreenInteractivo = (article, boton) => {
-    article.tabIndex = 0; article.setAttribute("role","button"); article.setAttribute("aria-label","Abrir en pantalla completa");
+    article.tabIndex = 0; article.setAttribute("role", "button"); article.setAttribute("aria-label", "Abrir en pantalla completa");
     article.addEventListener("click", e => { if (e.target.closest("button, input, textarea, a")) return; if (document.fullscreenElement === article) return cerrarFullscreen(); activarFullscreen(article, boton); });
     article.addEventListener("keydown", e => { if (e.key !== "Enter" && e.key !== " " && e.target !== article) return; if (e.target !== article) return; e.preventDefault(); activarFullscreen(article, boton); });
   };
@@ -648,7 +648,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       if (!modal) return;
       fotoEditando = fotoParaEditar;
-      modal.classList.add("active"); modal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
+      modal.classList.add("active"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
       form?.reset();
       if (inputPhoto) inputPhoto.required = !fotoParaEditar;
       if (inputPhotoCampo) inputPhotoCampo.hidden = Boolean(fotoParaEditar);
@@ -664,7 +664,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function cerrarModal() {
     try {
       if (!modal) return;
-      modal.classList.remove("active"); modal.setAttribute("aria-hidden","true"); document.body.style.overflow = "";
+      modal.classList.remove("active"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
       fotoEditando = null;
       if (inputPhoto) inputPhoto.required = true;
       if (inputPhotoCampo) inputPhotoCampo.hidden = false;
@@ -684,7 +684,7 @@ document.addEventListener("DOMContentLoaded", () => {
       navigator.geolocation.getCurrentPosition(
         ({ coords }) => { inputLat.value = coords.latitude; inputLng.value = coords.longitude; actualizarEstadoUbicacion(); btnPhotoLocation.disabled = false; },
         () => { if (photoLocationStatus) photoLocationStatus.textContent = "No se pudo obtener la ubicación."; btnPhotoLocation.disabled = false; },
-        { enableHighAccuracy:true, timeout:10000, maximumAge:300000 }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
       );
     } catch (err) { console.warn("geolocation:", err); btnPhotoLocation.disabled = false; }
   });
@@ -695,11 +695,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!aventurasMap || typeof window.L === "undefined") return;
       const ubicadas = fotos.filter(f => f.lat != null && f.lng != null && f.lat !== "" && f.lng !== "" && Number.isFinite(Number(f.lat)) && Number.isFinite(Number(f.lng)));
       mapaEmpty?.classList.toggle("hidden", ubicadas.length > 0);
-      if (!mapaLeaflet) { mapaLeaflet = L.map(aventurasMap).setView([20,0], 2); L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution:"© OpenStreetMap" }).addTo(mapaLeaflet); }
+      if (!mapaLeaflet) { mapaLeaflet = L.map(aventurasMap).setView([20, 0], 2); L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© OpenStreetMap" }).addTo(mapaLeaflet); }
       mapaLeaflet.eachLayer(l => { if (l instanceof L.Marker) mapaLeaflet.removeLayer(l); });
       const puntos = [];
       ubicadas.forEach(f => { const lat = Number(f.lat), lng = Number(f.lng); L.marker([lat, lng]).addTo(mapaLeaflet).bindPopup(`<strong>${f.fecha ? fmtFecha(f.fecha) : "Recuerdo"}</strong><br>${escapeHtml(f.nota || "Sin nota")}`); puntos.push([lat, lng]); });
-      if (puntos.length) mapaLeaflet.fitBounds(L.latLngBounds(puntos), { padding:[30,30], maxZoom:12 });
+      if (puntos.length) mapaLeaflet.fitBounds(L.latLngBounds(puntos), { padding: [30, 30], maxZoom: 12 });
       setTimeout(() => mapaLeaflet?.invalidateSize(), 100);
     } catch (err) { console.warn("renderMapa:", err); }
   }
@@ -716,10 +716,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const header = document.createElement("div"); header.className = "chat-message-header";
     const av = document.createElement("div"); av.className = "chat-message-avatar";
     if (perfil.avatar_url) av.innerHTML = `<img src="${perfil.avatar_url}" alt="">`; else av.innerHTML = window.ICONO?.persona || "";
-    const nombre = document.createElement("span"); nombre.className = "chat-message-nombre"; nombre.textContent = esPropio ? "Tú" : ("@"+(perfil.username||"usuario"));
+    const nombre = document.createElement("span"); nombre.className = "chat-message-nombre"; nombre.textContent = esPropio ? "Tú" : ("@" + (perfil.username || "usuario"));
     header.append(av, nombre);
     const p = document.createElement("p"); p.textContent = m.contenido;
-    const t = document.createElement("time"); t.textContent = new Date(m.created_at).toLocaleString("es-ES", { dateStyle:"short", timeStyle:"short" });
+    const t = document.createElement("time"); t.textContent = new Date(m.created_at).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" });
     item.append(header, p, t);
     chatMessages.appendChild(item);
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -729,13 +729,13 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const sel = document.getElementById("chat-privado-destinatario");
       if (!sel) return;
-      const { data:{ session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
       const { data } = await supabase.from("grupo_miembros").select("user_id").eq("grupo_id", grupoActivo.id).neq("user_id", session.user.id);
-      const ids = (data||[]).map(m => m.user_id);
+      const ids = (data || []).map(m => m.user_id);
       if (!ids.length) { sel.innerHTML = `<option value="">Sin miembros</option>`; return; }
-      const { data:perfiles } = await supabase.from("perfiles").select("id,username").in("id", ids);
-      sel.innerHTML = `<option value="">— Elige —</option>` + (perfiles||[]).map(p => `<option value="${p.id}">@${p.username}</option>`).join("");
+      const { data: perfiles } = await supabase.from("perfiles").select("id,username").in("id", ids);
+      sel.innerHTML = `<option value="">— Elige —</option>` + (perfiles || []).map(p => `<option value="${p.id}">@${p.username}</option>`).join("");
       if (chatDestinatario) sel.value = chatDestinatario;
     } catch (e) { console.warn(e); }
   }
@@ -745,25 +745,25 @@ document.addEventListener("DOMContentLoaded", () => {
       if (chatSubscription) { supabase.removeChannel(chatSubscription); chatSubscription = null; }
       if (!chatMessages) return;
       chatMessages.innerHTML = "";
-      const { data:{ session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
       let query;
-      if (chatModo === "grupo") query = supabase.from("mensajes").select("id,user_id,contenido,created_at").eq("room_id", grupoActivo.id).is("destinatario_id", null).order("created_at", { ascending:true }).limit(100);
+      if (chatModo === "grupo") query = supabase.from("mensajes").select("id,user_id,contenido,created_at").eq("room_id", grupoActivo.id).is("destinatario_id", null).order("created_at", { ascending: true }).limit(100);
       else {
         if (!chatDestinatario) { chatMessages.innerHTML = `<div class="chat-vacio">Elige un destinatario</div>`; return; }
-        query = supabase.from("mensajes").select("id,user_id,contenido,created_at,destinatario_id").eq("room_id", grupoActivo.id).or(`and(user_id.eq.${session.user.id},destinatario_id.eq.${chatDestinatario}),and(user_id.eq.${chatDestinatario},destinatario_id.eq.${session.user.id})`).order("created_at", { ascending:true }).limit(100);
+        query = supabase.from("mensajes").select("id,user_id,contenido,created_at,destinatario_id").eq("room_id", grupoActivo.id).or(`and(user_id.eq.${session.user.id},destinatario_id.eq.${chatDestinatario}),and(user_id.eq.${chatDestinatario},destinatario_id.eq.${session.user.id})`).order("created_at", { ascending: true }).limit(100);
       }
       const { data, error } = await query;
       if (error) { if (chatStatus) chatStatus.textContent = "Error al cargar mensajes"; return; }
-      const ids = [...new Set((data||[]).map(m => m.user_id))];
-      const { data:perfiles } = ids.length ? await supabase.from("perfiles").select("id,username,avatar_url").in("id", ids) : { data:[] };
-      const mapaPerfiles = Object.fromEntries((perfiles||[]).map(p => [p.id, p]));
-      (data||[]).forEach(m => renderMensajeChat(m, mapaPerfiles));
+      const ids = [...new Set((data || []).map(m => m.user_id))];
+      const { data: perfiles } = ids.length ? await supabase.from("perfiles").select("id,username,avatar_url").in("id", ids) : { data: [] };
+      const mapaPerfiles = Object.fromEntries((perfiles || []).map(p => [p.id, p]));
+      (data || []).forEach(m => renderMensajeChat(m, mapaPerfiles));
       if (chatStatus) chatStatus.textContent = chatModo === "grupo" ? "Chat de grupo" : "Chat privado";
-      chatSubscription = supabase.channel(`chat-${grupoActivo.id}-${chatModo}`).on("postgres_changes", { event:"INSERT", schema:"public", table:"mensajes", filter:`room_id=eq.${grupoActivo.id}` }, async ({ new:m }) => {
+      chatSubscription = supabase.channel(`chat-${grupoActivo.id}-${chatModo}`).on("postgres_changes", { event: "INSERT", schema: "public", table: "mensajes", filter: `room_id=eq.${grupoActivo.id}` }, async ({ new: m }) => {
         if (chatModo === "grupo" && m.destinatario_id) return;
         if (chatModo === "privado" && (!m.destinatario_id || (m.user_id !== session.user.id && m.destinatario_id !== session.user.id))) return;
-        if (!mapaPerfiles[m.user_id]) { const { data:p } = await supabase.from("perfiles").select("id,username,avatar_url").eq("id", m.user_id).single(); if (p) mapaPerfiles[m.user_id] = p; }
+        if (!mapaPerfiles[m.user_id]) { const { data: p } = await supabase.from("perfiles").select("id,username,avatar_url").eq("id", m.user_id).single(); if (p) mapaPerfiles[m.user_id] = p; }
         renderMensajeChat(m, mapaPerfiles);
       }).subscribe();
     } catch (e) { console.warn("recargarChat:", e); }
@@ -786,22 +786,22 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const original = chatInput?.value.trim();
       if (!original) return;
-      const { data:{ session } } = await supabase.auth.getSession();
-      if (!session) return alertar({ title:"Inicia sesión", message:"Necesitas una cuenta para escribir.", icon:"🔐" });
-      if (chatModo === "privado" && !chatDestinatario) return alertar({ title:"Sin destinatario", message:"Elige a quién enviar el mensaje.", icon:"👤" });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return alertar({ title: "Inicia sesión", message: "Necesitas una cuenta para escribir.", icon: "🔐" });
+      if (chatModo === "privado" && !chatDestinatario) return alertar({ title: "Sin destinatario", message: "Elige a quién enviar el mensaje.", icon: "👤" });
       chatInput.disabled = true;
       let contenido;
       try { contenido = await censurarMensaje(original); } catch { chatInput.disabled = false; return; }
-      const ins = { room_id:grupoActivo.id, grupo_id:grupoActivo.id, user_id:session.user.id, contenido, destinatario_id: chatModo === "privado" ? chatDestinatario : null };
-      const { data:mensaje, error } = await supabase.from("mensajes").insert(ins).select("id,user_id,contenido,created_at").single();
+      const ins = { room_id: grupoActivo.id, grupo_id: grupoActivo.id, user_id: session.user.id, contenido, destinatario_id: chatModo === "privado" ? chatDestinatario : null };
+      const { data: mensaje, error } = await supabase.from("mensajes").insert(ins).select("id,user_id,contenido,created_at").single();
       chatInput.disabled = false;
-      if (error) return alertar({ title:"No se pudo enviar", message:error.message, variant:"danger" });
+      if (error) return alertar({ title: "No se pudo enviar", message: error.message, variant: "danger" });
       chatInput.value = ""; chatInput.focus();
-      supabase.functions.invoke("send-push", { body:{ message:{ ...mensaje, user_id:session.user.id } } }).catch(() => {});
+      supabase.functions.invoke("send-push", { body: { message: { ...mensaje, user_id: session.user.id } } }).catch(() => { });
     } catch (err) { console.warn("chat submit:", err); }
   });
 
-  const convertirClaveBase64 = clave => { const padding = "=".repeat((4-clave.length%4)%4); return Uint8Array.from(atob((clave+padding).replace(/-/g,"+").replace(/_/g,"/")), c => c.charCodeAt(0)); };
+  const convertirClaveBase64 = clave => { const padding = "=".repeat((4 - clave.length % 4) % 4); return Uint8Array.from(atob((clave + padding).replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0)); };
   async function activarPush() {
     try {
       if (!("serviceWorker" in navigator) || !("PushManager" in window)) throw new Error("Este navegador no admite notificaciones push.");
@@ -819,17 +819,17 @@ document.addEventListener("DOMContentLoaded", () => {
           sub = null;
         }
       }
-      if (!sub) sub = await registro.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey });
-      const { data:{ session } } = await supabase.auth.getSession();
+      if (!sub) sub = await registro.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey });
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("Inicia sesión para activar notificaciones.");
-      const { error } = await supabase.from("push_subscriptions").upsert({ user_id:session.user.id, endpoint:sub.endpoint, subscription:sub.toJSON() }, { onConflict:"endpoint" });
+      const { error } = await supabase.from("push_subscriptions").upsert({ user_id: session.user.id, endpoint: sub.endpoint, subscription: sub.toJSON() }, { onConflict: "endpoint" });
       if (error) throw error;
       if (btnEnablePush) btnEnablePush.textContent = "Notificaciones activadas";
       return true;
     } catch (err) { console.warn("activarPush:", err); throw err; }
   }
   window._activarNotificacionesPush = activarPush;
-  btnEnablePush?.addEventListener("click", () => activarPush().catch(e => alertar({ title:"Error", message:"No se pudieron activar: " + e.message, variant:"danger" })));
+  btnEnablePush?.addEventListener("click", () => activarPush().catch(e => alertar({ title: "Error", message: "No se pudieron activar: " + e.message, variant: "danger" })));
 
   /* ---------- Formulario foto ---------- */
   if (btnAdd) btnAdd.addEventListener("click", () => abrirModal());
@@ -878,41 +878,41 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           const act = await actualizarFotoTabla(fotoEditando.id, fecha, nota, parseCoord(inputLat?.value), parseCoord(inputLng?.value));
           const idx = fotos.findIndex(f => f.id === fotoEditando.id);
-          if (idx !== -1) fotos[idx] = { ...fotos[idx], fecha:act.fecha, nota:act.nota, lat:act.lat, lng:act.lng };
+          if (idx !== -1) fotos[idx] = { ...fotos[idx], fecha: act.fecha, nota: act.nota, lat: act.lat, lng: act.lng };
           cerrarModal(); await render(); window.dispatchEvent(new Event("sunadventures:progress"));
-        } catch (err) { alertar({ title:"No se pudo actualizar", message:err.message || String(err), variant:"danger" }); if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Actualizar recuerdo"; } }
+        } catch (err) { alertar({ title: "No se pudo actualizar", message: err.message || String(err), variant: "danger" }); if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Actualizar recuerdo"; } }
         finally { subiendoFoto = false; }
         return;
       }
       const file = inputPhoto?.files[0];
-      if (!file) { alertar({ title:"Falta la foto", message:"Selecciona una imagen primero.", icon:"📸" }); subiendoFoto = false; return; }
+      if (!file) { alertar({ title: "Falta la foto", message: "Selecciona una imagen primero.", icon: "📸" }); subiendoFoto = false; return; }
       if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Subiendo..."; }
       mostrarLoading("Guardando recuerdo...");
       try {
         const blob = await redimensionarImagen(file, 1600);
-        const filePath = `fotos/${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
-        const { error:upErr } = await supabase.storage.from(BUCKET_NAME).upload(filePath, blob, { contentType:"image/jpeg" });
+        const filePath = `fotos/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+        const { error: upErr } = await supabase.storage.from(BUCKET_NAME).upload(filePath, blob, { contentType: "image/jpeg" });
         if (upErr) throw upErr;
         const nueva = await añadirFotoTabla(filePath, fecha, nota, parseCoord(inputLat?.value), parseCoord(inputLng?.value));
-        fotos.unshift({ id:nueva.id, path:nueva.path, fecha:nueva.fecha, nota:nueva.nota, lat:nueva.lat, lng:nueva.lng });
+        fotos.unshift({ id: nueva.id, path: nueva.path, fecha: nueva.fecha, nota: nueva.nota, lat: nueva.lat, lng: nueva.lng });
         cerrarModal(); await render(); window.dispatchEvent(new Event("sunadventures:progress"));
-      } catch (err) { alertar({ title:"No se pudo subir", message:err.message || String(err), variant:"danger" }); if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Guardar recuerdo"; } }
+      } catch (err) { alertar({ title: "No se pudo subir", message: err.message || String(err), variant: "danger" }); if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Guardar recuerdo"; } }
       finally { subiendoFoto = false; ocultarLoading(); }
     } catch (err) { console.error(err); subiendoFoto = false; ocultarLoading(); }
   });
 
   async function eliminarFoto(id) {
     try {
-      const ok = await confirmar({ title:"¿Eliminar esta aventura?", message:"La foto se borrará del álbum para siempre.", variant:"danger", icon:"🗑️", confirmText:"Sí, eliminar", cancelText:"Cancelar" });
+      const ok = await confirmar({ title: "¿Eliminar esta aventura?", message: "La foto se borrará del álbum para siempre.", variant: "danger", icon: "🗑️", confirmText: "Sí, eliminar", cancelText: "Cancelar" });
       if (!ok) return;
       const foto = fotos.find(f => f.id === id);
       if (!foto) return;
-      try { await supabase.storage.from(BUCKET_NAME).remove([foto.path]); } catch {}
+      try { await supabase.storage.from(BUCKET_NAME).remove([foto.path]); } catch { }
       await eliminarFotoTabla(foto.id);
       fotos = fotos.filter(f => f.id !== id);
       urlsFirmadasCache.delete(foto.path);
       await render();
-    } catch (err) { alertar({ title:"Error", message:"No se pudo eliminar: " + (err.message||err), variant:"danger" }); }
+    } catch (err) { alertar({ title: "Error", message: "No se pudo eliminar: " + (err.message || err), variant: "danger" }); }
   }
 
   /* ============================================================
@@ -920,21 +920,21 @@ document.addEventListener("DOMContentLoaded", () => {
      ============================================================ */
   async function cargarNotas() {
     try {
-      const { data:{ session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) { notas = []; return; }
       if (!grupoActivo) await asegurarGrupoActivo();
       if (!grupoActivo) { notas = []; return; }
       const { data, error } = await supabase.from("notas")
         .select("id,titulo,contenido,color,created_at,grupo_id")
         .eq("grupo_id", grupoActivo.id)
-        .order("created_at", { ascending:false });
+        .order("created_at", { ascending: false });
       if (error) { console.warn("cargarNotas error:", error); notas = []; return; }
-      notas = (data||[]).map(n => ({ id:n.id, titulo:n.titulo, contenido:n.contenido, color:n.color || "amarillo", created_at:n.created_at, grupo_id:n.grupo_id }));
+      notas = (data || []).map(n => ({ id: n.id, titulo: n.titulo, contenido: n.contenido, color: n.color || "amarillo", created_at: n.created_at, grupo_id: n.grupo_id }));
     } catch (err) { console.warn("cargarNotas:", err); notas = []; }
   }
-  const añadirNotaTabla = async (titulo, contenido, color) => { const { data:{ session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("notas").insert({ user_id:session.user.id, grupo_id:grupoActivo.id, titulo:titulo||null, contenido, color:color||"amarillo" }).select().single(); if (error) throw error; return data; };
+  const añadirNotaTabla = async (titulo, contenido, color) => { const { data: { session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("notas").insert({ user_id: session.user.id, grupo_id: grupoActivo.id, titulo: titulo || null, contenido, color: color || "amarillo" }).select().single(); if (error) throw error; return data; };
   const eliminarNotaTabla = async id => { const { error } = await supabase.from("notas").delete().eq("id", id); if (error) throw error; };
-  const actualizarNotaTabla = async (id, titulo, contenido, color) => { const { data, error } = await supabase.from("notas").update({ titulo:titulo||null, contenido, color:color||"amarillo" }).eq("id", id).select().single(); if (error) throw error; return data; };
+  const actualizarNotaTabla = async (id, titulo, contenido, color) => { const { data, error } = await supabase.from("notas").update({ titulo: titulo || null, contenido, color: color || "amarillo" }).eq("id", id).select().single(); if (error) throw error; return data; };
 
   function renderNotas() {
     try {
@@ -951,18 +951,17 @@ document.addEventListener("DOMContentLoaded", () => {
   function crearNotaPolaroid(nota) {
     try {
       const article = document.createElement("article");
-      article.className = "nota color-" + (nota.color||"amarillo");
+      article.className = "nota color-" + (nota.color || "amarillo");
       fullscreenInteractivo(article);
       const btnDel = crearBtn("nota-delete", SVG.trash, "Eliminar nota", e => { e.stopPropagation(); eliminarNota(nota.id); });
       const btnFull = crearBtn("nota-fullscreen", SVG.expand, "Pantalla completa", e => { e.preventDefault(); e.stopPropagation(); if (document.fullscreenElement === article) { cerrarFullscreen(); return; } activarFullscreen(article, btnFull); });
-      const btnClose = crearBtn("nota-close", SVG.close, "Salir", e => { e.preventDefault(); e.stopPropagation(); cerrarFullscreen(); });
       const btnEdit = crearBtn("nota-edit", SVG.edit, "Editar nota", e => { e.preventDefault(); e.stopPropagation(); abrirNotaModal(nota); });
-      article.append(btnDel, btnFull, btnClose, btnEdit);
+      article.append(btnDel, btnFull, btnEdit);
       if (nota.titulo) { const h3 = document.createElement("h3"); h3.className = "nota-titulo"; h3.textContent = nota.titulo; article.appendChild(h3); }
       const wrap = document.createElement("div"); wrap.className = "nota-contenido-wrap";
-      const lineas = (nota.contenido||"").split(/\r?\n/);
+      const lineas = (nota.contenido || "").split(/\r?\n/);
       if (lineas.length === 0 || (lineas.length === 1 && lineas[0].trim() === "")) { const p = document.createElement("p"); p.className = "nota-contenido"; p.textContent = nota.contenido || ""; wrap.appendChild(p); }
-      else { lineas.forEach(linea => { const row = document.createElement("div"); row.className = "nota-linea"; const cb = document.createElement("input"); cb.type = "checkbox"; cb.className = "nota-check"; cb.setAttribute("aria-label","Marcar línea"); const txt = document.createElement("span"); txt.className = "nota-texto"; txt.textContent = linea.trim() || " "; cb.addEventListener("change", () => txt.classList.toggle("tachada", cb.checked)); row.append(cb, txt); wrap.appendChild(row); }); }
+      else { lineas.forEach(linea => { const row = document.createElement("div"); row.className = "nota-linea"; const cb = document.createElement("input"); cb.type = "checkbox"; cb.className = "nota-check"; cb.setAttribute("aria-label", "Marcar línea"); const txt = document.createElement("span"); txt.className = "nota-texto"; txt.textContent = linea.trim() || " "; cb.addEventListener("change", () => txt.classList.toggle("tachada", cb.checked)); row.append(cb, txt); wrap.appendChild(row); }); }
       article.appendChild(wrap);
       if (nota.created_at) { const f = document.createElement("span"); f.className = "nota-fecha"; f.textContent = fmtFechaNota(nota.created_at); article.appendChild(f); }
       return article;
@@ -973,7 +972,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       if (!notaModal) return;
       notaEditando = notaParaEditar;
-      notaModal.classList.add("active"); notaModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
+      notaModal.classList.add("active"); notaModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
       notaForm?.reset();
       colorSeleccionado = notaParaEditar?.color || "amarillo";
       if (notaParaEditar) { if (notaTitulo) notaTitulo.value = notaParaEditar.titulo || ""; if (notaContenido) notaContenido.value = notaParaEditar.contenido || ""; }
@@ -1001,7 +1000,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function cerrarNotaModal() {
     try {
       if (!notaModal) return;
-      notaModal.classList.remove("active"); notaModal.setAttribute("aria-hidden","true"); document.body.style.overflow = "";
+      notaModal.classList.remove("active"); notaModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
       notaEditando = null;
       if (notaTituloCampo) notaTituloCampo.hidden = false;
       if (notaColorCampo) notaColorCampo.hidden = false;
@@ -1011,13 +1010,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function eliminarNota(id) {
     try {
-      const ok = await confirmar({ title:"¿Eliminar esta notita?", message:"Perderás este texto para siempre.", variant:"danger", icon:"📝", confirmText:"Sí, borrar", cancelText:"Mantener" });
+      const ok = await confirmar({ title: "¿Eliminar esta notita?", message: "Perderás este texto para siempre.", variant: "danger", icon: "📝", confirmText: "Sí, borrar", cancelText: "Mantener" });
       if (!ok) return;
       await eliminarNotaTabla(id);
       notas = notas.filter(n => n.id !== id);
       renderNotas();
       window.dispatchEvent(new Event("sunadventures:progress"));
-    } catch (err) { alertar({ title:"Error", message:"No se pudo eliminar: " + (err.message||err), variant:"danger" }); }
+    } catch (err) { alertar({ title: "Error", message: "No se pudo eliminar: " + (err.message || err), variant: "danger" }); }
   }
 
   btnAddNota?.addEventListener("click", () => abrirNotaModal());
@@ -1029,20 +1028,20 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     try {
       const titulo = notaTitulo?.value.trim() || "", contenido = notaContenido?.value.trim() || "";
-      if (!contenido) return alertar({ title:"Nota vacía", message:"Escribe algo en la notita.", icon:"✏️" });
+      if (!contenido) return alertar({ title: "Nota vacía", message: "Escribe algo en la notita.", icon: "✏️" });
       if (notaSubmitBtn) { notaSubmitBtn.disabled = true; notaSubmitBtn.textContent = "Guardando..."; }
       try {
         if (notaEditando) {
           const act = await actualizarNotaTabla(notaEditando.id, notaEditando.titulo, contenido, notaEditando.color);
           const idx = notas.findIndex(n => n.id === notaEditando.id);
-          if (idx !== -1) notas[idx] = { id:act.id, titulo:act.titulo, contenido:act.contenido, color:act.color, created_at:act.created_at };
+          if (idx !== -1) notas[idx] = { id: act.id, titulo: act.titulo, contenido: act.contenido, color: act.color, created_at: act.created_at };
         } else {
           const colorFinal = colorSeleccionado || document.querySelector(".color-option.activo")?.dataset.color || "amarillo";
           const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
-          notas.unshift({ id:nueva.id, titulo:nueva.titulo, contenido:nueva.contenido, color:nueva.color, created_at:nueva.created_at });
+          notas.unshift({ id: nueva.id, titulo: nueva.titulo, contenido: nueva.contenido, color: nueva.color, created_at: nueva.created_at });
         }
         cerrarNotaModal(); renderNotas(); window.dispatchEvent(new Event("sunadventures:progress"));
-      } catch (err) { alertar({ title:"No se pudo guardar", message:err.message || String(err), variant:"danger" }); if (notaSubmitBtn) { notaSubmitBtn.disabled = false; notaSubmitBtn.textContent = notaEditando ? "Actualizar texto" : "Guardar notita"; } }
+      } catch (err) { alertar({ title: "No se pudo guardar", message: err.message || String(err), variant: "danger" }); if (notaSubmitBtn) { notaSubmitBtn.disabled = false; notaSubmitBtn.textContent = notaEditando ? "Actualizar texto" : "Guardar notita"; } }
     } catch (err) { console.warn("nota submit:", err); }
   });
 
@@ -1051,16 +1050,16 @@ document.addEventListener("DOMContentLoaded", () => {
      ============================================================ */
   async function cargarPlaylists() {
     try {
-      const { data:{ session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) { playlists = []; return; }
       if (!grupoActivo) await asegurarGrupoActivo();
       if (!grupoActivo) { playlists = []; return; }
       const { data, error } = await supabase.from("playlists")
         .select("id,nombre,descripcion,emoji,color,canciones,created_at,grupo_id")
         .eq("grupo_id", grupoActivo.id)
-        .order("created_at", { ascending:false });
+        .order("created_at", { ascending: false });
       if (error) { console.warn("cargarPlaylists error:", error); playlists = []; return; }
-      playlists = (data||[]).map(p => ({
+      playlists = (data || []).map(p => ({
         id: p.id, nombre: p.nombre, descripcion: p.descripcion,
         emoji: p.emoji || "music", color: p.color || "amarillo",
         canciones: Array.isArray(p.canciones) ? p.canciones : [],
@@ -1068,11 +1067,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }));
     } catch (err) { console.warn("cargarPlaylists:", err); playlists = []; }
   }
-  const añadirPlaylistTabla = async (nombre, descripcion, emoji, color) => { const { data:{ session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("playlists").insert({ user_id:session.user.id, grupo_id:grupoActivo.id, nombre, descripcion:descripcion||null, emoji:emoji||"music", color:color||"amarillo", canciones:[] }).select().single(); if (error) throw error; return data; };
+  const añadirPlaylistTabla = async (nombre, descripcion, emoji, color) => { const { data: { session } } = await supabase.auth.getSession(); if (!session) throw new Error("No hay sesión"); const { data, error } = await supabase.from("playlists").insert({ user_id: session.user.id, grupo_id: grupoActivo.id, nombre, descripcion: descripcion || null, emoji: emoji || "music", color: color || "amarillo", canciones: [] }).select().single(); if (error) throw error; return data; };
   const eliminarPlaylistTabla = async id => { const { error } = await supabase.from("playlists").delete().eq("id", id); if (error) throw error; };
   const guardarCancionesTabla = async (id, canciones) => { const { error } = await supabase.from("playlists").update({ canciones }).eq("id", id); if (error) throw error; };
 
-  const EMOJI_A_SVG = { music:SVG.music, note:SVG.note, sparkle:SVG.sparkle, sunflower:SVG.sunflower, heart:SVG.heart, calendar:SVG.calendar };
+  const EMOJI_A_SVG = { music: SVG.music, note: SVG.note, sparkle: SVG.sparkle, sunflower: SVG.sunflower, heart: SVG.heart, calendar: SVG.calendar };
   const renderEmoji = e => EMOJI_A_SVG[e] || SVG.music;
 
   function renderPlaylists() {
@@ -1090,7 +1089,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function crearPlaylistCard(pl) {
     try {
       const card = document.createElement("article");
-      card.className = "playlist-card color-" + (pl.color||"amarillo");
+      card.className = "playlist-card color-" + (pl.color || "amarillo");
       const btnDel = crearBtn("playlist-card-delete", SVG.close, "Eliminar playlist", e => { e.stopPropagation(); eliminarPlaylist(pl.id); });
       card.appendChild(btnDel);
       const header = document.createElement("div"); header.className = "playlist-card-header";
@@ -1107,7 +1106,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (n > 0) {
         const prev = document.createElement("div");
         prev.className = "playlist-card-preview";
-        prev.textContent = pl.canciones.slice(0,3).map(c => c.titulo + (c.artista ? " · " + c.artista : "")).join("\n");
+        prev.textContent = pl.canciones.slice(0, 3).map(c => c.titulo + (c.artista ? " · " + c.artista : "")).join("\n");
         card.appendChild(prev);
       }
       card.addEventListener("click", () => abrirCancionesModal(pl.id));
@@ -1118,7 +1117,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function abrirPlaylistModal() {
     try {
       if (!playlistModal) return;
-      playlistModal.classList.add("active"); playlistModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
+      playlistModal.classList.add("active"); playlistModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
       playlistForm?.reset();
       emojiSeleccionado = "music"; colorPlaylistSeleccionado = "amarillo";
       document.querySelectorAll("#emoji-picker .emoji-option").forEach(o => o.classList.toggle("activo", o.dataset.emoji === "music"));
@@ -1128,17 +1127,17 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) { console.warn("abrirPlaylistModal:", err); }
   }
   function cerrarPlaylistModal() {
-    try { if (!playlistModal) return; playlistModal.classList.remove("active"); playlistModal.setAttribute("aria-hidden","true"); document.body.style.overflow = ""; } catch {}
+    try { if (!playlistModal) return; playlistModal.classList.remove("active"); playlistModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; } catch { }
   }
 
   async function eliminarPlaylist(id) {
     try {
-      const ok = await confirmar({ title:"¿Eliminar esta playlist?", message:"Se borrarán todas sus canciones del grupo.", variant:"danger", icon:"🎵", confirmText:"Sí, eliminar", cancelText:"Cancelar" });
+      const ok = await confirmar({ title: "¿Eliminar esta playlist?", message: "Se borrarán todas sus canciones del grupo.", variant: "danger", icon: "🎵", confirmText: "Sí, eliminar", cancelText: "Cancelar" });
       if (!ok) return;
       await eliminarPlaylistTabla(id);
       playlists = playlists.filter(p => p.id !== id);
       renderPlaylists();
-    } catch (err) { alertar({ title:"Error", message:"No se pudo eliminar: " + (err.message||err), variant:"danger" }); }
+    } catch (err) { alertar({ title: "Error", message: "No se pudo eliminar: " + (err.message || err), variant: "danger" }); }
   }
 
   function abrirCancionesModal(id) {
@@ -1149,12 +1148,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (cancionesModalTitle) cancionesModalTitle.textContent = pl.nombre;
       if (cancionesModalDesc) cancionesModalDesc.textContent = pl.descripcion || "";
       renderCancionesLista(); resetCancionTabs();
-      cancionesModal.classList.add("active"); cancionesModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
+      cancionesModal.classList.add("active"); cancionesModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
       setTimeout(() => cancionTitulo?.focus(), 100);
     } catch (err) { console.warn("abrirCancionesModal:", err); }
   }
   function cerrarCancionesModal() {
-    try { if (!cancionesModal) return; cancionesModal.classList.remove("active"); cancionesModal.setAttribute("aria-hidden","true"); document.body.style.overflow = ""; playlistEditando = null; } catch {}
+    try { if (!cancionesModal) return; cancionesModal.classList.remove("active"); cancionesModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; playlistEditando = null; } catch { }
   }
 
   function renderCancionesLista() {
@@ -1237,14 +1236,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!pl) return;
       const c = pl.canciones[index];
       if (c?.url?.startsWith("storage:")) {
-        try { await supabase.storage.from(BUCKET_CANCIONES).remove([c.url.replace(/^storage:/, "")]); } catch {}
+        try { await supabase.storage.from(BUCKET_CANCIONES).remove([c.url.replace(/^storage:/, "")]); } catch { }
       }
       const nuevas = pl.canciones.filter((_, i) => i !== index);
       await guardarCancionesTabla(pl.id, nuevas);
       pl.canciones = nuevas;
       renderCancionesLista(); renderPlaylists();
       window.dispatchEvent(new Event("sunadventures:progress"));
-    } catch (err) { alertar({ title:"Error", message:"No se pudo quitar la canción: " + (err.message||err), variant:"danger" }); }
+    } catch (err) { alertar({ title: "Error", message: "No se pudo quitar la canción: " + (err.message || err), variant: "danger" }); }
   }
 
   btnAddPlaylist?.addEventListener("click", abrirPlaylistModal);
@@ -1262,13 +1261,13 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     try {
       const nombre = playlistNombre?.value.trim() || "", descripcion = playlistDescripcion?.value.trim() || "";
-      if (!nombre) return alertar({ title:"Falta el nombre", message:"Ponle un nombre a la playlist.", icon:"🎵" });
+      if (!nombre) return alertar({ title: "Falta el nombre", message: "Ponle un nombre a la playlist.", icon: "🎵" });
       if (playlistSubmitBtn) { playlistSubmitBtn.disabled = true; playlistSubmitBtn.textContent = "Guardando..."; }
       try {
         const nueva = await añadirPlaylistTabla(nombre, descripcion, emojiSeleccionado, colorPlaylistSeleccionado);
-        playlists.unshift({ id:nueva.id, nombre:nueva.nombre, descripcion:nueva.descripcion, emoji:nueva.emoji, color:nueva.color, canciones:[], created_at:nueva.created_at });
+        playlists.unshift({ id: nueva.id, nombre: nueva.nombre, descripcion: nueva.descripcion, emoji: nueva.emoji, color: nueva.color, canciones: [], created_at: nueva.created_at });
         cerrarPlaylistModal(); renderPlaylists();
-      } catch (err) { alertar({ title:"No se pudo guardar", message:err.message || String(err), variant:"danger" }); if (playlistSubmitBtn) { playlistSubmitBtn.disabled = false; playlistSubmitBtn.textContent = "Guardar playlist"; } }
+      } catch (err) { alertar({ title: "No se pudo guardar", message: err.message || String(err), variant: "danger" }); if (playlistSubmitBtn) { playlistSubmitBtn.disabled = false; playlistSubmitBtn.textContent = "Guardar playlist"; } }
     } catch (err) { console.warn("playlist submit:", err); }
   });
 
@@ -1281,7 +1280,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const titulo = cancionTitulo?.value.trim() || "";
       const artista = cancionArtista?.value.trim() || "";
       const url = cancionUrl?.value.trim() || "";
-      if (!titulo) return alertar({ title:"Falta el título", message:"Ponle un título a la canción.", icon:"🎵" });
+      if (!titulo) return alertar({ title: "Falta el título", message: "Ponle un título a la canción.", icon: "🎵" });
 
       // Validar URL si la hay: solo Spotify o YouTube
       if (url && !identificarEnlaceMusical(url)) {
@@ -1298,7 +1297,7 @@ document.addEventListener("DOMContentLoaded", () => {
       pl.canciones = nuevas;
       renderCancionesLista(); renderPlaylists();
       cancionForm.reset(); cancionTitulo?.focus();
-    } catch (err) { alertar({ title:"Error", message:"No se pudo añadir: " + (err.message||err), variant:"danger" }); }
+    } catch (err) { alertar({ title: "Error", message: "No se pudo añadir: " + (err.message || err), variant: "danger" }); }
   });
 
   /* ---------- Pegar varias ---------- */
@@ -1325,14 +1324,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function parsearListaCanciones(texto, orden) {
     const resultado = [], seps = [" - ", " – ", " — ", " | ", "\t"];
-    (texto||"").split(/\r?\n/).forEach(raw => {
+    (texto || "").split(/\r?\n/).forEach(raw => {
       let linea = raw.trim();
       if (!linea || /^#EXT/i.test(linea)) return;
       if (/^[A-Za-z]:\\/.test(linea) || /^\/Users\//.test(linea) || /^\/(home|mnt|media)\//.test(linea)) return;
       if (/^(playlist|canciones|songs|tracklist|mi playlist|lista)\s*:?\s*$/i.test(linea)) return;
       linea = linea.replace(/^(?:#\d+|\d+\s*[\.\)\-:]\s*)/, "").replace(/^[•·*\-–—]\s*/, "");
       if (!linea) return;
-      if (/^https?:\/\/\S+$/i.test(linea)) { resultado.push({ titulo:"Canción", artista:"", url:linea }); return; }
+      if (/^https?:\/\/\S+$/i.test(linea)) { resultado.push({ titulo: "Canción", artista: "", url: linea }); return; }
       let url = "";
       const m = linea.match(/\s*[\(\[]?(https?:\/\/[^\s\)\]]+)[\)\]]?\s*$/i);
       if (m) { url = m[1]; linea = linea.replace(m[0], "").trim(); }
@@ -1388,15 +1387,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const pl = playlists.find(p => p.id === playlistEditando);
       if (!pl) return;
       const nuevas = parsearListaCanciones(cancionesPegarTexto.value, ordenSeleccionado());
-      if (nuevas.length === 0) return alertar({ title:"Sin canciones", message:"No se detectaron canciones válidas.", icon:"🎵" });
-      const ok = await confirmar({ title:"¿Importar canciones?", message:`Se añadirán <strong>${nuevas.length}</strong> canciones a <em>"${pl.nombre}"</em>.`, variant:"success", icon:"🎶", confirmText:"Importar", cancelText:"Cancelar" });
+      if (nuevas.length === 0) return alertar({ title: "Sin canciones", message: "No se detectaron canciones válidas.", icon: "🎵" });
+      const ok = await confirmar({ title: "¿Importar canciones?", message: `Se añadirán <strong>${nuevas.length}</strong> canciones a <em>"${pl.nombre}"</em>.`, variant: "success", icon: "🎶", confirmText: "Importar", cancelText: "Cancelar" });
       if (!ok) return;
       btnImportarCanciones.disabled = true; btnImportarCanciones.textContent = "Importando...";
       try {
         const actualizadas = [...pl.canciones, ...nuevas];
         await guardarCancionesTabla(pl.id, actualizadas); pl.canciones = actualizadas;
         renderCancionesLista(); renderPlaylists(); resetCancionTabs();
-      } catch (err) { alertar({ title:"Error", message:"No se pudo importar: " + (err.message||err), variant:"danger" }); }
+      } catch (err) { alertar({ title: "Error", message: "No se pudo importar: " + (err.message || err), variant: "danger" }); }
       finally { btnImportarCanciones.disabled = false; btnImportarCanciones.textContent = "Importar todas"; }
     } catch (err) { console.warn("importar:", err); }
   });
@@ -1414,7 +1413,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       if (!cancionesPegarTexto) return;
       const completo = textos.filter(Boolean).join("\n");
-      if (!completo.trim()) return alertar({ title:"Archivos vacíos", message:"Los archivos no contenían texto.", icon:"📄" });
+      if (!completo.trim()) return alertar({ title: "Archivos vacíos", message: "Los archivos no contenían texto.", icon: "📄" });
       const yaHay = cancionesPegarTexto.value.trim().length > 0;
       let final;
       if (yaHay) {
@@ -1446,14 +1445,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const archivos = Array.from(cancionPegarArchivo.files || []);
       if (!archivos.length) return;
       const textos = [], nombres = [];
-      for (const a of archivos) { try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size/1024).toFixed(1)} KB)`); } catch {} }
+      for (const a of archivos) { try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size / 1024).toFixed(1)} KB)`); } catch { } }
       aplicarArchivosCargados(textos, nombres); cancionPegarArchivo.value = "";
     } catch (err) { console.warn("cargar archivo:", err); }
   });
 
   if (cancionesPegarTexto) {
-    ["dragenter","dragover"].forEach(evt => cancionesPegarTexto.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); cancionesPegarTexto.classList.add("drag-over"); }));
-    ["dragleave","drop"].forEach(evt => cancionesPegarTexto.addEventListener(evt, e => {
+    ["dragenter", "dragover"].forEach(evt => cancionesPegarTexto.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); cancionesPegarTexto.classList.add("drag-over"); }));
+    ["dragleave", "drop"].forEach(evt => cancionesPegarTexto.addEventListener(evt, e => {
       e.preventDefault(); e.stopPropagation();
       if (evt === "dragleave" && e.relatedTarget && cancionesPegarTexto.contains(e.relatedTarget)) return;
       cancionesPegarTexto.classList.remove("drag-over");
@@ -1465,9 +1464,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const textos = [], nombres = [];
         for (const a of archivos) {
           if (!/\.(txt|csv|m3u|m3u8)$/i.test(a.name) && !a.type.startsWith("text/")) continue;
-          try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size/1024).toFixed(1)} KB)`); } catch {}
+          try { textos.push(await leerArchivoTexto(a)); nombres.push(`${a.name} (${(a.size / 1024).toFixed(1)} KB)`); } catch { }
         }
-        if (!textos.length) return alertar({ title:"Formatos no válidos", message:"Solo .txt, .csv, .m3u o .m3u8.", icon:"📄" });
+        if (!textos.length) return alertar({ title: "Formatos no válidos", message: "Solo .txt, .csv, .m3u o .m3u8.", icon: "📄" });
         aplicarArchivosCargados(textos, nombres);
       } catch (err) { console.warn("drop archivos:", err); }
     });
@@ -1483,7 +1482,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tituloDesdeArchivo = nombre => {
     try {
       const base = nombre.replace(/\.[^.]+$/, "");
-      const sep = [" - "," – "," — "].find(s => base.includes(s));
+      const sep = [" - ", " – ", " — "].find(s => base.includes(s));
       if (sep) {
         const p = base.split(sep).map(x => x.trim()).filter(Boolean);
         return { titulo: p[0] || base, artista: p.slice(1).join(" - ") || "" };
@@ -1499,7 +1498,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (archivosPendientes.some(p => p.file.name === f.name && p.file.size === f.size)) continue;
         const e = ext(f.name);
         if (!esAudio(e) && !esVideo(e)) continue;
-        archivosPendientes.push({ file:f, id:Math.random().toString(36).slice(2), estado:"pending" });
+        archivosPendientes.push({ file: f, id: Math.random().toString(36).slice(2), estado: "pending" });
       }
       renderColaArchivos(); actualizarBotonSubir();
     } catch (err) { console.warn("agregarArchivosACola:", err); }
@@ -1510,7 +1509,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!cancionSubirLista) return;
       cancionSubirLista.innerHTML = "";
       if (!archivosPendientes.length) return;
-      const textos = { pending:"Pendiente", uploading:"Subiendo...", done:"Listo", error:"Error" };
+      const textos = { pending: "Pendiente", uploading: "Subiendo...", done: "Listo", error: "Error" };
       const frag = document.createDocumentFragment();
       archivosPendientes.forEach(item => {
         const el = document.createElement("div"); el.className = "cancion-subir-item";
@@ -1535,8 +1534,8 @@ document.addEventListener("DOMContentLoaded", () => {
   cancionSubirArchivo?.addEventListener("change", () => { agregarArchivosACola(cancionSubirArchivo.files); cancionSubirArchivo.value = ""; });
 
   if (cancionSubirDropzone) {
-    ["dragenter","dragover"].forEach(evt => cancionSubirDropzone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); cancionSubirDropzone.classList.add("drag-over"); }));
-    ["dragleave","drop"].forEach(evt => cancionSubirDropzone.addEventListener(evt, e => {
+    ["dragenter", "dragover"].forEach(evt => cancionSubirDropzone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); cancionSubirDropzone.classList.add("drag-over"); }));
+    ["dragleave", "drop"].forEach(evt => cancionSubirDropzone.addEventListener(evt, e => {
       e.preventDefault(); e.stopPropagation();
       if (evt === "dragleave" && e.relatedTarget && cancionSubirDropzone.contains(e.relatedTarget)) return;
       cancionSubirDropzone.classList.remove("drag-over");
@@ -1546,7 +1545,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function subirArchivoACanciones(item, userId) {
     const e = ext(item.file.name) || "bin";
-    const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${e}`;
+    const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${e}`;
     const { error } = await supabase.storage.from(BUCKET_CANCIONES).upload(path, item.file, {
       contentType: item.file.type || "application/octet-stream",
       upsert: false
@@ -1559,8 +1558,8 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const pl = playlists.find(p => p.id === playlistEditando);
       if (!pl) return;
-      const { data:{ session } } = await supabase.auth.getSession();
-      if (!session) return alertar({ title:"Inicia sesión", message:"Necesitas una cuenta para subir archivos.", icon:"🔐" });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return alertar({ title: "Inicia sesión", message: "Necesitas una cuenta para subir archivos.", icon: "🔐" });
       const pendientes = archivosPendientes.filter(a => a.estado === "pending");
       if (!pendientes.length) return;
 
@@ -1607,7 +1606,7 @@ document.addEventListener("DOMContentLoaded", () => {
           icon: "🎵"
         });
       } catch (err) {
-        alertar({ title:"Error", message:"Error guardando en la playlist: " + (err.message||err), variant:"danger" });
+        alertar({ title: "Error", message: "Error guardando en la playlist: " + (err.message || err), variant: "danger" });
       } finally {
         btnSubirCanciones.disabled = false;
         btnSubirCanciones.textContent = "Subir todas";
@@ -1658,10 +1657,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function activarWakeLock() {
     if (!("wakeLock" in navigator)) return;
-    try { if (window._wakeLock) await window._wakeLock.release(); window._wakeLock = await navigator.wakeLock.request("screen"); } catch {}
+    try { if (window._wakeLock) await window._wakeLock.release(); window._wakeLock = await navigator.wakeLock.request("screen"); } catch { }
   }
   async function liberarWakeLock() {
-    if (window._wakeLock) { try { await window._wakeLock.release(); } catch {} window._wakeLock = null; }
+    if (window._wakeLock) { try { await window._wakeLock.release(); } catch { } window._wakeLock = null; }
   }
 
   function actualizarMediaSession(item) {
@@ -1678,7 +1677,7 @@ document.addEventListener("DOMContentLoaded", () => {
       navigator.mediaSession.setActionHandler("previoustrack", anteriorCancion);
       navigator.mediaSession.setActionHandler("nexttrack", () => siguienteCancion(true));
       navigator.mediaSession.playbackState = "playing";
-    } catch {}
+    } catch { }
   }
 
   /**
@@ -1850,7 +1849,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (globalAudio) { globalAudio.src = ""; globalAudio.currentTime = 0; }
     colaReproduccion = []; indiceReproduccion = -1;
     playerBar?.classList.remove("visible");
-    playerBar?.setAttribute("aria-hidden","true");
+    playerBar?.setAttribute("aria-hidden", "true");
     document.body.classList.remove("player-abierto", "player-playing");
     actualizarEstadoReproduciendo();
     liberarWakeLock();
@@ -1871,7 +1870,7 @@ document.addEventListener("DOMContentLoaded", () => {
   playerVolume?.addEventListener("input", () => {
     if (!globalAudio) return;
     const v = parseFloat(playerVolume.value);
-    window.dispatchEvent(new CustomEvent("sunadventures:volume-change", { detail:{ volume:v } }));
+    window.dispatchEvent(new CustomEvent("sunadventures:volume-change", { detail: { volume: v } }));
     window.SunPreferences?.setVolume(v);
     actualizarIconoVolumen();
   });
@@ -1930,19 +1929,19 @@ document.addEventListener("DOMContentLoaded", () => {
      ============================================================ */
   async function cargarEventos() {
     try {
-      const { data:{ session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) { eventos = []; return; }
-      const { data, error } = await supabase.from("eventos").select("id,titulo,descripcion,fecha,color,recordatorio_dias,recurrente").eq("user_id", session.user.id).order("fecha", { ascending:true });
+      const { data, error } = await supabase.from("eventos").select("id,titulo,descripcion,fecha,color,recordatorio_dias,recurrente").eq("user_id", session.user.id).order("fecha", { ascending: true });
       if (error) { eventos = []; return; }
-      eventos = (data||[]).map(e => ({ id:e.id, titulo:e.titulo, descripcion:e.descripcion, fecha:e.fecha, color:e.color||"amarillo", recordatorio_dias:e.recordatorio_dias ?? 1, recurrente:!!e.recurrente }));
+      eventos = (data || []).map(e => ({ id: e.id, titulo: e.titulo, descripcion: e.descripcion, fecha: e.fecha, color: e.color || "amarillo", recordatorio_dias: e.recordatorio_dias ?? 1, recurrente: !!e.recurrente }));
     } catch (err) { console.warn("cargarEventos:", err); eventos = []; }
   }
   const añadirEventoTabla = async (titulo, descripcion, fecha, color, recordatorio, recurrente) => {
-    const { data:{ session } } = await supabase.auth.getSession();
+    const { data: { session } } = await supabase.auth.getSession();
     if (!session) throw new Error("No hay sesión");
     const { data, error } = await supabase.from("eventos").insert({
-      user_id:session.user.id, titulo, descripcion:descripcion||null, fecha,
-      color:color||"amarillo", recordatorio_dias:recordatorio, recurrente
+      user_id: session.user.id, titulo, descripcion: descripcion || null, fecha,
+      color: color || "amarillo", recordatorio_dias: recordatorio, recurrente
     }).select().single();
     if (error) throw error;
     return data;
@@ -1992,17 +1991,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   function eventosDelDia(iso) { return eventos.filter(ev => { if (!ev.recurrente) return ev.fecha === iso; const [, mEv, dEv] = ev.fecha.split("-"); const [, mIso, dIso] = iso.split("-"); return mEv === mIso && dEv === dIso; }); }
   function proximaFechaEvento(ev) {
-    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
     const [y, m, d] = ev.fecha.split("-").map(Number);
     if (ev.recurrente) {
-      const este = new Date(hoy.getFullYear(), m-1, d);
-      return este < hoy ? new Date(hoy.getFullYear()+1, m-1, d) : este;
+      const este = new Date(hoy.getFullYear(), m - 1, d);
+      return este < hoy ? new Date(hoy.getFullYear() + 1, m - 1, d) : este;
     }
-    return new Date(y, m-1, d);
+    return new Date(y, m - 1, d);
   }
   const diasHasta = fecha => {
-    const h = new Date(); h.setHours(0,0,0,0);
-    const f = new Date(fecha); f.setHours(0,0,0,0);
+    const h = new Date(); h.setHours(0, 0, 0, 0);
+    const f = new Date(fecha); f.setHours(0, 0, 0, 0);
     return Math.round((f - h) / 86400000);
   };
 
@@ -2029,7 +2028,7 @@ document.addEventListener("DOMContentLoaded", () => {
       item.className = "cal-proximo-item color-" + ev.color;
       const fb = document.createElement("div"); fb.className = "cal-proximo-fecha";
       const dia = document.createElement("span"); dia.className = "cal-proximo-dia"; dia.textContent = proxima.getDate();
-      const mes = document.createElement("span"); mes.className = "cal-proximo-mes"; mes.textContent = MESES_LARGOS[proxima.getMonth()].slice(0,3);
+      const mes = document.createElement("span"); mes.className = "cal-proximo-mes"; mes.textContent = MESES_LARGOS[proxima.getMonth()].slice(0, 3);
       fb.append(dia, mes);
       const info = document.createElement("div"); info.className = "cal-proximo-info";
       const t = document.createElement("span"); t.className = "cal-proximo-titulo"; t.textContent = ev.titulo; info.appendChild(t);
@@ -2039,14 +2038,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (diff === 0) { cuando.classList.add("hoy"); cuando.textContent = "¡HOY!"; }
       else if (diff === 1) cuando.textContent = "Mañana";
       else if (diff < 7) cuando.textContent = `En ${diff} días`;
-      else if (diff < 30) cuando.textContent = `En ${Math.round(diff/7)} sem.`;
-      else cuando.textContent = `En ${Math.round(diff/30)} meses`;
+      else if (diff < 30) cuando.textContent = `En ${Math.round(diff / 7)} sem.`;
+      else cuando.textContent = `En ${Math.round(diff / 30)} meses`;
       const btn = crearBtn("cal-proximo-delete", SVG.close, "Eliminar fecha", e => { e.stopPropagation(); eliminarEvento(ev.id); });
       item.append(fb, info, cuando, btn);
       item.addEventListener("click", () => {
         mesMostrado = new Date(proxima.getFullYear(), proxima.getMonth(), 1);
         renderCalendario();
-        document.querySelector(".calendario-wrapper")?.scrollIntoView({ behavior:"smooth", block:"start" });
+        document.querySelector(".calendario-wrapper")?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
       return item;
     } catch (err) { console.warn("crearItemProximo:", err); return document.createElement("div"); }
@@ -2057,7 +2056,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function abrirEventoModal(fechaPrefill) {
     try {
       if (!eventoModal) return;
-      eventoModal.classList.add("active"); eventoModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
+      eventoModal.classList.add("active"); eventoModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
       eventoForm?.reset();
       colorEventoSeleccionado = "amarillo";
       document.querySelectorAll("#evento-form .color-option").forEach(o => o.classList.toggle("activo", o.dataset.color === "amarillo"));
@@ -2069,18 +2068,18 @@ document.addEventListener("DOMContentLoaded", () => {
   function cerrarEventoModal() {
     try {
       if (!eventoModal) return;
-      eventoModal.classList.remove("active"); eventoModal.setAttribute("aria-hidden","true"); document.body.style.overflow = "";
-    } catch {}
+      eventoModal.classList.remove("active"); eventoModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
+    } catch { }
   }
 
   async function eliminarEvento(id) {
     try {
-      const ok = await confirmar({ title:"¿Eliminar esta fecha?", message:"El evento se borrará del calendario.", variant:"danger", icon:"📅", confirmText:"Sí, eliminar", cancelText:"Cancelar" });
+      const ok = await confirmar({ title: "¿Eliminar esta fecha?", message: "El evento se borrará del calendario.", variant: "danger", icon: "📅", confirmText: "Sí, eliminar", cancelText: "Cancelar" });
       if (!ok) return;
       await eliminarEventoTabla(id);
       eventos = eventos.filter(e => e.id !== id);
       renderCalendario();
-    } catch (err) { alertar({ title:"Error", message:"No se pudo eliminar: " + (err.message||err), variant:"danger" }); }
+    } catch (err) { alertar({ title: "Error", message: "No se pudo eliminar: " + (err.message || err), variant: "danger" }); }
   }
 
   btnAddEvento?.addEventListener("click", () => abrirEventoModal());
@@ -2098,16 +2097,16 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const titulo = eventoTitulo?.value.trim() || "", descripcion = eventoDescripcion?.value.trim() || "", fecha = eventoFecha?.value || "";
       const recordatorio = parseInt(eventoRecordatorio?.value ?? "1", 10), recurrente = !!eventoRecurrente?.checked;
-      if (!titulo || !fecha) return alertar({ title:"Faltan datos", message:"Rellena título y fecha.", icon:"📅" });
+      if (!titulo || !fecha) return alertar({ title: "Faltan datos", message: "Rellena título y fecha.", icon: "📅" });
       if (eventoSubmitBtn) { eventoSubmitBtn.disabled = true; eventoSubmitBtn.textContent = "Guardando..."; }
       try {
         await pedirPermisoNotificacionesSilencioso();
         const nuevo = await añadirEventoTabla(titulo, descripcion, fecha, colorEventoSeleccionado, recordatorio, recurrente);
-        eventos.push({ id:nuevo.id, titulo:nuevo.titulo, descripcion:nuevo.descripcion, fecha:nuevo.fecha, color:nuevo.color, recordatorio_dias:nuevo.recordatorio_dias, recurrente:nuevo.recurrente });
+        eventos.push({ id: nuevo.id, titulo: nuevo.titulo, descripcion: nuevo.descripcion, fecha: nuevo.fecha, color: nuevo.color, recordatorio_dias: nuevo.recordatorio_dias, recurrente: nuevo.recurrente });
         eventos.sort((a, b) => a.fecha.localeCompare(b.fecha));
         cerrarEventoModal(); renderCalendario(); comprobarRecordatorios();
       } catch (err) {
-        alertar({ title:"No se pudo guardar", message:err.message || String(err), variant:"danger" });
+        alertar({ title: "No se pudo guardar", message: err.message || String(err), variant: "danger" });
         if (eventoSubmitBtn) { eventoSubmitBtn.disabled = false; eventoSubmitBtn.textContent = "Guardar fecha"; }
       }
     } catch (err) { console.warn("evento submit:", err); }
@@ -2127,11 +2126,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   async function pedirPermisoNotificacionesManual() {
     try {
-      if (!notifSoportadas()) return alertar({ title:"No compatible", message:"Tu navegador no soporta notificaciones.", icon:"🔕" });
+      if (!notifSoportadas()) return alertar({ title: "No compatible", message: "Tu navegador no soporta notificaciones.", icon: "🔕" });
       const r = await Notification.requestPermission();
       actualizarBotonNotifPermiso();
-      if (r === "granted") { alertar({ title:"¡Listo!", message:"Notificaciones activadas.", variant:"success", icon:"🔔" }); comprobarRecordatorios(); }
-      else if (r === "denied") alertar({ title:"Bloqueadas", message:"Has bloqueado las notificaciones. Actívalas desde la configuración del navegador.", variant:"warning", icon:"🔕" });
+      if (r === "granted") { alertar({ title: "¡Listo!", message: "Notificaciones activadas.", variant: "success", icon: "🔔" }); comprobarRecordatorios(); }
+      else if (r === "denied") alertar({ title: "Bloqueadas", message: "Has bloqueado las notificaciones. Actívalas desde la configuración del navegador.", variant: "warning", icon: "🔕" });
     } catch (err) { console.warn("pedirPermiso:", err); }
   }
   const actualizarBotonNotifPermiso = () => {
@@ -2156,7 +2155,7 @@ document.addEventListener("DOMContentLoaded", () => {
         else cuerpo = `Faltan ${diff} días · ` + (ev.descripcion || "");
         try {
           new Notification(ev.titulo, { body: cuerpo.trim(), icon: "img/girasol.jpg", tag: `evento-${ev.id}` });
-        } catch {}
+        } catch { }
       });
     } catch (err) { console.warn("comprobarRecordatorios:", err); }
   }
@@ -2185,7 +2184,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (logueado) {
         await asegurarGrupoActivo();
         try {
-          const { data:perfil } = await supabase.from("perfiles").select("username,avatar_url").eq("id", session.user.id).single();
+          const { data: perfil } = await supabase.from("perfiles").select("username,avatar_url").eq("id", session.user.id).single();
           if (perfil?.avatar_url) {
             const av = document.querySelector(".user-avatar");
             if (av) av.innerHTML = `<img src="${perfil.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
@@ -2195,7 +2194,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const ue = $("user-email"); if (ue) ue.textContent = perfil.username;
             const udn = $("user-dropdown-name"); if (udn) udn.textContent = perfil.username;
           }
-        } catch {}
+        } catch { }
         localStorage.setItem("sunadventures_uid", session.user.id);
         window._sunUserId = session.user.id;
         window.dispatchEvent(new Event("sunadventures:user-ready"));
@@ -2225,7 +2224,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   setTimeout(async () => {
     try {
-      const { data:{ session } } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       colaSesion = colaSesion.then(() => updateAuthUI(session)).catch(err => console.error(err));
     } catch (err) { console.error("getSession:", err); ocultarLoading(); }
   }, 100);
@@ -2238,16 +2237,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const recordar = $("auth-recordar");
       const guardado = localStorage.getItem("sunadventures_usuario_recordado");
       if (guardado && authUsername) { authUsername.value = guardado; if (recordar) recordar.checked = true; }
-      authModal.classList.add("active"); authModal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
+      authModal.classList.add("active"); authModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
       setTimeout(() => authUsername?.focus(), 100);
     } catch (err) { console.warn("abrirAuthModal:", err); }
   }
   function cerrarAuthModal() {
     try {
       if (!authModal) return;
-      authModal.classList.remove("active"); authModal.setAttribute("aria-hidden","true"); document.body.style.overflow = "";
+      authModal.classList.remove("active"); authModal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
       modoRegistro = false; if (authSubmit) authSubmit.disabled = false; authForm?.reset(); ocultarError(); setModoRegistro(false);
-    } catch {}
+    } catch { }
   }
   function setModoRegistro(activar) {
     modoRegistro = activar;
@@ -2322,13 +2321,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const abrirMenuPerfil = () => {
     if (!userDropdown || !userMenuToggle) return;
-    userDropdown.classList.add("open"); userDropdown.setAttribute("aria-hidden","false");
-    userMenuToggle.setAttribute("aria-expanded","true"); userInfo?.classList.add("open");
+    userDropdown.classList.add("open"); userDropdown.setAttribute("aria-hidden", "false");
+    userMenuToggle.setAttribute("aria-expanded", "true"); userInfo?.classList.add("open");
   };
   const cerrarMenuPerfil = () => {
     if (!userDropdown || !userMenuToggle) return;
-    userDropdown.classList.remove("open"); userDropdown.setAttribute("aria-hidden","true");
-    userMenuToggle.setAttribute("aria-expanded","false"); userInfo?.classList.remove("open");
+    userDropdown.classList.remove("open"); userDropdown.setAttribute("aria-hidden", "true");
+    userMenuToggle.setAttribute("aria-expanded", "false"); userInfo?.classList.remove("open");
   };
   userMenuToggle?.addEventListener("click", e => { e.stopPropagation(); userDropdown?.classList.contains("open") ? cerrarMenuPerfil() : abrirMenuPerfil(); });
   document.addEventListener("click", e => {
@@ -2348,17 +2347,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const msg = (uso.imagenes || uso.canciones)
           ? `Ya tienes descargado:<br>📸 ${uso.imagenes} imágenes<br>🎵 ${uso.canciones} canciones<br>💾 ${uso.tamanoMB} MB<br><br>¿Descargar de nuevo todo lo nuevo?`
           : "¿Descargar todas las imágenes y canciones para uso sin conexión?";
-        const ok = await confirmar({ title:"Descargar contenido", message:msg, variant:"success", icon:"📥", confirmText:"Descargar", cancelText:"Cancelar" });
+        const ok = await confirmar({ title: "Descargar contenido", message: msg, variant: "success", icon: "📥", confirmText: "Descargar", cancelText: "Cancelar" });
         if (ok) await window.SunOffline.descargarTodo();
       }
       cerrarMenuPerfil();
     });
   });
 
-const VISTAS = () => ["inicio","album","mapa","chat","logros","notas","playlists","calendario","mascotas","finanzas", ...(window._extraVistas || [])];
+  const VISTAS = () => ["inicio", "album", "mapa", "chat", "logros", "notas", "playlists", "calendario", "mascotas", "finanzas", ...(window._extraVistas || [])];
   const rutaDesdeHash = () => {
     const h = (location.hash || "").replace(/^#/, "").trim();
-    return VISTAS.includes(h) ? h : "inicio";
+    return VISTAS().includes(h) ? h : "inicio";
   };
 
   function mostrarVista(nombre) {
@@ -2368,11 +2367,11 @@ const VISTAS = () => ["inicio","album","mapa","chat","logros","notas","playlists
       document.querySelectorAll("[data-view-link]").forEach(el => el.classList.toggle("active", el.dataset.viewLink === nombre));
       if (userDropdown?.classList.contains("open")) cerrarMenuPerfil();
       if (nombre === "chat") { if (!grupoActivo) asegurarGrupoActivo().then(() => recargarChat()); else recargarChat(); }
-      else if (nombre === "logros") renderLogros({ notificar:false });
+      else if (nombre === "logros") renderLogros({ notificar: false });
       else if (nombre === "inicio") renderExperiencia();
       else if (nombre === "mapa") renderMapa();
       else if (nombre === "mascotas" && typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
-      window.scrollTo({ top:0, behavior:"smooth" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) { console.warn("mostrarVista:", err); }
   }
 
@@ -2398,7 +2397,7 @@ const VISTAS = () => ["inicio","album","mapa","chat","logros","notas","playlists
     for (const it of items) { if (it.type?.startsWith("image/")) { file = it.getAsFile(); if (file) break; } }
     if (!file) return;
     e.preventDefault();
-    try { const dt = new DataTransfer(); dt.items.add(file); inputPhoto.files = dt.files; } catch {}
+    try { const dt = new DataTransfer(); dt.items.add(file); inputPhoto.files = dt.files; } catch { }
     mostrarVistaPreviaFoto(file); actualizarVistaPreviaFotoInfo(); notifPegado();
   });
 
@@ -2415,7 +2414,7 @@ const VISTAS = () => ["inicio","album","mapa","chat","logros","notas","playlists
       const f = e.dataTransfer?.files?.[0];
       if (!f || !f.type.startsWith("image/")) return;
       e.preventDefault(); modalDrop.classList.remove("drag-foto");
-      try { const dt = new DataTransfer(); dt.items.add(f); inputPhoto.files = dt.files; } catch {}
+      try { const dt = new DataTransfer(); dt.items.add(f); inputPhoto.files = dt.files; } catch { }
       mostrarVistaPreviaFoto(f); actualizarVistaPreviaFotoInfo(); notifPegado();
     });
   }

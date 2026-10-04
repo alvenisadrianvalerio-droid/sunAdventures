@@ -475,13 +475,14 @@
     function terminar(gano) {
       activo = false;
       clearInterval(intervalo);
+      document.removeEventListener("keydown", o._onKey);
       const m = Math.max(1, puntos * 4);
       try { window._darPremio?.(m, Math.min(20, puntos * 2), `¡${puntos} hamburguesas! +${m}`); } catch {}
       snd("derrota");
 
       const panel = o.querySelector(".minijuego-panel");
       const r = document.createElement("div");
-      r.className = "minijuego-mensaje";
+      r.className = "minijuego-mensaje jm-final";
       r.innerHTML = `
         <div style="font-size:3.5rem;">${puntos >= 20 ? "🏆" : puntos >= 10 ? "🌟" : "🐍"}</div>
         <h2>${puntos >= 20 ? "¡Maestro serpiente!" : puntos >= 10 ? "¡Buen bocado!" : "¡Ups!"}</h2>
@@ -496,7 +497,6 @@
       r.querySelector("#snk-otra").addEventListener("click", () => {
         clearInterval(intervalo);
         clearInterval(o._tk);
-        document.removeEventListener("keydown", o._onKey);
         o.remove();
         setTimeout(juegoSnake, 100);
       });

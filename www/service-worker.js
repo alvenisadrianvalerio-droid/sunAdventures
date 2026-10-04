@@ -1,16 +1,15 @@
-const CACHE_NAME = "sunadventures-v85";
+const CACHE_NAME = "sunadventures-v97";
 const ASSETS_ESTATICOS = [
-  "./","./index.html","./styles.css","./album.css","./juegos.css",
-  "./rpg.css","./rpg-loot.css","./temas.css","./finanzas.css",
-  "./juegos.css","./youtube-spotify-metadata.js",
-  "./script.js","./album.js","./preferences.js","./finanzas.js","./icons-emojis.js","./juegos.js",
-  "./ds.js","./offline.js","./tienda.js","./perfil.js","./logros-extra.js",
-  "./sprites-config.js","./efectos.js","./rpg.js","./rpg-loot.js",
-  "./rpg-canvas.js","./rpg-habilidades.js","./rpg-minimap.js",
-  "./rpg-roguelike.js","./desafios-diarios.js","./mejoras.js","./parches-v2.js","./parches-v3.js",
-  "./manifest.json","./img/girasol-loading.png",
+  "./", "./index.html", "./styles.css", "./album.css", "./juegos.css",
+  "./rpg.css", "./rpg-loot.css", "./temas.css", "./finanzas.css",
+  "./youtube-spotify-metadata.js",
+  "./script.js", "./album.js", "./preferences.js", "./finanzas.js", "./icons-emojis.js", "./juegos.js",
+  "./ds.js", "./offline.js", "./tienda.js", "./perfil.js", "./logros-extra.js",
+  "./sprites-config.js", "./efectos.js", "./rpg.js", "./rpg-loot.js",
+  "./rpg-canvas.js", "./rpg-habilidades.js", "./rpg-minimap.js",
+  "./rpg-roguelike.js", "./desafios-diarios.js", "./mejoras.js", "./parches-v2.js", "./parches-v3.js",
+  "./manifest.json", "./img/girasol-loading.png",
   "./img/items%20de%20aventura/icon.png",
-  "./img/items%20de%20aventura/armadura.png",
   "./img/items%20de%20aventura/dado.png",
   "./img/items%20de%20aventura/hamburguesa.png",
   "./img/items%20de%20aventura/mapa.png",
@@ -22,8 +21,8 @@ const ASSETS_ESTATICOS = [
   "./img/items%20de%20aventura/estrella.png",
   "./img/items%20de%20aventura/corona.png",
   "./img/rpg/items/cofre-madera.png",
-  "./img/tienda/admurin-items.png","./img/tienda/comida-sheet.png","./img/tienda/tienda-sheet.png",
-  "./img/rpg/loot-1.png","./img/rpg/loot-2.png",
+  "./img/tienda/admurin-items.png", "./img/tienda/comida-sheet.png", "./img/tienda/tienda-sheet.png",
+  "./img/rpg/loot-1.png", "./img/rpg/loot-2.png",
   "./img/biomas/gen-02a9154e-49f2-4451-b734-a787ce316fd5.png",
   "./img/biomas/gen-3b1ee61a-d08b-44bc-a27b-9c56f5e009ef.png",
   "./img/biomas/gen-54356df9-2637-441f-96a0-4742f61f6a57.png",
@@ -45,15 +44,15 @@ const ASSETS_ESTATICOS = [
 // ... resto igual
 
 const HOSTS_EXTERNOS = [
-  "supabase.co","supabase.in","unpkg.com","jsdelivr.net",
-  "openstreetmap.org","googleapis.com","gstatic.com","purgomalum.com"
+  "supabase.co", "supabase.in", "unpkg.com", "jsdelivr.net",
+  "openstreetmap.org", "googleapis.com", "gstatic.com", "purgomalum.com"
 ];
 
 self.addEventListener("install", (e) => {
   self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE_NAME).then((c) =>
-      Promise.all(ASSETS_ESTATICOS.map((u) => c.add(u).catch(() => {})))
+      Promise.all(ASSETS_ESTATICOS.map((u) => c.add(u).catch(() => { })))
     )
   );
 });
@@ -73,16 +72,16 @@ self.addEventListener("push", event => {
     try { data = event.data?.json() || {}; }
     catch (error) {
       console.error("No se pudo leer la notificación push:", error);
-      data = { title:"SunAdventures", body:event.data?.text() || "" };
+      data = { title: "SunAdventures", body: event.data?.text() || "" };
     }
     await self.registration.showNotification(data.title || "SunAdventures", {
-      body:data.body || "",
-      icon:"./img/girasol-loading.png",
-      badge:"./img/girasol-loading.png",
-      image:data.image,
-      tag:data.tag,
-      silent:data.silent === true,
-      data:{ url:data.url || "./#finanzas" }
+      body: data.body || "",
+      icon: "./img/girasol-loading.png",
+      badge: "./img/girasol-loading.png",
+      image: data.image,
+      tag: data.tag,
+      silent: data.silent === true,
+      data: { url: data.url || "./#finanzas" }
     });
   })());
 });
@@ -91,7 +90,7 @@ self.addEventListener("notificationclick", event => {
   event.notification.close();
   const target = new URL(event.notification.data?.url || "./#finanzas", self.registration.scope).href;
   event.waitUntil((async () => {
-    const windows = await self.clients.matchAll({ type:"window", includeUncontrolled:true });
+    const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
     for (const client of windows) {
       if (client.url.startsWith(self.location.origin) && "focus" in client) {
         await client.navigate(target);
@@ -120,7 +119,7 @@ self.addEventListener("fetch", (event) => {
       try {
         const red = await fetch(req);
         if (red && red.status === 200) {
-          caches.open(CACHE_NAME).then((c) => c.put(req, red.clone())).catch(() => {});
+          caches.open(CACHE_NAME).then((c) => c.put(req, red.clone())).catch(() => { });
         }
         return red;
       } catch {
@@ -133,7 +132,7 @@ self.addEventListener("fetch", (event) => {
     try {
       const red = await fetch(req);
       if (red && red.status === 200 && red.type === "basic") {
-        caches.open(CACHE_NAME).then((c) => c.put(req, red.clone())).catch(() => {});
+        caches.open(CACHE_NAME).then((c) => c.put(req, red.clone())).catch(() => { });
       }
       return red;
     } catch {

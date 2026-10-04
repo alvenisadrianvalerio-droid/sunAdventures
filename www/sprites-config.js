@@ -6,7 +6,7 @@
   /* ---------- HOJA PRINCIPAL ---------- */
   // ⚠️ Ajusta estas 3 cosas según tu archivo real:
   window.SPRITE_SHEET = {
-    url:  "img/tienda/admurin-items.png",   // ← ruta de tu sprite sheet
+    url: "img/tienda/admurin-items.png",   // ← ruta de tu sprite sheet
     cols: 30,                                 // ← nº de columnas (ajústalo)
     rows: 110                                 // ← nº de filas (ajústalo)
   };
@@ -63,13 +63,13 @@
 
   /* ---------- APLICADOR AUTOMÁTICO ----------
      Recorre TIENDA_ITEMS y POOL aplicando sprites si existen en los mapas. */
-    window._aplicarSpritesAutomaticos = function () {
+  window._aplicarSpritesAutomaticos = function () {
     const mapas = {
-      comida:  window.SPRITE_MAP_COMIDA,
-      cabeza:  window.SPRITE_MAP_CABEZA,
-      cuello:  window.SPRITE_MAP_CUELLO,
-      ojos:    window.SPRITE_MAP_OJOS,
-      fondos:  window.SPRITE_MAP_FONDOS,
+      comida: window.SPRITE_MAP_COMIDA,
+      cabeza: window.SPRITE_MAP_CABEZA,
+      cuello: window.SPRITE_MAP_CUELLO,
+      ojos: window.SPRITE_MAP_OJOS,
+      fondos: window.SPRITE_MAP_FONDOS,
       efectos: window.SPRITE_MAP_EFECTOS
     };
 
@@ -82,7 +82,7 @@
           Object.entries(mapa || {}).forEach(([id, coords]) => {
             if (T[cat][id] && Array.isArray(coords) && coords.length === 2) {
               T[cat][id].sprite = coords;
-              T[cat][id].sheet  = "main";
+              T[cat][id].sheet = "main";
             }
           });
         });
@@ -98,7 +98,7 @@
           const coords = mapa[it.id];
           if (Array.isArray(coords) && coords.length === 2) {
             it.sprite = coords;
-            it.sheet  = "main";
+            it.sheet = "main";
           }
           // ⚡ Si NO está mapeado: no tocamos su sprite ni su sheet
           //    → sigue usando el sheet RPG pequeño original

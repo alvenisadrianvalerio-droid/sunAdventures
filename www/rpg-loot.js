@@ -59,9 +59,10 @@
     raro:       { prob:0.24,  label:"Raro",       color:"#6cb8ff", glow:"rgba(108,184,255,.5)" },
     epico:      { prob:0.095, label:"Épico",      color:"#a684f0", glow:"rgba(166,132,240,.6)" },
     legendario: { prob:0.040, label:"Legendario", color:"#ffd93d", glow:"rgba(255,217,61,.7)" },
-    mitico:     { prob:0.005, label:"Mítico",     color:"#ff6b9d", glow:"rgba(255,107,157,.8)" }
+    mitico:     { prob:0.005, label:"Mítico",     color:"#ff6b9d", glow:"rgba(255,107,157,.8)" },
+    tornasol:   { prob:0.001, label:"Tornasol",   color:"#b0f5ff", glow:"rgba(176,245,255,.9)" }
   };
-  const ORDEN_RAREZAS = ["comun","raro","epico","legendario","mitico"];
+  const ORDEN_RAREZAS = ["comun","raro","epico","legendario","mitico","tornasol"];
   const PROB_REROLL_RAREZA = { misma:0.94, sube1:0.05, sube2:0.005, baja1:0.005 };
   const CALIDADES = {
     normal:    { label:"Normal",    mult:1.0, icon:"" },
@@ -356,11 +357,33 @@
       document.body.appendChild(m);
       m.addEventListener("click", e => { if (e.target === m || e.target.classList.contains("rpg-loot-modal-close")) m.classList.remove("active"); });
     }
-    m.querySelector(".rpg-loot-modal-panel").className = "rpg-loot-modal-panel rar-" + item.rar;
+    m.querySelector(".rpg-loot-modal-panel").className = "rpg-loot-modal-panel rar-" + (item.rar || "comun");
     m.querySelector(".rpg-loot-modal-icon").innerHTML = renderIcono(item, "96px");
-    m.querySelector(".rpg-loot-modal-rarity").innerHTML = `${RAREZAS[item.rar].label} &nbsp;<span class="loot-cal-badge cal-${item.calidad || "normal"}">${cal.icon} ${cal.label}</span>`;
+    const rarInfo = RAREZAS[item.rar] || { label: item.rar || "Común" };
+    m.querySelector(".rpg-loot-modal-rarity").innerHTML = `${rarInfo.label} &nbsp;<span class="loot-cal-badge cal-${item.calidad || "normal"}">${cal.icon} ${cal.label}</span>`;
     m.querySelector(".rpg-loot-modal-nombre").textContent = item.nombre;
-    m.querySelector(".rpg-loot-modal-desc").textContent = `+${v} ${item.tipo.toUpperCase()}`;
+    
+    // Estadísticas y descripción
+    let statsTexto = item.desc ? `<div style="font-size:.82rem;opacity:.9;margin-bottom:.5rem;font-style:italic;">"${item.desc}"</div>` : "";
+    if (item.stats && Object.keys(item.stats).length > 0) {
+      const statsList = Object.entries(item.stats).map(([k, val]) => `<span style="display:inline-block;padding:.15rem .45rem;margin:.15rem;border-radius:6px;background:rgba(255,255,255,.08);font-size:.75rem;font-weight:700;">+${val} ${k.toUpperCase()}</span>`).join("");
+      statsTexto += `<div style="margin-bottom:.5rem;">${statsList}</div>`;
+    } else {
+      statsTexto += `+${v} ${item.tipo.toUpperCase()}`;
+    }
+
+    // Habilidades mapeadas
+    if (Array.isArray(item.habilidades) && item.habilidades.length > 0) {
+      statsTexto += `<div style="margin-top:.6rem;padding:.5rem;background:rgba(166,132,240,.12);border:1px solid rgba(166,132,240,.3);border-radius:8px;text-align:left;">
+        <div style="font-size:.7rem;font-weight:900;text-transform:uppercase;color:#c4a5ff;margin-bottom:.3rem;display:flex;align-items:center;gap:5px;">
+          <img src="img/sprites complementarios/estrella.png" alt="" style="width:14px;height:14px;object-fit:contain;display:inline-block;">
+          <span>HABILIDADES:</span>
+        </div>
+        ${item.habilidades.map(h => `<div style="font-size:.75rem;margin-bottom:.2rem;"><strong>${h.nombre}</strong> <span style="opacity:.7;">(${h.tipo})</span>: <small style="opacity:.85;">${h.desc || ''}</small></div>`).join("")}
+      </div>`;
+    }
+
+    m.querySelector(".rpg-loot-modal-desc").innerHTML = statsTexto;
     m.querySelector(".rpg-loot-modal-tipo").textContent = item.consumible ? `Consumible · Tienes ×${cant}` : "Pasivo · bonus permanente aplicado";
     const acc = m.querySelector(".rpg-loot-modal-acciones");
     acc.innerHTML = "";
@@ -390,7 +413,96 @@
     if (window.hidratarIconos) window.hidratarIconos(m);
   }
 
-  /* ---------- Reroll ---------- */
+  /* ---------- Mini Pop-up / Tooltip (Hover & Tap) ---------- */
+  let tooltipEl = null;
+  function getTooltipEl() {
+    if (!tooltipEl) {
+      tooltipEl = document.createElement("div");
+      tooltipEl.id = "rpg-item-tooltip";
+      tooltipEl.className = "rpg-item-tooltip";
+      document.body.appendChild(tooltipEl);
+    }
+    return tooltipEl;
+  }
+
+  function mostrarTooltipItem(item, x, y) {
+    const tip = getTooltipEl();
+    const rar = RAREZAS[item.rar] || { label: item.rar || "Común", color: "#ffd93d", glow: "rgba(255,217,61,.3)", prob: 0.1 };
+    const cal = CALIDADES[item.calidad || "normal"] || { label: "Normal", icon: "" };
+    const dropPct = (rar.prob * 100).toFixed(1);
+
+    tip.style.setProperty("--rar-color", rar.color || "#ffd93d");
+    tip.style.setProperty("--rar-glow", rar.glow || "rgba(255,217,61,.3)");
+
+    let statsHtml = "";
+    if (item.stats && Object.keys(item.stats).length > 0) {
+      statsHtml = Object.entries(item.stats).map(([k, val]) => `<span class="rpg-item-tooltip-stat-tag">+${val} ${k.toUpperCase()}</span>`).join("");
+    } else {
+      const v = item.valFinal || item.val || 0;
+      statsHtml = `<span class="rpg-item-tooltip-stat-tag">+${v} ${(item.tipo || "UTIL").toUpperCase()}</span>`;
+    }
+
+    let habsHtml = "";
+    if (Array.isArray(item.habilidades) && item.habilidades.length > 0) {
+      habsHtml = `
+        <div class="rpg-item-tooltip-habs">
+          <div class="rpg-item-tooltip-hab-title" style="display:flex;align-items:center;gap:4px;">
+            <img src="img/sprites complementarios/estrella.png" alt="" style="width:13px;height:13px;object-fit:contain;display:inline-block;">
+            <span>Habilidades:</span>
+          </div>
+          ${item.habilidades.map(h => `<div class="rpg-item-tooltip-hab-item"><strong>${h.nombre}</strong> <span style="opacity:.7">(${h.tipo})</span>: <span>${h.desc || ''}</span></div>`).join("")}
+        </div>
+      `;
+    }
+
+    tip.innerHTML = `
+      <div class="rpg-item-tooltip-header">
+        <div class="rpg-item-tooltip-icon">${renderIcono(item, "32px")}</div>
+        <div class="rpg-item-tooltip-titles">
+          <div class="rpg-item-tooltip-name">${item.nombre}</div>
+          <div class="rpg-item-tooltip-tags">
+            <span>${rar.label}</span>
+            <span>· ${cal.icon} ${cal.label}</span>
+          </div>
+        </div>
+      </div>
+      <div class="rpg-item-tooltip-drop">🎲 Drop rate: ${dropPct}%</div>
+      ${item.desc ? `<div class="rpg-item-tooltip-desc">"${item.desc}"</div>` : ""}
+      <div class="rpg-item-tooltip-stats">${statsHtml}</div>
+      ${habsHtml}
+    `;
+
+    tip.classList.add("active");
+
+    // Posicionar respecto a x, y de forma segura dentro de la ventana
+    const rect = tip.getBoundingClientRect();
+    const w = rect.width || 280, h = rect.height || 180;
+    let posX = x + 14;
+    let posY = y + 14;
+
+    if (posX + w > window.innerWidth - 12) posX = window.innerWidth - w - 12;
+    if (posX < 12) posX = 12;
+    if (posY + h > window.innerHeight - 12) posY = y - h - 14;
+    if (posY < 12) posY = 12;
+
+    tip.style.left = `${posX}px`;
+    tip.style.top = `${posY}px`;
+  }
+
+  function ocultarTooltipItem() {
+    if (tooltipEl) {
+      tooltipEl.classList.remove("active");
+      tooltipEl.dataset.currentId = "";
+    }
+  }
+
+  // Cerrar al tocar fuera o hacer scroll
+  document.addEventListener("scroll", ocultarTooltipItem, true);
+  document.addEventListener("pointerdown", e => {
+    if (!e.target.closest(".rpg-coleccion-item") && !e.target.closest("#rpg-item-tooltip")) {
+      ocultarTooltipItem();
+    }
+  });
   const COSTO_REROLL = { comun:100, raro:500, epico:2500, legendario:12000, mitico:50000 };
 
   const moverRareza = (actual, delta) => {
@@ -592,12 +704,12 @@
     let grid = "";
     pool.forEach(p => {
       const t = loot[p.id] || 0;
-      grid += `<div class="rpg-coleccion-item rar-${p.rar}${t ? "" : " bloqueado"}" data-id="${p.id}" title="${t ? p.nombre + (p.consumible ? " (usable)" : "") : "???"} (${RAREZAS[p.rar].label})">${renderIcono(p)}${t ? `<span class="rpg-coleccion-cant">×${t}</span>` : ""}</div>`;
+      grid += `<div class="rpg-coleccion-item rar-${p.rar || "comun"}${t ? "" : " bloqueado"}" data-id="${p.id}">${renderIcono(p)}${t ? `<span class="rpg-coleccion-cant">×${t}</span>` : ""}</div>`;
     });
 
     c.innerHTML = `
       <div class="rpg-coleccion-header">
-        <span class="rpg-coleccion-titulo">🎒 Colección</span>
+        <span class="rpg-coleccion-titulo"><img src="img/sprites complementarios/libro.png" alt="" style="width:20px;height:20px;vertical-align:-3px;object-fit:contain;margin-right:6px;display:inline-block;">Colección</span>
         <span class="rpg-coleccion-count">${uniq} / ${POOL.length} · ${total} objetos</span>
       </div>
       <div class="rpg-col-filtros">
@@ -608,10 +720,40 @@
 
     if (window.hidratarIconos) window.hidratarIconos(c);
     qsa(".rpg-col-filtro[data-cat]", c).forEach(b => b.addEventListener("click", () => { filtro = b.dataset.cat; renderColeccion(); }));
-    qsa(".rpg-coleccion-item", c).forEach(el => el.addEventListener("click", () => {
+    
+    // Mini pop-up tooltip en hover / tap y detalle modal en click
+    qsa(".rpg-coleccion-item", c).forEach(el => {
       const it = POOL.find(p => p.id === el.dataset.id);
-      if (it) mostrarDetalleItem(it);
-    }));
+      if (!it) return;
+
+      el.addEventListener("pointerenter", e => {
+        if (e.pointerType === "mouse") mostrarTooltipItem(it, e.clientX, e.clientY);
+      });
+      el.addEventListener("mousemove", e => {
+        mostrarTooltipItem(it, e.clientX, e.clientY);
+      });
+      el.addEventListener("pointerleave", () => {
+        ocultarTooltipItem();
+      });
+
+      // En dispositivos táctiles (o click/tap directo)
+      el.addEventListener("click", e => {
+        // En móvil/touch, el primer tap muestra el tooltip si no está activo, o abre el modal si se pulsa dos veces / click directo
+        if (window.matchMedia("(hover: none)").matches) {
+          const tip = getTooltipEl();
+          const activo = tip.classList.contains("active") && tip.dataset.currentId === it.id;
+          if (!activo) {
+            e.stopPropagation();
+            tip.dataset.currentId = it.id;
+            const rect = el.getBoundingClientRect();
+            mostrarTooltipItem(it, rect.left + rect.width / 2, rect.bottom + 8);
+            return;
+          }
+        }
+        ocultarTooltipItem();
+        mostrarDetalleItem(it);
+      });
+    });
 
     $("btn-reroll-cat")?.addEventListener("click", async () => {
       const r = await rerollCategoria(filtro);
