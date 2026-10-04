@@ -31,13 +31,31 @@
       if (!inner) return;
       // Añadir icono decorativo
       const h2 = inner.querySelector("h2");
-      if (h2 && !h2.querySelector(".v3-icon")) {
-        const ico = document.createElement("span");
-        ico.className = "v3-icon";
-        ico.style.cssText = "display:inline-block;font-size:2.6rem;margin-bottom:.4rem;";
+      if (h2 && !h2.querySelector(".v3-icon") && !inner.classList.contains("rpg-rl-tienda")) {
         const txt = h2.textContent || "";
-        ico.textContent = /caído|muerto|derrota/i.test(txt) ? "💀" : /victoria/i.test(txt) ? "🏆" : /recompensa/i.test(txt) ? "🎁" : "✨";
-        h2.prepend(document.createElement("br"), ico, document.createElement("br"));
+        const isDerrota = /caído|muerto|derrota/i.test(txt);
+        const isVictoria = /victoria/i.test(txt);
+        const isRec = /recompensa/i.test(txt);
+
+        if (isDerrota || isRec) {
+          const ico = document.createElement("span");
+          ico.className = "v3-icon";
+          ico.style.cssText = "display:inline-block;font-size:2.6rem;margin-bottom:.4rem;";
+          ico.textContent = isDerrota ? "💀" : "🎁";
+          h2.prepend(document.createElement("br"), ico, document.createElement("br"));
+        } else {
+          // Victoria: trofeo; eventos u otros modales: reloj de arena
+          const img = document.createElement("img");
+          img.className = "v3-icon";
+          img.src = isVictoria
+            ? "img/sprites%20complementarios/trofeo.png"
+            : inner.classList.contains("rpg-rl-eleccion")
+              ? "img/sprites%20complementarios/estrella.png"
+              : "img/sprites%20complementarios/reloj%20de%20arena.png";
+          img.alt = "";
+          img.style.cssText = "display:inline-block;width:3rem;height:3rem;object-fit:contain;margin-bottom:.4rem;filter:drop-shadow(0 6px 14px rgba(255,217,61,.6));";
+          h2.prepend(document.createElement("br"), img, document.createElement("br"));
+        }
       }
       // Estilizar lista
       const ul = inner.querySelector("ul");

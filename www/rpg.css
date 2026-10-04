@@ -215,13 +215,320 @@
   filter: drop-shadow(0 6px 12px rgba(0,0,0,.4));
 }
 .rpg-fighter-sprite.enemigo {
-  filter: hue-rotate(-20deg) saturate(1.3);
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,.6));
 }
-.rpg-fighter-sprite.golpeado { animation: rpgGolpe .35s ease; }
-@keyframes rpgGolpe {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-6px) rotate(-3deg); }
-  75% { transform: translateX(6px) rotate(3deg); }
+.rpg-mob-animado {
+  image-rendering: pixelated;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,.5));
+  transform-origin: center center;
+}
+.rpg-sprite-thumb-48 {
+  border-radius: 6px;
+  vertical-align: middle;
+}
+
+/* Keyframes para los ciclos idle de animación de mobs 48x48 */
+/* 4 frames dentro de una hoja de 6 columnas (0, 1, 2, 3): 0% a 80% con steps(4) */
+@keyframes anim-mob-idle-4-of-6 {
+  from { background-position-x: 0%; }
+  to   { background-position-x: 80%; }
+}
+/* 7 frames dentro de una hoja de 9 columnas (0..6): 0% a 87.5% con steps(7) */
+@keyframes anim-mob-idle-7-of-9 {
+  from { background-position-x: 0%; }
+  to   { background-position-x: 87.5%; }
+}
+/* 4 frames dentro de una hoja de 10 columnas (0..3): 0% a 44.444% con steps(4) */
+@keyframes anim-mob-idle-4-of-10 {
+  from { background-position-x: 0%; }
+  to   { background-position-x: 44.444%; }
+}
+/* 3 frames de 3 columnas (Orbinauts): 0% a 150% steps(3) */
+@keyframes anim-mob-idle-3-of-3 {
+  from { background-position-x: 0%; }
+  to   { background-position-x: 150%; }
+}
+/* 4 frames dentro de 8 columnas (Vehículos): 0% a 57.143% con steps(4) */
+@keyframes anim-mob-idle-4-of-8 {
+  from { background-position-x: 0%; }
+  to   { background-position-x: 57.143%; }
+}
+
+/* Fallback genérico para otros */
+@keyframes anim-mob-4 {
+  from { background-position-x: 0%; }
+  to   { background-position-x: 133.333%; }
+}
+@keyframes anim-mob-6 {
+  from { background-position-x: 0%; }
+  to   { background-position-x: 120%; }
+}
+
+/* Cuando el enemigo recibe daño: pausar ciclo idle y saltar directamente al frame de daño */
+.rpg-fighter-sprite.golpeado .rpg-mob-animado,
+.rpg-mob-animado.herido {
+  animation: none !important;
+  background-position-x: var(--mob-hurt-x, 80%) !important;
+  filter: drop-shadow(0 0 14px rgba(255, 60, 60, 0.9)) brightness(1.25) !important;
+  transform: scale(0.94) !important;
+  transition: transform 0.08s ease, filter 0.08s ease;
+}
+
+/* Jefe en batalla: ilustración completa escalada y con animación de respiración */
+.rpg-boss-animado {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  display: block;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.7));
+  animation: rpgBossIdle 2.8s ease-in-out infinite alternate;
+  transform-origin: center bottom;
+}
+@keyframes rpgBossIdle {
+  0%   { transform: translateY(0) scale(1); }
+  50%  { transform: translateY(-4px) scale(1.02); }
+  100% { transform: translateY(-7px) scale(1.04); }
+}
+.rpg-fighter-sprite.golpeado .rpg-boss-animado {
+  filter: drop-shadow(0 0 20px rgba(255, 50, 50, 0.95)) brightness(1.4) !important;
+  transform: scale(0.92) !important;
+}
+
+/* Animaciones de la mascota en combate */
+.rpg-fighter-sprite.hero-pet {
+  perspective: 600px;
+}
+.rpg-pet-avatar-combat {
+  animation: animPetCombatIdle 2.2s ease-in-out infinite alternate;
+  transform-origin: center bottom;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.45));
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+@keyframes animPetCombatIdle {
+  0%   { transform: translateY(0) scale(1) rotate(0deg); }
+  50%  { transform: translateY(-4px) scale(1.03) rotate(-1.5deg); }
+  100% { transform: translateY(-7px) scale(1.05) rotate(1.5deg); }
+}
+
+/* Ataque de la mascota: embestida hacia adelante con estiramiento e impacto */
+.rpg-fighter-sprite.atacando .rpg-pet-avatar-combat,
+.rpg-fighter-sprite.atacando {
+  animation: animPetLunge 0.38s cubic-bezier(0.18, 0.89, 0.32, 1.28) !important;
+}
+@keyframes animPetLunge {
+  0%   { transform: translateX(0) scale(1); }
+  35%  { transform: translateX(-14px) scale(0.92); }
+  65%  { transform: translateX(38px) scale(1.18) rotate(4deg); filter: brightness(1.25) drop-shadow(0 0 12px var(--accent, #ffd84d)); }
+  100% { transform: translateX(0) scale(1) rotate(0deg); }
+}
+
+/* Recibir daño de la mascota */
+.rpg-fighter-sprite.golpeado .rpg-pet-avatar-combat {
+  animation: animPetHurt 0.35s ease !important;
+  filter: brightness(1.4) drop-shadow(0 0 12px rgba(255, 60, 60, 0.9)) !important;
+}
+@keyframes animPetHurt {
+  0%, 100% { transform: translateX(0) scale(1); }
+  25% { transform: translateX(-10px) rotate(-6deg) scale(0.9); }
+  50% { transform: translateX(8px) rotate(4deg) scale(0.95); }
+  75% { transform: translateX(-4px) rotate(-2deg); }
+}
+
+/* Cuadrícula de Hordas (9 enemigos en 3x3) */
+.rpg-fighter-sprite.es-horda {
+  width: 150px;
+  height: 150px;
+  max-width: 150px;
+  max-height: 150px;
+  background: radial-gradient(circle at 50% 50%, rgba(255,84,112,.12), transparent 75%);
+  padding: 4px;
+}
+.rpg-horda-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+.rpg-horda-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 44px);
+  grid-template-rows: repeat(3, 44px);
+  gap: 3px;
+  justify-content: center;
+  align-items: center;
+}
+.rpg-horda-item {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform 0.2s ease, opacity 0.3s ease, filter 0.3s ease;
+}
+.rpg-horda-item:hover {
+  transform: scale(1.12);
+  z-index: 2;
+}
+.rpg-horda-item.caido {
+  opacity: 0.22;
+  filter: grayscale(1) blur(0.5px);
+  transform: scale(0.8);
+  pointer-events: none;
+}
+.rpg-horda-item-hp {
+  width: 32px;
+  height: 3px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 1px;
+}
+.rpg-horda-item-hp > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #ff5470, #ffd84d);
+  transition: width 0.25s ease;
+}
+.rpg-horda-contador {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #ff9a3d;
+  background: rgba(0,0,0,0.5);
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,154,61,0.3);
+}
+
+/* Panel Modal de Fin de Combate */
+.rpg-fin-combate-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(10, 10, 18, 0.88);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  border-radius: 20px;
+  animation: rpgFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 1.5rem;
+}
+.rpg-fin-combate-card {
+  background: linear-gradient(145deg, rgba(28, 28, 45, 0.95), rgba(18, 18, 30, 0.98));
+  border: 2px solid rgba(255, 216, 77, 0.4);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 24px rgba(255, 216, 77, 0.2);
+  border-radius: 18px;
+  padding: 1.8rem 2rem;
+  text-align: center;
+  max-width: 380px;
+  width: 100%;
+  animation: rpgFinPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.rpg-fin-combate-overlay.derrota .rpg-fin-combate-card {
+  border-color: rgba(255, 84, 112, 0.4);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 24px rgba(255, 84, 112, 0.2);
+}
+@keyframes rpgFinPop {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.rpg-fin-icono {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+}
+.rpg-fin-titulo {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+  color: #ffd84d;
+}
+.rpg-fin-combate-overlay.derrota .rpg-fin-titulo {
+  color: #ff5470;
+}
+.rpg-fin-sub {
+  font-size: 0.88rem;
+  opacity: 0.8;
+  margin-bottom: 1rem;
+}
+.rpg-fin-recompensas {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 0.8rem;
+}
+.rpg-fin-badge {
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+}
+.rpg-fin-badge.xp {
+  background: rgba(129, 221, 255, 0.18);
+  color: #81ddff;
+  border: 1px solid rgba(129, 221, 255, 0.4);
+}
+.rpg-fin-badge.oro {
+  background: rgba(255, 216, 77, 0.18);
+  color: #ffd84d;
+  border: 1px solid rgba(255, 216, 77, 0.4);
+}
+.rpg-fin-badge.oro.perdidas {
+  background: rgba(255, 84, 112, 0.18);
+  color: #ff7a9c;
+  border: 1px solid rgba(255, 84, 112, 0.4);
+}
+.rpg-fin-extra {
+  font-size: 0.78rem;
+  color: #4dd48e;
+  margin-bottom: 0.8rem;
+  font-weight: 700;
+}
+.rpg-fin-subio {
+  font-size: 0.88rem;
+  color: #ffae3d;
+  font-weight: 900;
+  margin-bottom: 0.8rem;
+}
+.rpg-fin-botones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+.rpg-fin-botones .rpg-btn.primaria {
+  background: linear-gradient(135deg, #ff7a9c, #ff5470);
+  color: #fff;
+  font-weight: 900;
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255, 84, 112, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.rpg-fin-botones .rpg-btn.primaria:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 84, 112, 0.6);
+}
+.rpg-fin-botones .rpg-btn.secundaria {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ddd;
+  font-weight: 700;
+  padding: 0.65rem 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.rpg-fin-botones .rpg-btn.secundaria:hover {
+  background: rgba(255, 255, 255, 0.16);
 }
 .rpg-fighter-nombre { font-weight: 900; font-size: .9rem; margin-bottom: .3rem; }
 .rpg-fighter-hp {
@@ -887,6 +1194,9 @@ svg.rpg-popup-svg,
 }
 .rpg-rl-fighter-info strong { display: block; margin-bottom: .25rem; font-size: .85rem; color: var(--accent); }
 .rpg-rl-fighter-info.enemigo { text-align: right; }
+.rpg-rl-enemigo-header { display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem; margin-bottom: 0.25rem; }
+.rpg-rl-enemigo-header strong { margin-bottom: 0; }
+.rpg-rl-hud-thumb { width: 28px; height: 28px; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); flex-shrink: 0; }
 .rpg-rl-intencion {
   display: inline-flex; margin-top: .4rem; padding: .25rem .55rem;
   border: 1px solid rgba(255,122,156,.4); border-radius: 999px;
@@ -1150,4 +1460,68 @@ svg.rpg-popup-svg,
   display: block;
   image-rendering: auto;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,.5));
-}
+}
+
+/* ===== Tienda compacta ===== */
+.rpg-rl-recompensa-card.rpg-rl-tienda {
+  max-width: 360px !important;
+  padding: .8rem .8rem .9rem !important;
+}
+.rpg-rl-tienda .rpg-rl-tienda-header-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+  margin-bottom: .6rem; padding-bottom: .5rem;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.rpg-rl-tienda .rpg-rl-tienda-header-bar h2 { font-size: 1.1rem !important; margin: 0 !important; }
+.rpg-rl-tienda .rpg-rl-tienda-title-icon { width: 1.4em; height: 1.4em; vertical-align: -.3em; }
+.rpg-rl-tienda .rpg-rl-tienda-lista {
+  max-height: 52vh; overflow-y: auto;
+  display: flex; flex-direction: column; gap: .4rem; margin-bottom: .7rem;
+}
+.rpg-rl-tienda .rpg-rl-tienda-item {
+  display: grid !important;
+  grid-template-columns: 38px 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center; column-gap: .6rem; row-gap: .1rem;
+  padding: .5rem .6rem !important; min-height: 0 !important;
+  text-align: left;
+}
+.rpg-rl-tienda .rpg-rl-tienda-ico {
+  grid-row: 1 / 3; width: 38px !important; height: 38px !important;
+  object-fit: contain; font-size: 1.6rem; line-height: 38px; text-align: center;
+}
+.rpg-rl-tienda .rpg-rl-tienda-item strong { grid-column: 2; font-size: .85rem; line-height: 1.2; }
+.rpg-rl-tienda .rpg-rl-tienda-item small { grid-column: 2; font-size: .72rem; opacity: .75; }
+.rpg-rl-tienda .rpg-rl-tienda-item em {
+  grid-column: 3; grid-row: 1 / 3;
+  display: inline-flex; align-items: center; gap: .25rem;
+  font-style: normal; font-weight: 800; white-space: nowrap;
+}
+.rpg-rl-tienda .rl-coin { width: 16px; height: 16px; object-fit: contain; vertical-align: -3px; }
+.rpg-rl-tienda .rpg-rl-tienda-oro { display: inline-flex; align-items: center; gap: .3rem; }
+
+/* ===== Elección de reliquia compacta ===== */
+.rpg-rl-recompensa-card.rpg-rl-eleccion {
+  max-width: 360px !important;
+  padding: .9rem .8rem !important;
+}
+.rpg-rl-eleccion h2 { font-size: 1.15rem !important; margin-bottom: .6rem !important; }
+.rpg-rl-eleccion .v3-icon { width: 2.2rem !important; height: 2.2rem !important; }
+.rpg-rl-eleccion .rpg-rl-eleccion-lista {
+  display: flex; flex-direction: column; gap: .4rem;
+  max-height: 55vh; overflow-y: auto;
+}
+.rpg-rl-eleccion .rpg-rl-opcion-reliquia {
+  display: grid !important;
+  grid-template-columns: 40px 1fr;
+  grid-template-rows: auto auto;
+  align-items: center; column-gap: .6rem;
+  padding: .5rem .7rem !important; min-height: 0 !important;
+  text-align: left;
+}
+.rpg-rl-eleccion .rpg-rl-opcion-ico {
+  grid-row: 1 / 3; width: 40px !important; height: 40px !important;
+  object-fit: contain; font-size: 1.6rem; line-height: 40px; text-align: center;
+}
+.rpg-rl-eleccion .rpg-rl-opcion-reliquia strong { font-size: .88rem; }
+.rpg-rl-eleccion .rpg-rl-opcion-reliquia small { font-size: .74rem; opacity: .8; }

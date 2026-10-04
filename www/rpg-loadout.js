@@ -245,6 +245,14 @@
         });
 
         let html = "";
+        const RL = window.RpgLoot;
+        const calidadesDef = {
+            normal: { label: "Normal", icon: "" },
+            reforzado: { label: "Reforzado", icon: "⚡" },
+            impecable: { label: "Impecable", icon: "✨" },
+            ancestral: { label: "Ancestral", icon: "🔥" }
+        };
+
         Object.entries(grupos).forEach(([tipo, habs]) => {
             html += `<div class="rpg-loadout-grupo">
         <div class="rpg-loadout-grupo-titulo">${tipo.replace(/_/g, " ")}</div>
@@ -253,14 +261,43 @@
                 const key = `${h.itemId}::${h.nombre}`;
                 const activa = loadoutKeys.includes(key);
                 const bloqueada = !activa && equipadas.length >= MAX_HABS;
+                
+                // Buscar el item asociado para obtener nombre, sprite, calidad y rareza
+                const it = RL?.POOL?.find(p => p.id === h.itemId);
+                const calKey = it?.calidad || "normal";
+                const calInfo = calidadesDef[calKey] || { label: "Normal", icon: "" };
+                const rarLabel = it?.rar ? it.rar.toUpperCase() : "";
+
+                // Render icono / sprite del arma
+                let itemVisual = "";
+                if (it && window.renderSprite && Array.isArray(it.sprite)) {
+                    itemVisual = window.renderSprite(it.sprite[0], it.sprite[1], 24);
+                } else if (it && RL?.renderIcono) {
+                    itemVisual = RL.renderIcono(it, "24px");
+                }
+
                 return `
               <button type="button" class="rpg-loadout-item${activa ? " activa" : ""}${bloqueada ? " bloqueada" : ""}" 
                 data-item-id="${h.itemId}" data-nombre="${h.nombre}" ${bloqueada ? "disabled" : ""}>
                 <span class="rpg-loadout-item-check">${activa ? "✓" : "+"}</span>
-                <span class="rpg-loadout-item-info">
-                  <strong>${h.nombre}</strong>
-                  <small>${h.desc || h.tipo}</small>
-                </span>
+                <div class="rpg-loadout-item-body">
+                  <div class="rpg-loadout-item-info">
+                    <strong>${h.nombre}</strong>
+                    <small>${h.desc || h.tipo}</small>
+                  </div>
+                  ${it ? `
+                    <div class="rpg-loadout-item-origen">
+                      <div class="rpg-loadout-item-arma rar-${it.rar || "comun"}">
+                        <span class="rpg-loadout-arma-icon">${itemVisual}</span>
+                        <span class="rpg-loadout-arma-nombre">${it.nombre}</span>
+                      </div>
+                      <span class="rpg-loadout-calidad-badge cal-${calKey}">
+                        ${calInfo.icon ? `<span class="rpg-loadout-cal-icon">${calInfo.icon}</span>` : ""}
+                        <span>${calInfo.label}</span>
+                      </span>
+                    </div>
+                  ` : ""}
+                </div>
               </button>
             `;
             }).join("")}
@@ -483,27 +520,27 @@
     .rpg-loadout-item {
       display: grid;
       grid-template-columns: 32px 1fr;
-      gap: .6rem;
+      gap: .75rem;
       align-items: center;
-      padding: .6rem .7rem;
-      border-radius: 10px;
+      padding: .65rem .8rem;
+      border-radius: 12px;
       border: 1.5px solid rgba(255,255,255,.1);
-      background: rgba(0,0,0,.25);
+      background: rgba(0,0,0,.28);
       color: #fff;
       font-family: inherit;
       cursor: pointer;
       text-align: left;
-      transition: all .18s;
+      transition: all .18s ease;
     }
     .rpg-loadout-item:hover:not(:disabled) {
       border-color: rgba(166,132,240,.5);
-      background: rgba(166,132,240,.1);
-      transform: translateX(3px);
+      background: rgba(166,132,240,.12);
+      transform: translateX(2px);
     }
     .rpg-loadout-item.activa {
       border-color: #a684f0;
-      background: linear-gradient(135deg, rgba(166,132,240,.25), rgba(166,132,240,.08));
-      box-shadow: 0 0 14px rgba(166,132,240,.3);
+      background: linear-gradient(135deg, rgba(166,132,240,.28), rgba(166,132,240,.1));
+      box-shadow: 0 0 16px rgba(166,132,240,.3);
     }
     .rpg-loadout-item.bloqueada {
       opacity: .35;
@@ -512,37 +549,136 @@
     .rpg-loadout-item-check {
       display: grid;
       place-items: center;
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       border: 1.5px solid rgba(255,255,255,.2);
       background: rgba(255,255,255,.05);
       font-weight: 900;
       font-size: .85rem;
       color: rgba(255,255,255,.5);
+      flex-shrink: 0;
     }
     .rpg-loadout-item.activa .rpg-loadout-item-check {
       border-color: #a684f0;
       background: #a684f0;
       color: #fff;
+      box-shadow: 0 0 10px rgba(166,132,240,.5);
+    }
+
+    /* Layout interno flexible y responsive */
+    .rpg-loadout-item-body {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: .8rem;
+      min-width: 0;
     }
     .rpg-loadout-item-info {
       display: flex;
       flex-direction: column;
-      gap: .1rem;
+      gap: .15rem;
       min-width: 0;
+      flex: 1;
     }
     .rpg-loadout-item-info strong {
-      font-size: .85rem;
+      font-size: .88rem;
       font-weight: 800;
+      color: #fff;
+      letter-spacing: .01em;
     }
     .rpg-loadout-item-info small {
-      font-size: .68rem;
-      opacity: .65;
+      font-size: .72rem;
+      opacity: .72;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    /* Arma y Calidad */
+    .rpg-loadout-item-origen {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      flex-shrink: 0;
+    }
+    .rpg-loadout-item-arma {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.14);
+      padding: .2rem .5rem;
+      border-radius: 8px;
+      max-width: 170px;
+    }
+    .rpg-loadout-arma-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .rpg-loadout-arma-icon .loot-sprite,
+    .rpg-loadout-arma-icon .sprite-item {
+      transform: scale(.85);
+    }
+    .rpg-loadout-arma-nombre {
+      font-size: .74rem;
+      font-weight: 800;
+      color: #e8ecf2;
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+    .rpg-loadout-item-arma.rar-comun { border-color: rgba(201,201,201,.4); color: #c9c9c9; }
+    .rpg-loadout-item-arma.rar-raro { border-color: rgba(108,184,255,.5); color: #6cb8ff; }
+    .rpg-loadout-item-arma.rar-epico { border-color: rgba(166,132,240,.5); color: #c4a5ff; }
+    .rpg-loadout-item-arma.rar-legendario { border-color: rgba(255,217,61,.5); color: #ffd93d; }
+    .rpg-loadout-item-arma.rar-mitico { border-color: rgba(255,107,157,.6); color: #ff6b9d; }
+    .rpg-loadout-item-arma.rar-tornasol { border-color: rgba(176,245,255,.7); color: #b0f5ff; }
+
+    /* Calidad Badge */
+    .rpg-loadout-calidad-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .25rem;
+      font-size: .66rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      padding: .2rem .45rem;
+      border-radius: 6px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.12);
+      color: #b0b8c4;
       white-space: nowrap;
     }
+    .rpg-loadout-calidad-badge.cal-normal {
+      background: rgba(255,255,255,.05);
+      border-color: rgba(255,255,255,.15);
+      color: #a0a6b5;
+    }
+    .rpg-loadout-calidad-badge.cal-reforzado {
+      background: rgba(108,184,255,.15);
+      border-color: rgba(108,184,255,.45);
+      color: #6cb8ff;
+    }
+    .rpg-loadout-calidad-badge.cal-impecable {
+      background: rgba(255,217,61,.15);
+      border-color: rgba(255,217,61,.45);
+      color: #ffd93d;
+    }
+    .rpg-loadout-calidad-badge.cal-ancestral {
+      background: rgba(255,107,157,.18);
+      border-color: rgba(255,107,157,.5);
+      color: #ff6b9d;
+    }
+    .rpg-loadout-cal-icon {
+      font-size: .75rem;
+      line-height: 1;
+    }
+
     .rpg-loadout-modal-vacio {
       text-align: center;
       padding: 2rem 1rem;
@@ -576,6 +712,40 @@
     .rpg-loadout-modal-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 18px rgba(255,217,61,.5);
+    }
+
+    /* Adaptabilidad Responsive */
+    @media (max-width: 640px) {
+      .rpg-loadout-modal-card {
+        width: 96vw;
+        max-height: 92vh;
+        border-radius: 16px;
+      }
+      .rpg-loadout-modal-header {
+        padding: 1rem 1.1rem .5rem;
+      }
+      .rpg-loadout-modal-hint {
+        margin: .4rem 1.1rem;
+      }
+      .rpg-loadout-modal-lista {
+        padding: 0 1rem .6rem;
+      }
+      .rpg-loadout-item-body {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: .45rem;
+      }
+      .rpg-loadout-item-origen {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+      .rpg-loadout-item-arma {
+        max-width: 100%;
+      }
+      .rpg-loadout-modal-footer {
+        padding: .8rem 1.1rem;
+      }
     }
 
     @media (max-width: 520px) {

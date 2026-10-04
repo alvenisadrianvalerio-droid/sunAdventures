@@ -18,15 +18,7 @@
     if (!window.Rpg) return false;
     const zonas = window.Rpg.zonas;
     if (!zonas?.length) return false;
-    window._rpgZonaDesbloqueada = function(id) {
-      const z = zonas.find(x => x.id === id);
-      if (!z) return false;
-      if (z.orden === 1) return true;
-      const st = window.Rpg.state();
-      const nivel = st.nivel || 1;
-      const derr  = st.enemigosDerrotados || 0;
-      return nivel >= z.nivel - 3 || derr >= z.nivel * 2;
-    };
+    // Respetar la progresión estricta canónica definida en rpg.js
     return true;
   }
   let _t=0; const _i=setInterval(()=>{ if (patchZonas() || ++_t>50) clearInterval(_i); }, 300);

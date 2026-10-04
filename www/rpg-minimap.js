@@ -210,7 +210,7 @@
     const jefesDerrotados = jefes.filter(z => (st.jefesDerrotados || []).includes(z.id)).length;
     const zonasGanadas = new Set(st.zonasConquistadas || []);
     const escapar = value => String(value ?? "").replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" })[ch]);
-    const desbloqueada = z => window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(z.id) : ((st.nivel || 1) >= z.nivel - 2 || (st.enemigosDerrotados || 0) >= z.nivel * 5);
+    const desbloqueada = z => window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(z.id) : (z.orden === 1 || zonasGanadas.has(zonas.find(x => x.orden === z.orden - 1)?.id));
     const gruposHtml = grupos.map((g, gi) => {
       const bioma = g.bioma || {};
       const imagen = bioma.imagen || "";

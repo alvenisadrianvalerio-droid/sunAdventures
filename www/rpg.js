@@ -18,51 +18,306 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const FX = det => window.dispatchEvent(new CustomEvent("rpg:fx", { detail: det }));
   const FX_KEY = id => (window.RpgCanvas?.HABILIDAD_FX?.[id]) || "slash";
 
-  const DIR_NEW = 'img/sprites%20complementarios/', DIR_OLD = 'img/items%20de%20aventura/';
+  const DIR_48 = 'img/48x48/';
   const SPR_ENEMIGO = {
-    abeja: "araña", mariposa: "flor", caracol: "lentitud", pajaro: "tengu", conejo: "colmillo", lagarto: "dragon", pulpo: "kraken", tortuga: "golem", "dragon-bebe": "dragon",
-    jirafa: "leon", hamburguesa: "icon", girasol: "girasol", hongo: "seta", escorpion: "scorpion", serpiente: "serpiente", escarabajo: "scorpion",
-    "lobo-hielo": "lobo", "oso-polar": "lobo", "elemental-hielo": "hielo", "golem-lava": "golem", salamandra: "dragon", "fenix-joven": "fuego",
-    esqueleto: "calavera", momia: "calavera", gargola: "demonio", "sapo-gigante": "rana", cocodrilo: "dragon", "bruja-pantano": "mago",
-    "golem-cristal": "golem", murcielago: "murcielago", espectro: "fantasma", grifo: "leon", quimera: "oni", "elemental-aire": "orbe",
-    sirena: "kraken", "kraken-joven": "kraken", tiburon: "kraken", "espectro-negro": "fantasma", vampiro: "vampiro", nigromante: "mago",
-    "robot-guardia": "golem", dron: "ojo", "mech-gigante": "golem", "dragon-rojo": "dragon", "senor-abismo": "demonio",
-    "girasol-anciano": "girasol", "arbol-ancestral": "arbol", "reina-cristal": "corona", faraon: "corona", "rey-glaciar": "corona",
-    lich: "calavera", "senor-sombras": "demonio", jaguar: "leon", "mono-loco": "tengu", "serpiente-emplumada": "serpiente",
-    "planta-carnivora": "brote", "tucan-sombrio": "tengu", "chaman-jaguar": "mago", "tigre-espiritu": "leon", "tarantula-gigante": "araña", "senor-selva": "corona",
-    "rana-venenosa": "rana", "cocodrilo-muerto": "zombie", "serpiente-veneno": "serpiente", "espectro-fango": "fantasma", "hechicero-pantano": "mago",
-    "rey-ranas": "rana", "treant-podrido": "arbol", "diosa-pantano": "corona", yeti: "troll", "lobo-blanco": "lobo", "gigante-hielo": "troll",
-    "rey-yeti": "troll", "quimera-nieve": "oni", "dragon-blanco-joven": "dragon", "titan-glaciar": "corona", harpia: "tengu", "angel-caido": "demonio",
-    "halcon-gigante": "tengu", serafin: "estrella", "quimera-alada": "oni", "dragon-tormenta": "dragon", "dios-cielo": "corona",
-    "demonio-menor": "demonio", "alma-perdida": "fantasma", "cerberus-cachorro": "lobo", succubus: "demonio", "espectro-fuego": "fuego",
-    "senor-demonio": "demonio", "lich-infierno": "calavera", "dragon-negro": "dragon", "senor-inframundo": "corona", horror: "demonio",
-    aberracion: "oni", "ojo-vacio": "ojo", tentaculo: "kraken", "sombra-vacia": "fantasma", "caballero-vacio": "espada",
-    "titan-vacio": "golem", "dragon-vacio": "dragon", "el-vacio": "corona"
+    // --- Murciélagos (Bats) ---
+    "murcielago-comun": "Bats/Bat 01 48.png",
+    "murcielago-vampiro": "Bats/Bat 02 48.png",
+    "murcielago-abismal": "Bats/Bat 03 48.png",
+    // --- Hongos (Fungi) ---
+    "hongo-espora": "Fungi/Fungus 01 48.png",
+    "hongo-venenoso": "Fungi/Fungus 02 48.png",
+    "hongo-alucinogeno": "Fungi/Fungus 03 48.png",
+    "hongo-anciano": "Fungi/Fungus 04 48.png",
+    // --- Fantasmas (Ghosts) ---
+    "espectro-errante": "Ghosts/Ghost 01 48.png",
+    "fantasma-vengativo": "Ghosts/Ghost 02 48.png",
+    "alma-en-pena": "Ghosts/Ghost 03 48.png",
+    // --- Orbinautas (Orbinauts) ---
+    "orbinauta-azul": "Orbinauts/Orbinaut 01 48.png",
+    "orbinauta-fuego": "Orbinauts/Orbinaut 02 48.png",
+    "orbinauta-electrico": "Orbinauts/Orbinaut 03 48.png",
+    "orbinauta-vacio": "Orbinauts/Orbinaut 04 48.png",
+    // --- Orcos (Orcs) ---
+    "orco-guerrero": "Orcs/Enemy Orc 01 48.png",
+    // --- Ratas (Rats) ---
+    "rata-de-cloaca": "Rats/Rat 01 48.png",
+    "rata-rabiosa": "Rats/Rat 02 48.png",
+    "rata-plagada": "Rats/Rat 03 48.png",
+    // --- Esqueletos (Skeletons) ---
+    "esqueleto-soldado": "Skeletons/Skeleton 01 48.png",
+    "esqueleto-arquero": "Skeletons/Skeleton 02 48.png",
+    "esqueleto-armadurado": "Skeletons/Skeleton 03 48.png",
+    // --- Slimes bebés y normales (Slimes) ---
+    "slime-bebe-verde": "Slimes/Baby Slime 01 48.png",
+    "slime-bebe-azul": "Slimes/Baby Slime 02 48.png",
+    "slime-bebe-rojo": "Slimes/Baby Slime 03 48.png",
+    "slime-bebe-dorado": "Slimes/Baby Slime 04 48.png",
+    "slime-verde": "Slimes/Slime 01 48.png",
+    "slime-azul": "Slimes/Slime 02 48.png",
+    "slime-rojo": "Slimes/Slime 03 48.png",
+    "slime-dorado": "Slimes/Slime 04 48.png",
+    // --- Serpientes (Snakes) ---
+    "serpiente-cascabel": "Snakes/Snake 01 48.png",
+    "serpiente-esmeralda": "Snakes/Snake 02 48.png",
+    "serpiente-coral": "Snakes/Snake 03 48.png",
+    // --- Zombis (Zombies) ---
+    "zombi-podrido": "Zombies/Zombie 01 48.png",
+    "zombi-infectado": "Zombies/Zombie 02 48.png",
+    "zombi-voraz": "Zombies/Zombie 03 48.png",
+    // --- Vehículos y Objetos Mágicos ---
+    "vagoneta-poseida": "Vehicles/Minecart 01 48.png",
+    "espada-viviente": "Weapons/Sword 01 48.png",
+    // --- Jefes (Bosses) ---
+    "reina-arana": "Bosses/arana.png",
+    "demonio-ancestral": "Bosses/demonio.png",
+    "dragon-supremo": "Bosses/dragon.png",
+    "golem-colosal": "Bosses/golem.png",
+    "kraken-abisal": "Bosses/kraken.png",
+    "rey-bestia-leon": "Bosses/leon.png",
+    "lobo-alfa-ancestral": "Bosses/lobo.png",
+    "archimago-oscuro": "Bosses/mago.webp",
+    "sapo-gigante-rey": "Bosses/rana.png",
+    "rey-rata": "Bosses/rata.png",
+    "escorpion-emperador": "Bosses/scorpion.png",
+    "gran-serpiente-antigua": "Bosses/serpiente.webp",
+    "senor-tengu": "Bosses/tengu.png",
+    "troll-titánico": "Bosses/troll.webp",
+    "lord-vampiro": "Bosses/vampiro.png",
+    "patriarca-zombi": "Bosses/zombie.png"
   };
-  const SPR_REGION = { praderas: "girasol", bosque: "arbol", cueva: "orbe", desierto: "fuego", glaciar: "hielo", volcan: "fuego", ruinas: "corona", sombras: "luna", abismo: "corona", selva: "arbol", pantano: "rana", tundra: "hielo", cielo: "estrella", inframundo: "demonio", vacio: "ojo" };
 
-  function spriteHtml(nombre, cls = "rpg-sprite-img", alt = "") {
-    if (!nombre) return "";
-    const ext = ["mago", "murcielago", "serpiente", "troll"].includes(nombre) ? ".webp" : ".png";
-    return `<img class="${cls}" src="${DIR_NEW}${nombre}${ext}" alt="${alt}" loading="lazy" decoding="async" data-fallback="${DIR_OLD}${nombre}.png" onerror="if(this.dataset.fallback){this.onerror=null;this.src=this.dataset.fallback;}">`;
+  const SPR_REGION = {
+    praderas: "Bosses/arana.png",
+    bosque: "Bosses/rana.png",
+    cueva: "Bosses/golem.png",
+    desierto: "Bosses/scorpion.png",
+    glaciar: "Bosses/lobo.png",
+    volcan: "Bosses/dragon.png",
+    ruinas: "Bosses/mago.webp",
+    sombras: "Bosses/vampiro.png",
+    abismo: "Bosses/demonio.png",
+    selva: "Bosses/leon.png",
+    pantano: "Bosses/zombie.png",
+    tundra: "Bosses/troll.webp",
+    cielo: "Bosses/tengu.png",
+    inframundo: "Bosses/serpiente.webp",
+    vacio: "Bosses/kraken.png"
+  };
+
+  // Metadatos de columnas y filas (de 48x48 px por frame)
+  // Las últimas 2 columnas de las hojas de 6, 9 y 10 cols corresponden a los frames de recibir daño (hurt).
+  const SPRITE_METADATA_48 = {
+    // Bats (9 cols x 4 rows) -> Primeros 7 frames idle (0..6), cols 7 y 8 hurt
+    "Bats/Bat 01 48.png": { cols: 9, rows: 4, idleFrames: 7, hurtCol: 7, animKey: "anim-mob-idle-7-of-9", fps: 8 },
+    "Bats/Bat 02 48.png": { cols: 9, rows: 4, idleFrames: 7, hurtCol: 7, animKey: "anim-mob-idle-7-of-9", fps: 8 },
+    "Bats/Bat 03 48.png": { cols: 9, rows: 4, idleFrames: 7, hurtCol: 7, animKey: "anim-mob-idle-7-of-9", fps: 8 },
+    // Fungi (6 cols x 8 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
+    "Fungi/Fungus 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
+    "Fungi/Fungus 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
+    "Fungi/Fungus 03 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
+    "Fungi/Fungus 04 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
+    // Ghosts (6 cols x 4 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
+    "Ghosts/Ghost 01 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
+    "Ghosts/Ghost 02 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
+    "Ghosts/Ghost 03 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
+    // Orbinauts (3 cols x 1 row) -> 3 frames de giro normal
+    "Orbinauts/Orbinaut 01 48.png": { cols: 3, rows: 1, idleFrames: 3, hurtCol: 1, animKey: "anim-mob-idle-3-of-3", fps: 6 },
+    "Orbinauts/Orbinaut 02 48.png": { cols: 3, rows: 1, idleFrames: 3, hurtCol: 1, animKey: "anim-mob-idle-3-of-3", fps: 6 },
+    "Orbinauts/Orbinaut 03 48.png": { cols: 3, rows: 1, idleFrames: 3, hurtCol: 1, animKey: "anim-mob-idle-3-of-3", fps: 6 },
+    "Orbinauts/Orbinaut 04 48.png": { cols: 3, rows: 1, idleFrames: 3, hurtCol: 1, animKey: "anim-mob-idle-3-of-3", fps: 6 },
+    // Orcs (10 cols x 16 rows) -> Primeros 4 frames idle (0..3), cols 8 y 9 hurt (daño)
+    "Orcs/Enemy Orc 01 48.png": { cols: 10, rows: 16, idleFrames: 4, hurtCol: 8, animKey: "anim-mob-idle-4-of-10", fps: 6 },
+    // Rats (6 cols x 8 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
+    "Rats/Rat 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
+    "Rats/Rat 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
+    "Rats/Rat 03 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
+    // Skeletons (10 cols x 16 rows) -> Primeros 4 frames idle (0..3), cols 8 y 9 hurt (daño)
+    "Skeletons/Skeleton 01 48.png": { cols: 10, rows: 16, idleFrames: 4, hurtCol: 8, animKey: "anim-mob-idle-4-of-10", fps: 6 },
+    "Skeletons/Skeleton 02 48.png": { cols: 10, rows: 16, idleFrames: 4, hurtCol: 8, animKey: "anim-mob-idle-4-of-10", fps: 6 },
+    "Skeletons/Skeleton 03 48.png": { cols: 10, rows: 16, idleFrames: 4, hurtCol: 8, animKey: "anim-mob-idle-4-of-10", fps: 6 },
+    // Slimes Baby (6 cols x 4 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
+    "Slimes/Baby Slime 01 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
+    "Slimes/Baby Slime 02 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
+    "Slimes/Baby Slime 03 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
+    "Slimes/Baby Slime 04 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
+    // Slimes Grandes (6 cols x 8 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
+    "Slimes/Slime 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
+    "Slimes/Slime 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
+    "Slimes/Slime 03 48.png": { cols: 6, rows: 8, idleFrames: 6, fps: 7 },
+    "Slimes/Slime 04 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
+    // Snakes (6 cols x 8 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
+    "Snakes/Snake 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
+    "Snakes/Snake 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
+    "Snakes/Snake 03 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
+    // Vehicles / Weapons (8 cols x 16 rows) -> Primeros 4 frames idle
+    "Vehicles/Minecart 01 48.png": { cols: 8, rows: 16, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-8", fps: 6 },
+    "Weapons/Sword 01 48.png": { cols: 8, rows: 16, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-8", fps: 6 },
+    // Zombies (6 cols x 8 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
+    "Zombies/Zombie 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 5 },
+    "Zombies/Zombie 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 5 },
+    "Zombies/Zombie 03 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 5 }
+  };
+
+  function renderMobAnimado(relPath, size = 96, cls = "") {
+    if (!relPath) return "";
+    // Los jefes son ilustraciones completas HD (768x768), no spritesheets cortados
+    if (relPath.startsWith("Bosses/")) {
+      const fullUrl = `img/48x48/${relPath}`;
+      return `<img src="${fullUrl}" alt="" class="rpg-boss-animado ${cls}" style="width:${size}px;height:${size}px;" onerror="this.onerror=null;this.src='img/girasol-loading.png'">`;
+    }
+
+    const meta = SPRITE_METADATA_48[relPath] || { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 };
+    const duracion = ((meta.idleFrames || 4) / (meta.fps || 6)).toFixed(2);
+    const bgW = meta.cols * 100;
+    const bgH = meta.rows * 100;
+    const fullUrl = `img/48x48/${relPath}`;
+    const animName = meta.animKey || `anim-mob-${meta.idleFrames}`;
+    const hurtPct = meta.cols > 1 ? ((meta.hurtCol || 4) / (meta.cols - 1) * 100).toFixed(3) : 0;
+
+    return `<div class="rpg-mob-animado ${cls}" style="
+      --mob-cols:${meta.cols};
+      --mob-rows:${meta.rows};
+      --mob-frames:${meta.idleFrames};
+      --mob-dur:${duracion}s;
+      --mob-hurt-x:${hurtPct}%;
+      width:${size}px;
+      height:${size}px;
+      background-image:url('${fullUrl}');
+      background-repeat:no-repeat;
+      background-size:${bgW}% ${bgH}%;
+      background-position:0% 0%;
+      image-rendering:pixelated;
+      display:inline-block;
+      animation:${animName} ${duracion}s steps(${meta.idleFrames}) infinite;
+    "></div>`;
+  }
+
+  function spriteHtml(rutaOClave, cls = "rpg-sprite-img", alt = "") {
+    if (!rutaOClave) return "";
+    let rel = SPR_ENEMIGO[rutaOClave] || SPR_REGION[rutaOClave] || rutaOClave;
+    if (rel.startsWith("img/48x48/")) rel = rel.replace("img/48x48/", "");
+
+    // Si es un Jefe de la carpeta Bosses, mostrarlo directamente como imagen completa
+    if (rel.startsWith("Bosses/")) {
+      const fullUrl = `img/48x48/${rel}`;
+      return `<img class="${cls}" src="${fullUrl}" alt="${alt}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='img/girasol-loading.png'">`;
+    }
+
+    const meta = SPRITE_METADATA_48[rel];
+
+    // Si es un spritesheet de 48x48, mostramos el primer frame recortado limpiamente
+    if (meta) {
+      const bgW = meta.cols * 100;
+      const bgH = meta.rows * 100;
+      const fullUrl = `img/48x48/${rel}`;
+      return `<div class="${cls} rpg-sprite-thumb-48" style="
+        width:32px;
+        height:32px;
+        background-image:url('${fullUrl}');
+        background-repeat:no-repeat;
+        background-size:${bgW}% ${bgH}%;
+        background-position:0% 0%;
+        image-rendering:pixelated;
+        display:inline-block;
+      "></div>`;
+    }
+
+    let ruta = rel.startsWith("img/") ? rel : `${DIR_48}${rel}`;
+    return `<img class="${cls}" src="${ruta}" alt="${alt}" loading="lazy" decoding="async">`;
   }
 
   const REGIONES = [
-    { id: "praderas", nombre: "Praderas de Girasoles", icono: ICONO.girasol, sprite: "girasol", base: ["abeja", "mariposa", "caracol", "pajaro", "conejo"], elite: ["jirafa", "oveja", "pollito", "girasol"], jefe: "girasol-anciano", jefeNombre: "El Girasol Ancestral", jefeIcono: ICONO.girasol },
-    { id: "bosque", nombre: "Bosque Umbrío", icono: ICONO.bosque, base: ["lagarto", "sapo-gigante", "cocodrilo", "pulpo", "tortuga"], elite: ["bruja-pantano", "espectro", "hongo"], jefe: "arbol-ancestral", jefeNombre: "El Árbol que Susurra", jefeIcono: ICONO.bosque },
-    { id: "cueva", nombre: "Cavernas de Cristal", icono: ICONO.gema, base: ["murcielago", "golem-cristal", "espectro", "lagarto"], elite: ["gargola", "elemental-hielo", "golem-lava"], jefe: "reina-cristal", jefeNombre: "La Reina de Cristal", jefeIcono: ICONO.gema },
-    { id: "desierto", nombre: "Desierto Ardiente", icono: ICONO.fuego, base: ["escorpion", "serpiente", "escarabajo", "momia"], elite: ["salamandra", "fenix-joven", "golem-lava"], jefe: "faraon", jefeNombre: "El Faraón Olvidado", jefeIcono: ICONO.corona },
-    { id: "glaciar", nombre: "Glaciar Eterno", icono: ICONO.copo, base: ["lobo-hielo", "oso-polar", "elemental-hielo", "espectro"], elite: ["gargola", "quimera", "elemental-aire"], jefe: "rey-glaciar", jefeNombre: "El Rey del Hielo Eterno", jefeIcono: ICONO.corona },
-    { id: "volcan", nombre: "Volcán Dormido", icono: ICONO.fuego, base: ["golem-lava", "salamandra", "fenix-joven", "escorpion"], elite: ["quimera", "gargola", "espectro-negro"], jefe: "dragon-rojo", jefeNombre: "El Dragón Rojo", jefeIcono: ICONO.fuego },
-    { id: "ruinas", nombre: "Ruinas Antiguas", icono: ICONO.castillo, base: ["esqueleto", "momia", "gargola", "espectro"], elite: ["nigromante", "vampiro", "golem-cristal"], jefe: "lich", jefeNombre: "El Lich Supremo", jefeIcono: ICONO.corona },
-    { id: "sombras", nombre: "Reino de Sombras", icono: ICONO.luna, base: ["espectro-negro", "vampiro", "nigromante", "murcielago"], elite: ["kraken-joven", "tiburon", "sirena"], jefe: "senor-sombras", jefeNombre: "El Señor de las Sombras", jefeIcono: ICONO.luna },
-    { id: "abismo", nombre: "Abismo Final", icono: ICONO.corona, base: ["mech-gigante", "robot-guardia", "dron", "golem-cristal"], elite: ["dragon-rojo", "kraken-joven", "nigromante"], jefe: "senor-abismo", jefeNombre: "El Señor del Abismo", jefeIcono: ICONO.corona },
-    { id: "selva", nombre: "Selva Ancestral", icono: ICONO.bosque, base: ["jaguar", "mono-loco", "serpiente-emplumada", "planta-carnivora", "tucan-sombrio"], elite: ["chaman-jaguar", "tigre-espiritu", "tarantula-gigante"], jefe: "senor-selva", jefeNombre: "El Señor de la Selva", jefeIcono: ICONO.bosque },
-    { id: "pantano", nombre: "Pantano Maldito", icono: ICONO.gota, base: ["rana-venenosa", "cocodrilo-muerto", "bruja-pantano", "serpiente-veneno", "espectro-fango"], elite: ["hechicero-pantano", "rey-ranas", "treant-podrido"], jefe: "diosa-pantano", jefeNombre: "La Diosa del Pantano", jefeIcono: ICONO.gota },
-    { id: "tundra", nombre: "Tundra Helada", icono: ICONO.copo, base: ["yeti", "lobo-blanco", "oso-polar", "elemental-hielo", "gigante-hielo"], elite: ["rey-yeti", "quimera-nieve", "dragon-blanco-joven"], jefe: "titan-glaciar", jefeNombre: "El Titán Glaciar", jefeIcono: ICONO.copo },
-    { id: "cielo", nombre: "Cielo Celestial", icono: ICONO.estrella, base: ["grifo", "angel-caido", "harpia", "halcon-gigante", "elemental-aire"], elite: ["serafin", "quimera-alada", "dragon-tormenta"], jefe: "dios-cielo", jefeNombre: "El Dios del Cielo", jefeIcono: ICONO.estrella },
-    { id: "inframundo", nombre: "Inframundo Ardiente", icono: ICONO.fuego, base: ["demonio-menor", "alma-perdida", "cerberus-cachorro", "succubus", "espectro-fuego"], elite: ["senor-demonio", "lich-infierno", "dragon-negro"], jefe: "senor-inframundo", jefeNombre: "El Señor del Inframundo", jefeIcono: ICONO.fuego },
-    { id: "vacio", nombre: "Vacío Absoluto", icono: ICONO.corona, base: ["horror", "aberracion", "ojo-vacio", "tentaculo", "sombra-vacia"], elite: ["caballero-vacio", "titan-vacio", "dragon-vacio"], jefe: "el-vacio", jefeNombre: "El Vacío", jefeIcono: ICONO.corona }
+    {
+      id: "praderas", nombre: "Praderas Verdes", icono: ICONO.girasol,
+      base: ["slime-bebe-verde", "rata-de-cloaca", "hongo-espora", "murcielago-comun"],
+      elite: ["slime-verde", "rata-rabiosa", "hongo-venenoso"],
+      jefe: "reina-arana", jefeNombre: "La Reina Araña", jefeIcono: ICONO.girasol
+    },
+    {
+      id: "bosque", nombre: "Bosque Espeso", icono: ICONO.bosque,
+      base: ["slime-bebe-azul", "hongo-alucinogeno", "serpiente-cascabel", "murcielago-vampiro"],
+      elite: ["slime-azul", "hongo-anciano", "orco-guerrero"],
+      jefe: "sapo-gigante-rey", jefeNombre: "Rey Sapo del Bosque", jefeIcono: ICONO.bosque
+    },
+    {
+      id: "cueva", nombre: "Cavernas de Cristal", icono: ICONO.gema,
+      base: ["murcielago-comun", "rata-rabiosa", "vagoneta-poseida", "orbinauta-azul"],
+      elite: ["orbinauta-electrico", "orco-guerrero", "murcielago-abismal"],
+      jefe: "golem-colosal", jefeNombre: "El Golem Colosal", jefeIcono: ICONO.gema
+    },
+    {
+      id: "desierto", nombre: "Desierto Ardiente", icono: ICONO.fuego,
+      base: ["serpiente-cascabel", "serpiente-coral", "esqueleto-soldado", "orbinauta-fuego"],
+      elite: ["serpiente-esmeralda", "esqueleto-arquero", "slime-rojo"],
+      jefe: "escorpion-emperador", jefeNombre: "El Emperador Escorpión", jefeIcono: ICONO.corona
+    },
+    {
+      id: "glaciar", nombre: "Glaciar Helado", icono: ICONO.copo,
+      base: ["slime-bebe-azul", "orbinauta-azul", "espectro-errante", "murcielago-abismal"],
+      elite: ["orbinauta-electrico", "fantasma-vengativo", "slime-azul"],
+      jefe: "lobo-alfa-ancestral", jefeNombre: "El Lobo Alfa Ancestral", jefeIcono: ICONO.corona
+    },
+    {
+      id: "volcan", nombre: "Cráter Volcánico", icono: ICONO.fuego,
+      base: ["slime-bebe-rojo", "slime-rojo", "orbinauta-fuego", "esqueleto-arquero"],
+      elite: ["espada-viviente", "orco-guerrero", "zombi-voraz"],
+      jefe: "dragon-supremo", jefeNombre: "El Dragón Supremo", jefeIcono: ICONO.fuego
+    },
+    {
+      id: "ruinas", nombre: "Ruinas Malditas", icono: ICONO.castillo,
+      base: ["esqueleto-soldado", "esqueleto-arquero", "esqueleto-armadurado", "zombi-podrido"],
+      elite: ["zombi-infectado", "espada-viviente", "fantasma-vengativo"],
+      jefe: "archimago-oscuro", jefeNombre: "El Archimago Oscuro", jefeIcono: ICONO.corona
+    },
+    {
+      id: "sombras", nombre: "Catacumbas de Sombras", icono: ICONO.luna,
+      base: ["murcielago-abismal", "rata-plagada", "espectro-errante", "fantasma-vengativo"],
+      elite: ["alma-en-pena", "orbinauta-vacio", "zombi-voraz"],
+      jefe: "lord-vampiro", jefeNombre: "El Lord Vampiro", jefeIcono: ICONO.luna
+    },
+    {
+      id: "abismo", nombre: "Abismo Profundo", icono: ICONO.corona,
+      base: ["orbinauta-vacio", "alma-en-pena", "esqueleto-armadurado", "espada-viviente"],
+      elite: ["orco-guerrero", "serpiente-esmeralda", "rata-plagada"],
+      jefe: "demonio-ancestral", jefeNombre: "El Demonio Ancestral", jefeIcono: ICONO.corona
+    },
+    {
+      id: "selva", nombre: "Selva Primitiva", icono: ICONO.bosque,
+      base: ["serpiente-esmeralda", "serpiente-coral", "hongo-venenoso", "slime-verde"],
+      elite: ["orco-guerrero", "hongo-anciano", "orbinauta-electrico"],
+      jefe: "rey-bestia-leon", jefeNombre: "El Rey Bestia León", jefeIcono: ICONO.bosque
+    },
+    {
+      id: "pantano", nombre: "Pantano Putrefacto", icono: ICONO.gota,
+      base: ["zombi-podrido", "zombi-infectado", "rata-plagada", "slime-bebe-verde"],
+      elite: ["zombi-voraz", "hongo-anciano", "esqueleto-armadurado"],
+      jefe: "patriarca-zombi", jefeNombre: "El Patriarca Zombi", jefeIcono: ICONO.gota
+    },
+    {
+      id: "tundra", nombre: "Tundra Gélida", icono: ICONO.copo,
+      base: ["slime-azul", "orbinauta-azul", "esqueleto-soldado", "espectro-errante"],
+      elite: ["esqueleto-armadurado", "fantasma-vengativo", "orco-guerrero"],
+      jefe: "troll-titánico", jefeNombre: "El Troll Titánico", jefeIcono: ICONO.copo
+    },
+    {
+      id: "cielo", nombre: "Cielos Tempestad", icono: ICONO.estrella,
+      base: ["murcielago-vampiro", "orbinauta-electrico", "espectro-errante", "alma-en-pena"],
+      elite: ["fantasma-vengativo", "espada-viviente", "slime-dorado"],
+      jefe: "senor-tengu", jefeNombre: "El Señor Tengu", jefeIcono: ICONO.estrella
+    },
+    {
+      id: "inframundo", nombre: "Inframundo Ígneo", icono: ICONO.fuego,
+      base: ["slime-bebe-rojo", "orbinauta-fuego", "esqueleto-armadurado", "serpiente-coral"],
+      elite: ["zombi-voraz", "espada-viviente", "rata-plagada"],
+      jefe: "gran-serpiente-antigua", jefeNombre: "La Gran Serpiente Antigua", jefeIcono: ICONO.fuego
+    },
+    {
+      id: "vacio", nombre: "El Vacío Cósmico", icono: ICONO.corona,
+      base: ["orbinauta-vacio", "alma-en-pena", "slime-dorado", "slime-bebe-dorado"],
+      elite: ["espada-viviente", "orbinauta-electrico", "esqueleto-armadurado"],
+      jefe: "kraken-abisal", jefeNombre: "El Kraken Abisal", jefeIcono: ICONO.corona
+    }
   ];
 
   const BIOMAS = {
@@ -85,65 +340,95 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   REGIONES.forEach(r => r.bioma = BIOMAS[r.id]);
 
   const NOMBRES = {
-    abeja: "Abeja Soldado", mariposa: "Mariposa Sombría", caracol: "Caracol Blindado", pajaro: "Gorrión Guerrero", conejo: "Conejo Espinoso",
-    lagarto: "Lagarto Espinoso", pulpo: "Pulpo Abisal", tortuga: "Tortuga de Hierro", "dragon-bebe": "Dragón Bebé",
-    jirafa: "Jirafa Colosal", hamburguesa: "Hamburguesa Mutante", girasol: "Girasol Guardián", hongo: "Hongo Lunar",
-    escorpion: "Escorpión de Arena", serpiente: "Serpiente del Desierto", escarabajo: "Escarabajo Sagrado",
-    "lobo-hielo": "Lobo de Hielo", "oso-polar": "Oso Polar", "elemental-hielo": "Elemental Glacial",
-    "golem-lava": "Golem de Lava", salamandra: "Salamandra Ígnea", "fenix-joven": "Fénix Joven",
-    esqueleto: "Esqueleto Guerrero", momia: "Momia Maldita", gargola: "Gárgola de Piedra",
-    "sapo-gigante": "Sapo Gigante", cocodrilo: "Cocodrilo Sombrío", "bruja-pantano": "Bruja del Pantano",
-    "golem-cristal": "Golem de Cristal", murcielago: "Murciélago Vampiro", espectro: "Espectro",
-    grifo: "Grifo Celestial", quimera: "Quimera", "elemental-aire": "Elemental de Aire",
-    sirena: "Sirena Hipnótica", "kraken-joven": "Kraken Joven", tiburon: "Tiburón Colosal",
-    "espectro-negro": "Espectro Negro", vampiro: "Vampiro Lord", nigromante: "Nigromante",
-    "robot-guardia": "Robot Guardián", dron: "Dron Asesino", "mech-gigante": "Mech Gigante",
-    "dragon-rojo": "Dragón Rojo Ancestral", "senor-abismo": "Señor del Abismo",
-    "girasol-anciano": "Girasol Ancestral", "arbol-ancestral": "Árbol Susurrante",
-    "reina-cristal": "Reina de Cristal", faraon: "Faraón Olvidado", "rey-glaciar": "Rey del Hielo",
-    lich: "Lich Supremo", "senor-sombras": "Señor de Sombras",
-    jaguar: "Jaguar Sangriento", "mono-loco": "Mono Poseído", "serpiente-emplumada": "Serpiente Emplumada",
-    "planta-carnivora": "Planta Carnívora", "tucan-sombrio": "Tucán Sombrío",
-    "chaman-jaguar": "Chamán Jaguar", "tigre-espiritu": "Tigre Espíritu", "tarantula-gigante": "Tarántula Gigante",
-    "senor-selva": "El Señor de la Selva",
-    "rana-venenosa": "Rana Venenosa", "cocodrilo-muerto": "Cocodrilo No-Muerto", "serpiente-veneno": "Serpiente de Veneno",
-    "espectro-fango": "Espectro del Fango", "hechicero-pantano": "Hechicero del Pantano",
-    "rey-ranas": "Rey de las Ranas", "treant-podrido": "Treant Podrido", "diosa-pantano": "La Diosa del Pantano",
-    yeti: "Yeti", "lobo-blanco": "Lobo Blanco", "gigante-hielo": "Gigante de Hielo",
-    "rey-yeti": "Rey Yeti", "quimera-nieve": "Quimera de Nieve", "dragon-blanco-joven": "Dragón Blanco Joven",
-    "titan-glaciar": "El Titán Glaciar", harpia: "Harpía", "angel-caido": "Ángel Caído", "halcon-gigante": "Halcón Gigante",
-    serafin: "Serafín", "quimera-alada": "Quimera Alada", "dragon-tormenta": "Dragón de Tormenta",
-    "dios-cielo": "El Dios del Cielo",
-    "demonio-menor": "Demonio Menor", "alma-perdida": "Alma Perdida", "cerberus-cachorro": "Cerberus Cachorro",
-    succubus: "Súcubo", "espectro-fuego": "Espectro de Fuego", "senor-demonio": "Señor Demonio",
-    "lich-infierno": "Lich del Infierno", "dragon-negro": "Dragón Negro", "senor-inframundo": "El Señor del Inframundo",
-    horror: "Horror", aberracion: "Aberración", "ojo-vacio": "Ojo del Vacío", tentaculo: "Tentáculo",
-    "sombra-vacia": "Sombra Vacía", "caballero-vacio": "Caballero del Vacío", "titan-vacio": "Titán Vacío",
-    "dragon-vacio": "Dragón Vacío", "el-vacio": "El Vacío"
+    // Murciélagos
+    "murcielago-comun": "Murciélago Común",
+    "murcielago-vampiro": "Murciélago Vampiro",
+    "murcielago-abismal": "Murciélago Abismal",
+    // Hongos
+    "hongo-espora": "Hongo de Esporas",
+    "hongo-venenoso": "Hongo Venenoso",
+    "hongo-alucinogeno": "Hongo Hechicero",
+    "hongo-anciano": "Hongo Anciano",
+    // Fantasmas
+    "espectro-errante": "Espectro Errante",
+    "fantasma-vengativo": "Fantasma Vengativo",
+    "alma-en-pena": "Alma en Pena",
+    // Orbinautas
+    "orbinauta-azul": "Orbinauta Arcano",
+    "orbinauta-fuego": "Orbinauta Ígneo",
+    "orbinauta-electrico": "Orbinauta de Trueno",
+    "orbinauta-vacio": "Orbinauta Cósmico",
+    // Orcos
+    "orco-guerrero": "Orco Berserker",
+    // Ratas
+    "rata-de-cloaca": "Rata de Cloaca",
+    "rata-rabiosa": "Rata Rabiosa",
+    "rata-plagada": "Rata Infectada",
+    // Esqueletos
+    "esqueleto-soldado": "Esqueleto Guerrero",
+    "esqueleto-arquero": "Esqueleto Arquero",
+    "esqueleto-armadurado": "Caballero Calavera",
+    // Slimes
+    "slime-bebe-verde": "Slime Bebé Verde",
+    "slime-bebe-azul": "Slime Bebé Azul",
+    "slime-bebe-rojo": "Slime Bebé Carmesí",
+    "slime-bebe-dorado": "Slime Bebé Áureo",
+    "slime-verde": "Slime Ácido",
+    "slime-azul": "Slime Glacial",
+    "slime-rojo": "Slime de Fuego",
+    "slime-dorado": "Slime Dorado",
+    // Serpientes
+    "serpiente-cascabel": "Serpiente de Cascabel",
+    "serpiente-esmeralda": "Víbora Esmeralda",
+    "serpiente-coral": "Cobra Venenosa",
+    // Zombis
+    "zombi-podrido": "Zombi Descompuesto",
+    "zombi-infectado": "Caminante Infectado",
+    "zombi-voraz": "Zombi Feroz",
+    // Especiales
+    "vagoneta-poseida": "Vagoneta Encantada",
+    "espada-viviente": "Espada Maldita",
+    // Jefes
+    "reina-arana": "Reina Araña",
+    "sapo-gigante-rey": "Rey Sapo del Pantano",
+    "golem-colosal": "Golem Colosal de Piedra",
+    "escorpion-emperador": "Emperador Escorpión",
+    "lobo-alfa-ancestral": "Lobo Alfa del Invierno",
+    "dragon-supremo": "Dragón Supremo de Fuego",
+    "archimago-oscuro": "Archimago Sombrío",
+    "lord-vampiro": "Señor de la Sangre Vampiro",
+    "demonio-ancestral": "Señor Demonio del Abismo",
+    "rey-bestia-leon": "León Rey de las Bestias",
+    "patriarca-zombi": "Patriarca Zombi Resucitado",
+    "troll-titánico": "Troll Titánico de las Nieves",
+    "senor-tengu": "Gran Señor Tengu",
+    "gran-serpiente-antigua": "Basilisco Antiguo de Fuego",
+    "kraken-abisal": "Kraken Abisal de las Mareas"
   };
 
-  /* ---------- Zonas (BALANCE v12) ---------- */
+  /* ---------- Zonas (BALANCE v13 - Progresión Proporcional) ---------- */
   const ZONAS = (() => {
     const z = [];
     REGIONES.forEach((reg, ri) => {
       for (let i = 1; i <= 10; i++) {
         const idx = ri * 10 + i, esJefe = i === 10, esMini = i === 5, esElite = i >= 6 && i <= 9;
-        const hpBase = 45 + idx * 30 + idx * idx * 3.6;
-        const atkBase = 7 + idx * 2.6 + Math.pow(idx, 1.75) * 1.3;
-        const hpJefe = esJefe ? Math.round(idx * 250) : 0;
-        const atkJefe = esJefe ? Math.round(idx * 8) : 0;
-        const hpMini = esMini ? Math.round(idx * 90) : 0;
-        const atkMini = esMini ? Math.round(idx * 4) : 0;
+        // Curva lineal suave y progresiva adecuada al jugador
+        const hpBase = 50 + idx * 16;
+        const atkBase = 8 + idx * 2.2;
+        const hpJefe = esJefe ? Math.round(idx * 35 + 80) : 0;
+        const atkJefe = esJefe ? Math.round(idx * 1.5 + 6) : 0;
+        const hpMini = esMini ? Math.round(idx * 18 + 35) : 0;
+        const atkMini = esMini ? Math.round(idx * 0.9 + 3) : 0;
         z.push({
           id: `${reg.id}-${i}`,
           nombre: esJefe ? reg.jefeNombre : `${reg.nombre} · ${i}`,
           desc: esJefe ? "⚔️ JEFE DE REGIÓN" : esMini ? "★ Mini-jefe" : reg.nombre,
           icono: esJefe ? reg.jefeIcono : reg.icono, nivel: idx,
           enemigos: esJefe ? [reg.jefe] : esMini ? [...reg.elite.slice(0, 2), reg.base[0]] : esElite ? reg.elite : reg.base,
-          hp: Math.round(hpBase * 1.35 + hpJefe + hpMini),
-          atk: Math.round(atkBase * 1.25 + atkJefe + atkMini),
-          xp: Math.round(9 + idx * 7 + (esJefe ? idx * 100 : esMini ? idx * 25 : 0)),
-          monedas: Math.round(3 + idx * 1.4 + (esJefe ? 55 : esMini ? 15 : 0)),
+          hp: Math.round(hpBase + hpJefe + hpMini),
+          atk: Math.round(atkBase + atkJefe + atkMini),
+          xp: Math.round(15 + idx * 12 + (esJefe ? idx * 25 : esMini ? idx * 10 : 0)),
+          monedas: Math.round(6 + idx * 2.2 + (esJefe ? 40 : esMini ? 15 : 0)),
           jefe: esJefe, miniJefe: esMini, region: reg.id, regionNombre: reg.nombre, orden: idx
         });
       }
@@ -159,7 +444,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   }));
 
   const KEY = () => `sa_rpg_${getUserId()}`;
-  const def = () => ({ nivel: 1, xp: 0, hp: 100, enemigosDerrotados: 0, jefesDerrotados: [], zonasConquistadas: [], zonaActual: null, statsBase: { atk: 10, def: 3 } });
+  const def = () => ({ nivel: 1, xp: 0, hp: 120, enemigosDerrotados: 0, jefesDerrotados: [], zonasConquistadas: [], zonaActual: null, statsBase: { atk: 14, def: 5 } });
   const cargar = () => { try { const r = localStorage.getItem(KEY()); return r ? { ...def(), ...JSON.parse(r) } : def(); } catch { return def(); } };
   const guardar = s => { try { localStorage.setItem(KEY(), JSON.stringify(s)); } catch { } };
 
@@ -172,9 +457,30 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   let state = cargar();
   if (!Array.isArray(state.zonasConquistadas)) state.zonasConquistadas = [];
 
-  const hpMax = () => 80 + state.nivel * 20 + (statsLoot().hpBonus || 0) + bonusTipo("hp_max");
-  const atkTotal = () => state.statsBase.atk + state.nivel * 3 + (statsLoot().atkBonus || 0) + bonusTipo("atk_fijo");
-  const defTotal = () => state.statsBase.def + state.nivel * 2 + (statsLoot().defBonus || 0) + bonusTipo("def_fijo");
+  // Desbloqueo estricto secuencial:
+  // 1) En la primera región, la zona 1 siempre está abierta.
+  // 2) Dentro de cualquier región, una zona requiere haber superado la zona inmediatamente anterior.
+  // 3) Para acceder a una nueva región (su zona 1), requiere haber completado las 10 zonas de la región anterior.
+  window._rpgZonaDesbloqueada = function (zid) {
+    const z = ZONAS.find(x => x.id === zid);
+    if (!z) return false;
+    if (z.orden === 1) return true;
+    const conq = state.zonasConquistadas || [];
+    const numEnRegion = ((z.orden - 1) % 10) + 1;
+    if (numEnRegion > 1) {
+      const prev = ZONAS.find(x => x.orden === z.orden - 1);
+      return prev ? conq.includes(prev.id) : false;
+    } else {
+      const ri = Math.floor((z.orden - 1) / 10);
+      const grupoAnterior = GRUPOS[ri - 1];
+      if (!grupoAnterior) return true;
+      return grupoAnterior.zonas.every(pz => conq.includes(pz.id));
+    }
+  };
+
+  const hpMax = () => 100 + state.nivel * 25 + (statsLoot().hpBonus || 0) + bonusTipo("hp_max");
+  const atkTotal = () => state.statsBase.atk + state.nivel * 4 + (statsLoot().atkBonus || 0) + bonusTipo("atk_fijo");
+  const defTotal = () => state.statsBase.def + state.nivel * 2.5 + (statsLoot().defBonus || 0) + bonusTipo("def_fijo");
   const critTotal = () => 0.15 + ((statsLoot().critBonus || 0) / 100);
   const esqTotal = () => ((statsLoot().esqBonus || 0) / 100);
   const regenTotal = () => (statsLoot().regenBonus || 0);
@@ -182,7 +488,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const thornsTotal = () => (statsLoot().thornsBonus || 0);
   const xpTotal = () => 1 + ((statsLoot().xpBonus || 0) / 100);
   const oroTotal = () => 1 + ((statsLoot().oroBonus || 0) / 100);
-  const xpParaSubir = () => Math.round(state.nivel * 320 + Math.pow(state.nivel, 2.3) * 60);
+  const xpParaSubir = () => Math.round(state.nivel * 160 + Math.pow(state.nivel, 1.8) * 35);
 
   let enemigo = null, turnoJugador = true, overlayObjetos = false;
   let buffsHeroe = [], buffsEnemigo = [];
@@ -313,7 +619,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       const conquistada = state.zonasConquistadas.includes(z.id);
       const tipo = z.jefe ? "Jefe de región" : z.miniJefe ? "Mini-jefe" : z.nivel % 10 >= 6 ? "Encuentro élite" : "Encuentro";
       const cls = ["rpg-popup-dot", "rpg-popup-zone", z.jefe ? "jefe" : z.miniJefe ? "minijefe" : "", !open ? "bloqueada" : "", conquistada ? "conquistada" : ""].filter(Boolean).join(" ");
-      const zSprite = z.jefe ? "corona" : z.miniJefe ? "calavera" : SPR_ENEMIGO[z.enemigos?.[0]] || (open ? "espada" : null);
+      const zSprite = z.jefe ? SPR_ENEMIGO[z.enemigos?.[0]] : z.miniJefe ? SPR_ENEMIGO[z.enemigos?.[0]] : SPR_ENEMIGO[z.enemigos?.[0]] || (open ? "espada" : null);
       const zSpriteHtml = zSprite ? spriteHtml(zSprite, "rpg-zone-sprite-thumb", z.nombre) : "";
       return `<button type="button" class="${cls}" data-zona="${z.id}" ${open ? "" : "disabled"}>
               <span class="rpg-popup-zone-number">${zSpriteHtml || String(i + 1).padStart(2, "0")}</span>
@@ -364,13 +670,33 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const m = MASCOTAS[localStorage.getItem("mascota_actual") || "mapache"] || MASCOTAS.mapache;
     const hpPct = clamp(state.hp / hpMax() * 100);
     const spriteKey = enemigo.sprite || SPR_ENEMIGO[enemigo.id];
-    const eSpriteEl = spriteKey ? spriteHtml(spriteKey, "rpg-enemy-sprite-img", enemigo.nombre) : "";
-    const eIcon = ICONO[enemigo.iconoKey] || enemigo.icono || (enemigo.jefe ? ICONO.corona : ICONO.espada) || ICONO.estrella || "";
-    const eContent = eSpriteEl || eIcon;
+    let relPath = spriteKey;
+    if (relPath && relPath.startsWith("img/48x48/")) relPath = relPath.replace("img/48x48/", "");
     const mascotaId = localStorage.getItem("mascota_actual") || "mapache";
     const habs = window.RpgHabilidades?.ataquesDesbloqueados(mascotaId, state.nivel) || [];
     const esFase2 = enemigo.phase === 2;
     const habsItems = window.RpgItems?.getHabilidadesActivas?.() || [];
+
+    // Renderizado del enemigo o horda
+    let eContent = "";
+    if (enemigo.esHorda && Array.isArray(enemigo.horda)) {
+      const mobsHtml = enemigo.horda.map((mob, i) => {
+        const vivo = mob.hp > 0;
+        const mobSpr = renderMobAnimado(relPath, 42, `rpg-horda-anim ${vivo ? "" : "muerto"}`);
+        return `<div class="rpg-horda-item ${vivo ? "" : "caido"}" data-horda-idx="${i}" title="${enemigo.nombre} #${i + 1} (${mob.hp}/${mob.hpMax} HP)">
+          ${mobSpr}
+          <div class="rpg-horda-item-hp"><span style="width:${Math.max(0, (mob.hp / mob.hpMax) * 100)}%"></span></div>
+        </div>`;
+      }).join("");
+      eContent = `<div class="rpg-horda-container">
+        <div class="rpg-horda-grid">${mobsHtml}</div>
+        <div class="rpg-horda-contador">Horda: ${enemigo.horda.filter(x => x.hp > 0).length}/9 vivos</div>
+      </div>`;
+    } else {
+      const eSpriteEl = relPath ? renderMobAnimado(relPath, 92, "rpg-enemy-sprite-anim") : "";
+      const eIcon = ICONO[enemigo.iconoKey] || enemigo.icono || (enemigo.jefe ? ICONO.corona : ICONO.espada) || ICONO.estrella || "";
+      eContent = eSpriteEl || eIcon;
+    }
 
     c.innerHTML = `
       <div class="rpg-hud">
@@ -387,20 +713,22 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       <div class="rpg-batalla ${esFase2 ? 'rpg-enraged' : ''}" id="rpg-batalla">
         <div class="rpg-batalla-top">
           <div class="rpg-fighter" id="fighter-heroe">
-            <div class="rpg-fighter-sprite" id="sprite-heroe"><img src="${m.imagen}" alt="" style="width:90px;height:90px;max-width:90px;max-height:90px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'"></div>
+            <div class="rpg-fighter-sprite hero-pet" id="sprite-heroe">
+              <img src="${m.imagen}" alt="" class="rpg-pet-avatar-combat" style="width:90px;height:90px;max-width:90px;max-height:90px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'">
+            </div>
             <div class="rpg-fighter-nombre">${m.nombre}</div>
             <div class="rpg-fighter-hp">${Math.round(state.hp)} HP</div>
             <div class="rpg-buffs" id="buffs-heroe"></div>
           </div>
           <div class="rpg-vs">VS</div>
           <div class="rpg-fighter" id="fighter-enemigo">
-            <div class="rpg-fighter-sprite enemigo ${esFase2 ? 'fase2' : ''}" id="sprite-enemigo">${eContent}</div>
-            <div class="rpg-fighter-nombre">${enemigo.nombre} ${enemigo.jefe ? (esFase2 ? '🔥 FASE 2' : '👑') : ''}</div>
+            <div class="rpg-fighter-sprite enemigo ${enemigo.esHorda ? 'es-horda' : ''} ${esFase2 ? 'fase2' : ''}" id="sprite-enemigo">${eContent}</div>
+            <div class="rpg-fighter-nombre">${enemigo.nombre} ${enemigo.jefe ? (esFase2 ? '🔥 FASE 2' : '👑') : enemigo.esHorda ? '👥 HORDA (x9)' : ''}</div>
             <div class="rpg-fighter-hp" id="hp-enemigo">${Math.round(enemigo.hp)} HP${enemigo.shield > 0 ? ` · 🛡️${enemigo.shield}` : ''}</div>
             <div class="rpg-buffs" id="buffs-enemigo"></div>
           </div>
         </div>
-        <div class="rpg-log" id="rpg-log"><div class="rpg-log-item info">¡Un ${enemigo.nombre} aparece!</div></div>
+        <div class="rpg-log" id="rpg-log"><div class="rpg-log-item info">¡${enemigo.esHorda ? '¡Una horda de 9 ' + enemigo.nombre + ' te rodea!' : '¡Un ' + enemigo.nombre + ' aparece!'}</div></div>
         <div class="rpg-habs-grid" id="rpg-habs-grid">
           ${habs.length ? habs.map(h => `<button type="button" class="rpg-hab rpg-hab-${h.tipo}" data-hab="${h.id}" title="${h.desc}"><span class="rpg-hab-nombre">${h.nombre}</span><span class="rpg-hab-lv">Nv ${h.lv}</span></button>`).join("") : `<button type="button" class="rpg-hab rpg-hab-daño" data-hab="ataque-basico" title="Ataque básico"><span class="rpg-hab-nombre">Ataque</span><span class="rpg-hab-lv">Básico</span></button>`}
         </div>
@@ -420,6 +748,13 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     $("#btn-arma-habs")?.addEventListener("click", toggleHabilidadesArma);
     $("#btn-huir")?.addEventListener("click", huir);
     renderBuffs();
+  }
+
+  function animarAtaqueHeroe() {
+    const s = $("sprite-heroe");
+    if (!s) return;
+    s.classList.add("atacando");
+    setTimeout(() => s.classList.remove("atacando"), 400);
   }
 
   function renderBuffs() {
@@ -450,15 +785,31 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     guardar(state);
 
     const eId = z.enemigos[rnd(0, z.enemigos.length - 1)];
-    const v = rnd(-20, 20) / 100;
-    const hp = Math.round(z.hp * (1 + v));
+    const v = rnd(-15, 15) / 100;
+    const hp = Math.max(30, Math.round(z.hp * (1 + v)));
     const tier = z.jefe ? 'jefe' : z.miniJefe ? 'elite' : 'comun';
     const esp = ESPECIALES[tier][rnd(0, ESPECIALES[tier].length - 1)];
     const spriteName = SPR_ENEMIGO[eId] || (z.jefe ? 'corona' : z.miniJefe ? 'calavera' : 'espada');
+
+    // Sistema de Hordas: si NO es jefe ni minijefe, aparecen 9 enemigos de la misma especie
+    const esHorda = !z.jefe && !z.miniJefe;
+    let hordaArr = null;
+    if (esHorda) {
+      const hpIndividual = Math.max(8, Math.round(hp / 9));
+      hordaArr = Array.from({ length: 9 }, (_, idx) => ({
+        id: idx,
+        hp: hpIndividual,
+        hpMax: hpIndividual
+      }));
+    }
+
     enemigo = {
       id: eId, iconoKey: eId, icono: z.icono, sprite: spriteName, nombre: NOMBRES[eId] || eId,
-      hpMax: hp, hp, atk: Math.round(z.atk * (1 + v)), xp: z.xp, monedas: z.monedas,
-      jefe: !!z.jefe, dot: 0, dotDur: 0, shield: 0, phase: 1, tier,
+      hpMax: esHorda ? (hordaArr.reduce((s, x) => s + x.hpMax, 0)) : hp,
+      hp: esHorda ? (hordaArr.reduce((s, x) => s + x.hp, 0)) : hp,
+      atk: Math.round(z.atk * (1 + v)), xp: z.xp, monedas: z.monedas,
+      jefe: !!z.jefe, miniJefe: !!z.miniJefe, esHorda, horda: hordaArr,
+      dot: 0, dotDur: 0, shield: 0, phase: 1, tier,
       special: esp, specialCD: z.jefe ? 2 : z.miniJefe ? 3 : 4, specialTimer: z.jefe ? 2 : z.miniJefe ? 3 : 4
     };
     turnoJugador = true; overlayObjetos = false;
@@ -485,16 +836,63 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   }
   function actualizarHPs() {
     const he = $("hp-enemigo");
-    if (he) he.textContent = `${Math.max(0, enemigo.hp)} HP${enemigo.shield > 0 ? ` · 🛡️${enemigo.shield}` : ''}`;
+    if (he && enemigo) {
+      if (enemigo.esHorda && enemigo.horda) {
+        const vivos = enemigo.horda.filter(x => x.hp > 0).length;
+        he.textContent = `${Math.max(0, enemigo.hp)} HP (${vivos}/9 vivos)${enemigo.shield > 0 ? ` · 🛡️${enemigo.shield}` : ''}`;
+        const countBadge = qs(".rpg-horda-contador");
+        if (countBadge) countBadge.textContent = `Horda: ${vivos}/9 vivos`;
+      } else {
+        he.textContent = `${Math.max(0, enemigo.hp)} HP${enemigo.shield > 0 ? ` · 🛡️${enemigo.shield}` : ''}`;
+      }
+    }
     const hh = qs("#fighter-heroe .rpg-fighter-hp"); if (hh) hh.textContent = `${Math.round(state.hp)} HP`;
     const b = qs(".rpg-barra.hp > span"); if (b) b.style.width = clamp(state.hp / hpMax() * 100) + "%";
   }
+
   function aplicarDmgEnemigo(dmg) {
+    if (!enemigo) return;
     if (enemigo.shield > 0) {
       const abs = Math.min(dmg, enemigo.shield);
       enemigo.shield -= abs; dmg -= abs;
     }
-    enemigo.hp = Math.max(0, enemigo.hp - dmg);
+
+    if (enemigo.esHorda && Array.isArray(enemigo.horda)) {
+      const vivos = enemigo.horda.filter(m => m.hp > 0);
+      if (vivos.length > 0) {
+        // El daño de un ataque se divide entre la cantidad de enemigos vivos en el combate
+        const dmgPorMob = Math.max(1, Math.floor(dmg / vivos.length));
+        vivos.forEach(m => {
+          m.hp = Math.max(0, m.hp - dmgPorMob);
+          const el = qs(`.rpg-horda-item[data-horda-idx="${m.id}"]`);
+          if (el) {
+            const bar = el.querySelector(".rpg-horda-item-hp > span");
+            if (bar) bar.style.width = `${Math.max(0, (m.hp / m.hpMax) * 100)}%`;
+            if (m.hp <= 0) {
+              el.classList.add("caido");
+              el.querySelector(".rpg-horda-anim")?.classList.add("muerto");
+            }
+          }
+        });
+        enemigo.hp = enemigo.horda.reduce((s, m) => s + m.hp, 0);
+      } else {
+        enemigo.hp = 0;
+      }
+    } else {
+      enemigo.hp = Math.max(0, enemigo.hp - dmg);
+    }
+
+    // Animación visual de recibir golpe / herido
+    const spr = qs("#sprite-enemigo");
+    if (spr) {
+      spr.classList.add("golpeado");
+      const animMob = spr.querySelector(".rpg-mob-animado");
+      if (animMob) animMob.classList.add("herido");
+      setTimeout(() => {
+        spr.classList.remove("golpeado");
+        if (animMob) animMob.classList.remove("herido");
+      }, 350);
+    }
   }
   function chequearFaseJefe() {
     if (enemigo.jefe && enemigo.phase === 1 && enemigo.hp / enemigo.hpMax <= 0.5) {
@@ -621,10 +1019,11 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   }
 
   function usarHabilidad(habId) {
-    if (!enemigo || !turnoJugador) return;
+    if (!enemigo || !turnoJugador || enemigo.terminado) return;
 
     if (habId === "ataque-basico") {
       turnoJugador = false; deshab(true);
+      animarAtaqueHeroe();
       const dmg = Math.max(1, Math.round(atkTotal() * 0.9));
       aplicarDmgEnemigo(dmg);
       log(`Atacas por ${dmg} daño.`, "daño");
@@ -639,6 +1038,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const hab = window.RpgHabilidades?.ataquePorId(habId);
     if (!hab) return;
     turnoJugador = false; deshab(true);
+    animarAtaqueHeroe();
     const mascotaId = localStorage.getItem("mascota_actual") || "mapache";
     const pasiva = window.RpgHabilidades?.getPasiva(mascotaId) || {};
     const fxKey = FX_KEY(habId);
@@ -749,9 +1149,10 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   }
 
   function usarHabilidadDeItem(hab) {
-    if (!enemigo || !turnoJugador) return;
+    if (!enemigo || !turnoJugador || enemigo.terminado) return;
     turnoJugador = false;
     deshab(true);
+    animarAtaqueHeroe();
 
     const nombre = (hab.nombre || "").toLowerCase();
     const desc = (hab.desc || "").toLowerCase();
@@ -1367,8 +1768,69 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     }
   }
 
+  function mostrarFinCombate(tipo, datos) {
+    if (enemigo) enemigo.terminado = true;
+    deshab(true);
+    const batallaEl = $("rpg-batalla");
+    if (!batallaEl) return;
+
+    // Remover panel anterior si existiese
+    qs(".rpg-fin-combate-overlay", batallaEl)?.remove();
+
+    const overlay = document.createElement("div");
+    overlay.className = `rpg-fin-combate-overlay ${tipo}`;
+    const esVic = tipo === "victoria";
+
+    overlay.innerHTML = `
+      <div class="rpg-fin-combate-card">
+        <div class="rpg-fin-icono">${esVic ? `<img src="img/sprites%20complementarios/trofeo.png" alt="" style="width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(255,217,61,.6));">` : "💀"}</div>
+        <div class="rpg-fin-titulo">${esVic ? "¡VICTORIA!" : "¡DERROTA!"}</div>
+        <div class="rpg-fin-sub">${esVic ? `${datos.nE} derrotado` : "Has caído en combate..."}</div>
+        ${esVic ? `
+          <div class="rpg-fin-recompensas">
+            <span class="rpg-fin-badge xp">+${datos.xp} XP</span>
+            <span class="rpg-fin-badge oro">+${datos.mon} 🪙</span>
+          </div>
+          ${datos.primeraVictoria ? `<div class="rpg-fin-extra">🌟 ¡Zona conquistada! Recompensa extra incluida.</div>` : ""}
+          ${datos.sub > 0 ? `<div class="rpg-fin-subio"><img src="img/sprites%20complementarios/estrella.png" alt="" style="width:18px;height:18px;object-fit:contain;vertical-align:-3px;margin-right:4px;">¡Subiste a Nivel ${state.nivel}!</div>` : ""}
+        ` : `
+          <div class="rpg-fin-recompensas">
+            <span class="rpg-fin-badge oro perdidas">-${datos.perdidas} 🪙</span>
+          </div>
+          <div class="rpg-fin-extra">Descansas un poco y recuperas vida.</div>
+        `}
+        <div class="rpg-fin-botones">
+          <button type="button" class="rpg-btn primaria" id="btn-combatir-otra-vez"><img src="img/sprites%20complementarios/espada.png" alt="" style="width:18px;height:18px;object-fit:contain;vertical-align:-3px;margin-right:6px;">Combatir otra vez</button>
+          <button type="button" class="rpg-btn secundaria" id="btn-salir-mapa"><img src="img/items%20de%20aventura/mapa.png" alt="" style="width:18px;height:18px;object-fit:contain;vertical-align:-3px;margin-right:6px;">Volver al mapa</button>
+        </div>
+      </div>
+    `;
+
+    batallaEl.appendChild(overlay);
+
+    overlay.querySelector("#btn-combatir-otra-vez")?.addEventListener("click", () => {
+      overlay.remove();
+      const zActual = state.zonaActual;
+      enemigo = null;
+      buffsHeroe = [];
+      buffsEnemigo = [];
+      state.sangrado = 0;
+      entrarZona(zActual);
+    });
+
+    overlay.querySelector("#btn-salir-mapa")?.addEventListener("click", () => {
+      overlay.remove();
+      enemigo = null;
+      buffsHeroe = [];
+      buffsEnemigo = [];
+      state.sangrado = 0;
+      render();
+    });
+  }
+
   function victoria() {
-    if (!enemigo) return;
+    if (!enemigo || enemigo.terminado) return;
+    enemigo.terminado = true;
     const eraJefe = enemigo.jefe, nE = enemigo.nombre;
     let xp = Math.round(enemigo.xp * xpTotal());
     let mon = Math.round(enemigo.monedas * oroTotal());
@@ -1426,7 +1888,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     log("¡" + nE + " derrotado! +" + xp + " XP, +" + mon + " monedas.", "info");
     if (primeraVictoriaZona) log(`✨ ¡Zona conquistada por primera vez! +${xpPrimeraVictoria} XP y +${monedasPrimeraVictoria} monedas extra.`, "critico");
     if (sub > 0) log("¡Subiste a nivel " + state.nivel + "!", "critico");
-    setTimeout(() => { enemigo = null; buffsHeroe = []; buffsEnemigo = []; state.sangrado = 0; render(); }, 1500);
+
+    mostrarFinCombate("victoria", { nE, xp, mon, primeraVictoria: primeraVictoriaZona, sub });
   }
 
   function derrota() {
@@ -1438,6 +1901,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       return;
     }
 
+    if (enemigo) enemigo.terminado = true;
     SND("derrota");
     log("Has caído...", "daño");
     const monedasActuales = getMonedas();
@@ -1448,7 +1912,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     state.sangrado = 0;
     guardar(state);
     $("rpg-batalla")?.classList.add("muerto");
-    setTimeout(() => { enemigo = null; buffsHeroe = []; buffsEnemigo = []; render(); }, 1600);
+
+    mostrarFinCombate("derrota", { perdidas });
   }
 
   function activarVistaRpg() {
@@ -1461,8 +1926,14 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if (!e.target.closest('[data-view-link="rpg"]')) return;
     setTimeout(() => { activarVistaRpg(); render(); }, 0);
   });
-  window.addEventListener("rpg:stats-cambiados", () => { state.hp = Math.min(state.hp, hpMax()); guardar(state); if ($("rpg-content")) render(); });
-  window.addEventListener("sunadventures:mascota-cambiada", () => { if ($("rpg-content")) render(); });
+  window.addEventListener("rpg:stats-cambiados", () => {
+    state.hp = Math.min(state.hp, hpMax());
+    guardar(state);
+    if ($("rpg-content") && (!enemigo || enemigo.terminado)) {
+      if (!enemigo) render();
+    }
+  });
+  window.addEventListener("sunadventures:mascota-cambiada", () => { if ($("rpg-content") && !enemigo) render(); });
 
   function init() { inyectarSeccion(); inyectarNav(); render(); if (location.hash === "#rpg") activarVistaRpg(); }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();
@@ -1473,6 +1944,12 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     enemigo: () => enemigo,
     zonas: ZONAS,
     grupos: GRUPOS,
+    regiones: REGIONES,
+    nombres: NOMBRES,
+    spriteMapEnemigos: SPR_ENEMIGO,
+    spriteMeta48: SPRITE_METADATA_48,
+    renderMobAnimado,
+    spriteHtml,
     biomas: REGIONES.map(reg => reg.bioma),
     abrirPopupGrupo,
     reset: () => { localStorage.removeItem(KEY()); state = def(); render(); }

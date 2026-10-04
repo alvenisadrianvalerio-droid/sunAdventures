@@ -134,23 +134,7 @@
     if (!window.Rpg) return false;
     const zonas = window.Rpg.zonas;
     if (!zonas || !zonas.length) return false;
-    // Map de zona por orden
-    const porOrden = new Map();
-    zonas.forEach(z => porOrden.set(z.orden, z));
-
-    window._rpgZonaDesbloqueada = function(id) {
-      const z = zonas.find(x => x.id === id);
-      if (!z) return false;
-      if (z.orden === 1) return true;
-      const prev = porOrden.get(z.orden - 1);
-      if (!prev) return true;
-      const st = window.Rpg.state();
-      // La zona anterior está completada si es jefe derrotado O el jugador
-      // tiene nivel suficiente Y ha derrotado enemigos de esa zona
-      if (prev.jefe) return (st.jefesDerrotados || []).includes(prev.id);
-      // Para zonas normales, basta con estar cerca del nivel
-      return st.nivel >= prev.nivel - 1 && st.enemigosDerrotados >= prev.nivel * 3;
-    };
+    // Respetar la progresión estricta canónica definida en rpg.js
     return true;
   }
   let _triesZonas = 0;

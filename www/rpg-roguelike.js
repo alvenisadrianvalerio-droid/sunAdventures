@@ -24,6 +24,243 @@
    ============================================================ */
 const RL_SPRITE_DIR_NEW = 'img/sprites%20complementarios/';
 const RL_SPRITE_DIR_OLD = 'img/items%20de%20aventura/';
+const DIR_48 = 'img/48x48/';
+
+const SPR_ENEMIGO_48 = {
+  // Murciélagos
+  "murcielago-comun": "Bats/Bat 01 48.png",
+  "murcielago-vampiro": "Bats/Bat 02 48.png",
+  "murcielago-abismal": "Bats/Bat 03 48.png",
+  // Hongos
+  "hongo-espora": "Fungi/Fungus 01 48.png",
+  "hongo-venenoso": "Fungi/Fungus 02 48.png",
+  "hongo-alucinogeno": "Fungi/Fungus 03 48.png",
+  "hongo-anciano": "Fungi/Fungus 04 48.png",
+  // Fantasmas
+  "espectro-errante": "Ghosts/Ghost 01 48.png",
+  "fantasma-vengativo": "Ghosts/Ghost 02 48.png",
+  "alma-en-pena": "Ghosts/Ghost 03 48.png",
+  // Orbinautas
+  "orbinauta-azul": "Orbinauts/Orbinaut 01 48.png",
+  "orbinauta-fuego": "Orbinauts/Orbinaut 02 48.png",
+  "orbinauta-electrico": "Orbinauts/Orbinaut 03 48.png",
+  "orbinauta-vacio": "Orbinauts/Orbinaut 04 48.png",
+  // Orcos
+  "orco-guerrero": "Orcs/Enemy Orc 01 48.png",
+  // Ratas
+  "rata-de-cloaca": "Rats/Rat 01 48.png",
+  "rata-rabiosa": "Rats/Rat 02 48.png",
+  "rata-plagada": "Rats/Rat 03 48.png",
+  // Esqueletos
+  "esqueleto-soldado": "Skeletons/Skeleton 01 48.png",
+  "esqueleto-arquero": "Skeletons/Skeleton 02 48.png",
+  "esqueleto-armadurado": "Skeletons/Skeleton 03 48.png",
+  // Slimes
+  "slime-bebe-verde": "Slimes/Baby Slime 01 48.png",
+  "slime-bebe-azul": "Slimes/Baby Slime 02 48.png",
+  "slime-bebe-rojo": "Slimes/Baby Slime 03 48.png",
+  "slime-bebe-dorado": "Slimes/Baby Slime 04 48.png",
+  "slime-verde": "Slimes/Slime 01 48.png",
+  "slime-azul": "Slimes/Slime 02 48.png",
+  "slime-rojo": "Slimes/Slime 03 48.png",
+  "slime-dorado": "Slimes/Slime 04 48.png",
+  // Serpientes
+  "serpiente-cascabel": "Snakes/Snake 01 48.png",
+  "serpiente-esmeralda": "Snakes/Snake 02 48.png",
+  "serpiente-coral": "Snakes/Snake 03 48.png",
+  // Zombis
+  "zombi-podrido": "Zombies/Zombie 01 48.png",
+  "zombi-infectado": "Zombies/Zombie 02 48.png",
+  "zombi-voraz": "Zombies/Zombie 03 48.png",
+  // Objetos especiales
+  "vagoneta-poseida": "Vehicles/Minecart 01 48.png",
+  "espada-viviente": "Weapons/Sword 01 48.png",
+  // Jefes
+  "reina-arana": "Bosses/arana.png",
+  "demonio-ancestral": "Bosses/demonio.png",
+  "dragon-supremo": "Bosses/dragon.png",
+  "golem-colosal": "Bosses/golem.png",
+  "kraken-abisal": "Bosses/kraken.png",
+  "rey-bestia-leon": "Bosses/leon.png",
+  "lobo-alfa-ancestral": "Bosses/lobo.png",
+  "archimago-oscuro": "Bosses/mago.webp",
+  "sapo-gigante-rey": "Bosses/rana.png",
+  "rey-rata": "Bosses/rata.png",
+  "escorpion-emperador": "Bosses/scorpion.png",
+  "gran-serpiente-antigua": "Bosses/serpiente.webp",
+  "senor-tengu": "Bosses/tengu.png",
+  "troll-titánico": "Bosses/troll.webp",
+  "lord-vampiro": "Bosses/vampiro.png",
+  "patriarca-zombi": "Bosses/zombie.png"
+};
+
+const SPRITE_METADATA_48_DEF = {
+  "Bats/Bat 01 48.png": { cols: 9, rows: 4, idleFrames: 7, hurtCol: 7, fps: 8 },
+  "Bats/Bat 02 48.png": { cols: 9, rows: 4, idleFrames: 7, hurtCol: 7, fps: 8 },
+  "Bats/Bat 03 48.png": { cols: 9, rows: 4, idleFrames: 7, hurtCol: 7, fps: 8 },
+  "Fungi/Fungus 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 6 },
+  "Fungi/Fungus 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 6 },
+  "Fungi/Fungus 03 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 6 },
+  "Fungi/Fungus 04 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 6 },
+  "Ghosts/Ghost 01 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, fps: 6 },
+  "Ghosts/Ghost 02 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, fps: 6 },
+  "Ghosts/Ghost 03 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, fps: 6 },
+  "Orbinauts/Orbinaut 01 48.png": { cols: 3, rows: 1, idleFrames: 3, hurtCol: 1, fps: 6 },
+  "Orbinauts/Orbinaut 02 48.png": { cols: 3, rows: 1, idleFrames: 3, hurtCol: 1, fps: 6 },
+  "Orbinauts/Orbinaut 03 48.png": { cols: 3, rows: 1, idleFrames: 3, hurtCol: 1, fps: 6 },
+  "Orbinauts/Orbinaut 04 48.png": { cols: 3, rows: 1, idleFrames: 3, hurtCol: 1, fps: 6 },
+  "Orcs/Enemy Orc 01 48.png": { cols: 10, rows: 16, idleFrames: 4, hurtCol: 8, fps: 6 },
+  "Rats/Rat 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 7 },
+  "Rats/Rat 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 7 },
+  "Rats/Rat 03 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 7 },
+  "Skeletons/Skeleton 01 48.png": { cols: 10, rows: 16, idleFrames: 4, hurtCol: 8, fps: 6 },
+  "Skeletons/Skeleton 02 48.png": { cols: 10, rows: 16, idleFrames: 4, hurtCol: 8, fps: 6 },
+  "Skeletons/Skeleton 03 48.png": { cols: 10, rows: 16, idleFrames: 4, hurtCol: 8, fps: 6 },
+  "Slimes/Baby Slime 01 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, fps: 7 },
+  "Slimes/Baby Slime 02 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, fps: 7 },
+  "Slimes/Baby Slime 03 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, fps: 7 },
+  "Slimes/Baby Slime 04 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, fps: 7 },
+  "Slimes/Slime 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 7 },
+  "Slimes/Slime 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 7 },
+  "Slimes/Slime 03 48.png": { cols: 6, rows: 8, idleFrames: 6, hurtCol: 4, fps: 7 },
+  "Slimes/Slime 04 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 7 },
+  "Snakes/Snake 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 6 },
+  "Snakes/Snake 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 6 },
+  "Snakes/Snake 03 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 6 },
+  "Vehicles/Minecart 01 48.png": { cols: 8, rows: 16, idleFrames: 4, hurtCol: 4, fps: 6 },
+  "Weapons/Sword 01 48.png": { cols: 8, rows: 16, idleFrames: 4, hurtCol: 4, fps: 6 },
+  "Zombies/Zombie 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 5 },
+  "Zombies/Zombie 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 5 },
+  "Zombies/Zombie 03 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, fps: 5 }
+};
+
+const NOMBRES_48_DEF = {
+  "murcielago-comun": "Murciélago Común",
+  "murcielago-vampiro": "Murciélago Vampiro",
+  "murcielago-abismal": "Murciélago Abismal",
+  "hongo-espora": "Hongo de Esporas",
+  "hongo-venenoso": "Hongo Venenoso",
+  "hongo-alucinogeno": "Hongo Hechicero",
+  "hongo-anciano": "Hongo Anciano",
+  "espectro-errante": "Espectro Errante",
+  "fantasma-vengativo": "Fantasma Vengativo",
+  "alma-en-pena": "Alma en Pena",
+  "orbinauta-azul": "Orbinauta Arcano",
+  "orbinauta-fuego": "Orbinauta Ígneo",
+  "orbinauta-electrico": "Orbinauta de Trueno",
+  "orbinauta-vacio": "Orbinauta Cósmico",
+  "orco-guerrero": "Orco Berserker",
+  "rata-de-cloaca": "Rata de Cloaca",
+  "rata-rabiosa": "Rata Rabiosa",
+  "rata-plagada": "Rata Infectada",
+  "esqueleto-soldado": "Esqueleto Guerrero",
+  "esqueleto-arquero": "Esqueleto Arquero",
+  "esqueleto-armadurado": "Caballero Calavera",
+  "slime-bebe-verde": "Slime Bebé Verde",
+  "slime-bebe-azul": "Slime Bebé Azul",
+  "slime-bebe-rojo": "Slime Bebé Carmesí",
+  "slime-bebe-dorado": "Slime Bebé Áureo",
+  "slime-verde": "Slime Ácido",
+  "slime-azul": "Slime Glacial",
+  "slime-rojo": "Slime de Fuego",
+  "slime-dorado": "Slime Dorado",
+  "serpiente-cascabel": "Serpiente de Cascabel",
+  "serpiente-esmeralda": "Víbora Esmeralda",
+  "serpiente-coral": "Cobra Venenosa",
+  "zombi-podrido": "Zombi Descompuesto",
+  "zombi-infectado": "Caminante Infectado",
+  "zombi-voraz": "Zombi Feroz",
+  "vagoneta-poseida": "Vagoneta Encantada",
+  "espada-viviente": "Espada Maldita",
+  "reina-arana": "Reina Araña",
+  "sapo-gigante-rey": "Rey Sapo del Pantano",
+  "golem-colosal": "Golem Colosal de Piedra",
+  "escorpion-emperador": "Emperador Escorpión",
+  "lobo-alfa-ancestral": "Lobo Alfa del Invierno",
+  "dragon-supremo": "Dragón Supremo de Fuego",
+  "archimago-oscuro": "Archimago Sombrío",
+  "lord-vampiro": "Señor de la Sangre Vampiro",
+  "demonio-ancestral": "Señor Demonio del Abismo",
+  "rey-bestia-leon": "León Rey de las Bestias",
+  "patriarca-zombi": "Patriarca Zombi Resucitado",
+  "troll-titánico": "Troll Titánico de las Nieves",
+  "senor-tengu": "Gran Señor Tengu",
+  "gran-serpiente-antigua": "Basilisco Antiguo de Fuego",
+  "kraken-abisal": "Kraken Abisal de las Mareas"
+};
+
+const REGIONES_DEF = [
+  {
+    id: "praderas", nombre: "Praderas Verdes",
+    biomaImg: "img/biomas/gen-5480873c-7b50-45b8-a3c1-abc457a2f0fa.png",
+    base: ["slime-bebe-verde", "rata-de-cloaca", "hongo-espora", "murcielago-comun"],
+    elite: ["slime-verde", "rata-rabiosa", "hongo-venenoso"],
+    jefe: "reina-arana", jefeNombre: "La Reina Araña"
+  },
+  {
+    id: "bosque", nombre: "Bosque Espeso",
+    biomaImg: "img/biomas/gen-df614595-485a-47f1-a074-7d4b4aa3d08e.png",
+    base: ["slime-bebe-azul", "hongo-alucinogeno", "serpiente-cascabel", "murcielago-vampiro"],
+    elite: ["slime-azul", "hongo-anciano", "orco-guerrero"],
+    jefe: "sapo-gigante-rey", jefeNombre: "Rey Sapo del Bosque"
+  },
+  {
+    id: "cueva", nombre: "Cavernas de Cristal",
+    biomaImg: "img/biomas/gen-e46023c3-4ac1-4361-b312-e6f525bcead6.png",
+    base: ["murcielago-comun", "rata-rabiosa", "vagoneta-poseida", "orbinauta-azul"],
+    elite: ["orbinauta-electrico", "orco-guerrero", "murcielago-abismal"],
+    jefe: "golem-colosal", jefeNombre: "El Golem Colosal"
+  },
+  {
+    id: "desierto", nombre: "Desierto Ardiente",
+    biomaImg: "img/biomas/gen-3b1ee61a-d08b-44bc-a27b-9c56f5e009ef.png",
+    base: ["serpiente-cascabel", "serpiente-coral", "esqueleto-soldado", "orbinauta-fuego"],
+    elite: ["serpiente-esmeralda", "esqueleto-arquero", "slime-rojo"],
+    jefe: "escorpion-emperador", jefeNombre: "El Emperador Escorpión"
+  },
+  {
+    id: "glaciar", nombre: "Glaciar Helado",
+    biomaImg: "img/biomas/gen-02a9154e-49f2-4451-b734-a787ce316fd5.png",
+    base: ["slime-bebe-azul", "orbinauta-azul", "espectro-errante", "murcielago-abismal"],
+    elite: ["orbinauta-electrico", "fantasma-vengativo", "slime-azul"],
+    jefe: "lobo-alfa-ancestral", jefeNombre: "El Lobo Alfa Ancestral"
+  },
+  {
+    id: "volcan", nombre: "Cráter Volcánico",
+    biomaImg: "img/biomas/gen-6148d727-5f04-4360-b612-587e58fbd20d.png",
+    base: ["slime-bebe-rojo", "slime-rojo", "orbinauta-fuego", "esqueleto-arquero"],
+    elite: ["espada-viviente", "orco-guerrero", "zombi-voraz"],
+    jefe: "dragon-supremo", jefeNombre: "El Dragón Supremo"
+  },
+  {
+    id: "ruinas", nombre: "Ruinas Malditas",
+    biomaImg: "img/biomas/gen-5510680d-7fe8-4834-b72d-04dd75fc60e2.png",
+    base: ["esqueleto-soldado", "esqueleto-arquero", "esqueleto-armadurado", "zombi-podrido"],
+    elite: ["zombi-infectado", "espada-viviente", "fantasma-vengativo"],
+    jefe: "archimago-oscuro", jefeNombre: "El Archimago Oscuro"
+  },
+  {
+    id: "sombras", nombre: "Catacumbas de Sombras",
+    biomaImg: "img/biomas/gen-710f318c-55ee-45ba-aad5-7afcca056906.png",
+    base: ["murcielago-abismal", "rata-plagada", "espectro-errante", "fantasma-vengativo"],
+    elite: ["alma-en-pena", "orbinauta-vacio", "zombi-voraz"],
+    jefe: "lord-vampiro", jefeNombre: "El Lord Vampiro"
+  },
+  {
+    id: "abismo", nombre: "Abismo Profundo",
+    biomaImg: "img/biomas/gen-7f3a60dc-0b7b-4b78-9ae9-e63140799a1c.png",
+    base: ["orbinauta-vacio", "alma-en-pena", "esqueleto-armadurado", "espada-viviente"],
+    elite: ["orco-guerrero", "serpiente-esmeralda", "rata-plagada"],
+    jefe: "demonio-ancestral", jefeNombre: "El Demonio Ancestral"
+  },
+  {
+    id: "vacio", nombre: "El Vacío Cósmico",
+    biomaImg: "img/biomas/gen-a36ad96d-725f-45b4-8793-4f27add89fb3.png",
+    base: ["orbinauta-vacio", "alma-en-pena", "slime-dorado", "slime-bebe-dorado"],
+    elite: ["espada-viviente", "orbinauta-electrico", "esqueleto-armadurado"],
+    jefe: "kraken-abisal", jefeNombre: "El Kraken Abisal"
+  }
+];
 
 // Mapa emoji → nombre de archivo .png (SIN extensión)
 // Los archivos deben existir en la carpeta nueva o en la antigua
@@ -641,39 +878,39 @@ function sustituirEmojis(root) {
      COMBATE
      ============================================================ */
   function obtenerEnemigoAventura(tier, piso) {
-    const regiones = window.Rpg?.regiones;
-    const nombres = window.Rpg?.nombres || {};
-    const spriteMap = window.Rpg?.spriteMapEnemigos || {};
+    const regiones = (window.Rpg?.regiones && window.Rpg.regiones.length) ? window.Rpg.regiones : REGIONES_DEF;
+    const nombres = { ...NOMBRES_48_DEF, ...(window.Rpg?.nombres || {}) };
+    const spriteMap = { ...SPR_ENEMIGO_48, ...(window.Rpg?.spriteMapEnemigos || {}) };
     const especiales = window.Rpg?.especiales || {
       comun: ['heal', 'buff', 'debuff', 'poison'],
       elite: ['multihit', 'drain', 'shield', 'curse'],
       jefe: ['firebreath', 'summon', 'apocalypse', 'curse']
     };
 
-    const regIdx = clamp((piso || 1) - 1, 0, (regiones?.length || 1) - 1);
-    const region = regiones?.[regIdx];
+    const regIdx = clamp((piso || 1) - 1, 0, regiones.length - 1);
+    const region = regiones[regIdx] || regiones[0];
 
-    let eId = 'slime';
+    let eId = 'slime-verde';
     let nombre = 'Monstruo';
     let ico = '👾';
 
     if (tier === 'jefe') {
-      eId = region?.jefe || 'dragon';
+      eId = region?.jefe || 'dragon-supremo';
       nombre = region?.jefeNombre || nombres[eId] || 'Jefe Primigenio';
       ico = '👑';
     } else if (tier === 'elite') {
-      const pool = (region?.elite && region.elite.length) ? region.elite : ['quimera', 'golem', 'nigromante'];
+      const pool = (region?.elite && region.elite.length) ? region.elite : ['orco-guerrero', 'golem-colosal', 'zombi-voraz'];
       eId = pool[rnd(0, pool.length - 1)];
       nombre = nombres[eId] || eId;
       ico = '💀';
     } else {
-      const pool = (region?.base && region.base.length) ? region.base : ['slime', 'rata', 'murcielago'];
+      const pool = (region?.base && region.base.length) ? region.base : ['slime-verde', 'rata-de-cloaca', 'murcielago-comun'];
       eId = pool[rnd(0, pool.length - 1)];
       nombre = nombres[eId] || eId;
       ico = '⚔️';
     }
 
-    const sprite = spriteMap[eId] || (tier === 'jefe' ? 'corona' : tier === 'elite' ? 'calavera' : 'espada');
+    const sprite = spriteMap[eId] || eId;
     const espList = especiales[tier] || ['heal', 'buff'];
     const special = espList[rnd(0, espList.length - 1)];
 
@@ -735,7 +972,10 @@ function sustituirEmojis(root) {
             </div>
           </div>
           <div class="rpg-rl-fighter-info enemigo ${esFase2 ? 'fase2' : ''}">
-            <strong>${e.nombre} ${e.tier === 'jefe' ? (esFase2 ? `${spriteMarkup('🔥')} FASE 2` : spriteMarkup('👑')) : e.tier === 'elite' ? spriteMarkup('💀') : ''}</strong>
+            <div class="rpg-rl-enemigo-header">
+              ${window.Rpg?.spriteHtml ? window.Rpg.spriteHtml(e.sprite || e.id, 'rpg-rl-hud-thumb') : ''}
+              <strong>${e.nombre} ${e.tier === 'jefe' ? (esFase2 ? `${spriteMarkup('🔥')} FASE 2` : spriteMarkup('👑')) : e.tier === 'elite' ? spriteMarkup('💀') : ''}</strong>
+            </div>
             <div class="rpg-rl-barra-hp enemigo ${esFase2 ? 'fase2' : ''}">
               <span style="width:${clamp(e.hp/e.hpMax*100)}%"></span>
               <em>${Math.round(e.hp)} / ${e.hpMax}</em>
@@ -1338,7 +1578,7 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
     const card = document.createElement('div');
     card.className = 'rpg-rl-recompensa';
     card.innerHTML = `
-      <div class="rpg-rl-recompensa-card">
+      <div class="rpg-rl-recompensa-card rpg-rl-eleccion">
         <h2>${titulo}</h2>
         <div class="rpg-rl-eleccion-lista">
           ${opciones.map((o, i) => `
@@ -1350,6 +1590,7 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
         </div>
       </div>`;
     panel.appendChild(card);
+    sustituirEmojis(card.querySelector('h2'));
     requestAnimationFrame(() => card.classList.add('active'));
     qsa('.rpg-rl-opcion', card).forEach(b => b.addEventListener('click', () => {
       const o = opciones[Number(b.dataset.i)];
@@ -1399,7 +1640,7 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
       <div class="rpg-rl-recompensa-card rpg-rl-tienda">
         <div class="rpg-rl-tienda-header-bar">
           <h2 style="margin:0;font-size:1.4rem;">${spriteMarkup('🛒', 'rpg-rl-sprite rpg-rl-tienda-title-icon')} Tienda de Reliquias</h2>
-          <span class="rpg-rl-tienda-oro">${spriteMarkup('💰')} ${state.oro}</span>
+          <span class="rpg-rl-tienda-oro"><img class="rl-coin" src="img/items%20de%20aventura/icon.png" alt=""> ${state.oro}</span>
         </div>
         <div class="rpg-rl-tienda-lista">
           ${items.map((o, i) => `
@@ -1407,19 +1648,19 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
               ${spriteMarkup(o.rel.ico, 'rpg-rl-tienda-ico')}
               <strong>${o.rel.nombre}</strong>
               <small>${o.rel.desc}</small>
-              <em>💰 ${o.precio}</em>
+              <em><img class="rl-coin" src="img/items%20de%20aventura/icon.png" alt=""> ${o.precio}</em>
             </button>`).join('')}
           <button type="button" class="rpg-rl-tienda-item" data-pocion="1" ${state.oro < precioPocion ? 'disabled' : ''}>
             ${spriteMarkup('🧪', 'rpg-rl-tienda-ico')}
             <strong>Poción curativa</strong>
             <small>+45% HP máximo</small>
-            <em>💰 ${precioPocion}</em>
+            <em><img class="rl-coin" src="img/items%20de%20aventura/icon.png" alt=""> ${precioPocion}</em>
           </button>
           <button type="button" class="rpg-rl-tienda-item" data-heal="1" ${state.oro < 45 ? 'disabled' : ''}>
             ${spriteMarkup('❤️', 'rpg-rl-tienda-ico')}
             <strong>Curar 30% HP</strong>
             <small>Recuperación inmediata</small>
-            <em>💰 45</em>
+            <em><img class="rl-coin" src="img/items%20de%20aventura/icon.png" alt=""> 45</em>
           </button>
         </div>
         <button type="button" class="btn-secondary" id="rl-tienda-salir">Salir</button>
@@ -1493,7 +1734,7 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
 
   const EVENTOS = [
     {
-      titulo:'🗿 Altar Antiguo',
+      titulo:'📜 Altar Antiguo',
       desc:'Un altar con runas brillantes. Puedes ofrecer sangre a cambio de poder.',
       ops: [
         { txt:'Ofrecer 15 HP por +8 ATK', fn: () => {
@@ -1580,6 +1821,7 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
         </div>
       </div>`;
     panel.appendChild(card);
+    sustituirEmojis(card);
     requestAnimationFrame(() => card.classList.add('active'));
     qsa('.rpg-rl-opcion', card).forEach(b => b.addEventListener('click', () => {
       const res = ev.ops[Number(b.dataset.i)].fn();
@@ -1627,25 +1869,56 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
     canvas.width = this.W * dpr;
     canvas.height = this.H * dpr;
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    this.ctx.imageSmoothingEnabled = true;
-    this.ctx.imageSmoothingQuality = 'high';
+    this.ctx.imageSmoothingEnabled = false;
     this.last = performance.now();
     this._loop = this._loop.bind(this);
     canvas._batallaAnim = this;
-    this.sprites = { hero: null, enemy: null };
+    this.sprites = { hero: null, enemy: null, bioma: null };
+
+    // Cargar imagen de fondo del bioma según el piso
+    const regIdx = clamp((state.piso || 1) - 1, 0, REGIONES_DEF.length - 1);
+    const regActual = REGIONES_DEF[regIdx];
+    if (regActual?.biomaImg) {
+      const bImg = new Image();
+      bImg.onload = () => { this.sprites.bioma = bImg; };
+      bImg.src = regActual.biomaImg;
+    }
+
+    // Mascota del héroe
     const m = MASCOTAS[state.mascota] || {};
-    if (m.imagen) { const i = new Image(); i.onload = () => { this.sprites.hero = i; }; i.src = m.imagen; }
+    if (m.imagen) {
+      const i = new Image();
+      i.onload = () => { this.sprites.hero = i; };
+      i.src = m.imagen;
+    }
+
+    // Sprite del enemigo
     const e = state.enemigo || {};
-    const enemySprite = e.sprite || (e.ico && RL_SPRITE_MAP[e.ico]) || e.id || (e.tier === 'jefe' ? 'corona' : e.tier === 'elite' ? 'calavera' : 'espada');
-    const ext = (enemySprite === 'mago' || enemySprite === 'murcielago' || enemySprite === 'serpiente' || enemySprite === 'troll') ? '.webp' : '.png';
-    const enemyImage = new Image();
-    enemyImage.onload = () => { this.sprites.enemy = enemyImage; };
-    enemyImage.onerror = () => {
-      if (enemyImage.src.indexOf(RL_SPRITE_DIR_OLD) === -1) {
-        enemyImage.src = `${RL_SPRITE_DIR_OLD}${enemySprite}.png`;
-      }
-    };
-    enemyImage.src = `${RL_SPRITE_DIR_NEW}${enemySprite}${ext}`;
+    let relPath = e.sprite || SPR_ENEMIGO_48[e.id] || (window.Rpg?.spriteMapEnemigos?.[e.id]);
+    if (relPath && relPath.startsWith("img/48x48/")) relPath = relPath.replace("img/48x48/", "");
+
+    if (relPath) {
+      const enemyImg = new Image();
+      const meta = (window.Rpg?.spriteMeta48?.[relPath]) || SPRITE_METADATA_48_DEF[relPath];
+      const isBoss = relPath.startsWith('Bosses/');
+      this.enemyMeta = {
+        relPath,
+        isBoss,
+        cols: meta?.cols || (isBoss ? 1 : 6),
+        rows: meta?.rows || (isBoss ? 1 : 8),
+        idleFrames: meta?.idleFrames || (isBoss ? 1 : 4),
+        hurtCol: meta?.hurtCol || (isBoss ? 0 : 4),
+        fps: meta?.fps || 6
+      };
+      enemyImg.onload = () => { this.sprites.enemy = enemyImg; };
+      enemyImg.onerror = () => {
+        // Fallback a sprites complementarios
+        const fbName = e.id || (e.tier === 'jefe' ? 'corona' : e.tier === 'elite' ? 'calavera' : 'espada');
+        enemyImg.src = `${RL_SPRITE_DIR_NEW}${fbName}.png`;
+      };
+      enemyImg.src = `${DIR_48}${relPath}`;
+    }
+
     this.raf = requestAnimationFrame(this._loop);
   }
   BatallaCanvas.prototype.playAttack = function (fxKey, dmg, crit) {
@@ -1691,14 +1964,23 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
     this.last = now;
     const ctx = this.ctx;
     ctx.clearRect(0, 0, this.W, this.H);
+
+    // Fondo del bioma sutil
+    if (this.sprites.bioma && this.sprites.bioma.complete && this.sprites.bioma.naturalWidth) {
+      ctx.save();
+      ctx.globalAlpha = 0.24;
+      ctx.drawImage(this.sprites.bioma, 0, 0, this.W, this.H);
+      ctx.restore();
+    }
+
     const g = ctx.createRadialGradient(this.W/2, this.H/2, 0, this.W/2, this.H/2, this.W/1.4);
-    g.addColorStop(0, state.enemigo?.phase === 2 ? 'rgba(255,84,112,0.18)' : 'rgba(255,217,61,0.06)');
-    g.addColorStop(1, 'rgba(0,0,0,0)');
+    g.addColorStop(0, state.enemigo?.phase === 2 ? 'rgba(255,84,112,0.22)' : 'rgba(255,217,61,0.06)');
+    g.addColorStop(1, 'rgba(0,0,0,0.4)');
     ctx.fillStyle = g; ctx.fillRect(0, 0, this.W, this.H);
     ctx.strokeStyle = 'rgba(255,217,61,0.08)'; ctx.lineWidth = 1;
     for (let i = 0; i < 8; i++) { const y = this.H * 0.65 + i * 6; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(this.W, y); ctx.stroke(); }
-    this._drawHero(ctx);
-    this._drawEnemy(ctx);
+    this._drawHero(ctx, now);
+    this._drawEnemy(ctx, now);
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
       p.t += dt;
@@ -1738,29 +2020,84 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
     if (this.flash > 0) { this.flash = Math.max(0, this.flash - dt); ctx.fillStyle = `rgba(255,255,255,${this.flash})`; ctx.fillRect(0, 0, this.W, this.H); }
     this.raf = requestAnimationFrame(this._loop);
   };
-  BatallaCanvas.prototype._drawHero = function (ctx) {
+  BatallaCanvas.prototype._drawHero = function (ctx, now = performance.now()) {
     const x = this.W * 0.22 + (this.heroShake > 0 ? (Math.random() - 0.5) * 12 : 0);
-    const y = this.H * 0.55;
+    // Micro-animación suave de respiración en combate
+    const bob = Math.sin(now / 400) * 4;
+    const y = this.H * 0.55 + bob;
     ctx.save(); ctx.translate(x, y);
-    if (this.sprites.hero) { ctx.imageSmoothingEnabled = true; ctx.drawImage(this.sprites.hero, -55, -55, 110, 110); }
-    else { ctx.font = '80px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🐾', 0, 0); }
+    if (this.sprites.hero) {
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(this.sprites.hero, -55, -55, 110, 110);
+    } else {
+      ctx.font = '80px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🐾', 0, 0);
+    }
     ctx.restore();
-    ctx.save(); ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(x, y + 60, 45, 10, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.ellipse(x, this.H * 0.55 + 60, 45, 10, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
   };
-  BatallaCanvas.prototype._drawEnemy = function (ctx) {
+  BatallaCanvas.prototype._drawEnemy = function (ctx, now = performance.now()) {
     const e = state.enemigo; if (!e) return;
     const x = this.W * 0.78 + (this.enemyShake > 0 ? (Math.random() - 0.5) * 14 : 0);
     const y = this.H * 0.5;
     ctx.save(); ctx.translate(x, y);
+
+    // Aura de fase 2 para jefes
     if (e.phase === 2) {
-      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 100);
-      g.addColorStop(0, 'rgba(255,84,112,0.5)');
+      const pulse = 1 + Math.sin(now / 180) * 0.08;
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 110 * pulse);
+      g.addColorStop(0, 'rgba(255,84,112,0.55)');
       g.addColorStop(1, 'rgba(255,84,112,0)');
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, 100, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, 110 * pulse, 0, Math.PI * 2); ctx.fill();
     }
-    if (this.sprites.enemy) {
-      ctx.imageSmoothingEnabled = true;
-      ctx.drawImage(this.sprites.enemy, -54, -54, 108, 108);
+
+    const enemyImg = this.sprites.enemy;
+    const meta = this.enemyMeta;
+
+    if (enemyImg && enemyImg.complete && enemyImg.naturalWidth) {
+      if (meta?.isBoss) {
+        // Jefe: ilustración completa HD con flotación y respiración
+        const bossBob = Math.sin(now / 500) * 5;
+        const bossScale = (e.phase === 2 ? 1.06 : 1.0) + Math.sin(now / 600) * 0.02;
+        const bossSize = 135 * bossScale;
+        ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        if (this.enemyShake > 0) {
+          ctx.filter = 'drop-shadow(0 0 16px rgba(255,50,50,0.9)) brightness(1.35)';
+        }
+        ctx.drawImage(enemyImg, -bossSize / 2, -bossSize / 2 + bossBob, bossSize, bossSize);
+        ctx.restore();
+      } else if (meta && meta.cols) {
+        // Spritesheet animado 48x48
+        const cols = meta.cols || 6;
+        const rows = meta.rows || 8;
+        const frameW = enemyImg.naturalWidth / cols;
+        const frameH = enemyImg.naturalHeight / rows;
+        const isHurt = this.enemyShake > 0;
+        let frameIdx = 0;
+        if (isHurt) {
+          frameIdx = meta.hurtCol || Math.min(cols - 1, 4);
+        } else {
+          const fps = meta.fps || 6;
+          const totalIdle = meta.idleFrames || 4;
+          frameIdx = Math.floor((now / 1000) * fps) % totalIdle;
+        }
+
+        const size = 114;
+        ctx.save();
+        ctx.imageSmoothingEnabled = false; // Pixel-perfect crisp
+        if (isHurt) {
+          ctx.filter = 'drop-shadow(0 0 14px rgba(255,60,60,0.9)) brightness(1.3)';
+        }
+        ctx.drawImage(
+          enemyImg,
+          frameIdx * frameW, 0, frameW, frameH,
+          -size / 2, -size / 2, size, size
+        );
+        ctx.restore();
+      } else {
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(enemyImg, -54, -54, 108, 108);
+      }
     } else {
       ctx.font = '90px system-ui, sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
