@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="finanzas.css?v=5">
   <link rel="stylesheet" href="player-extras.css?v=1">
   <link rel="stylesheet" href="musica-local.css?v=1">
+  <link rel="stylesheet" href="capsula-tiempo.css?v=1">
   <style>
     svg {
       max-width: 100%;
@@ -782,6 +783,7 @@ Artista - Canción
   <script src="youtube-spotify-metadata.js"></script>
   <script src="player-extras.js?v=1"></script>
   <script src="finanzas.js?v=6"></script>
+  <script src="capsula-tiempo.js?v=1"></script>
 
   <!-- FEATURES EXTRA RPG (descomenta cuando confirmes que la base funciona) -->
   <!--
@@ -854,7 +856,7 @@ Artista - Canción
     })();
   </script>
 
-  <!-- FIX POLAROID -->
+  <!-- FIX POLAROID & GESTOS RESPONSIVE (TAP ABRIR / LONG-PRESS MENSAJE) -->
   <script>
     (function () {
       "use strict";
@@ -868,8 +870,110 @@ Artista - Canción
         const enZona = (bx, by, w = 32, h = 32) => x >= bx && x <= bx + w && y >= by && y <= by + h;
         if (enZona(r.width - 40, 8)) { e.preventDefault(); pol.querySelector(".polaroid-delete")?.click(); }
         else if (enZona(8, 8)) { e.preventDefault(); pol.querySelector(".polaroid-edit")?.click(); }
+        else if (enZona(44, 8)) { e.preventDefault(); pol.querySelector(".polaroid-capsula")?.click(); }
         else if (enZona(r.width - 76, 8)) { e.preventDefault(); pol.querySelector(".polaroid-fullscreen")?.click(); }
       }, true);
+
+      // Gestor táctil en responsive (móvil / tablet)
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchStartTime = 0;
+      let longPressTimer = null;
+      let targetPolaroid = null;
+      let fueLongPress = false;
+      let touchMoved = false;
+
+      const limpiarLongPress = () => {
+        if (longPressTimer) {
+          clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+        if (targetPolaroid) {
+          targetPolaroid.classList.remove("presionando");
+        }
+      };
+
+      document.addEventListener("touchstart", function (e) {
+        if (window.innerWidth > 768) return;
+        const pol = e.target.closest(".polaroid");
+        if (!pol) return;
+        // Si tocó un botón directamente, no intervenir
+        if (e.target.closest("button")) return;
+        if (document.fullscreenElement === pol) return;
+
+        targetPolaroid = pol;
+        fueLongPress = false;
+        touchMoved = false;
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchStartTime = Date.now();
+
+        pol.classList.add("presionando");
+
+        // Temporizador para detectar Long-Press (dejar presionado)
+        longPressTimer = setTimeout(() => {
+          if (touchMoved || !targetPolaroid) return;
+          fueLongPress = true;
+          try {
+            if (navigator.vibrate) navigator.vibrate(40);
+          } catch (_) {}
+
+          // Alternar o activar la nota de la foto
+          targetPolaroid.classList.toggle("nota-activa");
+          targetPolaroid.classList.remove("presionando");
+        }, 420);
+      }, { passive: true });
+
+      document.addEventListener("touchmove", function (e) {
+        if (!targetPolaroid || touchMoved) return;
+        const touch = e.touches[0];
+        const dx = Math.abs(touch.clientX - touchStartX);
+        const dy = Math.abs(touch.clientY - touchStartY);
+        if (dx > 10 || dy > 10) {
+          touchMoved = true;
+          limpiarLongPress();
+        }
+      }, { passive: true });
+
+      document.addEventListener("touchend", function (e) {
+        if (!targetPolaroid) return;
+        const pol = targetPolaroid;
+        const duration = Date.now() - touchStartTime;
+        limpiarLongPress();
+
+        // Si fue un toque corto (Tap) sin desplazamiento y sin ser long-press
+        if (!touchMoved && !fueLongPress && duration < 380) {
+          // Si el toque fue cerca de las zonas de botones superiores, no abrir fullscreen aquí
+          const r = pol.getBoundingClientRect();
+          const changedTouch = e.changedTouches ? e.changedTouches[0] : null;
+          if (changedTouch) {
+            const x = changedTouch.clientX - r.left;
+            const y = changedTouch.clientY - r.top;
+            const enZona = (bx, by, w = 38, h = 38) => x >= bx && x <= bx + w && y >= by && y <= by + h;
+            if (enZona(r.width - 44, 4) || enZona(4, 4) || enZona(40, 4) || enZona(r.width - 80, 4)) {
+              targetPolaroid = null;
+              return;
+            }
+          }
+
+          // Es un tap normal sobre la foto en responsive: abrir fullscreen / visualizador
+          e.preventDefault();
+          const btnFull = pol.querySelector(".polaroid-fullscreen");
+          if (btnFull) {
+            btnFull.click();
+          } else {
+            pol.click();
+          }
+        }
+
+        targetPolaroid = null;
+      }, { passive: false });
+
+      document.addEventListener("touchcancel", function () {
+        limpiarLongPress();
+        targetPolaroid = null;
+      }, { passive: true });
     })();
   </script>
 

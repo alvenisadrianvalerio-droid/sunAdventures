@@ -132,7 +132,7 @@
     await dbPut(S_TR, rec);
     state.tracks.push(rec);
     renderLib();
-    notif(`✅ ${titulo}${kind === "video" ? " 🎬" : ""}`);
+    notif(`✅ ${titulo}`);
   }
 
   /* ---------- Biblioteca ---------- */
@@ -151,7 +151,7 @@
       <div class="ml-track${cur === t.hash ? " reproduciendo" : ""}" data-hash="${t.hash}">
         <button class="ml-track-play" title="Reproducir">▶</button>
         <div class="ml-track-info">
-          <span class="ml-track-titulo">${esc(t.titulo)}${t.kind === "video" ? ' <span class="ml-track-badge">🎬</span>' : ''}</span>
+          <span class="ml-track-titulo">${esc(t.titulo)}</span>
           <span class="ml-track-artista">${esc(t.artista || "—")} · ${fmt(t.duracion)} · ${fsz(t.size)}</span>
         </div>
         <button class="ml-track-add" title="Añadir a playlist">＋</button>
@@ -223,7 +223,7 @@
     const t = state.queue[state.queueIndex];
     if (!t) { b.classList.remove("visible"); return; }
     b.classList.add("visible");
-    b.querySelector(".ml-player-titulo").textContent  = t.titulo + (t.kind === "video" ? "  🎬" : "");
+    b.querySelector(".ml-player-titulo").textContent  = t.titulo;
     b.querySelector(".ml-player-artista").textContent = t.artista || "—";
     b.querySelector(".ml-player-play").textContent    = state.playing ? "❚❚" : "▶";
   };

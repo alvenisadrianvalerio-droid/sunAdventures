@@ -6697,7 +6697,13 @@ body.light .perfil-stat {
     max-width: 100%;
   }
 
-  .album-grid,
+  .album-grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 1.8rem;
+    padding-inline: clamp(0.5rem, 3vw, 1.2rem);
+  }
+
   .notas-grid,
   .playlists-grid,
   .logros-grid {
@@ -7172,3 +7178,73 @@ body.player-abierto.player-provider-abierto .shop-bubble { bottom: 420px; }
 
 body:has(.modal.active) .mascota-wrapper,
 body:has(.modal.active) .shop-bubble { display: none !important; }
+
+/* ============================================================
+   📱 RESPONSIVE POLAROID: Tamaño adaptado y nota en Long-Press
+   ============================================================ */
+@media (max-width: 700px) {
+  .album-grid .polaroid {
+    width: 100% !important;
+    max-width: min(92vw, 370px) !important;
+    margin-inline: auto !important;
+    box-sizing: border-box !important;
+    padding: 1.1rem 1.1rem 1.4rem !important;
+    transform: none !important;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: pan-y;
+  }
+
+  .album-grid .polaroid:nth-child(n) {
+    transform: none !important;
+  }
+
+  .album-grid .polaroid img {
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 4px;
+    pointer-events: auto;
+  }
+
+  /* La nota permanece plegada y oculta por defecto en responsive */
+  .album-grid .polaroid:not(:fullscreen) .polaroid-nota {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    margin-top: 0;
+    overflow: hidden;
+    transform: translateY(8px) scale(0.98);
+    transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                margin-top 0.28s ease,
+                padding 0.28s ease;
+    pointer-events: none;
+  }
+
+  /* Cuando el usuario deja presionada la foto (long-press) se despliega suavemente */
+  .album-grid .polaroid:not(:fullscreen).nota-activa .polaroid-nota {
+    opacity: 1;
+    max-height: 260px;
+    padding: 0.85rem 0.5rem 0.2rem;
+    margin-top: 0.4rem;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  /* Indicador sutil de toque en la polaroid */
+  .album-grid .polaroid.presionando {
+    transform: scale(0.985) !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  /* Si está en fullscreen nativo, respetar tamaño completo de la nota */
+  .album-grid .polaroid:fullscreen .polaroid-nota {
+    opacity: 1 !important;
+    max-height: none !important;
+    transform: none !important;
+    pointer-events: auto !important;
+  }
+}

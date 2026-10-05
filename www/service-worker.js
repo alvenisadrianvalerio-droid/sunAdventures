@@ -1,9 +1,9 @@
 const CACHE_NAME = "sunadventures-v104";
 const ASSETS_ESTATICOS = [
   "./", "./index.html", "./styles.css", "./album.css", "./juegos.css",
-  "./rpg.css", "./rpg-loot.css", "./temas.css", "./finanzas.css",
+  "./rpg.css", "./rpg-loot.css", "./temas.css", "./finanzas.css", "./capsula-tiempo.css",
   "./youtube-spotify-metadata.js",
-  "./script.js", "./album.js", "./preferences.js", "./finanzas.js", "./icons-emojis.js", "./juegos.js",
+  "./script.js", "./album.js", "./capsula-tiempo.js", "./preferences.js", "./finanzas.js", "./icons-emojis.js", "./juegos.js",
   "./ds.js", "./offline.js", "./tienda.js", "./perfil.js", "./logros-extra.js",
   "./sprites-config.js", "./efectos.js", "./rpg.js", "./rpg-loot.js",
   "./rpg-canvas.js", "./rpg-habilidades.js", "./rpg-minimap.js",

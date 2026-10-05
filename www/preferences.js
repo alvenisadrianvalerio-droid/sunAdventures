@@ -15,6 +15,7 @@
   const WORDS = {
     "Inicio":["Home","Início","首页","ホーム","홈","Home","Accueil"],
     "Álbum":["Album","Álbum","相册","アルバム","앨범","Album","Album"],
+    "Cápsulas del Tiempo":["Time Capsules","Cápsulas do Tempo","时间胶囊","タイムカプセル","타임캡슐","Capsule del Tempo","Capsules temporelles"],
     "Chat":["Chat","Chat","聊天","チャット","채팅","Chat","Chat"],
     "Mascotas":["Pets","Mascotes","宠物","ペット","반려동물","Animali","Animaux"],
     "Finanzas":["Finance","Finanças","财务","ファイナンス","재정","Finanze","Finances"],
