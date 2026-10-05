@@ -102,12 +102,27 @@
      4) 🐾 MASCOTA oculta en RPG
      ============================================================ */
   function checkMascota() {
-    const enRpg = location.hash === "#rpg" || document.querySelector('[data-view="rpg"].active');
+    const enRpg = location.hash === "#rpg" || 
+                  !!document.querySelector('[data-view="rpg"].active') ||
+                  !!document.querySelector('#rpg.active') ||
+                  !!document.querySelector('#rpg-roguelike-panel') ||
+                  !!document.querySelector('[data-rpg-panel="roguelike"].active');
     const w = $("mascota-wrapper");
-    if (w) { w.style.opacity = enRpg ? "0" : "1"; w.style.pointerEvents = enRpg ? "none" : ""; w.style.transition = "opacity .3s"; }
+    if (w) { 
+      if (enRpg) {
+        w.style.display = "none";
+        w.style.pointerEvents = "none";
+        w.style.opacity = "0";
+      } else {
+        w.style.display = "";
+        w.style.pointerEvents = "";
+        w.style.opacity = "1";
+      }
+    }
   }
   window.addEventListener("hashchange", checkMascota);
-  setInterval(checkMascota, 500);
+  window.addEventListener("sunadventures:rpg-tab", checkMascota);
+  setInterval(checkMascota, 400);
 
   /* ============================================================
      5) 🎨 TEMA CLARO comprable (500 🪙)

@@ -56,6 +56,11 @@
     { id:"rpg-cofres-10",     tipo:"personal", nombre:"Abrecofres",        descripcion:"Abre 10 cofres",                     meta:10,   medir:()=> lootStats().cofres },
     { id:"rpg-cofres-50",     tipo:"personal", nombre:"Traficante",        descripcion:"Abre 50 cofres",                     meta:50,   medir:()=> lootStats().cofres },
     { id:"rpg-bonus-100",     tipo:"personal", nombre:"Forjado",           descripcion:"Acumula +100 de bonus total",        meta:100,  medir:()=> lootStats().bonusTotal },
+    /* --- Hordas RPG --- */
+    { id:"rpg-horda-4",       tipo:"personal", nombre:"Cazador de Patrullas", descripcion:"Derrota a una horda de 4 o más enemigos",   meta:4,    medir:()=> rpgState().hordasTamanoMax || 0 },
+    { id:"rpg-horda-8",       tipo:"personal", nombre:"Furia de la Horda",     descripcion:"Derrota a una horda de 8 o más enemigos",   meta:8,    medir:()=> rpgState().hordasTamanoMax || 0 },
+    { id:"rpg-horda-12",      tipo:"personal", nombre:"Rompe-Enjambres",       descripcion:"Derrota a una horda de 12 enemigos",        meta:12,   medir:()=> rpgState().hordasTamanoMax || 0 },
+    { id:"rpg-horda-jefe",    tipo:"personal", nombre:"Asedio Legendario",     descripcion:"Derrota a un Jefe de región en modo Horda", meta:1,    medir:()=> rpgState().jefesHordaDerrotados || 0 },
     /* 🐰 LOGRO ESPECIAL: Máxima bestia */
 {
   id:"maxima-bestia",

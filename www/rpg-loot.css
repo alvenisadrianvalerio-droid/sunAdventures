@@ -655,18 +655,41 @@
   gap: .2rem;
 }
 
+.rpg-cofre-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  margin-top: .3rem;
+}
+
 .rpg-cofre-btn {
-  padding: .45rem 1rem;
+  padding: .45rem .8rem;
   border-radius: 999px;
   border: none;
   background: linear-gradient(135deg, var(--cofre-color, #ffd93d), rgba(255, 255, 255, .1));
   color: #1a1a1a;
   font-weight: 900;
   font-family: inherit;
-  font-size: .75rem;
+  font-size: .73rem;
   cursor: pointer;
-  transition: transform .2s;
-  margin-top: .2rem;
+  transition: transform .2s, filter .2s;
+  width: 100%;
+  text-align: center;
+}
+
+.rpg-cofre-llave-btn {
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: #052e16;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.rpg-cofre-llave-btn.sin-llave {
+  opacity: 0.55;
+  filter: grayscale(0.6);
+  background: rgba(255, 255, 255, 0.1);
+  color: #aaa;
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .rpg-cofre-btn:hover {

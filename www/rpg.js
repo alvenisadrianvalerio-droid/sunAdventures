@@ -18,6 +18,10 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const FX = det => window.dispatchEvent(new CustomEvent("rpg:fx", { detail: det }));
   const FX_KEY = id => (window.RpgCanvas?.HABILIDAD_FX?.[id]) || "slash";
 
+  const SVG_POTION = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;display:inline-block;vertical-align:-3px;margin-right:5px;"><path d="M9 2h6M10 2v3.5a2 2 0 0 1-.5 1.4L5.2 12.3A5 5 0 0 0 4 15.6V18a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4v-2.4a5 5 0 0 0-1.2-3.3l-4.3-5.4a2 2 0 0 1-.5-1.4V2"/><path d="M6 14h12" opacity="0.6"/></svg>';
+  const SVG_SPARKLES = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;display:inline-block;vertical-align:-3px;margin-right:5px;"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z"/><path d="M19 2l1.2 3.3L23.5 6.5l-3.3 1.2L19 11l-1.2-3.3L14.5 6.5l3.3-1.2L19 2z" opacity="0.75"/></svg>';
+  const SVG_RUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;display:inline-block;vertical-align:-3px;margin-right:5px;"><circle cx="14" cy="4" r="2"/><path d="m9 20 3-6-3-3 4-2 3 3h4"/><path d="m6 16 3-3"/><path d="M14 14l2 6"/></svg>';
+
   const DIR_48 = 'img/48x48/';
   const SPR_ENEMIGO = {
     // --- Murciélagos (Bats) ---
@@ -412,13 +416,13 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     REGIONES.forEach((reg, ri) => {
       for (let i = 1; i <= 10; i++) {
         const idx = ri * 10 + i, esJefe = i === 10, esMini = i === 5, esElite = i >= 6 && i <= 9;
-        // Curva lineal suave y progresiva adecuada al jugador
-        const hpBase = 50 + idx * 16;
-        const atkBase = 8 + idx * 2.2;
-        const hpJefe = esJefe ? Math.round(idx * 35 + 80) : 0;
-        const atkJefe = esJefe ? Math.round(idx * 1.5 + 6) : 0;
-        const hpMini = esMini ? Math.round(idx * 18 + 35) : 0;
-        const atkMini = esMini ? Math.round(idx * 0.9 + 3) : 0;
+        // Curva lineal suave y progresiva con enemigos normales reforzados y desafiantes
+        const hpBase = Math.round(75 + idx * 22);
+        const atkBase = Math.round(12 + idx * 3.0);
+        const hpJefe = esJefe ? Math.round(idx * 38 + 90) : 0;
+        const atkJefe = esJefe ? Math.round(idx * 1.6 + 6) : 0;
+        const hpMini = esMini ? Math.round(idx * 20 + 40) : 0;
+        const atkMini = esMini ? Math.round(idx * 1.0 + 4) : 0;
         z.push({
           id: `${reg.id}-${i}`,
           nombre: esJefe ? reg.jefeNombre : `${reg.nombre} · ${i}`,
@@ -427,8 +431,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
           enemigos: esJefe ? [reg.jefe] : esMini ? [...reg.elite.slice(0, 2), reg.base[0]] : esElite ? reg.elite : reg.base,
           hp: Math.round(hpBase + hpJefe + hpMini),
           atk: Math.round(atkBase + atkJefe + atkMini),
-          xp: Math.round(15 + idx * 12 + (esJefe ? idx * 25 : esMini ? idx * 10 : 0)),
-          monedas: Math.round(6 + idx * 2.2 + (esJefe ? 40 : esMini ? 15 : 0)),
+          xp: Math.round(18 + idx * 14 + (esJefe ? idx * 28 : esMini ? idx * 12 : 0)),
+          monedas: Math.round(8 + idx * 2.5 + (esJefe ? 45 : esMini ? 18 : 0)),
           jefe: esJefe, miniJefe: esMini, region: reg.id, regionNombre: reg.nombre, orden: idx
         });
       }
@@ -478,9 +482,10 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     }
   };
 
-  const hpMax = () => 100 + state.nivel * 25 + (statsLoot().hpBonus || 0) + bonusTipo("hp_max");
-  const atkTotal = () => state.statsBase.atk + state.nivel * 4 + (statsLoot().atkBonus || 0) + bonusTipo("atk_fijo");
-  const defTotal = () => state.statsBase.def + state.nivel * 2.5 + (statsLoot().defBonus || 0) + bonusTipo("def_fijo");
+  const NIVEL_MAX = 50;
+  const hpMax = () => 100 + Math.min(state.nivel, NIVEL_MAX) * 25 + (statsLoot().hpBonus || 0) + bonusTipo("hp_max");
+  const atkTotal = () => state.statsBase.atk + Math.min(state.nivel, NIVEL_MAX) * 4 + (statsLoot().atkBonus || 0) + bonusTipo("atk_fijo");
+  const defTotal = () => state.statsBase.def + Math.min(state.nivel, NIVEL_MAX) * 2.5 + (statsLoot().defBonus || 0) + bonusTipo("def_fijo");
   const critTotal = () => 0.15 + ((statsLoot().critBonus || 0) / 100);
   const esqTotal = () => ((statsLoot().esqBonus || 0) / 100);
   const regenTotal = () => (statsLoot().regenBonus || 0);
@@ -488,7 +493,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const thornsTotal = () => (statsLoot().thornsBonus || 0);
   const xpTotal = () => 1 + ((statsLoot().xpBonus || 0) / 100);
   const oroTotal = () => 1 + ((statsLoot().oroBonus || 0) / 100);
-  const xpParaSubir = () => Math.round(state.nivel * 160 + Math.pow(state.nivel, 1.8) * 35);
+  const xpParaSubir = () => state.nivel >= NIVEL_MAX ? Infinity : Math.round(state.nivel * 160 + Math.pow(state.nivel, 1.8) * 35);
 
   let enemigo = null, turnoJugador = true, overlayObjetos = false;
   let buffsHeroe = [], buffsEnemigo = [];
@@ -550,18 +555,20 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
   function htmlMapa() {
     const m = MASCOTAS[localStorage.getItem("mascota_actual") || "mapache"] || MASCOTAS.mapache;
+    const esNivelMax = state.nivel >= NIVEL_MAX;
     const hpPct = clamp(state.hp / hpMax() * 100);
-    const xpPct = clamp(state.xp / xpParaSubir() * 100);
+    const xpReq = xpParaSubir();
+    const xpPct = esNivelMax ? 100 : clamp(state.xp / (isFinite(xpReq) ? xpReq : 1) * 100);
     const st = statsLoot();
     const bonusTxt = (st.atkBonus + st.defBonus + st.hpBonus) > 0 ? `<span style="font-size:.68rem;opacity:.75;margin-left:.4rem;">+${st.atkBonus}ATK +${st.defBonus}DEF +${st.hpBonus}HP</span>` : "";
     return `
       <div class="rpg-hud">
         <div class="rpg-hero-avatar"><img src="${m.imagen}" alt="${m.nombre}" style="width:58px;height:58px;max-width:58px;max-height:58px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'"></div>
         <div class="rpg-hero-info">
-          <div class="rpg-hero-name">${m.nombre} <span class="rpg-hero-lvl">Nv ${state.nivel}</span>${bonusTxt}</div>
+          <div class="rpg-hero-name">${m.nombre} <span class="rpg-hero-lvl">${esNivelMax ? `Nv ${NIVEL_MAX} (MÁX)` : `Nv ${state.nivel}`}</span>${bonusTxt}</div>
           <div class="rpg-barra-label"><span>HP</span><span>${Math.round(state.hp)} / ${hpMax()}</span></div>
           <div class="rpg-barra hp"><span style="width:${hpPct}%"></span></div>
-          <div class="rpg-barra-label"><span>XP</span><span>${state.xp} / ${xpParaSubir()}</span></div>
+          <div class="rpg-barra-label"><span>XP</span><span>${esNivelMax ? 'NIVEL MÁXIMO' : `${state.xp} / ${xpReq}`}</span></div>
           <div class="rpg-barra xp"><span style="width:${xpPct}%"></span></div>
         </div>
         <div class="rpg-coins">${ICONO.moneda || ""} ${getMonedas()}</div>
@@ -593,6 +600,16 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       </div>`;
   }
 
+  function getTamanoHorda() {
+    const raw = Number(localStorage.getItem("sa_rpg_tamano_horda"));
+    return [1, 4, 8, 12].includes(raw) ? raw : 4;
+  }
+  function setTamanoHorda(n) {
+    const val = [1, 4, 8, 12].includes(Number(n)) ? Number(n) : 4;
+    localStorage.setItem("sa_rpg_tamano_horda", String(val));
+    return val;
+  }
+
   function abrirPopupGrupo(grupo) {
     let m = $("rpg-popup-grupo"); if (m) m.remove();
     m = document.createElement("div");
@@ -600,6 +617,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const zonas = grupo.zonas;
     const conquistadas = zonas.filter(z => state.zonasConquistadas.includes(z.id)).length;
     const desbloqueada = z => window._rpgZonaDesbloqueada ? window._rpgZonaDesbloqueada(z.id) : state.nivel >= z.nivel - 2 || state.enemigosDerrotados >= z.nivel * 6;
+    const currentHorda = getTamanoHorda();
     m.innerHTML = `
       <div class="rpg-popup-panel" style="--bioma-img:url('${grupo.bioma.imagen}');--bioma-acento:${grupo.bioma.acento}">
         <button class="rpg-popup-close" aria-label="Cerrar">×</button>
@@ -613,6 +631,33 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
             <em>${conquistadas}/10 zonas conquistadas · Primera victoria: +50% XP y monedas</em>
           </div>
         </header>
+
+        <!-- Selector de Tamaño de Horda / Dificultad -->
+        <div class="rpg-popup-horda-box">
+          <div class="rpg-popup-horda-label">
+            <span>👥 Modo de Combate:</span>
+            <small>Más enemigos = combate más difícil y mayor recompensa</small>
+          </div>
+          <div class="rpg-popup-horda-btns" id="rpg-horda-selector-btns">
+            <button type="button" class="rpg-btn-horda-opt ${currentHorda === 1 ? 'active' : ''}" data-mobs="1">
+              <span class="rpg-horda-opt-num">1</span>
+              <span class="rpg-horda-opt-info"><strong>Solo</strong><small>Dificultad base</small></span>
+            </button>
+            <button type="button" class="rpg-btn-horda-opt ${currentHorda === 4 ? 'active' : ''}" data-mobs="4">
+              <span class="rpg-horda-opt-num">4</span>
+              <span class="rpg-horda-opt-info"><strong>Patrulla</strong><small>+20% XP/Oro</small></span>
+            </button>
+            <button type="button" class="rpg-btn-horda-opt ${currentHorda === 8 ? 'active' : ''}" data-mobs="8">
+              <span class="rpg-horda-opt-num">8</span>
+              <span class="rpg-horda-opt-info"><strong>Horda</strong><small>+50% XP/Oro</small></span>
+            </button>
+            <button type="button" class="rpg-btn-horda-opt ${currentHorda === 12 ? 'active' : ''}" data-mobs="12">
+              <span class="rpg-horda-opt-num">12</span>
+              <span class="rpg-horda-opt-info"><strong>Enjambre</strong><small>+90% XP/Oro</small></span>
+            </button>
+          </div>
+        </div>
+
         <div class="rpg-popup-zonas" aria-label="Zonas de la región">
           ${zonas.map((z, i) => {
       const open = desbloqueada(z);
@@ -652,6 +697,17 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         setTimeout(() => popup.remove(), 250);
         return;
       }
+      const hordaBtn = e.target.closest(".rpg-btn-horda-opt");
+      if (hordaBtn) {
+        e.preventDefault(); e.stopPropagation();
+        const num = Number(hordaBtn.dataset.mobs);
+        setTamanoHorda(num);
+        popup.querySelectorAll(".rpg-btn-horda-opt").forEach(b => {
+          b.classList.toggle("active", Number(b.dataset.mobs) === num);
+        });
+        SND("blip");
+        return;
+      }
       const dot = e.target.closest(".rpg-popup-dot");
       if (dot) {
         e.preventDefault(); e.stopPropagation();
@@ -680,17 +736,22 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     // Renderizado del enemigo o horda
     let eContent = "";
     if (enemigo.esHorda && Array.isArray(enemigo.horda)) {
+      const totMobs = enemigo.horda.length;
       const mobsHtml = enemigo.horda.map((mob, i) => {
         const vivo = mob.hp > 0;
-        const mobSpr = renderMobAnimado(relPath, 42, `rpg-horda-anim ${vivo ? "" : "muerto"}`);
-        return `<div class="rpg-horda-item ${vivo ? "" : "caido"}" data-horda-idx="${i}" title="${enemigo.nombre} #${i + 1} (${mob.hp}/${mob.hpMax} HP)">
+        let mSprKey = mob.sprite || relPath;
+        if (mSprKey && mSprKey.startsWith("img/48x48/")) mSprKey = mSprKey.replace("img/48x48/", "");
+        const mobSize = mob.esLider ? (totMobs >= 12 ? 42 : 48) : (totMobs >= 12 ? 34 : totMobs >= 8 ? 38 : 42);
+        const mobSpr = renderMobAnimado(mSprKey, mobSize, `rpg-horda-anim ${vivo ? "" : "muerto"} ${mob.esLider ? "lider" : ""}`);
+        return `<div class="rpg-horda-item ${vivo ? "" : "caido"} ${mob.esLider ? "horda-lider" : ""}" data-horda-idx="${i}" title="${mob.nombre || enemigo.nombre} (${mob.hp}/${mob.hpMax} HP)">
+          ${mob.esLider ? `<span class="rpg-horda-corona">👑</span>` : ""}
           ${mobSpr}
           <div class="rpg-horda-item-hp"><span style="width:${Math.max(0, (mob.hp / mob.hpMax) * 100)}%"></span></div>
         </div>`;
       }).join("");
       eContent = `<div class="rpg-horda-container">
-        <div class="rpg-horda-grid">${mobsHtml}</div>
-        <div class="rpg-horda-contador">Horda: ${enemigo.horda.filter(x => x.hp > 0).length}/9 vivos</div>
+        <div class="rpg-horda-grid mobs-${totMobs}">${mobsHtml}</div>
+        <div class="rpg-horda-contador">Horda: ${enemigo.horda.filter(x => x.hp > 0).length}/${totMobs} vivos</div>
       </div>`;
     } else {
       const eSpriteEl = relPath ? renderMobAnimado(relPath, 92, "rpg-enemy-sprite-anim") : "";
@@ -702,7 +763,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       <div class="rpg-hud">
         <div class="rpg-hero-avatar"><img src="${m.imagen}" alt="${m.nombre}" style="width:58px;height:58px;max-width:58px;max-height:58px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'"></div>
         <div class="rpg-hero-info">
-          <div class="rpg-hero-name">${m.nombre} <span class="rpg-hero-lvl">Nv ${state.nivel}</span></div>
+          <div class="rpg-hero-name">${m.nombre} <span class="rpg-hero-lvl">${state.nivel >= NIVEL_MAX ? `Nv ${NIVEL_MAX} (MÁX)` : `Nv ${state.nivel}`}</span></div>
           <div class="rpg-barra-label"><span>HP</span><span>${Math.round(state.hp)} / ${hpMax()}</span></div>
           <div class="rpg-barra hp"><span style="width:${hpPct}%"></span></div>
           ${enemigo.dot ? `<div class="rpg-barra-label" style="color:#ff9a3d"><span>🔥 Quemadura</span><span>${enemigo.dot} dmg/turno</span></div>` : ""}
@@ -723,19 +784,25 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
           <div class="rpg-vs">VS</div>
           <div class="rpg-fighter" id="fighter-enemigo">
             <div class="rpg-fighter-sprite enemigo ${enemigo.esHorda ? 'es-horda' : ''} ${esFase2 ? 'fase2' : ''}" id="sprite-enemigo">${eContent}</div>
-            <div class="rpg-fighter-nombre">${enemigo.nombre} ${enemigo.jefe ? (esFase2 ? '🔥 FASE 2' : '👑') : enemigo.esHorda ? '👥 HORDA (x9)' : ''}</div>
+            <div class="rpg-fighter-nombre">${enemigo.nombre} ${enemigo.jefe ? (esFase2 ? '🔥 FASE 2' : '👑') : enemigo.esHorda ? `👥 HORDA (x${enemigo.horda.length})` : ''}</div>
             <div class="rpg-fighter-hp" id="hp-enemigo">${Math.round(enemigo.hp)} HP${enemigo.shield > 0 ? ` · 🛡️${enemigo.shield}` : ''}</div>
             <div class="rpg-buffs" id="buffs-enemigo"></div>
           </div>
         </div>
-        <div class="rpg-log" id="rpg-log"><div class="rpg-log-item info">¡${enemigo.esHorda ? '¡Una horda de 9 ' + enemigo.nombre + ' te rodea!' : '¡Un ' + enemigo.nombre + ' aparece!'}</div></div>
+        <div class="rpg-log" id="rpg-log"><div class="rpg-log-item info">¡${enemigo.esHorda ? `¡Una horda de ${enemigo.horda.length} ${enemigo.nombre} te rodea!` : '¡Un ' + enemigo.nombre + ' aparece!'}</div></div>
         <div class="rpg-habs-grid" id="rpg-habs-grid">
           ${habs.length ? habs.map(h => `<button type="button" class="rpg-hab rpg-hab-${h.tipo}" data-hab="${h.id}" title="${h.desc}"><span class="rpg-hab-nombre">${h.nombre}</span><span class="rpg-hab-lv">Nv ${h.lv}</span></button>`).join("") : `<button type="button" class="rpg-hab rpg-hab-daño" data-hab="ataque-basico" title="Ataque básico"><span class="rpg-hab-nombre">Ataque</span><span class="rpg-hab-lv">Básico</span></button>`}
         </div>
         <div class="rpg-acciones" id="rpg-acciones">
-          <button type="button" class="rpg-btn objeto" id="btn-objeto">🧪 Objeto</button>
-          ${habsItems.length ? `<button type="button" class="rpg-btn arma" id="btn-arma-habs">✨ Habilidad de arma <span class="rpg-btn-badge">${habsItems.length}</span></button>` : ""}
-          <button type="button" class="rpg-btn huir" id="btn-huir">🏃 Huir</button>
+          <button type="button" class="rpg-btn objeto" id="btn-objeto">
+            ${SVG_POTION} Objeto
+          </button>
+          ${habsItems.length ? `<button type="button" class="rpg-btn arma" id="btn-arma-habs">
+            ${SVG_SPARKLES} Habilidad de arma <span class="rpg-btn-badge">${habsItems.length}</span>
+          </button>` : ""}
+          <button type="button" class="rpg-btn huir" id="btn-huir">
+            ${SVG_RUN} Huir
+          </button>
         </div>
         <div id="rpg-arma-wrap"></div>
         <div id="rpg-objetos-wrap"></div>
@@ -791,24 +858,76 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const esp = ESPECIALES[tier][rnd(0, ESPECIALES[tier].length - 1)];
     const spriteName = SPR_ENEMIGO[eId] || (z.jefe ? 'corona' : z.miniJefe ? 'calavera' : 'espada');
 
-    // Sistema de Hordas: si NO es jefe ni minijefe, aparecen 9 enemigos de la misma especie
-    const esHorda = !z.jefe && !z.miniJefe;
+    // Selección y configuración de tamaño de horda (1, 4, 8, 12 mobs)
+    // ¡Ahora disponible también para jefes y mini-jefes!
+    const nHorda = getTamanoHorda();
+    const esHorda = nHorda > 1;
+
+    // Dificultad escalada: a mayor número de mobs, combate más desafiante y mejores recompensas
+    // 1 mob: 1.0x HP, 1.0x ATK, 1.0x XP/monedas
+    // 4 mobs: 1.15x HP total, 1.20x ATK, +20% XP/monedas
+    // 8 mobs: 1.40x HP total, 1.45x ATK, +50% XP/monedas
+    // 12 mobs: 1.75x HP total, 1.75x ATK, +90% XP/monedas
+    const multHP = esHorda ? (nHorda === 4 ? 1.15 : nHorda === 8 ? 1.40 : 1.75) : 1.0;
+    const multATK = esHorda ? (nHorda === 4 ? 1.20 : nHorda === 8 ? 1.45 : 1.75) : 1.0;
+    const multPremio = esHorda ? (nHorda === 4 ? 1.20 : nHorda === 8 ? 1.50 : 1.90) : 1.0;
+
+    const hpFinal = Math.max(30, Math.round(hp * multHP));
     let hordaArr = null;
     if (esHorda) {
-      const hpIndividual = Math.max(8, Math.round(hp / 9));
-      hordaArr = Array.from({ length: 9 }, (_, idx) => ({
-        id: idx,
-        hp: hpIndividual,
-        hpMax: hpIndividual
-      }));
+      if (z.jefe || z.miniJefe) {
+        // En horda de JEFE / MINI-JEFE: El jefe lidera la vanguardia con 40% de la vida total,
+        // y sus esbirros/guardias de la región lo escoltan con el resto repartido.
+        const regInfo = REGIONES.find(r => r.id === z.region);
+        const poolEscoltas = (regInfo && regInfo.elite && regInfo.elite.length) ? regInfo.elite : (z.enemigos || [eId]);
+        const hpJefeParte = Math.max(20, Math.round(hpFinal * 0.40));
+        const hpPorEscolta = Math.max(6, Math.round((hpFinal - hpJefeParte) / (nHorda - 1)));
+        
+        hordaArr = Array.from({ length: nHorda }, (_, idx) => {
+          if (idx === 0) {
+            return {
+              id: 0,
+              nombre: NOMBRES[eId] || eId,
+              sprite: spriteName,
+              hp: hpJefeParte,
+              hpMax: hpJefeParte,
+              esLider: true
+            };
+          } else {
+            const escId = poolEscoltas[(idx - 1) % poolEscoltas.length];
+            const escSpr = SPR_ENEMIGO[escId] || "espada";
+            return {
+              id: idx,
+              nombre: NOMBRES[escId] || escId,
+              sprite: escSpr,
+              hp: hpPorEscolta,
+              hpMax: hpPorEscolta,
+              esLider: false
+            };
+          }
+        });
+      } else {
+        const hpIndividual = Math.max(6, Math.round(hpFinal / nHorda));
+        hordaArr = Array.from({ length: nHorda }, (_, idx) => ({
+          id: idx,
+          nombre: NOMBRES[eId] || eId,
+          sprite: spriteName,
+          hp: hpIndividual,
+          hpMax: hpIndividual,
+          esLider: false
+        }));
+      }
     }
 
     enemigo = {
       id: eId, iconoKey: eId, icono: z.icono, sprite: spriteName, nombre: NOMBRES[eId] || eId,
-      hpMax: esHorda ? (hordaArr.reduce((s, x) => s + x.hpMax, 0)) : hp,
-      hp: esHorda ? (hordaArr.reduce((s, x) => s + x.hp, 0)) : hp,
-      atk: Math.round(z.atk * (1 + v)), xp: z.xp, monedas: z.monedas,
+      hpMax: esHorda ? (hordaArr.reduce((s, x) => s + x.hpMax, 0)) : hpFinal,
+      hp: esHorda ? (hordaArr.reduce((s, x) => s + x.hp, 0)) : hpFinal,
+      atk: Math.round(z.atk * (1 + v) * multATK),
+      xp: Math.round(z.xp * multPremio),
+      monedas: Math.round(z.monedas * multPremio),
       jefe: !!z.jefe, miniJefe: !!z.miniJefe, esHorda, horda: hordaArr,
+      tamanoHorda: nHorda,
       dot: 0, dotDur: 0, shield: 0, phase: 1, tier,
       special: esp, specialCD: z.jefe ? 2 : z.miniJefe ? 3 : 4, specialTimer: z.jefe ? 2 : z.miniJefe ? 3 : 4
     };
@@ -839,9 +958,10 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if (he && enemigo) {
       if (enemigo.esHorda && enemigo.horda) {
         const vivos = enemigo.horda.filter(x => x.hp > 0).length;
-        he.textContent = `${Math.max(0, enemigo.hp)} HP (${vivos}/9 vivos)${enemigo.shield > 0 ? ` · 🛡️${enemigo.shield}` : ''}`;
+        const total = enemigo.horda.length;
+        he.textContent = `${Math.max(0, enemigo.hp)} HP (${vivos}/${total} vivos)${enemigo.shield > 0 ? ` · 🛡️${enemigo.shield}` : ''}`;
         const countBadge = qs(".rpg-horda-contador");
-        if (countBadge) countBadge.textContent = `Horda: ${vivos}/9 vivos`;
+        if (countBadge) countBadge.textContent = `Horda: ${vivos}/${total} vivos`;
       } else {
         he.textContent = `${Math.max(0, enemigo.hp)} HP${enemigo.shield > 0 ? ` · 🛡️${enemigo.shield}` : ''}`;
       }
@@ -975,7 +1095,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
       if (evento === "turno-propio" && texto.includes("conocimiento absoluto")) {
         const curaMatch = desc.match(/(\d+)\s*(?:de\s+)?vida/);
-        const curaPorTurno = curaMatch ? parseInt(curaMatch[1]) : 500;
+        const curaPorTurno = curaMatch ? parseInt(curaMatch[1]) : (hab.val || 200);
         state.hp = Math.min(hpMax(), state.hp + curaPorTurno);
         log(`📚 ${hab.nombre}: +${curaPorTurno} HP por turno.`, "curar");
         activada = true;
@@ -1492,11 +1612,11 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     w.dataset.abierto = "1";
     w.innerHTML = `
       <div class="rpg-arma-panel">
-        <div class="rpg-arma-titulo">✨ Habilidades equipadas (máx. 4)</div>
+        <div class="rpg-arma-titulo">${SVG_SPARKLES} Habilidades equipadas (máx. 4)</div>
         <div class="rpg-arma-grid">
           ${habsItems.map((h, i) => `
             <button type="button" class="rpg-arma-item" data-arma-hab="${i}" title="${h.desc || ''}">
-              <span class="rpg-arma-icono">✨</span>
+              <span class="rpg-arma-icono">${SVG_SPARKLES}</span>
               <span class="rpg-arma-info">
                 <strong>${h.nombre}</strong>
                 <small>${(h.tipo || "").replace(/_/g, " ")} · val ${h.val}</small>
@@ -1863,6 +1983,16 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     window.dispatchEvent(new CustomEvent("rpg:victoria", { detail: { enemigo: { ...enemigo, zona: state.zonaActual, xp, monedas: mon } } }));
     state.enemigosDerrotados++;
     state.xp += xp;
+
+    // Métricas de Hordas para estadísticas y logros
+    if (enemigo.esHorda) {
+      state.hordasDerrotadas = (state.hordasDerrotadas || 0) + 1;
+      state.hordasTamanoMax = Math.max(state.hordasTamanoMax || 0, enemigo.tamanoHorda || 1);
+      if (eraJefe) {
+        state.jefesHordaDerrotados = (state.jefesHordaDerrotados || 0) + 1;
+      }
+    }
+
     if (eraJefe && !state.jefesDerrotados.includes(state.zonaActual)) state.jefesDerrotados.push(state.zonaActual);
     if (eraJefe) {
       try {
@@ -1876,7 +2006,16 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       } catch { }
     }
     let sub = 0;
-    while (state.xp >= xpParaSubir()) { state.xp -= xpParaSubir(); state.nivel++; state.hp = hpMax(); sub++; }
+    while (state.nivel < NIVEL_MAX && state.xp >= xpParaSubir()) {
+      state.xp -= xpParaSubir();
+      state.nivel++;
+      state.hp = hpMax();
+      sub++;
+    }
+    if (state.nivel >= NIVEL_MAX) {
+      state.nivel = NIVEL_MAX;
+      state.xp = 0;
+    }
     const cuv = bonusTipo("curar_victoria");
     if (cuv > 0) { state.hp = Math.min(hpMax(), state.hp + cuv); log("💚 +" + cuv + " HP.", "curar"); }
     setMonedas(getMonedas() + mon);

@@ -130,9 +130,9 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     ojos: {
       gafas:{nombre:"Gafas sol",precio:65,icono:"globo",sheet:"tienda",sprite:[4,2],desc:"Cool total",bonus:{tipo:"esquivar",val:10,desc:"10% prob. de esquivar"}},
-      monoculo:{nombre:"Monóculo",precio:90,icono:"ajustes",sheet:"tienda",sprite:[0,3],desc:"Distinguido",bonus:{tipo:"crit_pct",val:15,desc:"+15% golpe crítico"}},
+      monoculo:{nombre:"Monóculo",precio:80,icono:"ajustes",sheet:"tienda",sprite:[0,3],desc:"Distinguido",bonus:{tipo:"crit_pct",val:8,desc:"+8% golpe crítico"}},
       antifaz:{nombre:"Antifaz",precio:75,icono:"candado",sheet:"tienda",sprite:[1,3],desc:"Misterioso",bonus:{tipo:"escape_seguro",val:1,desc:"Escape garantizado"}},
-      gafas3d:{nombre:"Gafas 3D",precio:100,icono:"cubo",sheet:"tienda",sprite:[2,3],desc:"Cine retro",bonus:{tipo:"crit_pct",val:10,desc:"+10% golpe crítico"}}
+      gafas3d:{nombre:"Gafas 3D",precio:120,icono:"cubo",sheet:"tienda",sprite:[2,3],desc:"Cine retro",bonus:{tipo:"crit_pct",val:12,desc:"+12% golpe crítico"}}
     },
     fondos: {
       noche:{nombre:"Fondo Noche estrellada",precio:5000,icono:"nocheEstrellada",desc:"Cambia toda la web",bonus:{tipo:"tema_noche",val:1,desc:"Temática nocturna estelar"}},
@@ -807,14 +807,24 @@ document.addEventListener("DOMContentLoaded", () => {
       _contarClick();
     }
 
+    function _estaEnRpg() {
+      return document.body.classList.contains("rpg-abierto") ||
+             location.hash === "#rpg" ||
+             !!document.querySelector('[data-view="rpg"].active') ||
+             !!document.querySelector('#rpg.active') ||
+             !!document.querySelector('#rpg-roguelike-panel');
+    }
+
     mascotaImg.addEventListener("click", e => {
-      if (e.pointerType === "touch" || _ultimoTap > 0) return;
+      if (_estaEnRpg() || e.pointerType === "touch" || _ultimoTap > 0) return;
       e.stopPropagation();
       _interactuar();
     });
     mascotaImg.addEventListener("touchstart", () => {
+      if (_estaEnRpg()) return;
       _pressDisparo = false;
       _pressT = setTimeout(() => {
+        if (_estaEnRpg()) return;
         _pressDisparo = true;
         abrirMascotaModal();
         snd("blip");
@@ -823,6 +833,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, { passive: true });
     mascotaImg.addEventListener("touchend", e => {
       if (_pressT) { clearTimeout(_pressT); _pressT = null; }
+      if (_estaEnRpg()) return;
       if (_pressDisparo) { _pressDisparo = false; return; }
       e.stopPropagation(); e.preventDefault();
       _ultimoTap = Date.now();

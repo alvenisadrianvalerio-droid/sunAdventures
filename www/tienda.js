@@ -83,20 +83,23 @@
     return `
       <div class="tienda-header">
         <h2 class="tienda-titulo">Tienda</h2>
-        <span class="tienda-monedero">${ICONO.moneda || ""} <span class="tienda-monedas">0</span></span>
+        <div class="tienda-header-acciones">
+          <span class="tienda-monedero">${ICONO.moneda || ""} <span class="tienda-monedas">0</span></span>
+          <button type="button" class="tienda-cerrar-btn" aria-label="Cerrar tienda" title="Cerrar">✕</button>
+        </div>
       </div>
       <div class="tienda-buscador">
-        <input type="text" class="tienda-buscar" placeholder="Buscar objeto..." autocomplete="off">
+        <input type="text" class="tienda-buscar" placeholder="Buscar objeto..." autocomplete="off" value="${busqueda || ""}">
         <div class="tienda-filtros">
-          <button type="button" class="tienda-filtro active" data-filtro="todos">Todos</button>
-          <button type="button" class="tienda-filtro" data-filtro="nuevos">Nuevos</button>
-          <button type="button" class="tienda-filtro" data-filtro="comprados">Comprados</button>
-          <button type="button" class="tienda-filtro" data-filtro="favoritos">★ Favoritos</button>
+          <button type="button" class="tienda-filtro ${filtroActivo === "todos" ? "active" : ""}" data-filtro="todos">Todos</button>
+          <button type="button" class="tienda-filtro ${filtroActivo === "nuevos" ? "active" : ""}" data-filtro="nuevos">Nuevos</button>
+          <button type="button" class="tienda-filtro ${filtroActivo === "comprados" ? "active" : ""}" data-filtro="comprados">Comprados</button>
+          <button type="button" class="tienda-filtro ${filtroActivo === "favoritos" ? "active" : ""}" data-filtro="favoritos">★ Favoritos</button>
         </div>
       </div>
       <div class="tienda-categorias" role="tablist">
-        ${Object.keys(TIENDA_ITEMS).map((c, i) => `
-          <button type="button" class="tienda-categoria ${i === 0 ? "active" : ""}" data-cat="${c}">${labelCat(c)}</button>
+        ${Object.keys(TIENDA_ITEMS).map((c) => `
+          <button type="button" class="tienda-categoria ${c === categoriaActiva ? "active" : ""}" data-cat="${c}">${labelCat(c)}</button>
         `).join("")}
       </div>
       <div class="tienda-grid"></div>
@@ -134,6 +137,10 @@
     buscador?.addEventListener("input", () => {
       busqueda = buscador.value.trim().toLowerCase();
       render();
+    });
+    const btnCerrar = qs(".tienda-cerrar-btn", container);
+    btnCerrar?.addEventListener("click", () => {
+      cerrar();
     });
   }
 

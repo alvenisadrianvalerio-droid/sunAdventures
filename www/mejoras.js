@@ -260,17 +260,50 @@
      ============================================================ */
   const css2 = document.createElement("style");
   css2.textContent = `
-    body.rpg-abierto .mascota-wrapper { opacity: 0 !important; pointer-events: none !important; transform: translateY(30px); transition: opacity .3s, transform .3s; }
+    body.rpg-abierto .mascota-wrapper,
+    body.rpg-abierto .mascota,
+    body.rpg-abierto #mascota,
+    body.rpg-abierto #mascota-img { 
+      display: none !important; 
+      opacity: 0 !important; 
+      pointer-events: none !important; 
+      visibility: hidden !important; 
+    }
     body.rpg-abierto #shop-bubble { bottom: 24px; }
   `;
   document.head.appendChild(css2);
 
   function actualizarVisibilidadMascota() {
-    const enRpg = location.hash === "#rpg" || document.querySelector('[data-view="rpg"].active');
+    const enRpg = location.hash === "#rpg" || 
+                  !!document.querySelector('[data-view="rpg"].active') ||
+                  !!document.querySelector('#rpg.active') ||
+                  !!document.querySelector('#rpg-roguelike-panel') ||
+                  !!document.querySelector('[data-rpg-panel="roguelike"].active');
     document.body.classList.toggle("rpg-abierto", !!enRpg);
+    const w = document.getElementById("mascota-wrapper");
+    const m = document.getElementById("mascota");
+    if (w) {
+      if (enRpg) {
+        w.style.setProperty("display", "none", "important");
+        w.style.setProperty("pointer-events", "none", "important");
+        w.style.setProperty("visibility", "hidden", "important");
+      } else {
+        w.style.removeProperty("display");
+        w.style.removeProperty("pointer-events");
+        w.style.removeProperty("visibility");
+      }
+    }
+    if (m) {
+      if (enRpg) {
+        m.style.setProperty("pointer-events", "none", "important");
+      } else {
+        m.style.removeProperty("pointer-events");
+      }
+    }
   }
   window.addEventListener("hashchange", actualizarVisibilidadMascota);
-  setInterval(actualizarVisibilidadMascota, 500);
+  window.addEventListener("sunadventures:rpg-tab", actualizarVisibilidadMascota);
+  setInterval(actualizarVisibilidadMascota, 300);
   actualizarVisibilidadMascota();
 
   /* ============================================================

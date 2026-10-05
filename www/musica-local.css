@@ -102,8 +102,66 @@ body.light .ml-track-titulo { color: #3d2c1e; }
   .ml-section { padding: 1.2rem .8rem 10rem; }
   .ml-track { grid-template-columns: 34px 1fr auto; gap: .4rem; padding: .5rem; }
   .ml-track-add { display: none; }
-  .ml-player { grid-template-columns: 1fr auto; gap: 8px; padding: .55rem .7rem; }
-  .ml-player-info { grid-column: 1 / -1; }
-  .ml-player-controls button { width: 30px; height: 30px; }
-  .ml-player-controls .ml-player-play { width: 38px; height: 38px; }
+  .ml-player {
+    bottom: 12px;
+    width: calc(100vw - 16px);
+    max-width: 440px;
+    padding: .45rem .65rem;
+    gap: 6px;
+    border-radius: 16px;
+    grid-template-columns: auto 1fr auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,.6);
+  }
+  .ml-player-cover {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+  .ml-player-info {
+    gap: .5rem;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .ml-player-titulo {
+    font-size: .78rem;
+    max-width: 130px;
+  }
+  .ml-player-artista {
+    font-size: .65rem;
+    max-width: 130px;
+  }
+  .ml-player-controls {
+    gap: 0;
+  }
+  .ml-player-controls button {
+    width: 28px;
+    height: 28px;
+    font-size: .8rem;
+  }
+  .ml-player-controls .ml-player-play {
+    width: 32px;
+    height: 32px;
+    font-size: .85rem;
+    margin: 0 2px;
+  }
+  .ml-player-shuffle,
+  .ml-player-repeat {
+    display: none; /* No saturar en pantallas pequeñas */
+  }
+  .ml-player-progress {
+    gap: .35rem;
+    margin-top: -2px;
+  }
+  .ml-player-time {
+    font-size: .58rem;
+    min-width: 26px;
+  }
+  .ml-player-close {
+    width: 22px;
+    height: 22px;
+    font-size: 0.85rem;
+    top: -6px;
+    right: -6px;
+  }
 }

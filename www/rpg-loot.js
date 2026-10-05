@@ -636,12 +636,71 @@
   }
 
   /* ---------- Cofres ---------- */
-  function abrirCofre(tipo, cant) {
+  function getLlavesDisponibles() {
+    const loot = cargarLoot();
+    // Llaves en el pool: llave-pequena ("Llave Menuda") y llave-hierro ("Llave de Hierro")
+    // También chequeamos cualquier item con prefijo llave o id de llaves mapeadas
+    const comunes = (loot["llave-pequena"] || 0) + (loot["item-5-8"] || 0);
+    const doradas = (loot["llave-hierro"] || 0) + (loot["item-4-8"] || 0);
+    return { comunes, doradas, total: comunes + doradas, loot };
+  }
+
+  function consumirLlaveParaCofre(tipo) {
+    const { comunes, doradas, loot } = getLlavesDisponibles();
+    if (tipo === "hierro") {
+      // Abre con 1 llave común o 1 dorada si no hay común
+      if (comunes > 0) {
+        if (loot["llave-pequena"] > 0) loot["llave-pequena"]--;
+        else if (loot["item-5-8"] > 0) loot["item-5-8"]--;
+        guardarLoot(loot);
+        return true;
+      } else if (doradas > 0) {
+        if (loot["llave-hierro"] > 0) loot["llave-hierro"]--;
+        else if (loot["item-4-8"] > 0) loot["item-4-8"]--;
+        guardarLoot(loot);
+        return true;
+      }
+    } else if (tipo === "dorado") {
+      // Abre con 1 llave dorada o 2 llaves comunes
+      if (doradas > 0) {
+        if (loot["llave-hierro"] > 0) loot["llave-hierro"]--;
+        else if (loot["item-4-8"] > 0) loot["item-4-8"]--;
+        guardarLoot(loot);
+        return true;
+      } else if (comunes >= 2) {
+        let restantes = 2;
+        if (loot["llave-pequena"] > 0) {
+          const gasto = Math.min(loot["llave-pequena"], restantes);
+          loot["llave-pequena"] -= gasto;
+          restantes -= gasto;
+        }
+        if (restantes > 0 && loot["item-5-8"] > 0) {
+          loot["item-5-8"] -= restantes;
+        }
+        guardarLoot(loot);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function abrirCofre(tipo, cant, conLlave = false) {
     cant = cant || 1;
     const def = COFRES[tipo]; if (!def) return;
-    const cost = def.precio * cant;
-    if (getMonedas() < cost) { SND("error"); notifMascota?.("Sin monedas", `Necesitas ${cost}`); return; }
-    setMonedas(getMonedas() - cost);
+
+    if (conLlave) {
+      const exito = consumirLlaveParaCofre(tipo);
+      if (!exito) {
+        SND("error");
+        notifMascota?.("Sin llaves", tipo === "dorado" ? "Necesitas 1 Llave Dorada o 2 Llaves Comunes" : "Necesitas 1 Llave");
+        return;
+      }
+    } else {
+      const cost = def.precio * cant;
+      if (getMonedas() < cost) { SND("error"); notifMascota?.("Sin monedas", `Necesitas ${cost}`); return; }
+      setMonedas(getMonedas() - cost);
+    }
+
     const n = rnd(def.cantMin, def.cantMax) * cant;
     const items = [];
     for (let i = 0; i < n; i++) items.push(sortearItem(sortearRareza(def.rarBoosts), sortearCalidad(def.calBoosts)));
@@ -654,6 +713,7 @@
     } catch {}
     mostrarModalCofre(def, items);
     renderColeccion();
+    renderCofres();
     const top = items.some(it => it.rar === "legendario" || it.rar === "mitico");
     SND(top ? "victoria" : "sparkle");
     notifMascota?.("¡Cofre Abierto!", `+${items.length} items del ${def.nombre}`);
@@ -771,24 +831,51 @@
   function renderCofres() {
     const c = document.querySelector('[data-rpg-panel="cofres"]');
     if (!c) return;
+    const llaves = getLlavesDisponibles();
     const grid = Object.entries(COFRES).map(([tipo, def]) => {
       const visual = def.imagen
         ? `<img class="rpg-cofre-img" src="${def.imagen}" alt="${def.nombre}" loading="lazy">`
         : `<span class="rpg-cofre-emoji">${def.emoji}</span>`;
+      
+      let botonLlaveHtml = "";
+      if (tipo === "hierro") {
+        const tieneLlave = llaves.total > 0;
+        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${tieneLlave ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${tieneLlave ? `Tienes ${llaves.total} llaves` : 'No tienes llaves'}">
+          🔑 Abrir con Llave (${llaves.total})
+        </button>`;
+      } else if (tipo === "dorado") {
+        const puedeAbrirDorado = llaves.doradas > 0 || llaves.comunes >= 2;
+        const infoTxt = llaves.doradas > 0 ? `(${llaves.doradas} 🗝️)` : `(${Math.floor(llaves.comunes / 2)} usos)`;
+        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${puedeAbrirDorado ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${puedeAbrirDorado ? 'Usa 1 Llave Dorada o 2 Comunes' : 'Necesitas 1 Llave Dorada o 2 Comunes'}">
+          🗝️ Abrir con Llave ${puedeAbrirDorado ? infoTxt : '(0)'}
+        </button>`;
+      }
+
       return `<div class="rpg-cofre-card" data-tipo="${tipo}" style="--cofre-color:${def.color}">
         ${visual}
         <span class="rpg-cofre-nombre">${def.nombre}</span>
         <span class="rpg-cofre-precio"><span data-icono="moneda"></span> ${def.precio}</span>
-        <button class="rpg-cofre-btn" data-tipo="${tipo}">Abrir</button>
+        <div class="rpg-cofre-acciones">
+          <button class="rpg-cofre-btn" data-tipo="${tipo}">Abrir (🪙)</button>
+          ${botonLlaveHtml}
+        </div>
       </div>`;
     }).join("");
     c.innerHTML = `<div class="rpg-coleccion-header"><span class="rpg-coleccion-titulo">🎁 Cofres</span><span class="rpg-coleccion-count">Ábrelos para conseguir botín</span></div><div class="rpg-barra-cofres-grid">${grid}</div>`;
     if (window.hidratarIconos) window.hidratarIconos(c);
-    qsa(".rpg-cofre-btn", c).forEach(b => b.addEventListener("click", () => {
+
+    qsa(".rpg-cofre-btn:not(.rpg-cofre-llave-btn)", c).forEach(b => b.addEventListener("click", () => {
       const t = b.dataset.tipo;
       b.classList.add("shake");
       setTimeout(() => b.classList.remove("shake"), 600);
-      setTimeout(() => abrirCofre(t, 1), 300);
+      setTimeout(() => abrirCofre(t, 1, false), 300);
+    }));
+
+    qsa(".rpg-cofre-llave-btn", c).forEach(b => b.addEventListener("click", () => {
+      const t = b.dataset.tipo;
+      b.classList.add("shake");
+      setTimeout(() => b.classList.remove("shake"), 600);
+      setTimeout(() => abrirCofre(t, 1, true), 300);
     }));
   }
 

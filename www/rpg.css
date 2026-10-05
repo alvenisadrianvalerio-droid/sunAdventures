@@ -354,10 +354,30 @@
 .rpg-horda-grid {
   display: grid;
   grid-template-columns: repeat(3, 44px);
-  grid-template-rows: repeat(3, 44px);
-  gap: 3px;
+  gap: 4px;
   justify-content: center;
   align-items: center;
+}
+.rpg-horda-grid.mobs-4 {
+  grid-template-columns: repeat(2, 48px);
+}
+.rpg-horda-grid.mobs-4 .rpg-horda-item {
+  width: 48px;
+  height: 48px;
+}
+.rpg-horda-grid.mobs-8 {
+  grid-template-columns: repeat(4, 38px);
+}
+.rpg-horda-grid.mobs-8 .rpg-horda-item {
+  width: 38px;
+  height: 38px;
+}
+.rpg-horda-grid.mobs-12 {
+  grid-template-columns: repeat(4, 34px);
+}
+.rpg-horda-grid.mobs-12 .rpg-horda-item {
+  width: 34px;
+  height: 34px;
 }
 .rpg-horda-item {
   width: 44px;
@@ -378,6 +398,22 @@
   filter: grayscale(1) blur(0.5px);
   transform: scale(0.8);
   pointer-events: none;
+}
+.rpg-horda-item.horda-lider {
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+  z-index: 3;
+}
+.rpg-horda-corona {
+  position: absolute;
+  top: -8px;
+  font-size: 11px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
+  animation: rpgBouncing 1.4s infinite alternate ease-in-out;
+}
+@keyframes rpgBouncing {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-3px); }
 }
 .rpg-horda-item-hp {
   width: 32px;
@@ -401,6 +437,100 @@
   padding: 2px 8px;
   border-radius: 999px;
   border: 1px solid rgba(255,154,61,0.3);
+}
+
+/* Selector de Modo de Horda en el Popup de Expedición */
+.rpg-popup-horda-box {
+  margin: 10px 14px 4px 14px;
+  padding: 8px 12px;
+  background: rgba(20, 20, 35, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rpg-popup-horda-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.rpg-popup-horda-label span {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #ffd84d;
+  letter-spacing: 0.3px;
+}
+.rpg-popup-horda-label small {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+.rpg-popup-horda-btns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.rpg-btn-horda-opt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 6px 8px;
+  color: #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+}
+.rpg-btn-horda-opt:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 216, 77, 0.4);
+  transform: translateY(-1px);
+}
+.rpg-btn-horda-opt.active {
+  background: linear-gradient(135deg, rgba(255, 154, 61, 0.25), rgba(255, 216, 77, 0.15));
+  border-color: #ffd84d;
+  box-shadow: 0 0 12px rgba(255, 216, 77, 0.25);
+}
+.rpg-horda-opt-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: #ffd84d;
+}
+.rpg-btn-horda-opt.active .rpg-horda-opt-num {
+  background: #ffd84d;
+  color: #1a1a2e;
+}
+.rpg-horda-opt-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  min-width: 0;
+}
+.rpg-horda-opt-info strong {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+}
+.rpg-horda-opt-info small {
+  font-size: 0.58rem;
+  color: #a8b2d1;
+  white-space: nowrap;
+}
+.rpg-btn-horda-opt.active .rpg-horda-opt-info small {
+  color: #ffd84d;
+  font-weight: 700;
 }
 
 /* Panel Modal de Fin de Combate */

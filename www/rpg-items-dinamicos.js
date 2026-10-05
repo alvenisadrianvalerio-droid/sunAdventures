@@ -36,35 +36,35 @@
                 rows: SHEET_CONFIG.rows
             };
 
-            // ─── Escalado por rareza ───
+            // ─── Escalado por rareza (Balanceado y Proporcional) ───
             const MULT_RAREZA = {
                 comun: 1.0,
-                raro: 1.5,
-                epico: 2.2,
-                legendario: 3.5,
-                mitico: 5.5,
-                tornasol: 8.0
+                raro: 1.25,
+                epico: 1.6,
+                legendario: 2.1,
+                mitico: 2.8,
+                tornasol: 3.5
             };
 
-            // ─── Escalado por tipo (los stats "principales" dan más) ───
+            // ─── Escalado por tipo (valores moderados para un combate táctico equilibrado) ───
             const MULT_TIPO_STAT = {
-                atk: 1.0,
-                def: 0.9,
-                hp: 8.0,    // HP escala distinto
-                crit: 0.5,  // % más valioso
-                esq: 0.4,
-                regen: 0.6,
-                lifesteal: 0.4,
-                thorns: 0.7,
-                xp: 0.5,
-                oro: 0.5,
-                fuego: 1.2,
-                hielo: 1.2,
-                rayo: 1.2,
-                veneno: 1.2,
-                vel: 0.8,
-                mana: 0.8,
-                suerte: 0.6
+                atk: 0.85,
+                def: 0.80,
+                hp: 4.5,    // HP balanceado en lugar de 8.0x excesivo
+                crit: 0.35, // % moderado
+                esq: 0.30,
+                regen: 0.50,
+                lifesteal: 0.35,
+                thorns: 0.55,
+                xp: 0.40,
+                oro: 0.40,
+                fuego: 0.90,
+                hielo: 0.90,
+                rayo: 0.90,
+                veneno: 0.90,
+                vel: 0.65,
+                mana: 0.65,
+                suerte: 0.45
             };
 
             function escalarStats(stats, rareza) {
@@ -73,9 +73,10 @@
                 const escalados = {};
                 Object.entries(stats).forEach(([key, val]) => {
                     const tipoMult = MULT_TIPO_STAT[key] || 1.0;
-                    // Combinar multiplicadores pero con raíz cuadrada para no explotar
+                    // Escalado equilibrado con progresión controlada
                     const factor = Math.sqrt(mult * tipoMult);
-                    escalados[key] = Math.round(Number(val) * factor);
+                    const baseCalc = Number(val) * factor;
+                    escalados[key] = Math.max(1, Math.round(baseCalc));
                 });
                 return escalados;
             }
@@ -97,6 +98,11 @@
                     if (info.tipo) tipo = info.tipo;
 
                     const statsEscalados = escalarStats(info.stats, info.rar);
+
+                    // Si el objeto tiene stats configurados fijos o específicos como Origen de la vida
+                    if (coord === "5,4" || info.nombre?.includes("Origen de la vida")) {
+                        statsEscalados.hp = 1500;
+                    }
 
                     const valorPrincipal = statsEscalados.atk || statsEscalados.def || statsEscalados.hp ||
                         Object.values(statsEscalados)[0] || 0;

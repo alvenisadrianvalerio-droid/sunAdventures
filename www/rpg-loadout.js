@@ -264,16 +264,16 @@
                 
                 // Buscar el item asociado para obtener nombre, sprite, calidad y rareza
                 const it = RL?.POOL?.find(p => p.id === h.itemId);
-                const calKey = it?.calidad || "normal";
+                const calKey = (it?.calidad || "normal").toLowerCase();
                 const calInfo = calidadesDef[calKey] || { label: "Normal", icon: "" };
                 const rarLabel = it?.rar ? it.rar.toUpperCase() : "";
 
                 // Render icono / sprite del arma
                 let itemVisual = "";
-                if (it && window.renderSprite && Array.isArray(it.sprite)) {
-                    itemVisual = window.renderSprite(it.sprite[0], it.sprite[1], 24);
-                } else if (it && RL?.renderIcono) {
+                if (it && RL?.renderIcono) {
                     itemVisual = RL.renderIcono(it, "24px");
+                } else if (it && window.renderSprite && Array.isArray(it.sprite)) {
+                    itemVisual = window.renderSprite(it.sprite[0], it.sprite[1], 24);
                 }
 
                 return `
@@ -291,7 +291,7 @@
                         <span class="rpg-loadout-arma-icon">${itemVisual}</span>
                         <span class="rpg-loadout-arma-nombre">${it.nombre}</span>
                       </div>
-                      <span class="rpg-loadout-calidad-badge cal-${calKey}">
+                      <span class="rpg-loadout-calidad-badge cal-${calKey}" title="Calidad ${calInfo.label}">
                         ${calInfo.icon ? `<span class="rpg-loadout-cal-icon">${calInfo.icon}</span>` : ""}
                         <span>${calInfo.label}</span>
                       </span>
@@ -614,12 +614,20 @@
     .rpg-loadout-arma-icon {
       width: 24px;
       height: 24px;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      overflow: hidden;
+      border-radius: 4px;
     }
-    .rpg-loadout-arma-icon .loot-sprite,
+    .rpg-loadout-arma-icon .loot-sprite {
+      width: 24px !important;
+      height: 24px !important;
+      border-radius: 4px !important;
+      transform: none !important;
+      filter: none !important;
+    }
     .rpg-loadout-arma-icon .sprite-item {
       transform: scale(.85);
     }

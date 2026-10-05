@@ -52,16 +52,16 @@
 
   const state = { tracks: [], playlists: [], queue: [], queueIndex: -1, playing: false, shuffle: false, repeat: "off" };
 
-  /* ---------- <video> flotante (sirve también para audio) ---------- */
+  /* ---------- Reproductor (solo audio en segundo plano, sin ventana de vídeo invasiva) ---------- */
   const videoBox = document.createElement("div");
   videoBox.className = "ml-video-box";
   videoBox.hidden = true;
-  videoBox.innerHTML = `<button type="button" class="ml-video-close" title="Ocultar vídeo">×</button><video class="ml-video-el" playsinline controls></video>`;
+  videoBox.style.display = "none";
+  videoBox.innerHTML = `<video class="ml-video-el" playsinline style="display:none;"></video>`;
   document.body.appendChild(videoBox);
   const audio = videoBox.querySelector(".ml-video-el");
   audio.preload = "metadata";
   audio.volume = parseFloat(localStorage.getItem("ml_volumen") || "0.8");
-  videoBox.querySelector(".ml-video-close").onclick = () => { videoBox.hidden = true; };
   let blobUrlActual = null;
 
   /* ---------- Hash / parseo / duración ---------- */
@@ -186,7 +186,8 @@
     if (!t.blob) { notif("Archivo no disponible"); return; }
     blobUrlActual = URL.createObjectURL(t.blob);
     audio.src = blobUrlActual;
-    videoBox.hidden = t.kind !== "video";
+    videoBox.hidden = true;
+    videoBox.style.display = "none";
     if (t.kind === "video") { try { audio.load(); } catch {} }
     try { await audio.play(); state.playing = true; } catch { state.playing = false; }
     updPlayer();
@@ -221,9 +222,12 @@
   const updPlayer = () => {
     const b = $("ml-player"); if (!b) return;
     const t = state.queue[state.queueIndex];
-    if (!t) { b.classList.remove("visible"); return; }
+    if (!t || (!state.playing && (!audio.src || audio.paused))) {
+      b.classList.remove("visible");
+      return;
+    }
     b.classList.add("visible");
-    b.querySelector(".ml-player-titulo").textContent  = t.titulo;
+    b.querySelector(".ml-player-titulo").textContent  = t.titulo || "—";
     b.querySelector(".ml-player-artista").textContent = t.artista || "—";
     b.querySelector(".ml-player-play").textContent    = state.playing ? "❚❚" : "▶";
   };
@@ -343,18 +347,32 @@
     syncCh = s.channel(`ml-sync-${g}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "playback_sync", filter: `grupo_id=eq.${g}` },
         ({ new: row }) => {
-          if (!row || row.host_id === uid()) return;
+          if (!row || row.host_id === uid() || !row.playlist_id) return;
           const pl = state.playlists.find(p => p.id === row.playlist_id); if (!pl) return;
           const meta = pl.canciones[row.track_index]; if (!meta) return;
           if (!state.tracks.some(t => t.hash === meta.hash)) return;
+
+          // Si el host no está reproduciendo activamente, no forzar apertura del reproductor si estamos en segundo plano o parados
+          if (!row.is_playing) {
+            if (state.playing) {
+              pausar();
+            }
+            return;
+          }
+
+          // Verificar frescura del evento para evitar reanudar si estuvo inactivo mucho tiempo
+          const startedAt = row.host_started_at ? new Date(row.host_started_at).getTime() : 0;
+          const elapsed = startedAt ? (Date.now() - startedAt) : 0;
+          if (elapsed > 1000 * 60 * 10) return; // Más de 10 min de desfase, ignorar
+
           state.queue = pl.canciones.map(c => state.tracks.find(t => t.hash === c.hash)).filter(Boolean);
           state.queueIndex = state.queue.findIndex(t => t.hash === meta.hash);
           if (state.queueIndex < 0) return;
-          const elapsed = row.is_playing ? (Date.now() - new Date(row.host_started_at).getTime()) : 0;
-          const target = ((row.position_ms || 0) + elapsed) / 1000;
+          const target = ((row.position_ms || 0) + Math.max(0, elapsed)) / 1000;
           reproducirActual().then(() => {
-            if (row.is_playing) { audio.currentTime = target; audio.play().catch(() => {}); state.playing = true; }
-            else { audio.pause(); state.playing = false; }
+            audio.currentTime = target;
+            audio.play().catch(() => {});
+            state.playing = true;
             updPlayer();
           });
         }).subscribe();

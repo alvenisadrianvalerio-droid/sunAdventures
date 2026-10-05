@@ -13,6 +13,7 @@
     .sun-modal-card.warning{border-color:rgba(255,174,61,.55)}
     .sun-modal-card.success{border-color:rgba(77,212,142,.55)}
     .sun-modal-icon{width:60px;height:60px;margin:0 auto .9rem;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,217,61,.3),rgba(255,217,61,.05));border:2px solid rgba(255,217,61,.45);font-size:1.8rem;animation:sunModalPulse 1.6s ease-in-out infinite}
+    .sun-modal-icon svg{width:32px;height:32px;display:block}
     @keyframes sunModalPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
     .sun-modal-card.danger .sun-modal-icon{background:radial-gradient(circle at 35% 35%,rgba(255,84,112,.35),rgba(255,84,112,.05));border-color:rgba(255,84,112,.55)}
     .sun-modal-card.warning .sun-modal-icon{background:radial-gradient(circle at 35% 35%,rgba(255,174,61,.35),rgba(255,174,61,.05));border-color:rgba(255,174,61,.55)}
