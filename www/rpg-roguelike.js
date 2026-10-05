@@ -1007,6 +1007,8 @@ function sustituirEmojis(root) {
 
     qsa('[data-accion]', panel).forEach(b => b.addEventListener('click', () => {
       if (state.turno !== 'jugador' || !state.enBatalla) return;
+      if (b.dataset.accion === 'pocion' && state.pociones <= 0) return;
+      if (b.dataset.accion === 'habilidad' && state.cd > 0) return;
       state.turno = 'enemigo';
       desactivarBotones(panel);
       switch (b.dataset.accion) {
@@ -1031,7 +1033,35 @@ function sustituirEmojis(root) {
   }
 
   function desactivarBotones(panel) { qsa('[data-accion]', panel).forEach(b => b.disabled = true); }
-  function reactivarBotones(panel) { qsa('[data-accion]', panel).forEach(b => b.disabled = false); }
+  function reactivarBotones(panel) {
+    if (!panel) return;
+    qsa('[data-accion]', panel).forEach(b => {
+      const acc = b.dataset.accion;
+      if (acc === 'pocion') {
+        b.disabled = state.pociones <= 0;
+        const sp = b.querySelector('span');
+        if (sp) sp.textContent = `Poción (${state.pociones})`;
+      } else if (acc === 'habilidad') {
+        b.disabled = state.cd > 0;
+      } else if (acc === 'huir') {
+        b.disabled = state.enemigo?.tier === 'jefe';
+      } else {
+        b.disabled = false;
+      }
+    });
+  }
+
+  function actualizarPocionesUI() {
+    qsa('.rpg-rl-chip.poc').forEach(el => {
+      el.innerHTML = `${spriteMarkup('🧪')} ${state.pociones}`;
+    });
+    const pocBtn = qs('[data-accion="pocion"]');
+    if (pocBtn) {
+      pocBtn.disabled = state.pociones <= 0 || state.turno !== 'jugador';
+      const sp = pocBtn.querySelector('span');
+      if (sp) sp.textContent = `Poción (${state.pociones})`;
+    }
+  }
 
   function logBatalla(txt) {
     state.log.push(txt);
@@ -1214,8 +1244,14 @@ function sustituirEmojis(root) {
   }
 
   function accionPocion(animador) {
-    if (state.pociones <= 0) return;
+    if (state.pociones <= 0) {
+      state.turno = 'jugador';
+      reactivarBotones(qs('.rpg-rl-batalla'));
+      actualizarPocionesUI();
+      return;
+    }
     state.pociones--;
+    actualizarPocionesUI();
     const c = Math.round(state.hpMax * 0.45);
     state.hp = clamp(state.hp + c, 0, state.hpMax);
     animador.playHeal();
@@ -1442,6 +1478,7 @@ function sustituirEmojis(root) {
     if (premioRacha) {
       oroGanado += 20;
       state.pociones++;
+      actualizarPocionesUI();
     }
     state.oro += oroGanado;
     state.xp += e.xp;
@@ -1672,6 +1709,10 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
       if (b.dataset.pocion) {
         if (state.oro < precioPocion) return;
         state.oro -= precioPocion; state.pociones++;
+        actualizarPocionesUI();
+        const oroChip = qs('.rpg-rl-tienda-oro');
+        if (oroChip) oroChip.innerHTML = `<img class="rl-coin" src="img/items%20de%20aventura/icon.png" alt=""> ${state.oro}`;
+        qsa('.rpg-rl-chip.oro').forEach(el => el.innerHTML = `${spriteMarkup('💰')} ${state.oro}`);
         SND('moneda'); b.disabled = true; b.querySelector('em').textContent = '✓ Comprado';
         return;
       }
@@ -1679,6 +1720,9 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
         if (state.oro < 45) return;
         state.oro -= 45;
         state.hp = clamp(state.hp + Math.round(state.hpMax * 0.3), 0, state.hpMax);
+        const oroChip = qs('.rpg-rl-tienda-oro');
+        if (oroChip) oroChip.innerHTML = `<img class="rl-coin" src="img/items%20de%20aventura/icon.png" alt=""> ${state.oro}`;
+        qsa('.rpg-rl-chip.oro').forEach(el => el.innerHTML = `${spriteMarkup('💰')} ${state.oro}`);
         SND('comer'); b.disabled = true; b.querySelector('em').textContent = '✓ Comprado';
         return;
       }
@@ -1723,7 +1767,7 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
       if (op === 'curar')  { state.hp = clamp(state.hp + Math.round(state.hpMax * 0.4), 0, state.hpMax); }
       if (op === 'atk')    { state.atk += 3; }
       if (op === 'def')    { state.def += 2; }
-      if (op === 'pocion') { state.pociones++; }
+      if (op === 'pocion') { state.pociones++; actualizarPocionesUI(); }
       if (op === 'hp')     { state.hpMax += 15; state.hp += 15; }
       if (op === 'crit')   { state.crit += 0.05; }
       SND('despertar');

@@ -794,8 +794,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
           ${habs.length ? habs.map(h => `<button type="button" class="rpg-hab rpg-hab-${h.tipo}" data-hab="${h.id}" title="${h.desc}"><span class="rpg-hab-nombre">${h.nombre}</span><span class="rpg-hab-lv">Nv ${h.lv}</span></button>`).join("") : `<button type="button" class="rpg-hab rpg-hab-daño" data-hab="ataque-basico" title="Ataque básico"><span class="rpg-hab-nombre">Ataque</span><span class="rpg-hab-lv">Básico</span></button>`}
         </div>
         <div class="rpg-acciones" id="rpg-acciones">
-          <button type="button" class="rpg-btn objeto" id="btn-objeto">
-            ${SVG_POTION} Objeto
+          <button type="button" class="rpg-btn objeto" id="btn-objeto" ${totalConsumibles() <= 0 ? "disabled" : ""}>
+            ${SVG_POTION} Objeto <span class="rpg-btn-badge" id="rpg-badge-objetos">${totalConsumibles()}</span>
           </button>
           ${habsItems.length ? `<button type="button" class="rpg-btn arma" id="btn-arma-habs">
             ${SVG_SPARKLES} Habilidad de arma <span class="rpg-btn-badge">${habsItems.length}</span>
@@ -949,9 +949,28 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     el.style.position = "relative"; f.style.left = "50%"; f.style.top = "20%";
     el.appendChild(f); setTimeout(() => f.remove(), 1000);
   }
+  function totalConsumibles() {
+    const inv = cargarInv();
+    const comidasCount = Object.entries(COMIDAS).reduce((sum, [id]) => sum + (inv[id] || 0), 0);
+    const RL = window.RpgLoot;
+    const lootInv = RL?.cargarLoot?.() || {};
+    const lootCount = (RL?.getConsumibles?.() || []).reduce((sum, it) => sum + (lootInv[it.id] || 0), 0);
+    return comidasCount + lootCount;
+  }
+  function actualizarBadgeObjetos() {
+    const total = totalConsumibles();
+    const badge = $("rpg-badge-objetos");
+    if (badge) badge.textContent = total;
+    const btn = $("btn-objeto");
+    if (btn && turnoJugador) {
+      btn.disabled = total <= 0;
+    }
+  }
   function deshab(d) {
     qsa(".rpg-hab, [data-arma-hab]", document).forEach(b => b.disabled = d);
-    ["#btn-objeto", "#btn-arma-habs", "#btn-huir"].forEach(s => { const b = qs(s); if (b) b.disabled = d; });
+    ["#btn-arma-habs", "#btn-huir"].forEach(s => { const b = qs(s); if (b) b.disabled = d; });
+    const btnObj = $("btn-objeto");
+    if (btnObj) btnObj.disabled = d || totalConsumibles() <= 0;
   }
   function actualizarHPs() {
     const he = $("hp-enemigo");
@@ -1843,6 +1862,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     floatDmg("#sprite-heroe", `+${Math.round(state.hp - a)}`, "curar");
     FX({ tipo: "consumible", target: "hero", valor: Math.round(state.hp - a), fxKey: "potionRed" });
     actualizarHPs();
+    actualizarBadgeObjetos();
     overlayObjetos = false; const w = $("rpg-objetos-wrap"); if (w) w.innerHTML = "";
     turnoJugador = false; deshab(true);
     setTimeout(turnoEnemigo, 700);
@@ -1868,6 +1888,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       chequearFaseJefe();
     }
     actualizarHPs();
+    actualizarBadgeObjetos();
     overlayObjetos = false; const w = $("rpg-objetos-wrap"); if (w) w.innerHTML = "";
     turnoJugador = false; deshab(true);
     if (enemigo.hp <= 0) setTimeout(victoria, 500);
@@ -2068,8 +2089,17 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   window.addEventListener("rpg:stats-cambiados", () => {
     state.hp = Math.min(state.hp, hpMax());
     guardar(state);
+    actualizarBadgeObjetos();
     if ($("rpg-content") && (!enemigo || enemigo.terminado)) {
       if (!enemigo) render();
+    }
+  });
+  window.addEventListener("rpg:loot-cambiado", () => {
+    actualizarBadgeObjetos();
+  });
+  window.addEventListener("storage", e => {
+    if (e.key === "inventario" || e.key === "rpg_loot_inv") {
+      actualizarBadgeObjetos();
     }
   });
   window.addEventListener("sunadventures:mascota-cambiada", () => { if ($("rpg-content") && !enemigo) render(); });
