@@ -1173,10 +1173,20 @@ function sustituirEmojis(root) {
       if (state.revive) {
         state.revive = false;
         state.hp = Math.round(state.hpMax * 0.5);
+        state.sangrado = 0;
         logBatalla('👻 ¡Alma Errante te revive!');
         actualizarBarraHeroe();
         state.turno = 'jugador';
-        reactivarBotones(qs('.rpg-rl-batalla'));
+        guardarRun(state);
+        reactivarBotones(qs('.rpg-rl-batalla') || $('rl-panel') || document);
+        actualizarPocionesUI();
+        const habBtn = qs('[data-accion="habilidad"] span:last-child');
+        if (habBtn) {
+          habBtn.textContent = state.cd <= 0 ? 'Habilidad' : `CD: ${state.cd}`;
+          const btn = qs('[data-accion="habilidad"]');
+          if (btn) btn.disabled = state.cd > 0;
+          btn?.classList.toggle('listo', state.cd <= 0);
+        }
         return;
       }
       return derrotaBatalla();
@@ -1447,11 +1457,21 @@ function sustituirEmojis(root) {
       if (state.revive) {
         state.revive = false;
         state.hp = Math.round(state.hpMax * 0.5);
+        state.sangrado = 0;
+        if (state.cd > 0) state.cd--;
         logBatalla('👻 ¡Alma Errante te revive!');
         actualizarBarraHeroe();
         state.turno = 'jugador';
         guardarRun(state);
-        reactivarBotones(qs('.rpg-rl-batalla'));
+        reactivarBotones(qs('.rpg-rl-batalla') || $('rl-panel') || document);
+        actualizarPocionesUI();
+        const habBtn = qs('[data-accion="habilidad"] span:last-child');
+        if (habBtn) {
+          habBtn.textContent = state.cd <= 0 ? 'Habilidad' : `CD: ${state.cd}`;
+          const btn = qs('[data-accion="habilidad"]');
+          if (btn) btn.disabled = state.cd > 0;
+          btn?.classList.toggle('listo', state.cd <= 0);
+        }
         return;
       }
       return derrotaBatalla();

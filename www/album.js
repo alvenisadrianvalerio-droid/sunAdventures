@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const hoyISO = () => fechaISO(new Date());
 
   /* ---------- DOM refs ---------- */
-  const grid = $("album-grid"), empty = $("album-empty"), btnAdd = $("btn-add-photo"), modal = $("photo-modal"), modalTitle = $("modal-title"), form = $("photo-form");
+  const grid = $("album-grid"), empty = $("album-empty"), btnAdd = $("btn-add-photo"), btnPastePhotos = $("btn-paste-photos"), inputPastePhotos = $("input-paste-photos"), modal = $("photo-modal"), modalTitle = $("modal-title"), form = $("photo-form");
   const inputPhoto = $("input-photo"), inputPhotoCampo = inputPhoto?.closest(".form-field"), inputDate = $("input-date"), inputNote = $("input-note");
   const preview = $("photo-preview"), photoPreviewInfo = $("photo-preview-info"), submitBtn = form?.querySelector('button[type="submit"]');
   const btnPhotoLocation = $("btn-photo-location"), photoLocationStatus = $("photo-location-status"), inputLat = $("input-lat"), inputLng = $("input-lng");
@@ -834,6 +834,122 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ---------- Formulario foto ---------- */
   if (btnAdd) btnAdd.addEventListener("click", () => abrirModal());
   modal?.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", cerrarModal));
+
+  /* ---------- Pegar múltiples fotos en el Álbum ---------- */
+  async function procesarYSubirFotosMultiples(archivos) {
+    if (!archivos || !archivos.length) return;
+    const imagenes = Array.from(archivos).filter(f => f.type.startsWith("image/") || /\.(jpe?g|png|webp|gif|bmp|heic|avif)$/i.test(f.name));
+    if (!imagenes.length) {
+      return alertar({ title: "Sin imágenes válidas", message: "No se encontraron archivos de imagen en lo que intentaste pegar.", icon: "📸" });
+    }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      return alertar({ title: "Inicia sesión", message: "Debes iniciar sesión para subir fotos al álbum.", icon: "🔒" });
+    }
+    if (!grupoActivo) await asegurarGrupoActivo();
+    if (!grupoActivo) {
+      return alertar({ title: "Sin grupo", message: "No se encontró un grupo activo para guardar las fotos.", icon: "👥" });
+    }
+
+    const hoy = hoyISO();
+    let subidas = 0;
+    let fallidas = 0;
+    mostrarLoading(`Guardando ${imagenes.length} polaroid${imagenes.length === 1 ? '' : 's'}...`);
+
+    for (let i = 0; i < imagenes.length; i++) {
+      const img = imagenes[i];
+      if (loadingText) loadingText.textContent = `Guardando polaroid ${i + 1} de ${imagenes.length}...`;
+      try {
+        const blob = await redimensionarImagen(img, 1600);
+        const filePath = `fotos/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+        const { error: upErr } = await supabase.storage.from(BUCKET_NAME).upload(filePath, blob, { contentType: "image/jpeg" });
+        if (upErr) throw upErr;
+        const nueva = await añadirFotoTabla(filePath, hoy, null, null, null);
+        fotos.unshift({ id: nueva.id, path: nueva.path, fecha: nueva.fecha, nota: nueva.nota, lat: nueva.lat, lng: nueva.lng });
+        subidas++;
+      } catch (err) {
+        console.warn("Error subiendo foto pegada:", err);
+        fallidas++;
+      }
+    }
+
+    ocultarLoading();
+    await render();
+    window.dispatchEvent(new Event("sunadventures:progress"));
+
+    if (subidas > 0) {
+      alertar({
+        title: "¡Recuerdos guardados!",
+        message: `Se ${subidas === 1 ? 'ha agregado 1 polaroid' : `han agregado ${subidas} polaroids`} al álbum${fallidas > 0 ? ` (${fallidas} fallaron)` : ''}.`,
+        icon: "📷"
+      });
+    } else {
+      alertar({ title: "Error al guardar", message: "No se pudieron subir las imágenes copiadas.", variant: "danger" });
+    }
+  }
+
+  async function pegarFotosDelPortapapeles() {
+    let archivosEncontrados = [];
+    if (navigator.clipboard && navigator.clipboard.read) {
+      try {
+        const items = await navigator.clipboard.read();
+        for (const item of items) {
+          const tiposImg = item.types.filter(t => t.startsWith("image/"));
+          for (const tipo of tiposImg) {
+            const blob = await item.getType(tipo);
+            if (blob) {
+              const file = new File([blob], `polaroid_${Date.now()}.jpg`, { type: blob.type || "image/jpeg" });
+              archivosEncontrados.push(file);
+            }
+          }
+        }
+      } catch (err) {
+        console.info("navigator.clipboard.read no disponible o denegado:", err);
+      }
+    }
+
+    if (archivosEncontrados.length > 0) {
+      await procesarYSubirFotosMultiples(archivosEncontrados);
+    } else {
+      // Si el portapapeles directo no entregó imágenes, abrir selector múltiple como fallback infalible
+      inputPastePhotos?.click();
+    }
+  }
+
+  btnPastePhotos?.addEventListener("click", () => {
+    pegarFotosDelPortapapeles();
+  });
+
+  inputPastePhotos?.addEventListener("change", async () => {
+    if (inputPastePhotos.files && inputPastePhotos.files.length) {
+      const files = Array.from(inputPastePhotos.files);
+      inputPastePhotos.value = "";
+      await procesarYSubirFotosMultiples(files);
+    }
+  });
+
+  // Soporte directo para Ctrl+V / Command+V cuando se está en la vista del álbum
+  window.addEventListener("paste", async e => {
+    const vistaActiva = document.querySelector("[data-view].active")?.dataset.view;
+    if (vistaActiva !== "album") return;
+    const targetTag = e.target?.tagName?.toLowerCase();
+    if (targetTag === "input" || targetTag === "textarea") return;
+
+    const items = e.clipboardData?.items;
+    if (!items || !items.length) return;
+    const files = [];
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf("image") !== -1) {
+        const f = items[i].getAsFile();
+        if (f) files.push(f);
+      }
+    }
+    if (files.length > 0) {
+      e.preventDefault();
+      await procesarYSubirFotosMultiples(files);
+    }
+  });
 
   inputPhoto?.addEventListener("change", () => { mostrarVistaPreviaFoto(inputPhoto.files?.[0] || null); actualizarVistaPreviaFotoInfo(); });
   inputDate?.addEventListener("change", () => { const date = preview?.querySelector(".photo-preview-date"), note = preview?.querySelector(".photo-preview-note"); actualizarContenidoVistaPrevia(date, note); actualizarVistaPreviaFotoInfo(); });
@@ -2204,6 +2320,8 @@ document.addEventListener("DOMContentLoaded", () => {
         renderExperiencia();
         if (typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
       } else {
+        localStorage.removeItem("sunadventures_uid");
+        window._sunUserId = null;
         window._sunUserEmail = "";
         fotos = []; notas = []; playlists = []; eventos = [];
         if (grid) grid.innerHTML = ""; if (empty) empty.classList.remove("hidden");
@@ -2214,6 +2332,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (calendarioEmpty) calendarioEmpty.classList.remove("hidden");
         const mGrid = $("mascotas-grid"); if (mGrid) mGrid.innerHTML = "";
         renderExperiencia();
+        window.dispatchEvent(new Event("sunadventures:user-logout"));
       }
       if (logueado && authModal) cerrarAuthModal();
     } catch (err) { console.error("updateAuthUI:", err); }

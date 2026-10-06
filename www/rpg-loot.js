@@ -51,7 +51,7 @@
   const guardarStats= o => save(K.stats(), o);
   const cargarEstado= () => load(K.rpg(), '{"nivel":1,"xp":0,"hp":100,"statsBase":{"atk":10,"def":3}}');
   const guardarEstado=s => save(K.rpg(), s);
-  const hpMaxRpg   = s => 80 + s.nivel * 20 + (cargarStats().hpBonus || 0);
+  const hpMaxRpg   = s => 100 + (s.nivel || 1) * 25 + (cargarStats().hpBonus || 0);
 
   /* ---------- Rarezas / calidades ---------- */
   const RAREZAS = {
@@ -75,7 +75,7 @@
   const COFRES = {
     // Orden visual correcto: madera (marrón), hierro (verdoso), dorado (dorado)
     madera: {
-      nombre:"Cofre de Madera", precio:100,
+      nombre:"Cofre de Madera", precio:500,
       rarBoosts:{comun:.70,raro:.22,epico:.065,legendario:.013,mitico:.002},
       calBoosts:{normal:.78,reforzado:.18,impecable:.035,ancestral:.005},
       emoji:"📦", imagen:"img/rpg/items/cofre-madera.png?v=2", color:"#a0522d",
@@ -99,14 +99,14 @@
       nombre:"Cofre del Alba", precio:75000,
       rarBoosts:{comun:.15,raro:.30,epico:.33,legendario:.18,mitico:.04},
       calBoosts:{normal:.15,reforzado:.30,impecable:.38,ancestral:.17},
-      emoji:"🌟", color:"#ff6b9d",
+      emoji:"🌟", imagen:"img/rpg/items/cofre-alba.png?v=4", color:"#ff6b9d",
       cantMin:5, cantMax:7
     },
     celestial: {
       nombre:"Cofre Celestial", precio:400000,
       rarBoosts:{comun:.03,raro:.15,epico:.35,legendario:.37,mitico:.10},
       calBoosts:{normal:.05,reforzado:.15,impecable:.42,ancestral:.38},
-      emoji:"☀️", color:"#fff5b8",
+      emoji:"☀️", imagen:"img/rpg/items/cofre-celestial.png?v=4", color:"#fff5b8",
       cantMin:7, cantMax:10
     }
   };
@@ -388,21 +388,39 @@
     const acc = m.querySelector(".rpg-loot-modal-acciones");
     acc.innerHTML = "";
     if (item.consumible && cant > 0) {
-      const b = document.createElement("button");
-      b.type = "button"; b.className = "rpg-loot-usar"; b.textContent = "🧪 Usar ahora";
-      b.addEventListener("click", () => {
-        const s = cargarEstado(); const hm = hpMaxRpg(s);
-        if (item.tipo === "hp" || item.tipo === "def") {
-          const cur = item.tipo === "hp" ? v : v * 3;
-          const a = s.hp; s.hp = Math.min(hm, s.hp + cur);
-          const g = Math.round(s.hp - a);
-          if (g <= 0) { alert("Ya tienes la vida al máximo"); return; }
-          usarConsumible(item.id); guardarEstado(s); SND("comer");
+      if (item.id === "item-4-8" || item.id === "llave-hierro" || item.nombre?.toLowerCase().includes("llave dorada")) {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "rpg-loot-usar"; b.textContent = "🏆 Abrir Cofre Dorado";
+        b.addEventListener("click", () => {
           m.classList.remove("active");
-          window.dispatchEvent(new Event("rpg:stats-cambiados"));
-        } else alert("Los objetos de ataque solo funcionan en batalla");
-      });
-      acc.appendChild(b);
+          abrirCofre("dorado", 1, true);
+        });
+        acc.appendChild(b);
+      } else if (item.id === "item-5-8" || item.id === "llave-pequena" || item.nombre?.toLowerCase().includes("llave común") || item.nombre?.toLowerCase().includes("llave comun")) {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "rpg-loot-usar"; b.textContent = "🗃️ Abrir Cofre Plateado";
+        b.addEventListener("click", () => {
+          m.classList.remove("active");
+          abrirCofre("hierro", 1, true);
+        });
+        acc.appendChild(b);
+      } else {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "rpg-loot-usar"; b.textContent = "🧪 Usar ahora";
+        b.addEventListener("click", () => {
+          const s = cargarEstado(); const hm = hpMaxRpg(s);
+          if (item.tipo === "hp" || item.tipo === "def") {
+            const cur = item.tipo === "hp" ? v : v * 3;
+            const a = s.hp; s.hp = Math.min(hm, s.hp + cur);
+            const g = Math.round(s.hp - a);
+            if (g <= 0) { alert("Ya tienes la vida al máximo"); return; }
+            usarConsumible(item.id); guardarEstado(s); SND("comer");
+            m.classList.remove("active");
+            window.dispatchEvent(new Event("rpg:stats-cambiados"));
+          } else alert("Los objetos de ataque solo funcionan en batalla");
+        });
+        acc.appendChild(b);
+      }
     }
     añadirBotonReroll(m, item);
     const bc = document.createElement("button");
@@ -638,17 +656,18 @@
   /* ---------- Cofres ---------- */
   function getLlavesDisponibles() {
     const loot = cargarLoot();
-    // Llaves en el pool: llave-pequena ("Llave Menuda") y llave-hierro ("Llave de Hierro")
-    // También chequeamos cualquier item con prefijo llave o id de llaves mapeadas
+    // Llaves en el pool:
+    // Común (plateada): "llave-pequena", "item-5-8"
+    // Dorada: "llave-hierro", "item-4-8", "llave-dorada"
     const comunes = (loot["llave-pequena"] || 0) + (loot["item-5-8"] || 0);
-    const doradas = (loot["llave-hierro"] || 0) + (loot["item-4-8"] || 0);
+    const doradas = (loot["llave-hierro"] || 0) + (loot["item-4-8"] || 0) + (loot["llave-dorada"] || 0);
     return { comunes, doradas, total: comunes + doradas, loot };
   }
 
   function consumirLlaveParaCofre(tipo) {
     const { comunes, doradas, loot } = getLlavesDisponibles();
     if (tipo === "hierro") {
-      // Abre con 1 llave común o 1 dorada si no hay común
+      // Cofre plateado / de hierro: se abre con 1 Llave común (o 1 dorada como alternativa si no tiene comunes)
       if (comunes > 0) {
         if (loot["llave-pequena"] > 0) loot["llave-pequena"]--;
         else if (loot["item-5-8"] > 0) loot["item-5-8"]--;
@@ -657,14 +676,16 @@
       } else if (doradas > 0) {
         if (loot["llave-hierro"] > 0) loot["llave-hierro"]--;
         else if (loot["item-4-8"] > 0) loot["item-4-8"]--;
+        else if (loot["llave-dorada"] > 0) loot["llave-dorada"]--;
         guardarLoot(loot);
         return true;
       }
     } else if (tipo === "dorado") {
-      // Abre con 1 llave dorada o 2 llaves comunes
+      // Cofre Dorado: se abre con 1 Llave dorada (o 2 llaves comunes)
       if (doradas > 0) {
         if (loot["llave-hierro"] > 0) loot["llave-hierro"]--;
         else if (loot["item-4-8"] > 0) loot["item-4-8"]--;
+        else if (loot["llave-dorada"] > 0) loot["llave-dorada"]--;
         guardarLoot(loot);
         return true;
       } else if (comunes >= 2) {
@@ -839,15 +860,16 @@
       
       let botonLlaveHtml = "";
       if (tipo === "hierro") {
-        const tieneLlave = llaves.total > 0;
-        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${tieneLlave ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${tieneLlave ? `Tienes ${llaves.total} llaves` : 'No tienes llaves'}">
-          🔑 Abrir con Llave (${llaves.total})
+        const tieneLlave = llaves.comunes > 0 || llaves.doradas > 0;
+        const infoTxt = llaves.comunes > 0 ? `(${llaves.comunes} 🔑)` : `(${llaves.doradas} 🗝️)`;
+        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${tieneLlave ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${tieneLlave ? `Abre con 1 Llave Común (${llaves.comunes} disp.)` : 'Necesitas 1 Llave Común'}">
+          🔑 Abrir con Llave Común ${tieneLlave ? infoTxt : '(0)'}
         </button>`;
       } else if (tipo === "dorado") {
         const puedeAbrirDorado = llaves.doradas > 0 || llaves.comunes >= 2;
         const infoTxt = llaves.doradas > 0 ? `(${llaves.doradas} 🗝️)` : `(${Math.floor(llaves.comunes / 2)} usos)`;
-        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${puedeAbrirDorado ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${puedeAbrirDorado ? 'Usa 1 Llave Dorada o 2 Comunes' : 'Necesitas 1 Llave Dorada o 2 Comunes'}">
-          🗝️ Abrir con Llave ${puedeAbrirDorado ? infoTxt : '(0)'}
+        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${puedeAbrirDorado ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${puedeAbrirDorado ? 'Abre con 1 Llave Dorada o 2 Comunes' : 'Necesitas 1 Llave Dorada o 2 Comunes'}">
+          🗝️ Abrir con Llave Dorada ${puedeAbrirDorado ? infoTxt : '(0)'}
         </button>`;
       }
 

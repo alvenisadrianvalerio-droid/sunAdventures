@@ -687,6 +687,7 @@
   font-family: 'Courier New', monospace;
 }
 .rpg-log-item { opacity: 0; animation: rpgLogIn .3s ease forwards; }
+html.animations-disabled .rpg-log-item { opacity: 1 !important; }
 .rpg-log-item + .rpg-log-item { margin-top: .2rem; }
 .rpg-log-item.daño { color: #ff7a9c; }
 .rpg-log-item.curar { color: #4dd48e; }
@@ -1378,6 +1379,7 @@ svg.rpg-popup-svg,
   font-family: monospace; font-size: .78rem; line-height: 1.5;
 }
 .rpg-rl-log-line { opacity: 0; animation: rlLogIn .3s ease forwards; }
+html.animations-disabled .rpg-rl-log-line { opacity: 1 !important; }
 @keyframes rlLogIn { to { opacity: 1; } }
 
 .rpg-rl-recompensa {

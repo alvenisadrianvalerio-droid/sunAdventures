@@ -167,6 +167,23 @@
       overlay.setAttribute("aria-hidden", "true");
       document.body.appendChild(overlay);
       overlay.addEventListener("click", e => { if (e.target === overlay) cerrar(); });
+      // Detener propagación de eventos táctiles, clicks y scroll para que no afecten a la pantalla principal
+      ["touchstart", "touchmove", "touchend", "pointerdown", "pointerup", "pointermove", "click", "dblclick", "contextmenu"].forEach(evtName => {
+        overlay.addEventListener(evtName, e => {
+          e.stopPropagation();
+          // Si el gesto ocurre en el fondo/backdrop fuera del panel de la tienda, prevenir acciones por defecto
+          if (e.target === overlay && (evtName === "touchmove" || evtName === "wheel")) {
+            e.preventDefault();
+          }
+        }, { passive: false });
+      });
+      // Prevenir rebote de scroll al llegar al borde del panel de la tienda
+      overlay.addEventListener("wheel", e => {
+        if (e.target === overlay) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, { passive: false });
       document.addEventListener("keydown", e => {
         if (e.key === "Escape" && overlay?.classList.contains("active")) cerrar();
       });
@@ -175,13 +192,17 @@
     activar(qs(".tienda-panel", overlay));
     overlay.classList.add("active");
     overlay.setAttribute("aria-hidden", "false");
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
   }
 
   function cerrar() {
     overlay?.classList.remove("active");
     overlay?.setAttribute("aria-hidden", "true");
+    document.documentElement.style.overflow = "";
     document.body.style.overflow = "";
+    document.body.style.touchAction = "";
   }
 
   /* ---------- Precio con descuento ---------- */

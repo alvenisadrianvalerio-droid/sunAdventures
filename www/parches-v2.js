@@ -263,7 +263,7 @@
     const btn = e.target.closest('[data-rpg-accion="descansar"]'); if (!btn) return;
     e.preventDefault(); e.stopPropagation();
     const st = window.Rpg?.state?.(); if (!st) return;
-    const hpMax = 80 + st.nivel*20, cost = costeRest();
+    const hpMax = window.Rpg?.hpMax ? window.Rpg.hpMax() : (100 + (st.nivel || 1)*25), cost = costeRest();
     if (st.hp >= hpMax) return alertar({ title:"Ya estás al máximo", message:"No necesitas descansar.", icon:"💚" });
     if (window._getMonedas() < cost) return alertar({ title:"Sin monedas", message:`Necesitas ${cost} 🪙.`, variant:"warning", icon:"🪙" });
     const ok = await confirmar({ title:"💤 Descansar", message:`Recuperarás toda tu vida por <strong>${cost} 🪙</strong>.`, variant:"success", icon:"🔥", confirmText:`Pagar ${cost}`, cancelText:"Cancelar" });
@@ -289,7 +289,7 @@
     const mon = Math.round(15 + nivel*2), xp = Math.round(20 + nivel*5);
     window._setMonedas(window._getMonedas() + mon);
     if (st) { st.xp += xp; try { localStorage.setItem(`sa_rpg_${getUser()}`, JSON.stringify(st)); } catch {} }
-    alertar({ title:"🎁 Recompensa de aventura", message:`+<strong>${mon} 🪙</strong> · +<strong>${xp} XP</strong>`, variant:"success", icon:"⚔️" });
+    alertar({ title:"👑 Recompensa de aventura", message:`+<strong>${mon} 🪙</strong> · +<strong>${xp} XP</strong>`, variant:"success", icon:"⚔️" });
   }
   window.addEventListener("sunadventures:user-ready", () => setTimeout(rpgDiario, 4000));
   setTimeout(() => { if (localStorage.getItem("sunadventures_uid")) rpgDiario(); }, 6000);

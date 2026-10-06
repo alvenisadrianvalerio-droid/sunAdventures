@@ -322,7 +322,7 @@
     window._setMonedas(window._getMonedas() + monedas);
     if (st) { st.xp += xp; try { localStorage.setItem(`sa_rpg_${getUser()}`, JSON.stringify(st)); } catch {} }
     alertar({
-      title:"🎁 Recompensa de aventura",
+      title:"👑 Recompensa de aventura",
       message:`Has recibido <strong>+${monedas} 🪙</strong> y <strong>+${xp} XP</strong> por tu visita diaria.`,
       variant:"success", icon:"⚔️"
     });

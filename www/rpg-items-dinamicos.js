@@ -99,13 +99,32 @@
 
                     const statsEscalados = escalarStats(info.stats, info.rar);
 
+                    // Si el objeto no tiene stats o quedaron en 0, otorgar stats base según rareza para que nunca tenga 0 util
+                    if (!info.stats || Object.keys(info.stats).length === 0 || Object.values(statsEscalados).every(v => !v)) {
+                        const baseAtk = info.rar === "mitico" || info.rar === "tornasol" ? 25 : info.rar === "legendario" ? 18 : info.rar === "epico" ? 12 : info.rar === "raro" ? 8 : 4;
+                        statsEscalados.atk = baseAtk;
+                        statsEscalados.def = Math.max(1, Math.round(baseAtk / 2));
+                        if (tipo === "util") tipo = "atk";
+                    }
+
                     // Si el objeto tiene stats configurados fijos o específicos como Origen de la vida
                     if (coord === "5,4" || info.nombre?.includes("Origen de la vida")) {
                         statsEscalados.hp = 1500;
                     }
 
                     const valorPrincipal = statsEscalados.atk || statsEscalados.def || statsEscalados.hp ||
-                        Object.values(statsEscalados)[0] || 0;
+                        Object.values(statsEscalados)[0] || 1;
+
+                    const habsFinales = Array.isArray(info.habilidades) ? [...info.habilidades] : [];
+                    const sangradoVal = statsEscalados.sangrado || info.stats?.sangrado || 0;
+                    if (sangradoVal > 0 && !habsFinales.some(h => (h.nombre || "").toLowerCase().includes("sangr") || (h.desc || "").toLowerCase().includes("sangr"))) {
+                        habsFinales.push({
+                            nombre: "Desgarro Sangriento.",
+                            tipo: "pasiva",
+                            val: sangradoVal,
+                            desc: `Tus ataques desgarran al enemigo provocando sangrado continuo (${sangradoVal} dmg/turno).`
+                        });
+                    }
 
                     return {
                         id: info.id || `item-${col}-${row}`,
@@ -121,7 +140,7 @@
                         consumible: !!info.consumible,
                         stats: statsEscalados,          // ← stats escalados
                         statsRaw: info.stats || {},     // ← stats originales (por si acaso)
-                        habilidades: Array.isArray(info.habilidades) ? info.habilidades : [],
+                        habilidades: habsFinales,
                         calidad: "normal"
                     };
                 });

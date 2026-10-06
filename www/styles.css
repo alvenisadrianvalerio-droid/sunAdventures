@@ -1897,6 +1897,17 @@ html.animations-disabled *::after {
   scroll-behavior: auto !important;
 }
 
+/* Elementos cuya visibilidad inicial dependía de animación fadeIn */
+html.animations-disabled .rpg-log-item,
+html.animations-disabled .rpg-rl-log-line,
+html.animations-disabled .rpg-mob-animado,
+html.animations-disabled .rpg-boss-animado,
+html.animations-disabled .rpg-batalla,
+html.animations-disabled .rpg-fin-combate-overlay.active,
+html.animations-disabled .rpg-rl-recompensa.active {
+  opacity: 1 !important;
+}
+
 /* ============================================
    TIENDA EMBEBIDA EN PESTAÑA (mm-panel)
    ============================================ */

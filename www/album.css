@@ -661,17 +661,19 @@ body.light .mascota-card {
 .tienda-overlay {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, .75), rgba(0, 0, 0, .9));
-  backdrop-filter: blur(6px);
+  background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, .78), rgba(0, 0, 0, .92));
+  backdrop-filter: blur(8px);
   z-index: 8500;
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 1rem
+  padding: 0.75rem;
+  overscroll-behavior: contain;
+  touch-action: none;
 }
 
 body.light .tienda-overlay {
-  background: radial-gradient(circle at 50% 50%, rgba(255, 248, 235, .85), rgba(245, 234, 209, .95))
+  background: radial-gradient(circle at 50% 50%, rgba(255, 248, 235, .88), rgba(245, 234, 209, .96))
 }
 
 .tienda-overlay.active {
@@ -680,14 +682,16 @@ body.light .tienda-overlay {
 
 .tienda-panel {
   width: 100%;
-  max-width: 720px;
-  max-height: 88vh;
+  max-width: 580px;
+  max-height: 82vh;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
   background: linear-gradient(180deg, var(--bg-2), rgba(11, 12, 18, .98));
   border: 2px solid rgba(255, 217, 61, .35);
-  border-radius: 20px;
-  padding: 1.4rem;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 217, 61, .1) inset
+  border-radius: 18px;
+  padding: 1.05rem;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, .65), 0 0 0 1px rgba(255, 217, 61, .1) inset
 }
 
 body.light .tienda-panel {
@@ -1027,39 +1031,64 @@ body.light .tienda-item-precio {
   margin: 0.1rem 0;
 }
 
-/* Responsive: 4 columnas en desktop/tablet, 2 columnas amplias y cómodas en móviles */
+/* Responsive: 4 columnas en desktop/tablet, 2 columnas compactas y cómodas en móviles/apk */
 @media (max-width: 720px) {
+  .tienda-overlay {
+    padding: 0.5rem !important;
+  }
   .tienda-panel {
-    padding: 1.1rem 0.85rem !important;
-    max-height: 92vh !important;
-    border-radius: 16px !important;
+    padding: 0.85rem 0.65rem !important;
+    max-height: 84vh !important;
+    max-width: 95vw !important;
+    border-radius: 15px !important;
+  }
+  .tienda-header {
+    margin-bottom: 0.65rem !important;
+    padding-bottom: 0.55rem !important;
+  }
+  .tienda-titulo {
+    font-size: 1.3rem !important;
+  }
+  .tienda-monedero {
+    font-size: 0.82rem !important;
+    padding: 0.3rem 0.65rem !important;
+  }
+  .tienda-categorias {
+    margin-bottom: 0.65rem !important;
+    padding: 0.2rem !important;
+    gap: 0.25rem !important;
+  }
+  .tienda-categoria {
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.76rem !important;
   }
   .tienda-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.65rem !important;
+    gap: 0.5rem !important;
   }
   .tienda-item {
-    padding: 0.85rem 0.5rem 0.75rem !important;
-    border-radius: 14px !important;
+    padding: 0.65rem 0.4rem 0.55rem !important;
+    border-radius: 12px !important;
+    gap: 0.3rem !important;
   }
   .tienda-item-preview {
-    width: 64px !important;
-    height: 64px !important;
-    border-radius: 14px !important;
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 12px !important;
   }
   .tienda-item-nombre {
-    font-size: 0.86rem !important;
+    font-size: 0.78rem !important;
   }
   .tienda-item-desc {
-    font-size: 0.72rem !important;
+    font-size: 0.66rem !important;
   }
   .tienda-item-precio {
-    font-size: 0.8rem !important;
-    padding: 0.22rem 0.65rem !important;
+    font-size: 0.74rem !important;
+    padding: 0.18rem 0.55rem !important;
   }
   .tienda-item-btn {
-    font-size: 0.78rem !important;
-    padding: 0.5rem 0.6rem !important;
+    font-size: 0.72rem !important;
+    padding: 0.42rem 0.5rem !important;
   }
 }
 

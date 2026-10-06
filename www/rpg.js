@@ -171,11 +171,12 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       return `<img src="${fullUrl}" alt="" class="rpg-boss-animado ${cls}" style="width:${size}px;height:${size}px;" onerror="this.onerror=null;this.src='img/girasol-loading.png'">`;
     }
 
-    const meta = SPRITE_METADATA_48[relPath] || { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 };
+    const cleanPath = (relPath || "").trim();
+    const meta = SPRITE_METADATA_48[cleanPath] || { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 };
     const duracion = ((meta.idleFrames || 4) / (meta.fps || 6)).toFixed(2);
     const bgW = meta.cols * 100;
     const bgH = meta.rows * 100;
-    const fullUrl = `img/48x48/${relPath}`;
+    const fullUrl = `img/48x48/${encodeURI(cleanPath)}`;
     const animName = meta.animKey || `anim-mob-${meta.idleFrames}`;
     const hurtPct = meta.cols > 1 ? ((meta.hurtCol || 4) / (meta.cols - 1) * 100).toFixed(3) : 0;
 
@@ -187,24 +188,27 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       --mob-hurt-x:${hurtPct}%;
       width:${size}px;
       height:${size}px;
+      min-width:${size}px;
+      min-height:${size}px;
       background-image:url('${fullUrl}');
       background-repeat:no-repeat;
       background-size:${bgW}% ${bgH}%;
       background-position:0% 0%;
       image-rendering:pixelated;
       display:inline-block;
+      flex-shrink:0;
       animation:${animName} ${duracion}s steps(${meta.idleFrames}) infinite;
     "></div>`;
   }
 
   function spriteHtml(rutaOClave, cls = "rpg-sprite-img", alt = "") {
     if (!rutaOClave) return "";
-    let rel = SPR_ENEMIGO[rutaOClave] || SPR_REGION[rutaOClave] || rutaOClave;
+    let rel = (SPR_ENEMIGO[rutaOClave] || SPR_REGION[rutaOClave] || rutaOClave).trim();
     if (rel.startsWith("img/48x48/")) rel = rel.replace("img/48x48/", "");
 
     // Si es un Jefe de la carpeta Bosses, mostrarlo directamente como imagen completa
     if (rel.startsWith("Bosses/")) {
-      const fullUrl = `img/48x48/${rel}`;
+      const fullUrl = `img/48x48/${encodeURI(rel)}`;
       return `<img class="${cls}" src="${fullUrl}" alt="${alt}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='img/girasol-loading.png'">`;
     }
 
@@ -214,7 +218,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if (meta) {
       const bgW = meta.cols * 100;
       const bgH = meta.rows * 100;
-      const fullUrl = `img/48x48/${rel}`;
+      const fullUrl = `img/48x48/${encodeURI(rel)}`;
       return `<div class="${cls} rpg-sprite-thumb-48" style="
         width:32px;
         height:32px;
@@ -227,7 +231,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       "></div>`;
     }
 
-    let ruta = rel.startsWith("img/") ? rel : `${DIR_48}${rel}`;
+    let ruta = rel.startsWith("img/") ? encodeURI(rel) : `${DIR_48}${encodeURI(rel)}`;
     return `<img class="${cls}" src="${ruta}" alt="${alt}" loading="lazy" decoding="async">`;
   }
 
@@ -416,13 +420,13 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     REGIONES.forEach((reg, ri) => {
       for (let i = 1; i <= 10; i++) {
         const idx = ri * 10 + i, esJefe = i === 10, esMini = i === 5, esElite = i >= 6 && i <= 9;
-        // Curva lineal suave y progresiva con enemigos normales reforzados y desafiantes
-        const hpBase = Math.round(75 + idx * 22);
-        const atkBase = Math.round(12 + idx * 3.0);
-        const hpJefe = esJefe ? Math.round(idx * 38 + 90) : 0;
-        const atkJefe = esJefe ? Math.round(idx * 1.6 + 6) : 0;
-        const hpMini = esMini ? Math.round(idx * 20 + 40) : 0;
-        const atkMini = esMini ? Math.round(idx * 1.0 + 4) : 0;
+        // Dificultad afinada: enemigos normales y jefes más desafiantes
+        const hpBase = Math.round(90 + idx * 26);
+        const atkBase = Math.round(14 + idx * 3.4);
+        const hpJefe = esJefe ? Math.round(idx * 50 + 130) : 0;
+        const atkJefe = esJefe ? Math.round(idx * 2.2 + 9) : 0;
+        const hpMini = esMini ? Math.round(idx * 26 + 60) : 0;
+        const atkMini = esMini ? Math.round(idx * 1.4 + 6) : 0;
         z.push({
           id: `${reg.id}-${i}`,
           nombre: esJefe ? reg.jefeNombre : `${reg.nombre} · ${i}`,
@@ -431,8 +435,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
           enemigos: esJefe ? [reg.jefe] : esMini ? [...reg.elite.slice(0, 2), reg.base[0]] : esElite ? reg.elite : reg.base,
           hp: Math.round(hpBase + hpJefe + hpMini),
           atk: Math.round(atkBase + atkJefe + atkMini),
-          xp: Math.round(18 + idx * 14 + (esJefe ? idx * 28 : esMini ? idx * 12 : 0)),
-          monedas: Math.round(8 + idx * 2.5 + (esJefe ? 45 : esMini ? 18 : 0)),
+          xp: Math.round(22 + idx * 16 + (esJefe ? idx * 32 : esMini ? idx * 15 : 0)),
+          monedas: Math.round(10 + idx * 3.0 + (esJefe ? 55 : esMini ? 22 : 0)),
           jefe: esJefe, miniJefe: esMini, region: reg.id, regionNombre: reg.nombre, orden: idx
         });
       }
@@ -506,13 +510,20 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const f = qs(".site-footer");
     f ? f.parentNode.insertBefore(sec, f) : document.body.appendChild(sec);
   }
+  function tieneSesion() {
+    return !!(window._sunUserId || localStorage.getItem("sunadventures_uid"));
+  }
+
   function inyectarNav() {
-    if (qs('[data-view-link="rpg"]')) return;
     const nav = qs(".nav-links"); if (!nav) return;
-    const a = document.createElement("a");
-    a.href = "#rpg"; a.className = "nav-link"; a.dataset.viewLink = "rpg";
-    a.innerHTML = `<span class="ui-icon nav-link-icon" data-icono="espada"></span><span class="nav-link-text">Aventura</span>`;
-    nav.appendChild(a);
+    let a = qs('[data-view-link="rpg"]');
+    if (!a) {
+      a = document.createElement("a");
+      a.href = "#rpg"; a.className = "nav-link"; a.dataset.viewLink = "rpg";
+      a.innerHTML = `<span class="ui-icon nav-link-icon" data-icono="espada"></span><span class="nav-link-text">Aventura</span>`;
+      nav.appendChild(a);
+    }
+    a.style.display = tieneSesion() ? "" : "none";
   }
 
   function render() {
@@ -928,7 +939,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       monedas: Math.round(z.monedas * multPremio),
       jefe: !!z.jefe, miniJefe: !!z.miniJefe, esHorda, horda: hordaArr,
       tamanoHorda: nHorda,
-      dot: 0, dotDur: 0, shield: 0, phase: 1, tier,
+      dot: 0, dotDur: 0, sangrado: 0, sangradoDur: 0, shield: 0, phase: 1, tier,
       special: esp, specialCD: z.jefe ? 2 : z.miniJefe ? 3 : 4, specialTimer: z.jefe ? 2 : z.miniJefe ? 3 : 4
     };
     turnoJugador = true; overlayObjetos = false;
@@ -975,14 +986,20 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   function actualizarHPs() {
     const he = $("hp-enemigo");
     if (he && enemigo) {
+      let extras = [];
+      if (enemigo.shield > 0) extras.push(`🛡️${enemigo.shield}`);
+      if (enemigo.dot > 0) extras.push(`🔥${enemigo.dot}`);
+      if (enemigo.sangrado > 0) extras.push(`🩸${enemigo.sangrado}`);
+      const extraStr = extras.length ? ` · ${extras.join(" · ")}` : "";
+
       if (enemigo.esHorda && enemigo.horda) {
         const vivos = enemigo.horda.filter(x => x.hp > 0).length;
         const total = enemigo.horda.length;
-        he.textContent = `${Math.max(0, enemigo.hp)} HP (${vivos}/${total} vivos)${enemigo.shield > 0 ? ` · 🛡️${enemigo.shield}` : ''}`;
+        he.textContent = `${Math.max(0, enemigo.hp)} HP (${vivos}/${total} vivos)${extraStr}`;
         const countBadge = qs(".rpg-horda-contador");
         if (countBadge) countBadge.textContent = `Horda: ${vivos}/${total} vivos`;
       } else {
-        he.textContent = `${Math.max(0, enemigo.hp)} HP${enemigo.shield > 0 ? ` · 🛡️${enemigo.shield}` : ''}`;
+        he.textContent = `${Math.max(0, enemigo.hp)} HP${extraStr}`;
       }
     }
     const hh = qs("#fighter-heroe .rpg-fighter-hp"); if (hh) hh.textContent = `${Math.round(state.hp)} HP`;
@@ -1076,6 +1093,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         if (state._segundaOportunidadUsada) return;
         state._segundaOportunidadUsada = true;
         activada = true;
+        state.sangrado = 0;
         state.hp = Math.round(hpMax() * 0.3);
         log(`👻 ¡${hab.nombre} activado! Revives con ${state.hp} HP.`, "critico");
         floatDmg("#sprite-heroe", "¡RENACES!", "curar");
@@ -1152,6 +1170,18 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
           activada = true;
         }
       }
+
+      if (evento === "atacar" && (texto.includes("sangr") || hab.tipo === "sangrado" || hab.stats?.sangrado)) {
+        if (enemigo && !enemigo.terminado) {
+          const sangradoMatch = desc.match(/(\d+)\s*(?:de\s+)?(?:dmg|daño)/i);
+          const sangradoDmg = sangradoMatch ? parseInt(sangradoMatch[1]) : (hab.val || 20);
+          enemigo.sangrado = Math.max(enemigo.sangrado || 0, sangradoDmg);
+          enemigo.sangradoDur = Math.max(enemigo.sangradoDur || 0, 3);
+          log(`🩸 ${hab.nombre}: aplicas sangrado (${enemigo.sangrado} dmg/turno).`, "critico");
+          floatDmg("#sprite-enemigo", "🩸 SANGRADO", "daño");
+          activada = true;
+        }
+      }
     });
 
     return activada;
@@ -1168,6 +1198,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       log(`Atacas por ${dmg} daño.`, "daño");
       floatDmg("#sprite-enemigo", "-" + dmg, "daño");
       FX({ tipo: "attack", target: "enemy", valor: dmg, fxKey: "slash" });
+      comprobarPasivas("atacar", { dmg, habId });
       actualizarHPs();
       if (enemigo.hp <= 0) return setTimeout(victoria, 500);
       setTimeout(turnoEnemigo, 800);
@@ -1267,6 +1298,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     qs("#sprite-enemigo")?.classList.add("golpeado");
     setTimeout(() => qs("#sprite-enemigo")?.classList.remove("golpeado"), 350);
     chequearFaseJefe();
+    comprobarPasivas("atacar", { dmg: totalDmg, hab });
     if (enemigo.hp <= 0) return setTimeout(victoria, 500);
 
     if (pasiva.tipo === "doble_ataque" && Math.random() * 100 < pasiva.val) {
@@ -1369,6 +1401,9 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       log(`🛡️ ${hab.nombre} es pasiva (siempre activa).`, "info");
     }
 
+    if (["daño", "ataque", "invocacion", "ultimate"].includes(tipo)) {
+      comprobarPasivas("atacar", { hab });
+    }
     actualizarHPs();
     chequearFaseJefe();
     if (enemigo.hp <= 0) return setTimeout(victoria, 500);
@@ -1653,6 +1688,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   }
 
   function tickDoT() {
+    let dotActivo = false;
     if (enemigo.dot && enemigo.dot > 0) {
       aplicarDmgEnemigo(enemigo.dot);
       log(`🔥 Quemadura: -${enemigo.dot} HP.`, "daño");
@@ -1662,6 +1698,18 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       if (enemigo.hp <= 0) { setTimeout(victoria, 400); return true; }
       enemigo.dotDur--;
       if (enemigo.dotDur <= 0) enemigo.dot = 0;
+      dotActivo = true;
+    }
+    if (enemigo.sangrado && enemigo.sangrado > 0) {
+      aplicarDmgEnemigo(enemigo.sangrado);
+      log(`🩸 Sangrado: -${enemigo.sangrado} HP al enemigo.`, "critico");
+      floatDmg("#sprite-enemigo", "-" + enemigo.sangrado, "daño");
+      FX({ tipo: "attack", target: "enemy", valor: enemigo.sangrado, fxKey: "slash" });
+      actualizarHPs();
+      if (enemigo.hp <= 0) { setTimeout(victoria, 400); return true; }
+      enemigo.sangradoDur--;
+      if (enemigo.sangradoDur <= 0) enemigo.sangrado = 0;
+      dotActivo = true;
     }
     return false;
   }
@@ -2068,7 +2116,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const perdidas = Math.floor(monedasActuales * 0.02);
     try { notifMascota?.("Derrota", `Pierdes ${perdidas} 🪙 (2% de tus monedas)`); } catch { }
     setMonedas(monedasActuales - perdidas);
-    state.hp = Math.round(hpMax() * 0.3);
+    state.hp = hpMax();
     state.sangrado = 0;
     guardar(state);
     $("rpg-batalla")?.classList.add("muerto");
@@ -2077,13 +2125,33 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   }
 
   function activarVistaRpg() {
+    if (!tieneSesion()) {
+      if (location.hash === "#rpg") {
+        location.hash = "#album";
+      }
+      inyectarNav();
+      try {
+        if (typeof window.SunModal?.alert === "function") {
+          window.SunModal.alert({ title: "Inicia sesión", message: "Inicia sesión con tu cuenta para acceder al modo Aventura y guardar tu progreso.", icon: "⚔️" });
+        } else {
+          alert("Inicia sesión para acceder al modo Aventura.");
+        }
+      } catch { }
+      try { $("btn-open-login")?.click(); } catch { }
+      return;
+    }
     qsa("[data-view]").forEach(el => el.classList.toggle("active", el.dataset.view === "rpg"));
     qsa("[data-view-link]").forEach(el => el.classList.toggle("active", el.dataset.viewLink === "rpg"));
     document.body.style.overflow = "";
   }
-  window.addEventListener("hashchange", () => { if (location.hash === "#rpg") { activarVistaRpg(); render(); } });
+  window.addEventListener("hashchange", () => { if (location.hash === "#rpg") { activarVistaRpg(); if (tieneSesion()) render(); } });
   document.addEventListener("click", e => {
     if (!e.target.closest('[data-view-link="rpg"]')) return;
+    if (!tieneSesion()) {
+      e.preventDefault();
+      activarVistaRpg();
+      return;
+    }
     setTimeout(() => { activarVistaRpg(); render(); }, 0);
   });
   window.addEventListener("rpg:stats-cambiados", () => {
@@ -2103,10 +2171,43 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     }
   });
   window.addEventListener("sunadventures:mascota-cambiada", () => { if ($("rpg-content") && !enemigo) render(); });
+  window.addEventListener("sunadventures:user-ready", () => {
+    state = cargar();
+    inyectarNav();
+    if (location.hash === "#rpg") {
+      activarVistaRpg();
+      render();
+    } else {
+      render();
+    }
+  });
+  window.addEventListener("sunadventures:user-logout", () => {
+    inyectarNav();
+    if (location.hash === "#rpg" || $("rpg")?.classList.contains("active")) {
+      location.hash = "#album";
+      qsa("[data-view]").forEach(el => el.classList.toggle("active", el.dataset.view === "album"));
+      qsa("[data-view-link]").forEach(el => el.classList.toggle("active", el.dataset.viewLink === "album"));
+    }
+  });
 
-  function init() { inyectarSeccion(); inyectarNav(); render(); if (location.hash === "#rpg") activarVistaRpg(); }
+  function init() {
+    inyectarSeccion();
+    inyectarNav();
+    if (tieneSesion()) {
+      render();
+      if (location.hash === "#rpg") activarVistaRpg();
+    } else if (location.hash === "#rpg") {
+      activarVistaRpg();
+    }
+  }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();
-  setTimeout(() => { if (location.hash === "#rpg" && !$("rpg")?.classList.contains("active")) { activarVistaRpg(); render(); } }, 300);
+  setTimeout(() => {
+    inyectarNav();
+    if (location.hash === "#rpg" && !$("rpg")?.classList.contains("active")) {
+      activarVistaRpg();
+      if (tieneSesion()) render();
+    }
+  }, 300);
 
   window.Rpg = {
     state: () => state,

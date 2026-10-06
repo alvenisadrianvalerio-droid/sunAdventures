@@ -50,29 +50,20 @@
         const todas = getTodasHabilidades();
         const loadout = getLoadout();
 
-        if (loadout.length === 0) {
-            // Sin loadout configurado → autoequipar las primeras 4
+        // Si nunca se ha configurado el loadout (clave no existe en localStorage)
+        if (localStorage.getItem(SLOT_KEY()) === null) {
             const auto = todas.slice(0, MAX_HABS).map(h => `${h.itemId}::${h.nombre}`);
             setLoadout(auto);
             return todas.slice(0, MAX_HABS);
         }
 
-        // Filtrar solo las que siguen activas
+        // Mapear exactamente según el orden guardado por el usuario
         const equipadas = [];
         loadout.forEach(slot => {
             const [itemId, nombre] = slot.split("::");
             const hab = todas.find(h => h.itemId === itemId && h.nombre === nombre);
             if (hab) equipadas.push(hab);
         });
-
-        // Si alguna ya no existe, rellenar con las primeras disponibles
-        if (equipadas.length < MAX_HABS) {
-            todas.forEach(h => {
-                if (equipadas.length >= MAX_HABS) return;
-                const key = `${h.itemId}::${h.nombre}`;
-                if (!loadout.includes(key)) equipadas.push(h);
-            });
-        }
 
         return equipadas.slice(0, MAX_HABS);
     }
@@ -91,7 +82,7 @@
         }
 
         if (loadout.length >= MAX_HABS) {
-            return { accion: "lleno", loadout, error: `Máximo ${MAX_HABS} habilidades equipadas.` };
+            return { accion: "lleno", loadout, error: `Máximo ${MAX_HABS} habilidades equipadas. Quita una primero.` };
         }
 
         loadout.push(slotId);
@@ -99,10 +90,25 @@
         return { accion: "añadida", loadout };
     }
 
+    // ─── Desequipar habilidad específica por índice o clave ───
+    function desequiparHabilidad(itemId, nombre) {
+        const slotId = `${itemId}::${nombre}`;
+        const loadout = getLoadout();
+        const idx = loadout.indexOf(slotId);
+        if (idx !== -1) {
+            loadout.splice(idx, 1);
+            setLoadout(loadout);
+            actualizarPanelLoadout();
+            return true;
+        }
+        return false;
+    }
+
     // ─── Exponer en RpgItems ───
     window.RpgItems.getHabilidadesEquipadas = getHabilidadesEquipadas;
     window.RpgItems.getTodasHabilidades = getTodasHabilidades;
     window.RpgItems.toggleHabilidad = toggleHabilidad;
+    window.RpgItems.desequiparHabilidad = desequiparHabilidad;
     window.RpgItems.getLoadout = getLoadout;
     window.RpgItems.clearLoadout = () => setLoadout([]);
 
@@ -158,18 +164,30 @@
         for (let i = 0; i < MAX_HABS; i++) {
             const hab = equipadas[i];
             const slot = document.createElement("div");
-            slot.className = "rpg-loadout-slot" + (hab ? " ocupado" : "");
+            slot.className = "rpg-loadout-slot" + (hab ? " ocupado" : " clickable-vacio");
 
             if (hab) {
                 const tipo = (hab.tipo || "daño").replace(/_/g, " ");
                 slot.innerHTML = `
           <span class="rpg-loadout-slot-num">${i + 1}</span>
+          <button type="button" class="rpg-loadout-slot-quitar" title="Quitar habilidad">×</button>
           <span class="rpg-loadout-slot-nombre">${hab.nombre}</span>
           <span class="rpg-loadout-slot-tipo">${tipo}</span>
         `;
-                slot.title = hab.desc || hab.nombre;
+                slot.title = `${hab.nombre} (${tipo})\nHaz clic para cambiar o quitar`;
+                slot.querySelector(".rpg-loadout-slot-quitar").addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    desequiparHabilidad(hab.itemId, hab.nombre);
+                });
+                slot.addEventListener("click", () => {
+                    abrirModalLoadout();
+                });
             } else {
-                slot.innerHTML = `<span class="rpg-loadout-slot-num">${i + 1}</span><span class="rpg-loadout-slot-vacio">vacío</span>`;
+                slot.innerHTML = `<span class="rpg-loadout-slot-num">${i + 1}</span><span class="rpg-loadout-slot-vacio">+ Añadir</span>`;
+                slot.title = "Espacio libre. Haz clic para elegir una habilidad.";
+                slot.addEventListener("click", () => {
+                    abrirModalLoadout();
+                });
             }
 
             slots.appendChild(slot);
@@ -375,6 +393,12 @@
       min-height: 64px;
       text-align: center;
       position: relative;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .rpg-loadout-slot:hover {
+      border-color: rgba(166,132,240,.8);
+      transform: translateY(-1px);
     }
     .rpg-loadout-slot.ocupado {
       border-style: solid;
@@ -389,6 +413,31 @@
       font-weight: 900;
       color: #c4a5ff;
       opacity: .8;
+    }
+    .rpg-loadout-slot-quitar {
+      position: absolute;
+      top: 2px;
+      right: 3px;
+      width: 18px;
+      height: 18px;
+      line-height: 16px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 80, 80, .25);
+      color: #ff9999;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+    }
+    .rpg-loadout-slot-quitar:hover {
+      background: rgba(255, 60, 60, .85);
+      color: #fff;
+      transform: scale(1.15);
     }
     .rpg-loadout-slot-nombre {
       font-size: .72rem;
@@ -405,9 +454,10 @@
       opacity: .75;
     }
     .rpg-loadout-slot-vacio {
-      font-size: .7rem;
-      font-style: italic;
-      opacity: .4;
+      font-size: .72rem;
+      font-weight: 700;
+      color: #c4a5ff;
+      opacity: .7;
     }
     .rpg-loadout-btn {
       width: 100%;

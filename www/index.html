@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="leaflet.css">
   <link rel="stylesheet" href="styles.css?v=121">
   <link rel="stylesheet" href="album.css?v=120">
   <link rel="stylesheet" href="juegos.css?v=119">
@@ -207,7 +207,12 @@
       <h2 class="album-title">Nuestro álbum</h2>
       <p class="album-subtitle">Cada foto guarda un momento que no queremos olvidar.</p>
     </div>
-    <div class="album-actions"><button id="btn-add-photo" class="btn-primary"><span>+</span> Añadir un recuerdo</button>
+    <div class="album-actions">
+      <button id="btn-add-photo" class="btn-primary"><span>+</span> Añadir un recuerdo</button>
+      <button id="btn-paste-photos" class="btn-secondary" title="Pega fotos del portapapeles o selecciona múltiples archivos para guardarlos como polaroids">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Pegar fotos
+      </button>
+      <input type="file" id="input-paste-photos" accept="image/*" multiple style="display:none;">
     </div>
     <div id="album-grid" class="album-grid"></div>
     <div id="album-empty" class="album-empty">
@@ -748,8 +753,8 @@ Artista - Canción
      5) rpg-loadout
      6) rpg.js
      ============================================================ -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="supabase.js"></script>
+  <script src="leaflet.js"></script>
   <script src="icons-emojis.js"></script>
   <script src="ds.js"></script>
   <script src="offline.js"></script>
