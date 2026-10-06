@@ -175,7 +175,7 @@
      ============================================================ */
   (function equipoRpg() {
     const $ = id => document.getElementById(String(id).replace(/^#/, ""));
-    const getUser = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunadventures_uid") || "local";
+    const getUser = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || "local";
 
     // Asegurar que el CSS oculta los skins bajo la mascota
     if (!document.getElementById("hide-skins-css")) {
@@ -307,9 +307,9 @@
     // Mantener sincronizado
     window._v3SyncEquipo = () => { inyectarTab(); inyectarPanel(); };
     window._v3SyncEquipo();
-    window.addEventListener("sunadventures:tienda-compra", () => setTimeout(render, 100));
-    window.addEventListener("sunadventures:mascota-cambiada", () => setTimeout(render, 100));
-    window.addEventListener("sunadventures:perfil-actualizado", () => setTimeout(render, 100));
+    window.addEventListener("sunad:tienda-compra", () => setTimeout(render, 100));
+    window.addEventListener("sunad:mascota-cambiada", () => setTimeout(render, 100));
+    window.addEventListener("sunad:perfil-actualizado", () => setTimeout(render, 100));
   })();
 
   function limpiarArtefactosMascota() {

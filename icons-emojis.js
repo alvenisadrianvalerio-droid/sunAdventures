@@ -1,5 +1,5 @@
 /* ============================================================
-   ICONOS SVG — Estilo único "SunAdventures" (línea gruesa dorada)
+   ICONOS SVG — Estilo único "SunAd" (línea gruesa dorada)
    Reemplaza TODOS los emojis genéricos por SVG reutilizables.
    Uso: ICONO.girasol, ICONO.corazon, ICONO.casa ...
    ============================================================ */

@@ -268,7 +268,7 @@
         header.appendChild(btn);
     }
 
-    window.addEventListener("sunadventures:rpg-tab", e => {
+    window.addEventListener("sunad:rpg-tab", e => {
         if (e.detail?.tab === "objetos") {
             setTimeout(inyectarForjaMasiva, 200);
         }

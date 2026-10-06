@@ -1,4 +1,4 @@
-/* ICONOS SVG — Estilo único SunAdventures (línea gruesa dorada) */
+/* ICONOS SVG — Estilo único SunAd (línea gruesa dorada) */
 (function () {
   const S = (d, e = "") => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${e}>${d}</svg>`;
   const F = (d, e = "") => `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" ${e}>${d}</svg>`;

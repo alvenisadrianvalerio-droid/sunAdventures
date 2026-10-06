@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const URL_EXPIRY = 3600;
   const URL_EXPIRY_CANCIONES = 14400;
   const DURACION_CACHE_URL = (URL_EXPIRY - 60) * 1000;
-  const CENSURA_KEY = "sunadventures_censura_activa";
+  const CENSURA_KEY = "sunad_censura_activa";
   const PUSH_VAPID_PUBLIC_KEY = "BGLQw2FyE65Bd8m2BcucYBvgCPrfJQEDfDr-VE2EalHz4LzcKBwjtysfCrWxyIhYULhmTNroGxJZCCnqtjrCrog";
   const AUDIO_EXTS = ["mp3", "m4a", "wav", "ogg", "flac", "aac", "opus"];
   const VIDEO_EXTS = ["mp4", "webm", "mov", "mkv"];
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ---------- Helpers ---------- */
   const $ = id => document.getElementById(id);
-  const getUserIdSafe = () => window._sunUserId || localStorage.getItem("sunadventures_uid") || "local";
+  const getUserIdSafe = () => window._sunUserId || localStorage.getItem("sunad_uid") || "local";
   window._getUserIdSafe = getUserIdSafe;
   const parseCoord = v => (v === null || v === undefined || v === "") ? null : (Number.isFinite(Number(v)) ? Number(v) : null);
   const escapeHtml = t => String(t).replace(/[&<>'"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[c]));
@@ -287,7 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function registrarVisita() {
     try {
       const hoy = new Date().toISOString().slice(0, 10);
-      const clave = `sunadventures_visitas_${getUserIdSafe()}`;
+      const clave = `sunad_visitas_${getUserIdSafe()}`;
       const dias = JSON.parse(localStorage.getItem(clave) || "[]");
       if (!dias.includes(hoy)) dias.push(hoy);
       const ordenados = dias.sort().slice(-400);
@@ -352,13 +352,13 @@ document.addEventListener("DOMContentLoaded", () => {
       };
       const personales = LOGROS.filter(l => l.tipo !== "grupo");
       const grupales = LOGROS.filter(l => l.tipo === "grupo");
-      const totalPersonal = pintar(personales, logrosPersonalesGrid, `sunadventures_logros_${getUserIdSafe()}`, "personal");
-      pintar(grupales, logrosGrupoGrid, `sunadventures_logros_grupo_${grupoActivo?.id || "local"}`, "grupo");
+      const totalPersonal = pintar(personales, logrosPersonalesGrid, `sunad_logros_${getUserIdSafe()}`, "personal");
+      pintar(grupales, logrosGrupoGrid, `sunad_logros_grupo_${grupoActivo?.id || "local"}`, "grupo");
       if (logrosDesbloqueados) logrosDesbloqueados.textContent = totalPersonal;
       renderExperiencia();
       window._logrosDesbloqueados = {
-        ...JSON.parse(localStorage.getItem(`sunadventures_logros_grupo_${grupoActivo?.id || "local"}`) || "{}"),
-        ...JSON.parse(localStorage.getItem(`sunadventures_logros_${getUserIdSafe()}`) || "{}")
+        ...JSON.parse(localStorage.getItem(`sunad_logros_grupo_${grupoActivo?.id || "local"}`) || "{}"),
+        ...JSON.parse(localStorage.getItem(`sunad_logros_${getUserIdSafe()}`) || "{}")
       };
       if (typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
     } catch (err) { console.error("renderLogros:", err); }
@@ -373,11 +373,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (vistaActiva === "inicio") renderExperiencia();
     if (typeof window._actualizarModalMascota === "function") { try { window._actualizarModalMascota(); } catch { } }
   }
-  window.addEventListener("sunadventures:progress", () => {
+  window.addEventListener("sunad:progress", () => {
     if (_progressT) { _progressPend = true; return; }
     _progressT = requestAnimationFrame(() => {
       _progressT = null; _ejecutarProgress();
-      if (_progressPend) { _progressPend = false; window.dispatchEvent(new Event("sunadventures:progress")); }
+      if (_progressPend) { _progressPend = false; window.dispatchEvent(new Event("sunad:progress")); }
     });
   });
   document.addEventListener("visibilitychange", () => {
@@ -396,8 +396,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!session) { grupoActivo = null; return null; }
       usuarioActualId = session.user.id;
       window._sunUserId = session.user.id;
-      localStorage.setItem("sunadventures_uid", session.user.id);
-      window.dispatchEvent(new Event("sunadventures:user-ready"));
+      localStorage.setItem("sunad_uid", session.user.id);
+      window.dispatchEvent(new Event("sunad:user-ready"));
       const username = usernameDesdeSesion(session);
       const { data: perfilExistente, error: perfilError } = await supabase.from("perfiles").select("id,username").eq("id", session.user.id).maybeSingle();
       if (perfilError) throw perfilError;
@@ -419,13 +419,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       grupoActivo = membresia.grupos || { id: membresia.grupo_id, nombre: "Nuestro grupo de aventuras" };
       localStorage.setItem("grupo_activo", grupoActivo.id);
-      window.dispatchEvent(new CustomEvent("sunadventures:group-ready", { detail: { groupId: grupoActivo.id, userId: session.user.id } }));
+      window.dispatchEvent(new CustomEvent("sunad:group-ready", { detail: { groupId: grupoActivo.id, userId: session.user.id } }));
       await Promise.all(["fotos", "notas", "playlists"].map(t => supabase.from(t).update({ grupo_id: grupoActivo.id }).eq("user_id", session.user.id).is("grupo_id", null)));
       return grupoActivo;
     } catch (err) {
       console.error("asegurarGrupoActivo:", err);
       grupoActivo = null;
-      window.dispatchEvent(new CustomEvent("sunadventures:group-error", { detail: { message: err?.message || "Error desconocido" } }));
+      window.dispatchEvent(new CustomEvent("sunad:group-error", { detail: { message: err?.message || "Error desconocido" } }));
       return null;
     }
   }
@@ -491,7 +491,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       if (toggleCensura) toggleCensura.checked = localStorage.getItem(CENSURA_KEY) === "true";
       window.SunPreferences?.setLanguage(window.SunPreferences.getLanguage());
-      window.SunPreferences?.setAnimationsDisabled(localStorage.getItem("sunadventures_animations_disabled") === "true");
+      window.SunPreferences?.setAnimationsDisabled(localStorage.getItem("sunad_animations_disabled") === "true");
       window.SunPreferences?.setVolume(localStorage.getItem("app_volume") || localStorage.getItem("player_volumen") || "0.8");
       settingsModal.classList.add("active");
       settingsModal.setAttribute("aria-hidden", "false");
@@ -876,7 +876,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     ocultarLoading();
     await render();
-    window.dispatchEvent(new Event("sunadventures:progress"));
+    window.dispatchEvent(new Event("sunad:progress"));
 
     if (subidas > 0) {
       alertar({
@@ -1032,7 +1032,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const act = await actualizarFotoTabla(fotoEditando.id, fecha, nota, parseCoord(inputLat?.value), parseCoord(inputLng?.value));
           const idx = fotos.findIndex(f => f.id === fotoEditando.id);
           if (idx !== -1) fotos[idx] = { ...fotos[idx], fecha: act.fecha, nota: act.nota, lat: act.lat, lng: act.lng };
-          cerrarModal(); await render(); window.dispatchEvent(new Event("sunadventures:progress"));
+          cerrarModal(); await render(); window.dispatchEvent(new Event("sunad:progress"));
         } catch (err) { alertar({ title: "No se pudo actualizar", message: err.message || String(err), variant: "danger" }); if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Actualizar recuerdo"; } }
         finally { subiendoFoto = false; }
         return;
@@ -1048,7 +1048,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (upErr) throw upErr;
         const nueva = await añadirFotoTabla(filePath, fecha, nota, parseCoord(inputLat?.value), parseCoord(inputLng?.value));
         fotos.unshift({ id: nueva.id, path: nueva.path, fecha: nueva.fecha, nota: nueva.nota, lat: nueva.lat, lng: nueva.lng });
-        cerrarModal(); await render(); window.dispatchEvent(new Event("sunadventures:progress"));
+        cerrarModal(); await render(); window.dispatchEvent(new Event("sunad:progress"));
       } catch (err) { alertar({ title: "No se pudo subir", message: err.message || String(err), variant: "danger" }); if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Guardar recuerdo"; } }
       finally { subiendoFoto = false; ocultarLoading(); }
     } catch (err) { console.error(err); subiendoFoto = false; ocultarLoading(); }
@@ -1168,7 +1168,7 @@ document.addEventListener("DOMContentLoaded", () => {
       await eliminarNotaTabla(id);
       notas = notas.filter(n => n.id !== id);
       renderNotas();
-      window.dispatchEvent(new Event("sunadventures:progress"));
+      window.dispatchEvent(new Event("sunad:progress"));
     } catch (err) { alertar({ title: "Error", message: "No se pudo eliminar: " + (err.message || err), variant: "danger" }); }
   }
 
@@ -1193,7 +1193,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const nueva = await añadirNotaTabla(titulo, contenido, colorFinal);
           notas.unshift({ id: nueva.id, titulo: nueva.titulo, contenido: nueva.contenido, color: nueva.color, created_at: nueva.created_at });
         }
-        cerrarNotaModal(); renderNotas(); window.dispatchEvent(new Event("sunadventures:progress"));
+        cerrarNotaModal(); renderNotas(); window.dispatchEvent(new Event("sunad:progress"));
       } catch (err) { alertar({ title: "No se pudo guardar", message: err.message || String(err), variant: "danger" }); if (notaSubmitBtn) { notaSubmitBtn.disabled = false; notaSubmitBtn.textContent = notaEditando ? "Actualizar texto" : "Guardar notita"; } }
     } catch (err) { console.warn("nota submit:", err); }
   });
@@ -1395,7 +1395,7 @@ document.addEventListener("DOMContentLoaded", () => {
       await guardarCancionesTabla(pl.id, nuevas);
       pl.canciones = nuevas;
       renderCancionesLista(); renderPlaylists();
-      window.dispatchEvent(new Event("sunadventures:progress"));
+      window.dispatchEvent(new Event("sunad:progress"));
     } catch (err) { alertar({ title: "Error", message: "No se pudo quitar la canción: " + (err.message || err), variant: "danger" }); }
   }
 
@@ -1794,7 +1794,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (playerVolume) playerVolume.value = volumenActual;
     actualizarIconoVolumen();
   }
-  window.addEventListener("sunadventures:volume-change", event => {
+  window.addEventListener("sunad:volume-change", event => {
     const volume = Number(event.detail?.volume);
     if (!Number.isFinite(volume)) return;
     volumenActual = Math.max(0, Math.min(1, volume));
@@ -2023,7 +2023,7 @@ document.addEventListener("DOMContentLoaded", () => {
   playerVolume?.addEventListener("input", () => {
     if (!globalAudio) return;
     const v = parseFloat(playerVolume.value);
-    window.dispatchEvent(new CustomEvent("sunadventures:volume-change", { detail: { volume: v } }));
+    window.dispatchEvent(new CustomEvent("sunad:volume-change", { detail: { volume: v } }));
     window.SunPreferences?.setVolume(v);
     actualizarIconoVolumen();
   });
@@ -2327,7 +2327,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (btnOpenLogin) btnOpenLogin.style.display = logueado ? "none" : "inline-flex";
       if (userInfo) userInfo.style.display = logueado ? "flex" : "none";
       if (logueado && userEmail) {
-        const n = localStorage.getItem("sunadventures_username") || session.user.email.split("@")[0];
+        const n = localStorage.getItem("sunad_username") || session.user.email.split("@")[0];
         userEmail.textContent = n;
         const dn = $("user-dropdown-name"); if (dn) dn.textContent = n;
         window._sunUserEmail = session.user.email;
@@ -2343,21 +2343,21 @@ document.addEventListener("DOMContentLoaded", () => {
             if (av) av.innerHTML = `<img src="${perfil.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
           }
           if (perfil?.username) {
-            localStorage.setItem("sunadventures_username", perfil.username);
+            localStorage.setItem("sunad_username", perfil.username);
             const ue = $("user-email"); if (ue) ue.textContent = perfil.username;
             const udn = $("user-dropdown-name"); if (udn) udn.textContent = perfil.username;
           }
         } catch { }
-        localStorage.setItem("sunadventures_uid", session.user.id);
+        localStorage.setItem("sunad_uid", session.user.id);
         window._sunUserId = session.user.id;
-        window.dispatchEvent(new Event("sunadventures:user-ready"));
+        window.dispatchEvent(new Event("sunad:user-ready"));
         registrarVisita();
         await Promise.all([cargarFotos(), cargarNotas(), cargarPlaylists(), cargarEventos()]);
         await Promise.all([render(), Promise.resolve(renderNotas()), Promise.resolve(renderPlaylists()), Promise.resolve(renderCalendario()), Promise.resolve(renderLogros())]);
         renderExperiencia();
         if (typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
       } else {
-        localStorage.removeItem("sunadventures_uid");
+        localStorage.removeItem("sunad_uid");
         window._sunUserId = null;
         window._sunUserEmail = "";
         fotos = []; notas = []; playlists = []; eventos = [];
@@ -2369,7 +2369,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (calendarioEmpty) calendarioEmpty.classList.remove("hidden");
         const mGrid = $("mascotas-grid"); if (mGrid) mGrid.innerHTML = "";
         renderExperiencia();
-        window.dispatchEvent(new Event("sunadventures:user-logout"));
+        window.dispatchEvent(new Event("sunad:user-logout"));
       }
       if (logueado && authModal) cerrarAuthModal();
     } catch (err) { console.error("updateAuthUI:", err); }
@@ -2391,7 +2391,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (authSubmit) authSubmit.disabled = false;
       modoRegistro = false; setModoRegistro(false); authForm?.reset(); ocultarError();
       const recordar = $("auth-recordar");
-      const guardado = localStorage.getItem("sunadventures_usuario_recordado");
+      const guardado = localStorage.getItem("sunad_usuario_recordado");
       if (guardado && authUsername) { authUsername.value = guardado; if (recordar) recordar.checked = true; }
       authModal.classList.add("active"); authModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
       setTimeout(() => authUsername?.focus(), 100);
@@ -2461,8 +2461,8 @@ document.addEventListener("DOMContentLoaded", () => {
           if (error) throw error;
         }
         const recordar = $("auth-recordar");
-        if (recordar?.checked) localStorage.setItem("sunadventures_usuario_recordado", usuario);
-        else localStorage.removeItem("sunadventures_usuario_recordado");
+        if (recordar?.checked) localStorage.setItem("sunad_usuario_recordado", usuario);
+        else localStorage.removeItem("sunad_usuario_recordado");
       } catch (err) {
         ocultarLoading();
         mostrarError(traducirError(err.message));

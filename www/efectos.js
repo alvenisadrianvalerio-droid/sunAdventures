@@ -79,9 +79,9 @@
 
   function aplicar() {
     detener();
-    if (localStorage.getItem("sunadventures_animations_disabled") === "true") return;
+    if (localStorage.getItem("sunad_animations_disabled") === "true") return;
     try {
-      const userId = window._getUserId?.() || localStorage.getItem("sunadventures_uid") || "local";
+      const userId = window._getUserId?.() || localStorage.getItem("sunad_uid") || "local";
       const mascota = localStorage.getItem("mascota_actual") || "mapache";
       const eq = JSON.parse(localStorage.getItem(`mascota_skins_eq_${userId}_${mascota}`) || "{}");
       const fx = eq.efectos;
@@ -97,10 +97,10 @@
   setTimeout(aplicar, 600);
 
   // Re-aplicar cuando cambie la mascota o el equipamiento
-  window.addEventListener("sunadventures:mascota-cambiada", () => setTimeout(aplicar, 100));
-  window.addEventListener("sunadventures:animations-change", () => aplicar());
-  window.addEventListener("sunadventures:perfil-actualizado", () => setTimeout(aplicar, 100));
-  window.addEventListener("sunadventures:inventario-refresh", () => setTimeout(aplicar, 100));
+  window.addEventListener("sunad:mascota-cambiada", () => setTimeout(aplicar, 100));
+  window.addEventListener("sunad:animations-change", () => aplicar());
+  window.addEventListener("sunad:perfil-actualizado", () => setTimeout(aplicar, 100));
+  window.addEventListener("sunad:inventario-refresh", () => setTimeout(aplicar, 100));
 
   // Re-aplicar al equipar/quitar desde la tienda
   document.addEventListener("click", (e) => {

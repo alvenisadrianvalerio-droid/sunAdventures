@@ -1,5 +1,5 @@
 /* ============================================================
-   TIENDA.JS — Tienda de SunAdventures
+   TIENDA.JS — Tienda de SunAd
    · Pestaña embebida (Tienda.montar) + overlay (Tienda.abrir)
    · Soporta sprite sheets con fallback automático a SVG
    · Auto-refresco al comprar / equipar / abrir
@@ -14,7 +14,7 @@
       setTimeout(it, 100);
     };
     // ✅ Escuchar el evento Y hacer polling
-    window.addEventListener("sunadventures:api-ready", () => {
+    window.addEventListener("sunad:api-ready", () => {
       if (window._TiendaAPI) boot();
     }, { once: true });
     return setTimeout(it, 100);
@@ -341,9 +341,9 @@
     window._snd?.("moneda");
     notifMascota?.("¡Comprado!", `${item.nombre} (+1)`);
     pushHist({ id, nombre: item.nombre, cat: "comida" });
-    window.dispatchEvent(new Event("sunadventures:tienda-compra"));
+    window.dispatchEvent(new Event("sunad:tienda-compra"));
     render();
-    window.dispatchEvent(new Event("sunadventures:inventario-refresh"));
+    window.dispatchEvent(new Event("sunad:inventario-refresh"));
   }
 
   function comprarSkin(id, item) {
@@ -356,7 +356,7 @@
     window._snd?.("compra");
     notifMascota?.("¡Comprado!", item.nombre);
     pushHist({ id, nombre: item.nombre, cat: categoriaActiva });
-    window.dispatchEvent(new Event("sunadventures:tienda-compra"));
+    window.dispatchEvent(new Event("sunad:tienda-compra"));
     render();
   }
 
@@ -371,11 +371,11 @@
   }
 
   /* ---------- Listeners globales ---------- */
-  window.addEventListener("sunadventures:tienda-compra", () => { if (container) render(); });
-  window.addEventListener("sunadventures:mascota-cambiada", () => { if (container) render(); });
+  window.addEventListener("sunad:tienda-compra", () => { if (container) render(); });
+  window.addEventListener("sunad:mascota-cambiada", () => { if (container) render(); });
 
   /* ---------- API pública ---------- */
   window.Tienda = { abrir, cerrar, render, montar };
-  window.dispatchEvent(new Event("sunadventures:tienda-ready"));
+  window.dispatchEvent(new Event("sunad:tienda-ready"));
   console.log("✅ tienda.js listo");
 })();

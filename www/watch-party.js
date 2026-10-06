@@ -23,7 +23,7 @@
     const { data:{ session } } = await s.auth.getSession();
     if (!session) { setTimeout(init, 800); return; }
     state.userId = session.user.id;
-    state.userName = localStorage.getItem("sunadventures_username") || "Alguien";
+    state.userName = localStorage.getItem("sunad_username") || "Alguien";
     state.grupoId = window._getGrupoActivo?.()?.id || localStorage.getItem("grupo_activo");
     if (!state.grupoId) { setTimeout(init, 800); return; }
     await leerEstadoInicial();
@@ -209,7 +209,7 @@
   }
 
   /* ---------- 9. Init ---------- */
-  window.addEventListener("sunadventures:group-ready", () => init());
+  window.addEventListener("sunad:group-ready", () => init());
   if (document.readyState === "loading")
     document.addEventListener("DOMContentLoaded", () => setTimeout(() => { init(); inyectarBotonCompartir(); engancharPlayer(); }, 1500));
   else

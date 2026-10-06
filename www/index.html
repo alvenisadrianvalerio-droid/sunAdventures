@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SunAdventures · Nuestro rincón</title>
+  <title>SunAd · Nuestro rincón</title>
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
   <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
@@ -14,7 +14,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="SunAdventures">
+  <meta name="apple-mobile-web-app-title" content="SunAd">
   <meta name="description" content="Un rincón para guardar nuestros recuerdos con girasoles">
   <meta name="author" content="A.A.V.C">
   <meta property="og:title" content="Four Sunflowers · Nuestro rincón">
@@ -812,7 +812,7 @@ Artista - Canción
         document.getElementById("user-dropdown")?.classList.remove("open");
         document.getElementById("user-info")?.classList.remove("open");
         window.scrollTo({ top: 0, behavior: "smooth" });
-        window.dispatchEvent(new CustomEvent("sunadventures:view-change", { detail: { view: v } }));
+        window.dispatchEvent(new CustomEvent("sunad:view-change", { detail: { view: v } }));
       }
       document.addEventListener("click", function (e) {
         var link = e.target.closest("[data-view-link]");

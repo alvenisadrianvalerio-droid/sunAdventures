@@ -1,12 +1,12 @@
-# ☀️ SunAdventures — Documentación del Proyecto y Arquitectura
+# ☀️ SunAd — Documentación del Proyecto y Arquitectura
 
-Bienvenido a la documentación técnica de **SunAdventures**, una aplicación web progresiva (PWA) híbrida (empaquetada también para Android con Capacitor) con una rica experiencia interactiva, gamificación, redes sociales/álbum colaborativo, finanzas y un completo ecosistema **RPG Roguelike**.
+Bienvenido a la documentación técnica de **SunAd**, una aplicación web progresiva (PWA) híbrida (empaquetada también para Android con Capacitor) con una rica experiencia interactiva, gamificación, redes sociales/álbum colaborativo, finanzas y un completo ecosistema **RPG Roguelike**.
 
 ---
 
 ## 🧭 1. Visión General del Proyecto
 
-SunAdventures combina la utilidad diaria con una experiencia de videojuego retro pixel-art:
+SunAd combina la utilidad diaria con una experiencia de videojuego retro pixel-art:
 - **Álbum de Recuerdos y Social**: Álbumes de fotos, notas, amigos, grupos compartidos y watch parties en tiempo real.
 - **Finanzas Personales**: Registro de gastos e ingresos, gráficos, presupuestos y recordatorios.
 - **Mascotas Virtuales & Tienda**: Personalización, cuidado de mascotas virtuales y compra de accesorios y cosméticos.
@@ -131,6 +131,6 @@ sunAdventures/
 2. **APIs Públicas en `window`**:
    - Cada módulo expone selectivamente un objeto global bien definido (ej. `window.Rpg`, `window.RpgLoot`, `window._TiendaAPI`, `window.SunModal`) para permitir comunicación desacoplada entre scripts.
 3. **Comunicación por Eventos (`CustomEvent`)**:
-   - La arquitectura hace un uso intensivo de eventos del navegador como `sunadventures:view-change`, `sunadventures:mascota-cambiada`, `rpg:fx` y `rpg:stats-cambiados` para sincronizar la UI sin acoplar fuertemente los módulos.
+   - La arquitectura hace un uso intensivo de eventos del navegador como `sunad:view-change`, `sunad:mascota-cambiada`, `rpg:fx` y `rpg:stats-cambiados` para sincronizar la UI sin acoplar fuertemente los módulos.
 4. **Resiliencia y Asincronía**:
    - Patrón de inicialización reactivo con sondeo controlado (`esperarDependencias`), asegurando que módulos independientes arranquen en cuanto sus dependencias estén disponibles sin depender estrictamente del orden del HTML.

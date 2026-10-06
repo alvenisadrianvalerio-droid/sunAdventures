@@ -60,14 +60,14 @@
 
     // ---------- Obtener encantamientos guardados ----------
     function cargarEncantamientos() {
-        const u = window._getUserIdSafe?.() || localStorage.getItem("sunadventures_uid") || "local";
+        const u = window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local";
         try {
             return JSON.parse(localStorage.getItem(`sa_rpg_encantamientos_${u}`) || "{}");
         } catch { return {}; }
     }
 
     function guardarEncantamientos(data) {
-        const u = window._getUserIdSafe?.() || localStorage.getItem("sunadventures_uid") || "local";
+        const u = window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local";
         localStorage.setItem(`sa_rpg_encantamientos_${u}`, JSON.stringify(data));
     }
 

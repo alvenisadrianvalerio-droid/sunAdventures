@@ -1,5 +1,5 @@
 /* ============================================================
-   SCRIPT.JS — SunAdventures · v5 compacto
+   SCRIPT.JS — SunAd · v5 compacto
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
   /* ---------- Helpers ---------- */
@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     windows: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5l7.5-1v7H3v-6zm0 13l7.5 1v-7H3v6zm8.5 1.2L21 21V12.5h-9.5v7.2zm0-15.4v7.2H21V3l-9.5 1.3z"/></svg>',
     linux: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-2.2 0-4 1.8-4 4 0 1.2.5 2.2 1.3 2.9C8.2 9.6 7 11 6.3 12.9c-.2.5-.8 1.9-1.4 3.2-.5 1.2-.9 2.4-.5 3 .3.5 1 .7 1.8.6.7 0 1.5-.2 2.2-.5.6-.3 1.5-.5 2.6-.5h2c1.1 0 2 .2 2.6.5.7.3 1.5.5 2.2.5.8.1 1.5-.1 1.8-.6.4-.6 0-1.8-.5-3-.6-1.3-1.2-2.7-1.4-3.2-.7-1.9-1.9-3.3-3-4 .8-.7 1.3-1.7 1.3-2.9 0-2.2-1.8-4-4-4z"/></svg>'
   };
-  const getUserId = () => window._sunUserId || localStorage.getItem("sunadventures_uid") || "local";
+  const getUserId = () => window._sunUserId || localStorage.getItem("sunad_uid") || "local";
   const randomDe = a => (Array.isArray(a) && a.length) ? a[Math.floor(Math.random() * a.length)] : "";
   const clamp = (n, min = 0, max = 100) => Math.max(min, Math.min(max, n));
   const hoyISO = () => new Date().toISOString().slice(0, 10);
@@ -207,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setMascotasCompradas(compradas);
     notifMascota("¡Desbloqueado!", `Nueva mascota: ${MASCOTAS[id].nombre}`);
     try { snd("compra"); } catch {}
-    window.dispatchEvent(new Event("sunadventures:progress"));
+    window.dispatchEvent(new Event("sunad:progress"));
     return true;
   };
   const desbloqueada = id => {
@@ -364,7 +364,7 @@ document.addEventListener("DOMContentLoaded", () => {
     derrota:()=>[600,500,400,300].forEach((f,i)=>tono(f,0.2,"sine",0.1,i*0.1))
   };
   const snd = t => { if (!t) return; try { (SND[t] || (() => tono(600, 0.2)))(); } catch {} };
-  const getNombre = () => localStorage.getItem("sunadventures_username") || window._sunUserEmail?.split("@")[0] || "";
+  const getNombre = () => localStorage.getItem("sunad_username") || window._sunUserEmail?.split("@")[0] || "";
 
   /* ---------- Notificación ---------- */
   let notifT = null, _notifEl = null;
@@ -402,7 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch {}
     try { setNumLS(`sa_minijuegos_jugados_${getUserId()}`, numLS(`sa_minijuegos_jugados_${getUserId()}`) + 1); } catch {}
     if (window.decirMascota) window.decirMascota(mot || `+${m}`, 2500);
-    window.dispatchEvent(new Event("sunadventures:progress"));
+    window.dispatchEvent(new Event("sunad:progress"));
   };
 
   /* ============================================================
@@ -519,7 +519,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.style.overflow = "hidden";
       actualizarModalMascota();
       renderInv(); renderCuidado(); renderCambiarMascota();
-      window.dispatchEvent(new Event("sunadventures:mascota-cambiada"));
+      window.dispatchEvent(new Event("sunad:mascota-cambiada"));
     };
     window.cerrarMascotaModal = () => {
       const m = $("mascota-modal"); if (!m) return;
@@ -600,7 +600,7 @@ document.addEventListener("DOMContentLoaded", () => {
             actualizarModalMascota();
             renderInv(); renderCuidado(); renderCambiarMascota();
             decirMascota(`¡Hola! Ahora soy ${MASCOTAS[mascotaActual].nombre}`);
-            window.dispatchEvent(new Event("sunadventures:mascota-cambiada"));
+            window.dispatchEvent(new Event("sunad:mascota-cambiada"));
           });
         } else if (comprable) {
           item.addEventListener("click", () => {
@@ -721,7 +721,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (fav) { setMonedas(getMonedas() + 3); notifMascota("+3", "¡Comida favorita!"); }
         actualizarModalMascota();
         renderInv(); renderCuidado(); visual();
-        window.dispatchEvent(new Event("sunadventures:progress"));
+        window.dispatchEvent(new Event("sunad:progress"));
       } catch {}
     }
 
@@ -795,7 +795,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const k = `mascota_clicks_${u}_${mascotaActual}`;
         const actual = Number(localStorage.getItem(k) || 0) + 1;
         localStorage.setItem(k, String(actual));
-        window.dispatchEvent(new Event("sunadventures:progress"));
+        window.dispatchEvent(new Event("sunad:progress"));
       } catch {}
     }
     function _interactuar() {
@@ -1293,8 +1293,8 @@ sprite.style.opacity = "0.25";
   $("btn-juego-memoria")?.addEventListener("click", juegoMemoria);
   $("btn-juego-adivina")?.addEventListener("click", juegoAdivina);
   setTimeout(renderGrid, 600);
-  window.addEventListener("sunadventures:progress", renderGrid);
-  window.addEventListener("sunadventures:user-ready", () => setTimeout(renderGrid, 400));
+  window.addEventListener("sunad:progress", renderGrid);
+  window.addEventListener("sunad:user-ready", () => setTimeout(renderGrid, 400));
 
   /* ---------- Hidratar iconos ---------- */
   function hidratarIconos(root = document) {
@@ -1336,7 +1336,7 @@ sprite.style.opacity = "0.25";
       const m = document.createElement("div");
       m.className = "modal active";
       m.setAttribute("aria-hidden", "false");
-      m.innerHTML = `<div class="modal-backdrop" data-close></div><div class="modal-content"><h3 class="modal-title">Descargar SunAdventures</h3><p style="opacity:.8;margin-bottom:.5rem">Llévanos contigo a todas partes</p><div class="download-grid"><a class="download-option" href="app/sunadventures.apk" download="SunAdventures-1.5.apk"><span class="download-option-icon">${SVG.android}</span><span class="download-option-title">Android</span><span class="download-option-hint">Descargar APK · v1.5</span></a><button class="download-option" data-platform="ios" type="button"><span class="download-option-icon">${SVG.apple}</span><span class="download-option-title">iOS</span><span class="download-option-hint">Añadir a inicio</span></button><button class="download-option" data-platform="windows" type="button"><span class="download-option-icon">${SVG.windows}</span><span class="download-option-title">Windows</span><span class="download-option-hint">Próximamente</span></button><button class="download-option" data-platform="linux" type="button"><span class="download-option-icon">${SVG.linux}</span><span class="download-option-title">Linux</span><span class="download-option-hint">Próximamente</span></button></div><div class="modal-actions" style="margin-top:1.2rem"><button type="button" class="btn-secondary" data-close>Cerrar</button></div></div>`;
+      m.innerHTML = `<div class="modal-backdrop" data-close></div><div class="modal-content"><h3 class="modal-title">Descargar SunAd</h3><p style="opacity:.8;margin-bottom:.5rem">Llévanos contigo a todas partes</p><div class="download-grid"><a class="download-option" href="app/sunad.apk" download="SunAd-1.5.apk"><span class="download-option-icon">${SVG.android}</span><span class="download-option-title">Android</span><span class="download-option-hint">Descargar APK · v1.5</span></a><button class="download-option" data-platform="ios" type="button"><span class="download-option-icon">${SVG.apple}</span><span class="download-option-title">iOS</span><span class="download-option-hint">Añadir a inicio</span></button><button class="download-option" data-platform="windows" type="button"><span class="download-option-icon">${SVG.windows}</span><span class="download-option-title">Windows</span><span class="download-option-hint">Próximamente</span></button><button class="download-option" data-platform="linux" type="button"><span class="download-option-icon">${SVG.linux}</span><span class="download-option-title">Linux</span><span class="download-option-hint">Próximamente</span></button></div><div class="modal-actions" style="margin-top:1.2rem"><button type="button" class="btn-secondary" data-close>Cerrar</button></div></div>`;
       document.body.appendChild(m);
       document.body.style.overflow = "hidden";
       const c = () => { m.remove(); document.body.style.overflow = ""; };
@@ -1475,7 +1475,7 @@ sprite.style.opacity = "0.25";
   window._registrarMinijuego = () => {
     const u = getUserId();
     setNumLS(`sa_minijuegos_jugados_${u}`, numLS(`sa_minijuegos_jugados_${u}`) + 1);
-    window.dispatchEvent(new Event("sunadventures:progress"));
+    window.dispatchEvent(new Event("sunad:progress"));
   };
 
   /* ---------- Aplicar tema de fondo comprado ---------- */
@@ -1503,10 +1503,10 @@ sprite.style.opacity = "0.25";
   };
   try { window._aplicarTemaFondo(); } catch {}
 
-  window.dispatchEvent(new Event("sunadventures:api-ready"));
+  window.dispatchEvent(new Event("sunad:api-ready"));
 
   /* ---------- Contadores extra ---------- */
-  window.addEventListener("sunadventures:tienda-compra", () => {
+  window.addEventListener("sunad:tienda-compra", () => {
     const u = getUserId();
     setNumLS(`sa_tienda_compras_${u}`, numLS(`sa_tienda_compras_${u}`) + 1);
   });
@@ -1520,13 +1520,13 @@ sprite.style.opacity = "0.25";
     if (s.icono && !ICONO[s.icono]) console.warn(`[Skin] ${id}: icono "${s.icono}" no existe en ICONO`);
   });
 
-  window.addEventListener("sunadventures:inventario-refresh", () => { try { window._renderInv?.(); } catch {} });
-  window.addEventListener("sunadventures:tienda-compra", () => {
+  window.addEventListener("sunad:inventario-refresh", () => { try { window._renderInv?.(); } catch {} });
+  window.addEventListener("sunad:tienda-compra", () => {
     try {
       window._actualizarModalMascota?.();
     } catch {}
   });
-  window.addEventListener("sunadventures:perfil-actualizado", () => {
+  window.addEventListener("sunad:perfil-actualizado", () => {
     try { window._aplicarTemaFondo?.(); } catch {}
   });
 

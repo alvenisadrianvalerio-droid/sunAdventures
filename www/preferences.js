@@ -335,7 +335,7 @@
   const animationToggle = document.getElementById("toggle-animaciones");
   const volumeSlider = document.getElementById("settings-volume");
   const volumeOutput = document.getElementById("settings-volume-value");
-  let currentLanguage = localStorage.getItem("sunadventures_language") || "es";
+  let currentLanguage = localStorage.getItem("sunad_language") || "es";
   let applying = false;
 
   function normalize(value) {
@@ -426,23 +426,23 @@
 
   function setLanguage(language) {
     currentLanguage = languageFor(language);
-    localStorage.setItem("sunadventures_language", currentLanguage);
+    localStorage.setItem("sunad_language", currentLanguage);
     document.documentElement.lang = LANGUAGES[currentLanguage].locale;
     const title = currentLanguage === "es"
-      ? "SunAdventures · Nuestro rincón"
-      : `SunAdventures · ${TRANSLATION_MAP["Nuestro rincón"]?.[currentLanguage] || "Our little corner"}`;
+      ? "SunAd · Nuestro rincón"
+      : `SunAd · ${TRANSLATION_MAP["Nuestro rincón"]?.[currentLanguage] || "Our little corner"}`;
     document.title = title;
     if (languageSelect) languageSelect.value = currentLanguage;
     translateTree(document.body, currentLanguage);
-    window.dispatchEvent(new CustomEvent("sunadventures:language-change", { detail:{ language:currentLanguage } }));
+    window.dispatchEvent(new CustomEvent("sunad:language-change", { detail:{ language:currentLanguage } }));
   }
 
   function setAnimationsDisabled(disabled) {
     const isDisabled = Boolean(disabled);
-    localStorage.setItem("sunadventures_animations_disabled", String(isDisabled));
+    localStorage.setItem("sunad_animations_disabled", String(isDisabled));
     document.documentElement.classList.toggle("animations-disabled", isDisabled);
     if (animationToggle) animationToggle.checked = isDisabled;
-    window.dispatchEvent(new CustomEvent("sunadventures:animations-change", { detail:{ disabled:isDisabled } }));
+    window.dispatchEvent(new CustomEvent("sunad:animations-change", { detail:{ disabled:isDisabled } }));
   }
 
   function setVolume(rawValue) {
@@ -452,7 +452,7 @@
     localStorage.setItem("player_volumen", String(volume));
     if (volumeSlider) volumeSlider.value = String(volume);
     if (volumeOutput) volumeOutput.value = `${Math.round(volume * 100)}%`;
-    window.dispatchEvent(new CustomEvent("sunadventures:volume-change", { detail:{ volume } }));
+    window.dispatchEvent(new CustomEvent("sunad:volume-change", { detail:{ volume } }));
   }
 
   window.SunPreferences = {
@@ -465,12 +465,12 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     setLanguage(currentLanguage);
-    setAnimationsDisabled(localStorage.getItem("sunadventures_animations_disabled") === "true");
+    setAnimationsDisabled(localStorage.getItem("sunad_animations_disabled") === "true");
     setVolume(localStorage.getItem("app_volume") ?? localStorage.getItem("player_volumen") ?? "0.8");
     languageSelect?.addEventListener("change", () => setLanguage(languageSelect.value));
     animationToggle?.addEventListener("change", () => setAnimationsDisabled(animationToggle.checked));
     volumeSlider?.addEventListener("input", () => setVolume(volumeSlider.value));
-    window.addEventListener("sunadventures:volume-change", event => {
+    window.addEventListener("sunad:volume-change", event => {
       if (event.target === window && event.detail?.volume !== undefined) {
         const volume = Number(event.detail.volume);
         if (volumeSlider) volumeSlider.value = String(volume);

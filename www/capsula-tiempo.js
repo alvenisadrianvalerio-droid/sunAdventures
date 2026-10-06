@@ -4,7 +4,7 @@
 (function () {
   "use strict";
 
-  const STORAGE_KEY_PREFIX = "sunadventures_capsulas_";
+  const STORAGE_KEY_PREFIX = "sunad_capsulas_";
   const SVG_CAPSULE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
   const SVG_HOURGLASS = '<svg viewBox="0 0 24 24" fill="none" stroke="#ffd93d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>';
   const SVG_LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
@@ -24,7 +24,7 @@
   const SPRITE_RELOJ_ARENA = (size = 20) => `<img src="img/sprites%20complementarios/reloj%20de%20arena.png" alt="Reloj de Arena" class="sprite-capsula" style="width:${size}px;height:${size}px;object-fit:contain;image-rendering:pixelated;display:inline-block;vertical-align:middle;margin-right:4px;">`;
 
   const getStorageKey = () => {
-    const uid = window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunadventures_uid") || "local";
+    const uid = window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || "local";
     return `${STORAGE_KEY_PREFIX}${uid}`;
   };
 

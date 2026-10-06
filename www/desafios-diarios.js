@@ -6,7 +6,7 @@
   const PREMIO_XP = 25;
   const hoy = () => new Date().toISOString().slice(0, 10);
   const getUsuario = () =>
-    window._getUserIdSafe?.() || localStorage.getItem("sunadventures_uid") || "local";
+    window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local";
   const clave = () => `sa_minijuegos_desafio_${getUsuario()}`;
   const nombreJuego = id => {
     const conocidos = {
@@ -99,7 +99,7 @@
     }
 
     render(estado);
-    window.dispatchEvent(new Event("sunadventures:progress"));
+    window.dispatchEvent(new Event("sunad:progress"));
     window._snd?.("victoria");
     window.SunModal?.alert({
       title: "¡Reto completado!",
@@ -123,8 +123,8 @@
     render(estado);
   }
 
-  window.addEventListener("sunadventures:progress", registrarMinijuego);
-  window.addEventListener("sunadventures:user-ready", () => render());
+  window.addEventListener("sunad:progress", registrarMinijuego);
+  window.addEventListener("sunad:user-ready", () => render());
   window.addEventListener("storage", event => {
     if (event.key === clave()) render();
   });

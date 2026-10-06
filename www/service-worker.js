@@ -1,4 +1,4 @@
-const CACHE_NAME = "sunadventures-v104";
+const CACHE_NAME = "sunad-v104";
 const ASSETS_ESTATICOS = [
   "./", "./index.html", "./styles.css", "./album.css", "./juegos.css",
   "./rpg.css", "./rpg-loot.css", "./temas.css", "./finanzas.css", "./capsula-tiempo.css",
@@ -72,9 +72,9 @@ self.addEventListener("push", event => {
     try { data = event.data?.json() || {}; }
     catch (error) {
       console.error("No se pudo leer la notificación push:", error);
-      data = { title: "SunAdventures", body: event.data?.text() || "" };
+      data = { title: "SunAd", body: event.data?.text() || "" };
     }
-    await self.registration.showNotification(data.title || "SunAdventures", {
+    await self.registration.showNotification(data.title || "SunAd", {
       body: data.body || "",
       icon: "./img/girasol-loading.png",
       badge: "./img/girasol-loading.png",

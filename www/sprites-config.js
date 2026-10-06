@@ -107,7 +107,7 @@
     } catch (e) { console.warn("aplicarSprites rpg:", e); }
   };
   /* ---------- AUTO-APLICAR ---------- */
-  window.addEventListener("sunadventures:api-ready", () => {
+  window.addEventListener("sunad:api-ready", () => {
     setTimeout(window._aplicarSpritesAutomaticos, 50);
   });
 

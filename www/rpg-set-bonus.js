@@ -94,7 +94,7 @@
     // ---------- Aplicar/actualizar sets en localStorage ----------
     function aplicarSets() {
         const sets = setsActivos();
-        const u = window._getUserIdSafe?.() || localStorage.getItem("sunadventures_uid") || "local";
+        const u = window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local";
         const key = `sa_rpg_sets_${u}`;
 
         // Guardar sets activos
@@ -195,7 +195,7 @@
     document.head.appendChild(style);
 
     // ---------- Inyectar al cambiar de tab ----------
-    window.addEventListener("sunadventures:rpg-tab", e => {
+    window.addEventListener("sunad:rpg-tab", e => {
         if (e.detail?.tab === "objetos") {
             setTimeout(inyectarPanelSets, 250);
         }

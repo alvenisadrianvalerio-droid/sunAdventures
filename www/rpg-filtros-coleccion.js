@@ -258,7 +258,7 @@
     document.head.appendChild(style);
 
     // ---------- Inyectar al cambiar de tab ----------
-    window.addEventListener("sunadventures:rpg-tab", e => {
+    window.addEventListener("sunad:rpg-tab", e => {
         if (e.detail?.tab === "objetos") {
             setTimeout(() => {
                 inyectarFiltros();

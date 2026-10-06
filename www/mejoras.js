@@ -1,12 +1,12 @@
 /* ============================================================
-   MEJORAS.JS — SunAdventures
+   MEJORAS.JS — SunAd
    Todas las mejoras nuevas en un solo lugar
    ============================================================ */
 (function () {
   "use strict";
   const $  = id => document.getElementById(String(id).replace(/^#/,""));
   const qsa = (s, r=document) => [...r.querySelectorAll(s)];
-  const getUser = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunadventures_uid") || "local";
+  const getUser = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || "local";
   const hoyISO = () => new Date().toISOString().slice(0,10);
   const confirmar = o => window.SunModal ? window.SunModal.confirm(o) : Promise.resolve(confirm(o.message || o.title));
   const alertar   = o => window.SunModal ? window.SunModal.alert(o)   : (alert(o.message || o.title), Promise.resolve());
@@ -60,13 +60,13 @@
         window._experienciaActual = (window._experienciaActual || 0) + recompensa.xp;
       } catch {}
       try { window._darPremio?.(0, 5, "¡Recompensa diaria!"); } catch {}
-      try { window.dispatchEvent(new Event("sunadventures:progress")); } catch {}
+      try { window.dispatchEvent(new Event("sunad:progress")); } catch {}
       try { window._snd?.("victoria"); } catch {}
     });
   }
 
   function comprobarDiario() {
-    if (!window._getUserIdSafe && !localStorage.getItem("sunadventures_uid")) return;
+    if (!window._getUserIdSafe && !localStorage.getItem("sunad_uid")) return;
     const d = cargarDiario();
     if (d.ultimo === hoyISO()) return;
 
@@ -80,8 +80,8 @@
     setTimeout(() => mostrarModalDiario(recompensa, nuevaRacha, true), 1500);
   }
   // Ejecutar cuando el usuario esté listo
-  window.addEventListener("sunadventures:user-ready", () => setTimeout(comprobarDiario, 2000));
-  setTimeout(() => { if (localStorage.getItem("sunadventures_uid")) comprobarDiario(); }, 3500);
+  window.addEventListener("sunad:user-ready", () => setTimeout(comprobarDiario, 2000));
+  setTimeout(() => { if (localStorage.getItem("sunad_uid")) comprobarDiario(); }, 3500);
 
   /* ============================================================
      2) ✏️ CAMBIAR NOMBRE
@@ -90,7 +90,7 @@
     const btn = e.target.closest('[data-action="cambiar-nombre"]');
     if (!btn) return;
     e.preventDefault();
-    const actual = localStorage.getItem("sunadventures_username") || "usuario";
+    const actual = localStorage.getItem("sunad_username") || "usuario";
     const nuevo = prompt("Nuevo nombre de usuario (3-20 letras/números/_/-):", actual);
     if (!nuevo) return;
     const limpio = nuevo.trim().toLowerCase();
@@ -104,7 +104,7 @@
           if (error) throw error;
         }
       }
-      localStorage.setItem("sunadventures_username", limpio);
+      localStorage.setItem("sunad_username", limpio);
       const ue = $("user-email"); if (ue) ue.textContent = limpio;
       const udn = $("user-dropdown-name"); if (udn) udn.textContent = limpio;
       alertar({ title:"¡Listo!", message:`Ahora te llamas @${limpio}`, variant:"success", icon:"✨" });
@@ -119,7 +119,7 @@
   // Ya existe notificarLogro en album.js. Aseguramos que se dispare
   // incluso si el usuario está en otra vista.
   let _ultimoCheckLogros = 0;
-  window.addEventListener("sunadventures:progress", () => {
+  window.addEventListener("sunad:progress", () => {
     if (Date.now() - _ultimoCheckLogros < 2000) return;
     _ultimoCheckLogros = Date.now();
     setTimeout(() => { try { window.renderLogros?.({ notificar:true }); } catch {} }, 300);
@@ -302,7 +302,7 @@
     }
   }
   window.addEventListener("hashchange", actualizarVisibilidadMascota);
-  window.addEventListener("sunadventures:rpg-tab", actualizarVisibilidadMascota);
+  window.addEventListener("sunad:rpg-tab", actualizarVisibilidadMascota);
   setInterval(actualizarVisibilidadMascota, 300);
   actualizarVisibilidadMascota();
 
@@ -329,8 +329,8 @@
     try { window.dispatchEvent(new Event("rpg:stats-cambiados")); } catch {}
     return true;
   }
-  window.addEventListener("sunadventures:user-ready", () => setTimeout(reclamarRpgDiario, 4000));
-  setTimeout(() => { if (localStorage.getItem("sunadventures_uid")) reclamarRpgDiario(); }, 6000);
+  window.addEventListener("sunad:user-ready", () => setTimeout(reclamarRpgDiario, 4000));
+  setTimeout(() => { if (localStorage.getItem("sunad_uid")) reclamarRpgDiario(); }, 6000);
 
   /* ============================================================
      9) 🛒 BURBUJA FLOTANTE TIENDA
@@ -349,10 +349,10 @@
      ============================================================ */
   // Los bonus ya se leen vía _getBonusActivos() en rpg.js.
   // Aseguramos que se recarguen al equipar/quitar:
-  window.addEventListener("sunadventures:tienda-compra", () => {
+  window.addEventListener("sunad:tienda-compra", () => {
     try { window.dispatchEvent(new Event("rpg:stats-cambiados")); } catch {}
   });
-  window.addEventListener("sunadventures:mascota-cambiada", () => {
+  window.addEventListener("sunad:mascota-cambiada", () => {
     try { window.dispatchEvent(new Event("rpg:stats-cambiados")); } catch {}
   });
 

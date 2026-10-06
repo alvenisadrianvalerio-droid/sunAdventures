@@ -9,7 +9,7 @@
   window._extraVistas = window._extraVistas || [];
   if (!window._extraVistas.includes("musica-local")) window._extraVistas.push("musica-local");
 
-  const DB = "sunadventures_musica", VER = 1, S_TR = "tracks", S_PL = "playlists";
+  const DB = "sunad_musica", VER = 1, S_TR = "tracks", S_PL = "playlists";
   const $ = id => document.getElementById(String(id).replace(/^#/, ""));
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [...r.querySelectorAll(s)];
@@ -45,7 +45,7 @@
   const dbDel = async (s, k) => { const d = await openDB(); return new Promise((res, rej) => { const t = d.transaction(s, "readwrite"); t.objectStore(s).delete(k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); };
 
   /* ---------- Helpers ---------- */
-  const uid = () => window._getUserIdSafe?.() || localStorage.getItem("sunadventures_uid") || "local";
+  const uid = () => window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local";
   const gid = () => window._getGrupoActivo?.()?.id || localStorage.getItem("grupo_activo");
   const sb  = () => window._supabase;
   const notif = t => { try { window._TiendaAPI?.notifMascota?.("Mi música", t); } catch {} };
@@ -335,7 +335,7 @@
     if (!session) return;
     await s.from("playback_sync").upsert({
       grupo_id: g, playlist_id: pid, host_id: session.user.id,
-      host_name: localStorage.getItem("sunadventures_username") || "Anfitrión",
+      host_name: localStorage.getItem("sunad_username") || "Anfitrión",
       track_index: idx, position_ms: Math.round(posMs),
       is_playing: !!playing, host_started_at: new Date().toISOString()
     }, { onConflict: "grupo_id" });

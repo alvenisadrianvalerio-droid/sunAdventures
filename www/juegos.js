@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const qs = (s, r = document) => r.querySelector(s);
   const qsa = (s, r = document) => [...r.querySelectorAll(s)];
   const ICONO = window.ICONO || {};
-  const getUserId = () => window._sunUserId || localStorage.getItem("sunadventures_uid") || "local";
+  const getUserId = () => window._sunUserId || localStorage.getItem("sunad_uid") || "local";
   const clamp = (n, min = 0, max = 100) => Math.max(min, Math.min(max, n));
   const randomDe = (a) => (Array.isArray(a) && a.length) ? a[Math.floor(Math.random() * a.length)] : "";
   const shuffle = (arr) => arr.slice().sort(() => Math.random() - 0.5);

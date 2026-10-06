@@ -511,7 +511,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     f ? f.parentNode.insertBefore(sec, f) : document.body.appendChild(sec);
   }
   function tieneSesion() {
-    return !!(window._sunUserId || localStorage.getItem("sunadventures_uid"));
+    return !!(window._sunUserId || localStorage.getItem("sunad_uid"));
   }
 
   function inyectarNav() {
@@ -557,11 +557,11 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       c.dataset.tabActiva = target;
       qsa(".rpg-tab", c).forEach(x => x.classList.toggle("active", x === t));
       qsa(".rpg-panel", c).forEach(p => p.classList.toggle("active", p.dataset.rpgPanel === target));
-      window.dispatchEvent(new CustomEvent("sunadventures:rpg-tab", { detail: { tab: target } }));
+      window.dispatchEvent(new CustomEvent("sunad:rpg-tab", { detail: { tab: target } }));
     }));
 
     window.hidratarIconos?.(c);
-    setTimeout(() => window.dispatchEvent(new CustomEvent("sunadventures:rpg-tab", { detail: { tab } })), 0);
+    setTimeout(() => window.dispatchEvent(new CustomEvent("sunad:rpg-tab", { detail: { tab } })), 0);
   }
 
   function htmlMapa() {
@@ -2170,8 +2170,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       actualizarBadgeObjetos();
     }
   });
-  window.addEventListener("sunadventures:mascota-cambiada", () => { if ($("rpg-content") && !enemigo) render(); });
-  window.addEventListener("sunadventures:user-ready", () => {
+  window.addEventListener("sunad:mascota-cambiada", () => { if ($("rpg-content") && !enemigo) render(); });
+  window.addEventListener("sunad:user-ready", () => {
     state = cargar();
     inyectarNav();
     if (location.hash === "#rpg") {
@@ -2181,7 +2181,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       render();
     }
   });
-  window.addEventListener("sunadventures:user-logout", () => {
+  window.addEventListener("sunad:user-logout", () => {
     inyectarNav();
     if (location.hash === "#rpg" || $("rpg")?.classList.contains("active")) {
       location.hash = "#album";

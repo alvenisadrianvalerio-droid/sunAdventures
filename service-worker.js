@@ -1,8 +1,8 @@
 /* ============================================
-   SERVICE WORKER — SunAdventures
+   SERVICE WORKER — SunAd
    ============================================ */
 
-const CACHE_NAME = "sunadventures-v5";   // ⬅️ subido por cambios de assets
+const CACHE_NAME = "sunad-v5";   // ⬅️ subido por cambios de assets
 const ASSETS_ESTATICOS = [
   "./",
   "./index.html",

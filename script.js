@@ -419,7 +419,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const clicsMascota = Number(localStorage.getItem(clicsKey) || 0) + 1;
       localStorage.setItem(clicsKey, String(clicsMascota));
       localStorage.setItem("mascota_clicks", String(Number(localStorage.getItem("mascota_clicks") || 0) + 1));
-      window.dispatchEvent(new Event("sunadventures:progress"));
+      window.dispatchEvent(new Event("sunad:progress"));
 
       const sonido = MASCOTAS[mascotaActual].sonido;
       reproducirSonido(sonido);
@@ -567,12 +567,12 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.innerHTML = `
       <div class="modal-backdrop" data-close></div>
       <div class="modal-content" role="dialog" aria-modal="true">
-        <h3 class="modal-title">📲 Descargar SunAdventures</h3>
+        <h3 class="modal-title">📲 Descargar SunAd</h3>
         <p style="opacity:0.8; margin-bottom: 0.5rem;">
           Llévanos contigo a todas partes ✨
         </p>
         <div class="download-grid">
-          <a class="download-option" href="app/sunadventures.apk" download>
+          <a class="download-option" href="app/sunad.apk" download>
             <span class="download-option-icon">🤖</span>
             <span class="download-option-title">Android</span>
             <span class="download-option-hint">Descargar APK</span>

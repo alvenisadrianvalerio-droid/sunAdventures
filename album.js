@@ -182,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let modoRegistro = false;
   let grupoActivo = null;
   let perfilActual = null;
-  const CENSURA_STORAGE_KEY = "sunadventures_censura_activa";
+  const CENSURA_STORAGE_KEY = "sunad_censura_activa";
   let visitasConsecutivas = 0;
 
   let playlists = [];
@@ -373,7 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function registrarVisita() {
     const hoy = new Date().toISOString().slice(0, 10);
-    const clave = `sunadventures_visitas_${perfilActual?.id || "local"}`;
+    const clave = `sunad_visitas_${perfilActual?.id || "local"}`;
     const dias = JSON.parse(localStorage.getItem(clave) || "[]");
     if (!dias.includes(hoy)) dias.push(hoy);
     const ordenados = dias.sort().slice(-400);
@@ -423,13 +423,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const personales = LOGROS.filter((logro) => logro.tipo !== "grupo");
     const grupales = LOGROS.filter((logro) => logro.tipo === "grupo");
-    const totalPersonal = pintarColeccion(personales, logrosPersonalesGrid, `sunadventures_logros_${perfilActual?.id || "local"}`);
-    pintarColeccion(grupales, logrosGrupoGrid, `sunadventures_logros_grupo_${grupoActivo?.id || "local"}`);
+    const totalPersonal = pintarColeccion(personales, logrosPersonalesGrid, `sunad_logros_${perfilActual?.id || "local"}`);
+    pintarColeccion(grupales, logrosGrupoGrid, `sunad_logros_grupo_${grupoActivo?.id || "local"}`);
     if (logrosDesbloqueados) logrosDesbloqueados.textContent = totalPersonal;
     renderExperiencia();
   }
 
-  window.addEventListener("sunadventures:progress", () => renderLogros({ notificar: true }));
+  window.addEventListener("sunad:progress", () => renderLogros({ notificar: true }));
 
   // ============================================
   //  GRUPO PRIVADO Y AMIGOS
@@ -1197,7 +1197,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           cerrarModal();
           await render();
-          window.dispatchEvent(new Event("sunadventures:progress"));
+          window.dispatchEvent(new Event("sunad:progress"));
         } catch (err) {
           console.error(err);
           alert("No se pudo actualizar: " + (err.message || err));
@@ -1234,7 +1234,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         cerrarModal();
         await render();
-        window.dispatchEvent(new Event("sunadventures:progress"));
+        window.dispatchEvent(new Event("sunad:progress"));
       } catch (err) {
         console.error(err);
         alert("No se pudo subir la foto: " + (err.message || err));
@@ -1587,7 +1587,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         cerrarNotaModal();
         renderNotas();
-        window.dispatchEvent(new Event("sunadventures:progress"));
+        window.dispatchEvent(new Event("sunad:progress"));
       } catch (err) {
         console.error(err);
         alert("No se pudo guardar: " + (err.message || err));

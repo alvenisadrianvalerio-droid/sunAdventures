@@ -1,6 +1,6 @@
 {
-  "name": "SunAdventures",
-  "short_name": "SunAdventures",
+  "name": "SunAd",
+  "short_name": "SunAd",
   "description": "Un rincón para guardar nuestros recuerdos con girasoles 🌻",
   "start_url": "/",
   "scope": "/",

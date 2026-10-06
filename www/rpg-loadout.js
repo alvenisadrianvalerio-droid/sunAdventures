@@ -24,7 +24,7 @@
     function ejecutar() {
 
     const MAX_HABS = 4;
-    const SLOT_KEY = () => `sa_rpg_loadout_${window._getUserIdSafe?.() || localStorage.getItem("sunadventures_uid") || "local"}`;
+    const SLOT_KEY = () => `sa_rpg_loadout_${window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local"}`;
 
     // ─── Obtener loadout guardado ───
     function getLoadout() {
@@ -813,7 +813,7 @@
     document.head.appendChild(style);
 
     // ─── Inyectar al cambiar de tab ───
-    window.addEventListener("sunadventures:rpg-tab", e => {
+    window.addEventListener("sunad:rpg-tab", e => {
         if (e.detail?.tab === "objetos") {
             setTimeout(inyectarPanelLoadout, 200);
         }

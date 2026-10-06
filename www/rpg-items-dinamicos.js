@@ -161,7 +161,7 @@
             // De todos tus items conseguidos, solo los 10 "más fuertes" dan stats.
             // Los demás quedan en inventario pero no aportan stats pasivos.
             const MAX_ITEMS_ACTIVOS = 10;
-            const SLOTS_KEY = () => `sa_rpg_items_activos_${window._getUserIdSafe?.() || localStorage.getItem("sunadventures_uid") || "local"}`;
+            const SLOTS_KEY = () => `sa_rpg_items_activos_${window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local"}`;
 
             function getItemsActivos() {
                 try {
@@ -241,7 +241,7 @@
                 try { RL.renderColeccion?.(); } catch (e) { console.warn(e); }
             }, 500);
 
-            window.addEventListener("sunadventures:rpg-tab", e => {
+            window.addEventListener("sunad:rpg-tab", e => {
                 if (e.detail?.tab === "objetos") setTimeout(() => { try { RL.renderColeccion?.(); } catch (e) { } }, 100);
             });
 
@@ -250,7 +250,7 @@
             window.addEventListener("rpg:item-obtenido", () => setTimeout(() => RL.aplicarBonus(), 200));
 
             // ─── Guardar habilidades de items ───
-            const STORAGE_HABS = () => `sa_rpg_habs_items_${window._getUserIdSafe?.() || localStorage.getItem("sunadventures_uid") || "local"}`;
+            const STORAGE_HABS = () => `sa_rpg_habs_items_${window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local"}`;
 
             function guardarHabs(item) {
                 if (!item || !item.habilidades?.length) return;

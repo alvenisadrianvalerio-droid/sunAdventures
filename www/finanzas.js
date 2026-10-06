@@ -108,7 +108,7 @@
   }
 
   /* ---------- Cotizaciones ---------- */
-  const quoteHistoryKey = c => `sunadventures_fx_history_v2_${c}`;
+  const quoteHistoryKey = c => `sunad_fx_history_v2_${c}`;
   function loadQuoteHistory(c) {
     try {
       const rows = JSON.parse(localStorage.getItem(quoteHistoryKey(c)) || "[]");
@@ -870,7 +870,7 @@
       ui.app.hidden = true; ui.login.hidden = false;
       showError("");
     });
-    window.addEventListener("sunadventures:language-change", () => {
+    window.addEventListener("sunad:language-change", () => {
       if (state.data.personal) {
         render();
         if (state.quote) renderQuote(state.quote, state.quoteHistory, null);
@@ -880,8 +880,8 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     bindEvents();
-    window.addEventListener("sunadventures:group-ready", () => initialize());
-    window.addEventListener("sunadventures:group-error", e => {
+    window.addEventListener("sunad:group-ready", () => initialize());
+    window.addEventListener("sunad:group-error", e => {
       ui.login.hidden = true; ui.app.hidden = false;
       showError(`No se pudo preparar el grupo para Finanzas: ${e.detail?.message || "error desconocido"}`);
     });

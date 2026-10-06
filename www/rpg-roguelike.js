@@ -2210,7 +2210,7 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
   };
 
   /* Ocultar/mostrar panel al cambiar de pestaña normal */
-  window.addEventListener("sunadventures:rpg-tab", () => {
+  window.addEventListener("sunad:rpg-tab", () => {
     const p = $("rpg-roguelike-panel");
     if (p) p.style.display = "none";
   });

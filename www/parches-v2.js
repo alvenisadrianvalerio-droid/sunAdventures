@@ -5,7 +5,7 @@
   "use strict";
   const $   = id => document.getElementById(String(id).replace(/^#/,""));
   const qsa = (s, r=document) => [...r.querySelectorAll(s)];
-  const getUser = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunadventures_uid") || "local";
+  const getUser = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || "local";
   const confirmar = o => window.SunModal ? window.SunModal.confirm(o) : Promise.resolve(confirm(o.message || o.title));
   const alertar   = o => window.SunModal ? window.SunModal.alert(o)   : (alert(o.message || o.title), Promise.resolve());
   const snd = t => { try { window._snd?.(t); } catch {} };
@@ -121,7 +121,7 @@
     }
   }
   window.addEventListener("hashchange", checkMascota);
-  window.addEventListener("sunadventures:rpg-tab", checkMascota);
+  window.addEventListener("sunad:rpg-tab", checkMascota);
   setInterval(checkMascota, 400);
 
   /* ============================================================
@@ -192,7 +192,7 @@
     });
   }
   function checkDiario() {
-    if (!localStorage.getItem("sunadventures_uid")) return;
+    if (!localStorage.getItem("sunad_uid")) return;
     const d = cargarD();
     const hoy = new Date().toISOString().slice(0,10);
     if (d.ultimo === hoy) return;
@@ -203,8 +203,8 @@
     guardarD({ ultimo: hoy, racha: r });
     setTimeout(() => modalDiario(DREC[r-1], r), 1500);
   }
-  window.addEventListener("sunadventures:user-ready", () => setTimeout(checkDiario, 2000));
-  setTimeout(() => { if (localStorage.getItem("sunadventures_uid")) checkDiario(); }, 3500);
+  window.addEventListener("sunad:user-ready", () => setTimeout(checkDiario, 2000));
+  setTimeout(() => { if (localStorage.getItem("sunad_uid")) checkDiario(); }, 3500);
 
   /* ============================================================
      7) ✏️ CAMBIAR NOMBRE
@@ -213,7 +213,7 @@
     const btn = e.target.closest('[data-action="cambiar-nombre"]');
     if (!btn) return;
     e.preventDefault(); e.stopPropagation();
-    const actual = localStorage.getItem("sunadventures_username") || "usuario";
+    const actual = localStorage.getItem("sunad_username") || "usuario";
     const nuevo = prompt("Nuevo nombre (3-20 caracteres):", actual);
     if (!nuevo) return;
     const limpio = nuevo.trim().toLowerCase();
@@ -227,7 +227,7 @@
           if (error) throw error;
         }
       }
-      localStorage.setItem("sunadventures_username", limpio);
+      localStorage.setItem("sunad_username", limpio);
       const ue = $("user-email"); if (ue) ue.textContent = limpio;
       const udn = $("user-dropdown-name"); if (udn) udn.textContent = limpio;
       alertar({ title:"¡Listo!", message:`Ahora te llamas @${limpio}`, variant:"success", icon:"✨" });
@@ -281,7 +281,7 @@
      ============================================================ */
   const RK = () => `sa_rpg_diario_${getUser()}`;
   function rpgDiario() {
-    if (!localStorage.getItem("sunadventures_uid")) return;
+    if (!localStorage.getItem("sunad_uid")) return;
     const hoy = new Date().toISOString().slice(0,10);
     if (localStorage.getItem(RK()) === hoy) return;
     localStorage.setItem(RK(), hoy);
@@ -291,8 +291,8 @@
     if (st) { st.xp += xp; try { localStorage.setItem(`sa_rpg_${getUser()}`, JSON.stringify(st)); } catch {} }
     alertar({ title:"👑 Recompensa de aventura", message:`+<strong>${mon} 🪙</strong> · +<strong>${xp} XP</strong>`, variant:"success", icon:"⚔️" });
   }
-  window.addEventListener("sunadventures:user-ready", () => setTimeout(rpgDiario, 4000));
-  setTimeout(() => { if (localStorage.getItem("sunadventures_uid")) rpgDiario(); }, 6000);
+  window.addEventListener("sunad:user-ready", () => setTimeout(rpgDiario, 4000));
+  setTimeout(() => { if (localStorage.getItem("sunad_uid")) rpgDiario(); }, 6000);
 
   /* ============================================================
      11) 🗑️ QUITAR duplicados (por si acaso)

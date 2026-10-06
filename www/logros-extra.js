@@ -70,7 +70,7 @@
   meta:1,
   medir:()=> {
     try {
-      const u = window._getUserIdSafe?.() || localStorage.getItem("sunadventures_uid") || "local";
+      const u = window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local";
       const st = JSON.parse(localStorage.getItem(`sa_rpg_${u}`) || "{}");
       const jefesDerrotados = st.jefesDerrotados || [];
       const mascota = localStorage.getItem("mascota_actual");
@@ -96,7 +96,7 @@
   ];
 
   function numLS(clave) {
-    const u = window._getUserIdSafe?.() || localStorage.getItem("sunadventures_uid") || "local";
+    const u = window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local";
     return Number(localStorage.getItem(`sa_${clave}_${u}`) || 0);
   }
   function mascotasAmistadMax() {

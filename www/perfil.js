@@ -161,7 +161,7 @@
 
       perfil.username = username;
       perfil.avatar_url = avatar_url;
-      localStorage.setItem("sunadventures_username", username);
+      localStorage.setItem("sunad_username", username);
 
       const ue = $("user-email"); if (ue) ue.textContent = username;
       const udn = $("user-dropdown-name"); if (udn) udn.textContent = username;
@@ -171,7 +171,7 @@
       archivoAvatar = null;
       limpiarPreview();
       cerrar();
-      window.dispatchEvent(new Event("sunadventures:perfil-actualizado"));
+      window.dispatchEvent(new Event("sunad:perfil-actualizado"));
     } catch (e) {
       alert("Error: " + (e.message || e));
     } finally {

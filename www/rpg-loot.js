@@ -730,7 +730,7 @@
     guardarLoot(loot);
     try {
       localStorage.setItem(K.cofres(), String(Number(localStorage.getItem(K.cofres()) || 0) + cant));
-      window.dispatchEvent(new Event("sunadventures:progress"));
+      window.dispatchEvent(new Event("sunad:progress"));
     } catch {}
     mostrarModalCofre(def, items);
     renderColeccion();
@@ -906,7 +906,7 @@
   }
 
   /* ---------- Eventos ---------- */
-  window.addEventListener("sunadventures:rpg-tab", e => {
+  window.addEventListener("sunad:rpg-tab", e => {
     const t = e.detail?.tab || "zonas";
     setTimeout(() => { if (t === "objetos") renderColeccion(); else if (t === "cofres") renderCofres(); }, 0);
   });
