@@ -99,14 +99,14 @@
       nombre:"Cofre del Alba", precio:75000,
       rarBoosts:{comun:.15,raro:.30,epico:.33,legendario:.18,mitico:.04},
       calBoosts:{normal:.15,reforzado:.30,impecable:.38,ancestral:.17},
-      emoji:"🌟", imagen:"img/rpg/items/cofre-alba.png?v=5", color:"#ff6b9d",
+      emoji:"🌟", imagen:"img/rpg/items/cofre-alba.png?v=6", color:"#ff6b9d",
       cantMin:5, cantMax:7
     },
     celestial: {
       nombre:"Cofre Celestial", precio:400000,
       rarBoosts:{comun:.03,raro:.15,epico:.35,legendario:.37,mitico:.10},
       calBoosts:{normal:.05,reforzado:.15,impecable:.42,ancestral:.38},
-      emoji:"☀️", imagen:"img/rpg/items/cofre-celestial.png?v=4", color:"#fff5b8",
+      emoji:"☀️", imagen:"img/rpg/items/cofre-celestial.png?v=6", color:"#fff5b8",
       cantMin:7, cantMax:10
     }
   };
