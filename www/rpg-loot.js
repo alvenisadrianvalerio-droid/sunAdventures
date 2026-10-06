@@ -858,8 +858,8 @@
         ? `<img class="rpg-cofre-img" src="${def.imagen}" alt="${def.nombre}" loading="lazy">`
         : `<span class="rpg-cofre-emoji">${def.emoji}</span>`;
       
-      const svgLlave = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:2px;"><circle cx="8" cy="15" r="4"/><path d="M10.85 12.15L19 4M18 5l2 2M15 8l2 2"/></svg>`;
-      const svgLlaveDorada = `<svg viewBox="0 0 24 24" fill="none" stroke="#ffd93d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:2px;"><circle cx="8" cy="15" r="4"/><path d="M10.85 12.15L19 4M18 5l2.5 2.5M15 8l2.5 2.5"/></svg>`;
+      const svgLlave = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;display:inline-block;vertical-align:-1px;margin-right:2px;"><circle cx="8" cy="15" r="4"/><path d="M10.85 12.15L19 4M18 5l2 2M15 8l2 2"/></svg>`;
+      const svgLlaveDorada = `<svg viewBox="0 0 24 24" fill="none" stroke="#ffd93d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;display:inline-block;vertical-align:-1px;margin-right:2px;"><circle cx="8" cy="15" r="4"/><path d="M10.85 12.15L19 4M18 5l2.5 2.5M15 8l2.5 2.5"/></svg>`;
 
       let botonLlaveHtml = "";
       if (tipo === "hierro") {
