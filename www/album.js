@@ -105,6 +105,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ---------- DOM refs ---------- */
   const grid = $("album-grid"), empty = $("album-empty"), btnAdd = $("btn-add-photo"), btnPastePhotos = $("btn-paste-photos"), inputPastePhotos = $("input-paste-photos"), modal = $("photo-modal"), modalTitle = $("modal-title"), form = $("photo-form");
+  const btnSeleccionarFotos = $("btn-seleccionar-fotos"), albumSeleccionBar = $("album-seleccion-bar"), albumSeleccionContador = $("album-seleccion-contador");
+  const btnSeleccionarTodas = $("btn-seleccionar-todas"), btnEliminarSeleccionadas = $("btn-eliminar-seleccionadas"), btnCancelarSeleccion = $("btn-cancelar-seleccion");
   const inputPhoto = $("input-photo"), inputPhotoCampo = inputPhoto?.closest(".form-field"), inputDate = $("input-date"), inputNote = $("input-note");
   const preview = $("photo-preview"), photoPreviewInfo = $("photo-preview-info"), submitBtn = form?.querySelector('button[type="submit"]');
   const btnPhotoLocation = $("btn-photo-location"), photoLocationStatus = $("photo-location-status"), inputLat = $("input-lat"), inputLng = $("input-lng");
@@ -134,6 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ---------- Estado ---------- */
   let fotos = [], notas = [], notaEditando = null, fotoEditando = null;
+  let modoSeleccionFotos = false, fotosSeleccionadasIds = new Set();
   let colorSeleccionado = "amarillo", modoRegistro = false, grupoActivo = null, perfilActual = null, visitasConsecutivas = 0;
   let playlists = [], playlistEditando = null, emojiSeleccionado = "music", colorPlaylistSeleccionado = "amarillo";
   let eventos = [], mesMostrado = new Date(), colorEventoSeleccionado = "amarillo";
@@ -544,7 +547,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const { data, error } = await supabase.from("fotos")
         .select("id,path,fecha,nota,lat,lng,lugar,grupo_id")
         .eq("grupo_id", grupoActivo.id)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(5000);
       if (error) { console.warn("cargarFotos error:", error); fotos = []; return; }
       fotos = (data || []).map(f => ({ id: f.id, path: f.path, fecha: f.fecha, nota: f.nota, lat: f.lat, lng: f.lng, lugar: f.lugar, grupo_id: f.grupo_id }));
     } catch (err) { console.warn("cargarFotos:", err); fotos = []; }
@@ -628,18 +632,40 @@ document.addEventListener("DOMContentLoaded", () => {
   function crearPolaroid(foto, url) {
     try {
       const article = document.createElement("article");
-      article.className = "polaroid"; fullscreenInteractivo(article);
-      const btnDel = crearBtn("polaroid-delete", SVG.trash, "Eliminar foto", e => { e.stopPropagation(); eliminarFoto(foto.id); });
-      const btnEdit = crearBtn("polaroid-edit", SVG.edit, "Editar", e => { e.preventDefault(); e.stopPropagation(); abrirModal(foto); });
-      const btnFull = crearBtn("polaroid-fullscreen", SVG.expand, "Pantalla completa", e => { e.preventDefault(); e.stopPropagation(); if (document.fullscreenElement === article) { cerrarFullscreen(); return; } activarFullscreen(article, btnFull); });
-      const btnClose = crearBtn("polaroid-close", SVG.close, "Salir", e => { e.preventDefault(); e.stopPropagation(); cerrarFullscreen(); });
+      article.className = "polaroid";
+      article.dataset.fotoId = foto.id;
+
+      if (modoSeleccionFotos) {
+        article.classList.add("modo-seleccion");
+        const estaSel = fotosSeleccionadasIds.has(foto.id);
+        if (estaSel) article.classList.add("seleccionada");
+
+        const checkIndicator = document.createElement("div");
+        checkIndicator.className = "polaroid-checkbox-indicator";
+        checkIndicator.textContent = estaSel ? "✓" : "";
+        article.appendChild(checkIndicator);
+
+        article.addEventListener("click", e => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleSeleccionFoto(foto.id);
+        });
+      } else {
+        fullscreenInteractivo(article);
+        const btnDel = crearBtn("polaroid-delete", SVG.trash, "Eliminar foto", e => { e.stopPropagation(); eliminarFoto(foto.id); });
+        const btnEdit = crearBtn("polaroid-edit", SVG.edit, "Editar", e => { e.preventDefault(); e.stopPropagation(); abrirModal(foto); });
+        const btnFull = crearBtn("polaroid-fullscreen", SVG.expand, "Pantalla completa", e => { e.preventDefault(); e.stopPropagation(); if (document.fullscreenElement === article) { cerrarFullscreen(); return; } activarFullscreen(article, btnFull); });
+        const btnClose = crearBtn("polaroid-close", SVG.close, "Salir", e => { e.preventDefault(); e.stopPropagation(); cerrarFullscreen(); });
+        article.append(btnDel, btnEdit, btnFull, btnClose);
+      }
+
       const img = document.createElement("img");
       img.src = url; img.alt = foto.nota || "Recuerdo"; img.loading = "lazy";
       const nota = document.createElement("div"); nota.className = "polaroid-nota";
       if (foto.fecha) { const f = document.createElement("span"); f.className = "polaroid-fecha"; f.textContent = fmtFecha(foto.fecha); nota.appendChild(f); }
       if (foto.nota) { const p = document.createElement("p"); p.textContent = foto.nota; nota.appendChild(p); }
       const visual = document.createElement("div"); visual.className = "polaroid-visual"; visual.append(img, nota);
-      article.append(btnDel, btnEdit, btnFull, btnClose, visual);
+      article.append(visual);
       return article;
     } catch (err) { console.warn("crearPolaroid:", err); return null; }
   }
@@ -855,23 +881,58 @@ document.addEventListener("DOMContentLoaded", () => {
     const hoy = hoyISO();
     let subidas = 0;
     let fallidas = 0;
-    mostrarLoading(`Guardando ${imagenes.length} polaroid${imagenes.length === 1 ? '' : 's'}...`);
+    let completadas = 0;
+    const nuevasFotos = [];
+    mostrarLoading(`Guardando ${imagenes.length} polaroids (0/${imagenes.length})...`);
 
-    for (let i = 0; i < imagenes.length; i++) {
-      const img = imagenes[i];
-      if (loadingText) loadingText.textContent = `Guardando polaroid ${i + 1} de ${imagenes.length}...`;
-      try {
-        const blob = await redimensionarImagen(img, 1600);
-        const filePath = `fotos/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
-        const { error: upErr } = await supabase.storage.from(BUCKET_NAME).upload(filePath, blob, { contentType: "image/jpeg" });
-        if (upErr) throw upErr;
-        const nueva = await añadirFotoTabla(filePath, hoy, null, null, null);
-        fotos.unshift({ id: nueva.id, path: nueva.path, fecha: nueva.fecha, nota: nueva.nota, lat: nueva.lat, lng: nueva.lng });
-        subidas++;
-      } catch (err) {
-        console.warn("Error subiendo foto pegada:", err);
-        fallidas++;
+    // Concurrencia de 4 subidas simultáneas para máxima velocidad y estabilidad
+    const CONCURRENCIA_SUBIDA = 4;
+    let indiceSiguiente = 0;
+
+    const subirUnaFotoConReintento = async (img, retries = 2) => {
+      let ultimoError = null;
+      for (let intento = 0; intento <= retries; intento++) {
+        try {
+          const blob = await redimensionarImagen(img, 1600);
+          const filePath = `fotos/${Date.now()}-${Math.random().toString(36).slice(2, 9)}.jpg`;
+          const { error: upErr } = await supabase.storage.from(BUCKET_NAME).upload(filePath, blob, { contentType: "image/jpeg" });
+          if (upErr) throw upErr;
+          const nueva = await añadirFotoTabla(filePath, hoy, null, null, null);
+          return { id: nueva.id, path: nueva.path, fecha: nueva.fecha, nota: nueva.nota, lat: nueva.lat, lng: nueva.lng, lugar: nueva.lugar, grupo_id: nueva.grupo_id };
+        } catch (e) {
+          ultimoError = e;
+          if (intento < retries) {
+            await new Promise(r => setTimeout(r, 600 * (intento + 1)));
+          }
+        }
       }
+      throw ultimoError;
+    };
+
+    const worker = async () => {
+      while (indiceSiguiente < imagenes.length) {
+        const indiceActual = indiceSiguiente++;
+        const img = imagenes[indiceActual];
+        try {
+          const fotoGuardada = await subirUnaFotoConReintento(img);
+          nuevasFotos.push(fotoGuardada);
+          subidas++;
+        } catch (err) {
+          console.warn(`Error al subir foto #${indiceActual + 1}:`, err);
+          fallidas++;
+        } finally {
+          completadas++;
+          if (loadingText) {
+            loadingText.textContent = `Guardando polaroids (${completadas}/${imagenes.length}) · ${subidas} listas...`;
+          }
+        }
+      }
+    };
+
+    await Promise.all(Array.from({ length: Math.min(CONCURRENCIA_SUBIDA, imagenes.length) }, () => worker()));
+
+    if (nuevasFotos.length) {
+      fotos = [...nuevasFotos, ...fotos];
     }
 
     ocultarLoading();
@@ -1026,6 +1087,128 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (err) { alertar({ title: "No se pudo subir", message: err.message || String(err), variant: "danger" }); if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Guardar recuerdo"; } }
       finally { subiendoFoto = false; ocultarLoading(); }
     } catch (err) { console.error(err); subiendoFoto = false; ocultarLoading(); }
+  });
+
+  function actualizarUISeleccionFotos() {
+    if (!albumSeleccionBar) return;
+    if (modoSeleccionFotos) {
+      albumSeleccionBar.classList.remove("hidden");
+      if (btnSeleccionarFotos) btnSeleccionarFotos.classList.add("active");
+      const cant = fotosSeleccionadasIds.size;
+      if (albumSeleccionContador) {
+        albumSeleccionContador.textContent = `${cant} foto${cant === 1 ? '' : 's'} seleccionada${cant === 1 ? '' : 's'}`;
+      }
+      if (btnEliminarSeleccionadas) {
+        btnEliminarSeleccionadas.disabled = cant === 0;
+      }
+    } else {
+      albumSeleccionBar.classList.add("hidden");
+      if (btnSeleccionarFotos) btnSeleccionarFotos.classList.remove("active");
+      fotosSeleccionadasIds.clear();
+    }
+  }
+
+  function toggleSeleccionFoto(id) {
+    if (fotosSeleccionadasIds.has(id)) {
+      fotosSeleccionadasIds.delete(id);
+    } else {
+      fotosSeleccionadasIds.add(id);
+    }
+    const card = grid?.querySelector(`[data-foto-id="${id}"]`);
+    if (card) {
+      const estaSel = fotosSeleccionadasIds.has(id);
+      card.classList.toggle("seleccionada", estaSel);
+      const ind = card.querySelector(".polaroid-checkbox-indicator");
+      if (ind) ind.textContent = estaSel ? "✓" : "";
+    }
+    actualizarUISeleccionFotos();
+  }
+
+  function activarModoSeleccion(activar = true) {
+    modoSeleccionFotos = activar;
+    if (!activar) fotosSeleccionadasIds.clear();
+    actualizarUISeleccionFotos();
+    render();
+  }
+
+  btnSeleccionarFotos?.addEventListener("click", () => {
+    activarModoSeleccion(!modoSeleccionFotos);
+  });
+
+  btnCancelarSeleccion?.addEventListener("click", () => {
+    activarModoSeleccion(false);
+  });
+
+  btnSeleccionarTodas?.addEventListener("click", () => {
+    if (!modoSeleccionFotos) modoSeleccionFotos = true;
+    if (fotosSeleccionadasIds.size === fotos.length) {
+      fotosSeleccionadasIds.clear();
+    } else {
+      fotosSeleccionadasIds = new Set(fotos.map(f => f.id));
+    }
+    actualizarUISeleccionFotos();
+    render();
+  });
+
+  btnEliminarSeleccionadas?.addEventListener("click", async () => {
+    const ids = Array.from(fotosSeleccionadasIds);
+    if (!ids.length) return;
+    const ok = await confirmar({
+      title: `¿Eliminar ${ids.length} polaroid${ids.length === 1 ? '' : 's'}?`,
+      message: "Las fotos seleccionadas se borrarán permanentemente del álbum.",
+      variant: "danger",
+      icon: "🗑️",
+      confirmText: `Sí, eliminar ${ids.length}`,
+      cancelText: "Cancelar"
+    });
+    if (!ok) return;
+
+    mostrarLoading(`Eliminando ${ids.length} polaroids...`);
+    try {
+      const fotosParaBorrar = fotos.filter(f => ids.includes(f.id));
+      const pathsStorage = fotosParaBorrar.map(f => f.path).filter(Boolean);
+
+      // Borrar de Storage en lote si hay paths
+      if (pathsStorage.length) {
+        try {
+          // Supabase Storage remove soporta un arreglo de paths
+          await supabase.storage.from(BUCKET_NAME).remove(pathsStorage);
+        } catch (e) {
+          console.warn("Storage remove batch error:", e);
+        }
+      }
+
+      // Borrar de la base de datos en lotes de hasta 50 IDs
+      for (let i = 0; i < ids.length; i += 50) {
+        const chunk = ids.slice(i, i + 50);
+        const { error: dbErr } = await supabase.from("fotos").delete().in("id", chunk);
+        if (dbErr) throw dbErr;
+      }
+
+      // Limpiar caché y estado local
+      pathsStorage.forEach(p => urlsFirmadasCache.delete(p));
+      const idSet = new Set(ids);
+      fotos = fotos.filter(f => !idSet.has(f.id));
+
+      activarModoSeleccion(false);
+      await render();
+      window.dispatchEvent(new Event("sunad:progress"));
+
+      alertar({
+        title: "Fotos eliminadas",
+        message: `Se eliminaron correctamente ${ids.length} polaroid${ids.length === 1 ? '' : 's'}.`,
+        icon: "🗑️"
+      });
+    } catch (err) {
+      console.error("Error al eliminar fotos seleccionadas:", err);
+      alertar({
+        title: "Error al eliminar",
+        message: "Ocurrió un problema: " + (err.message || err),
+        variant: "danger"
+      });
+    } finally {
+      ocultarLoading();
+    }
   });
 
   async function eliminarFoto(id) {

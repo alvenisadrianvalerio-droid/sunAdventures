@@ -283,9 +283,118 @@ body.light .btn-secondary {
   display: flex;
   justify-content: center;
   gap: .75rem;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   flex-wrap: wrap
 }
+
+.album-seleccion-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: .9rem 1.4rem;
+  margin-bottom: 2.2rem;
+  background: rgba(25, 27, 38, 0.92);
+  border: 1px solid rgba(255, 217, 61, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: slideUp .25s ease;
+}
+
+body.light .album-seleccion-bar {
+  background: rgba(255, 252, 245, 0.95);
+  border-color: rgba(181, 115, 32, 0.35);
+  box-shadow: 0 10px 30px rgba(90, 60, 20, 0.15);
+}
+
+.album-seleccion-bar.hidden {
+  display: none !important;
+}
+
+.album-seleccion-info {
+  font-weight: bold;
+  font-size: 0.95rem;
+  color: var(--accent, #ffd93d);
+}
+
+.album-seleccion-botones {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  border-radius: 10px;
+}
+
+.btn-danger {
+  background: #ff4d6d;
+  color: #fff;
+  border: none;
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform .2s ease, opacity .2s ease, background .2s ease;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #e63956;
+  transform: translateY(-2px);
+}
+
+.btn-danger:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.polaroid.modo-seleccion {
+  cursor: pointer;
+  transform: none !important;
+  user-select: none;
+}
+
+.polaroid.modo-seleccion:hover {
+  transform: translateY(-4px) scale(1.02) !important;
+}
+
+.polaroid.seleccionada {
+  outline: 3px solid #ff4d6d;
+  box-shadow: 0 0 0 5px rgba(255, 77, 109, 0.3), 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+  transform: translateY(-4px) scale(1.02) !important;
+}
+
+.polaroid-checkbox-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  z-index: 6;
+  transition: transform .2s ease, background .2s ease, border-color .2s ease;
+}
+
+.polaroid.seleccionada .polaroid-checkbox-indicator {
+  background: #ff4d6d;
+  border-color: #ff4d6d;
+  transform: scale(1.1);
+}
+
 
 /* ============================================
    ÁLBUM
