@@ -891,28 +891,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function pegarFotosDelPortapapeles() {
     let archivosEncontrados = [];
+
+    // 1) Intentar leer ClipboardItems directamente desde navigator.clipboard.read()
     if (navigator.clipboard && navigator.clipboard.read) {
       try {
         const items = await navigator.clipboard.read();
-        for (const item of items) {
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
           const tiposImg = item.types.filter(t => t.startsWith("image/"));
           for (const tipo of tiposImg) {
-            const blob = await item.getType(tipo);
-            if (blob) {
-              const file = new File([blob], `polaroid_${Date.now()}.jpg`, { type: blob.type || "image/jpeg" });
-              archivosEncontrados.push(file);
+            try {
+              const blob = await item.getType(tipo);
+              if (blob && blob.size > 0) {
+                const ext = tipo.split("/")[1] || "jpg";
+                const file = new File([blob], `polaroid_${Date.now()}_${i}.${ext}`, { type: tipo });
+                archivosEncontrados.push(file);
+              }
+            } catch (err) {
+              console.warn("Error obteniendo blob de clipboard:", err);
+            }
+          }
+          // Si no vino como image/* directa, buscar imágenes incrustadas en text/html copiado
+          if (archivosEncontrados.length === 0 && item.types.includes("text/html")) {
+            try {
+              const htmlBlob = await item.getType("text/html");
+              const htmlText = await htmlBlob.text();
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(htmlText, "text/html");
+              const imgs = doc.querySelectorAll("img[src]");
+              for (const imgEl of imgs) {
+                const src = imgEl.src;
+                if (src.startsWith("data:image/")) {
+                  const res = await fetch(src);
+                  const b = await res.blob();
+                  archivosEncontrados.push(new File([b], `polaroid_${Date.now()}_data.jpg`, { type: b.type }));
+                } else if (src.startsWith("http://") || src.startsWith("https://")) {
+                  try {
+                    const res = await fetch(src, { mode: "cors" });
+                    if (res.ok) {
+                      const b = await res.blob();
+                      archivosEncontrados.push(new File([b], `polaroid_${Date.now()}_web.jpg`, { type: b.type }));
+                    }
+                  } catch { }
+                }
+              }
+            } catch (err) {
+              console.warn("Error parseando html de portapapeles:", err);
             }
           }
         }
       } catch (err) {
-        console.info("navigator.clipboard.read no disponible o denegado:", err);
+        console.info("navigator.clipboard.read fallo o requirió permiso:", err);
       }
     }
 
     if (archivosEncontrados.length > 0) {
       await procesarYSubirFotosMultiples(archivosEncontrados);
     } else {
-      // Si el portapapeles directo no entregó imágenes, abrir selector múltiple como fallback infalible
+      // Si el portapapeles no contenía imágenes o el navegador no otorgó permiso directo,
+      // abrir el selector múltiple como fallback garantizado
       inputPastePhotos?.click();
     }
   }

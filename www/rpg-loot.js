@@ -99,7 +99,7 @@
       nombre:"Cofre del Alba", precio:75000,
       rarBoosts:{comun:.15,raro:.30,epico:.33,legendario:.18,mitico:.04},
       calBoosts:{normal:.15,reforzado:.30,impecable:.38,ancestral:.17},
-      emoji:"🌟", imagen:"img/rpg/items/cofre-alba.png?v=4", color:"#ff6b9d",
+      emoji:"🌟", imagen:"img/rpg/items/cofre-alba.png?v=5", color:"#ff6b9d",
       cantMin:5, cantMax:7
     },
     celestial: {
@@ -858,18 +858,21 @@
         ? `<img class="rpg-cofre-img" src="${def.imagen}" alt="${def.nombre}" loading="lazy">`
         : `<span class="rpg-cofre-emoji">${def.emoji}</span>`;
       
+      const svgLlave = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:2px;"><circle cx="8" cy="15" r="4"/><path d="M10.85 12.15L19 4M18 5l2 2M15 8l2 2"/></svg>`;
+      const svgLlaveDorada = `<svg viewBox="0 0 24 24" fill="none" stroke="#ffd93d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:2px;"><circle cx="8" cy="15" r="4"/><path d="M10.85 12.15L19 4M18 5l2.5 2.5M15 8l2.5 2.5"/></svg>`;
+
       let botonLlaveHtml = "";
       if (tipo === "hierro") {
         const tieneLlave = llaves.comunes > 0 || llaves.doradas > 0;
-        const infoTxt = llaves.comunes > 0 ? `(${llaves.comunes} 🔑)` : `(${llaves.doradas} 🗝️)`;
+        const infoTxt = llaves.comunes > 0 ? `(${llaves.comunes} ${svgLlave})` : `(${llaves.doradas} ${svgLlaveDorada})`;
         botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${tieneLlave ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${tieneLlave ? `Abre con 1 Llave Común (${llaves.comunes} disp.)` : 'Necesitas 1 Llave Común'}">
-          🔑 Abrir con Llave Común ${tieneLlave ? infoTxt : '(0)'}
+          ${svgLlave} Abrir con Llave Común ${tieneLlave ? infoTxt : '(0)'}
         </button>`;
       } else if (tipo === "dorado") {
         const puedeAbrirDorado = llaves.doradas > 0 || llaves.comunes >= 2;
-        const infoTxt = llaves.doradas > 0 ? `(${llaves.doradas} 🗝️)` : `(${Math.floor(llaves.comunes / 2)} usos)`;
+        const infoTxt = llaves.doradas > 0 ? `(${llaves.doradas} ${svgLlaveDorada})` : `(${Math.floor(llaves.comunes / 2)} usos)`;
         botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${puedeAbrirDorado ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${puedeAbrirDorado ? 'Abre con 1 Llave Dorada o 2 Comunes' : 'Necesitas 1 Llave Dorada o 2 Comunes'}">
-          🗝️ Abrir con Llave Dorada ${puedeAbrirDorado ? infoTxt : '(0)'}
+          ${svgLlaveDorada} Abrir con Llave Dorada ${puedeAbrirDorado ? infoTxt : '(0)'}
         </button>`;
       }
 
@@ -883,7 +886,8 @@
         </div>
       </div>`;
     }).join("");
-    c.innerHTML = `<div class="rpg-coleccion-header"><span class="rpg-coleccion-titulo">🎁 Cofres</span><span class="rpg-coleccion-count">Ábrelos para conseguir botín</span></div><div class="rpg-barra-cofres-grid">${grid}</div>`;
+    const svgCofreRegalo = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;display:inline-block;vertical-align:-3px;margin-right:6px;color:var(--accent,#ffd93d);"><path d="M20 12v10H4V12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>`;
+    c.innerHTML = `<div class="rpg-coleccion-header"><span class="rpg-coleccion-titulo">${svgCofreRegalo}Cofres</span><span class="rpg-coleccion-count">Ábrelos para conseguir botín</span></div><div class="rpg-barra-cofres-grid">${grid}</div>`;
     if (window.hidratarIconos) window.hidratarIconos(c);
 
     qsa(".rpg-cofre-btn:not(.rpg-cofre-llave-btn)", c).forEach(b => b.addEventListener("click", () => {
