@@ -892,70 +892,44 @@ document.addEventListener("DOMContentLoaded", () => {
   async function pegarFotosDelPortapapeles() {
     let archivosEncontrados = [];
 
-    // 1) Intentar leer ClipboardItems directamente desde navigator.clipboard.read()
-    if (navigator.clipboard && navigator.clipboard.read) {
+    // Intentar leer directamente imágenes del portapapeles
+    if (navigator.clipboard && typeof navigator.clipboard.read === "function") {
       try {
         const items = await navigator.clipboard.read();
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i];
-          const tiposImg = item.types.filter(t => t.startsWith("image/"));
-          for (const tipo of tiposImg) {
-            try {
-              const blob = await item.getType(tipo);
-              if (blob && blob.size > 0) {
-                const ext = tipo.split("/")[1] || "jpg";
-                const file = new File([blob], `polaroid_${Date.now()}_${i}.${ext}`, { type: tipo });
-                archivosEncontrados.push(file);
-              }
-            } catch (err) {
-              console.warn("Error obteniendo blob de clipboard:", err);
-            }
-          }
-          // Si no vino como image/* directa, buscar imágenes incrustadas en text/html copiado
-          if (archivosEncontrados.length === 0 && item.types.includes("text/html")) {
-            try {
-              const htmlBlob = await item.getType("text/html");
-              const htmlText = await htmlBlob.text();
-              const parser = new DOMParser();
-              const doc = parser.parseFromString(htmlText, "text/html");
-              const imgs = doc.querySelectorAll("img[src]");
-              for (const imgEl of imgs) {
-                const src = imgEl.src;
-                if (src.startsWith("data:image/")) {
-                  const res = await fetch(src);
-                  const b = await res.blob();
-                  archivosEncontrados.push(new File([b], `polaroid_${Date.now()}_data.jpg`, { type: b.type }));
-                } else if (src.startsWith("http://") || src.startsWith("https://")) {
-                  try {
-                    const res = await fetch(src, { mode: "cors" });
-                    if (res.ok) {
-                      const b = await res.blob();
-                      archivosEncontrados.push(new File([b], `polaroid_${Date.now()}_web.jpg`, { type: b.type }));
-                    }
-                  } catch { }
+        if (items && items.length) {
+          for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const tiposImg = (item.types || []).filter(t => t.startsWith("image/"));
+            for (const tipo of tiposImg) {
+              try {
+                const blob = await item.getType(tipo);
+                if (blob && blob.size > 0) {
+                  const ext = (tipo.split("/")[1] || "jpg").replace(/[^a-z0-9]/gi, "");
+                  const file = new File([blob], `polaroid_${Date.now()}_${i}.${ext}`, { type: tipo });
+                  archivosEncontrados.push(file);
                 }
+              } catch (e) {
+                console.warn("getType error:", e);
               }
-            } catch (err) {
-              console.warn("Error parseando html de portapapeles:", err);
             }
           }
         }
       } catch (err) {
-        console.info("navigator.clipboard.read fallo o requirió permiso:", err);
+        console.info("Clipboard API read() no permitido o sin items directos:", err);
       }
     }
 
     if (archivosEncontrados.length > 0) {
       await procesarYSubirFotosMultiples(archivosEncontrados);
     } else {
-      // Si el portapapeles no contenía imágenes o el navegador no otorgó permiso directo,
-      // abrir el selector múltiple como fallback garantizado
+      // Si el portapapeles del sistema operativo no expone los archivos a la API web sin evento paste,
+      // abrir el selector múltiple para pegar/seleccionar todos los archivos copiados
       inputPastePhotos?.click();
     }
   }
 
-  btnPastePhotos?.addEventListener("click", () => {
-    pegarFotosDelPortapapeles();
+  btnPastePhotos?.addEventListener("click", async () => {
+    await pegarFotosDelPortapapeles();
   });
 
   inputPastePhotos?.addEventListener("change", async () => {
