@@ -83,7 +83,10 @@
   const popoverBtnGrupo = $("chat-popover-btn-grupo");
 
   function cerrarPopoverAmigo() {
-    if (popover) popover.hidden = true;
+    if (popover) {
+      popover.hidden = true;
+      popover.classList.add("hidden");
+    }
     amigoSeleccionadoPopover = null;
   }
 
@@ -120,15 +123,20 @@
     popover.style.top = `${Math.max(10, top)}px`;
     popover.style.left = `${Math.max(10, left)}px`;
     popover.hidden = false;
+    popover.classList.remove("hidden");
   }
 
-  // Cerrar al hacer click o tap fuera
-  window.addEventListener("pointerdown", e => {
+  // Cerrar al hacer click o tap fuera en cualquier parte de la pantalla
+  const cerrarSiAfuera = e => {
     if (!popover || popover.hidden) return;
     if (!popover.contains(e.target) && !e.target.closest(".chat-amigo-item")) {
       cerrarPopoverAmigo();
     }
-  }, true);
+  };
+
+  document.addEventListener("click", cerrarSiAfuera, true);
+  document.addEventListener("touchstart", cerrarSiAfuera, { passive: true, capture: true });
+  document.addEventListener("pointerdown", cerrarSiAfuera, true);
 
   window.addEventListener("keydown", e => {
     if (e.key === "Escape" && popover && !popover.hidden) {
