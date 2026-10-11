@@ -116,10 +116,17 @@
   };
 
   const activarFullscreen = (el, btn) => { const api = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen; if (api) { api.call(el); btn?.setAttribute("aria-pressed", "true"); return; } alert("Tu navegador no admite pantalla completa aquí."); };
-  const cerrarFullscreen = () => { const api = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen; if (api && document.fullscreenElement) api.call(document); };
+  const cerrarFullscreen = async () => {
+    try {
+      const api = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+      if (api && (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement)) {
+        await api.call(document);
+      }
+    } catch (_) {}
+  };
   const fullscreenInteractivo = (article, boton) => {
     article.tabIndex = 0; article.setAttribute("role", "button"); article.setAttribute("aria-label", "Abrir en pantalla completa");
-    article.addEventListener("click", e => { if (e.target.closest("button, input, textarea, a")) return; if (document.fullscreenElement === article) return cerrarFullscreen(); activarFullscreen(article, boton); });
+    article.addEventListener("click", async e => { if (e.target.closest("button, input, textarea, a")) return; if (document.fullscreenElement === article) { await cerrarFullscreen(); return; } activarFullscreen(article, boton); });
     article.addEventListener("keydown", e => { if (e.key !== "Enter" && e.key !== " " && e.target !== article) return; if (e.target !== article) return; e.preventDefault(); activarFullscreen(article, boton); });
   };
 

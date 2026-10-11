@@ -266,8 +266,10 @@
   async function abrirModal(fotoParaEditar = null) {
     try {
       if (!modal) return;
-      if (document.fullscreenElement) {
-        cerrarFullscreen();
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+        await cerrarFullscreen();
+        // Breve pausa para permitir que el navegador restaure el viewport
+        await new Promise(r => setTimeout(r, 60));
       }
       fotoEditando = fotoParaEditar;
       modal.classList.add("active"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";

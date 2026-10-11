@@ -110,9 +110,13 @@
     } catch (err) { console.warn("crearNotaPolaroid:", err); return document.createElement("div"); }
   }
 
-  function abrirNotaModal(notaParaEditar = null) {
+  async function abrirNotaModal(notaParaEditar = null) {
     try {
       if (!notaModal) return;
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+        await cerrarFullscreen();
+        await new Promise(r => setTimeout(r, 60));
+      }
       notaEditando = notaParaEditar;
       notaModal.classList.add("active"); notaModal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
       notaForm?.reset();

@@ -1288,6 +1288,11 @@ Artista - Canción
         const duration = Date.now() - touchStartTime;
         limpiarLongPress();
 
+        if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+          targetPolaroid = null;
+          return;
+        }
+
         // Si fue un toque corto (Tap) sin desplazamiento y sin ser long-press
         if (!touchMoved && !fueLongPress && duration < 380) {
           // Si el toque fue cerca de las zonas de botones superiores, no abrir fullscreen aquí

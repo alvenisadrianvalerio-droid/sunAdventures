@@ -601,6 +601,10 @@ Object.defineProperty(window, "_fotos",     { get: () => fotos,     configurable
   async function abrirModal(fotoParaEditar = null) {
     try {
       if (!modal) return;
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+        cerrarPantallaCompleta();
+        await new Promise(r => setTimeout(r, 60));
+      }
       fotoEditando = fotoParaEditar;
       modal.classList.add("active"); modal.setAttribute("aria-hidden","false"); document.body.style.overflow = "hidden";
       form?.reset();
