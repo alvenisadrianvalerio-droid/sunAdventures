@@ -1,4 +1,4 @@
-const CACHE_NAME = "sunad-v162";
+const CACHE_NAME = "sunad-v163";
 const ASSETS_ESTATICOS = [
   "./", "./index.html", "./styles.css", "./album.css", "./juegos.css",
   "./rpg.css", "./rpg-loot.css", "./temas.css", "./finanzas.css", "./capsula-tiempo.css", "./pareja-chat.css",
@@ -112,8 +112,9 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(req.url);
   if (url.protocol !== "http:" && url.protocol !== "https:") return;
 
-  // ✅ Saltar CDNs/APIs sin lanzar excepciones
+  // ✅ Saltar CDNs/APIs y archivos de descarga APK para que el navegador los descargue directamente
   if (HOSTS_EXTERNOS.some((h) => url.hostname.includes(h))) return;
+  if (url.pathname.endsWith(".apk") || url.pathname.includes("/app/")) return;
 
   event.respondWith((async () => {
     const cached = await caches.match(req, { ignoreSearch: true });

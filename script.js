@@ -1380,20 +1380,109 @@ sprite.style.opacity = "0.25";
   });
 
   /* ---------- Modal descarga app ---------- */
-  qsa('[data-action="descargar"]').forEach(b => b.addEventListener("click", abrirDescarga));
+  document.addEventListener("click", e => {
+    const btn = e.target.closest('[data-action="descargar"]');
+    if (btn) {
+      e.preventDefault();
+      abrirDescarga();
+    }
+  });
+
+  function descargarApkDirecta(e) {
+    if (e) e.preventDefault();
+    try {
+      const enlace = document.createElement("a");
+      enlace.href = "./app/sunad.apk";
+      enlace.download = "SunAd-1.5.apk";
+      enlace.target = "_blank";
+      enlace.rel = "noopener noreferrer";
+      document.body.appendChild(enlace);
+      enlace.click();
+      setTimeout(() => enlace.remove(), 100);
+    } catch {
+      window.open("./app/sunad.apk", "_blank");
+    }
+  }
+
   function abrirDescarga() {
     try {
+      const modalExistente = $("descarga-app-modal");
+      if (modalExistente) modalExistente.remove();
+
       const m = document.createElement("div");
+      m.id = "descarga-app-modal";
       m.className = "modal active";
       m.setAttribute("aria-hidden", "false");
-      m.innerHTML = `<div class="modal-backdrop" data-close></div><div class="modal-content"><h3 class="modal-title">Descargar SunAd</h3><p style="opacity:.8;margin-bottom:.5rem">Llévanos contigo a todas partes</p><div class="download-grid"><a class="download-option" href="app/sunad.apk" download="SunAd-1.5.apk"><span class="download-option-icon">${SVG.android}</span><span class="download-option-title">Android</span><span class="download-option-hint">Descargar APK · v1.5</span></a><button class="download-option" data-platform="ios" type="button"><span class="download-option-icon">${SVG.apple}</span><span class="download-option-title">iOS</span><span class="download-option-hint">Añadir a inicio</span></button><button class="download-option" data-platform="windows" type="button"><span class="download-option-icon">${SVG.windows}</span><span class="download-option-title">Windows</span><span class="download-option-hint">Próximamente</span></button><button class="download-option" data-platform="linux" type="button"><span class="download-option-icon">${SVG.linux}</span><span class="download-option-title">Linux</span><span class="download-option-hint">Próximamente</span></button></div><div class="modal-actions" style="margin-top:1.2rem"><button type="button" class="btn-secondary" data-close>Cerrar</button></div></div>`;
+      m.innerHTML = `<div class="modal-backdrop" data-close></div>
+        <div class="modal-content" style="max-width:440px">
+          <h3 class="modal-title">Descargar SunAd</h3>
+          <p style="opacity:.8;margin-bottom:1rem;font-size:.9rem">Llévanos contigo a todas partes en tu dispositivo</p>
+          <div class="download-grid">
+            <a class="download-option" id="btn-descargar-apk" href="./app/sunad.apk" download="SunAd-1.5.apk" target="_blank" rel="noopener">
+              <span class="download-option-icon">${SVG.android || "🤖"}</span>
+              <span class="download-option-title">Android</span>
+              <span class="download-option-hint">Descargar APK directa</span>
+            </a>
+            <button class="download-option" data-platform="ios" type="button">
+              <span class="download-option-icon">${SVG.apple || "🍎"}</span>
+              <span class="download-option-title">iOS (iPhone)</span>
+              <span class="download-option-hint">Añadir a inicio</span>
+            </button>
+            <button class="download-option" data-platform="pwa" type="button">
+              <span class="download-option-icon">✨</span>
+              <span class="download-option-title">App Web (PWA)</span>
+              <span class="download-option-hint">Instalar en teléfono</span>
+            </button>
+            <button class="download-option" data-platform="windows" type="button">
+              <span class="download-option-icon">${SVG.windows || "💻"}</span>
+              <span class="download-option-title">Windows</span>
+              <span class="download-option-hint">Instalar PWA</span>
+            </button>
+          </div>
+          <div style="margin-top:1.2rem;text-align:center">
+            <a href="./app/sunad.apk" download="SunAd-1.5.apk" style="display:inline-block;padding:.6rem 1.2rem;background:rgba(255,217,61,.2);color:#ffd93d;border:1px solid rgba(255,217,61,.4);border-radius:12px;font-size:.85rem;font-weight:bold;text-decoration:none">
+              📥 Descarga directa inmediata (APK)
+            </a>
+          </div>
+          <div class="modal-actions" style="margin-top:1.2rem">
+            <button type="button" class="btn-secondary" data-close>Cerrar</button>
+          </div>
+        </div>`;
       document.body.appendChild(m);
       document.body.style.overflow = "hidden";
       const c = () => { m.remove(); document.body.style.overflow = ""; };
       qsa("[data-close]", m).forEach(el => el.addEventListener("click", c));
-      const a = { ios:"Ábrela en Safari → Compartir → Añadir a pantalla de inicio", windows:"Próximamente", linux:"Próximamente" };
-      qsa("[data-platform]", m).forEach(b => b.addEventListener("click", () => alert(a[b.dataset.platform])));
-    } catch {}
+      
+      const apkBtn = m.querySelector("#btn-descargar-apk");
+      if (apkBtn) {
+        apkBtn.addEventListener("click", (ev) => {
+          // Asegurar inicio de descarga
+          setTimeout(() => {
+            if (window.SunModal) {
+              window.SunModal.toast?.("Descargando APK de SunAd...", "success");
+            }
+          }, 300);
+        });
+      }
+
+      const a = {
+        ios: "En iPhone/iPad: Abre esta página en Safari → toca el botón Compartir (cuadrado con flecha) → 'Añadir a pantalla de inicio'.",
+        pwa: "En Android o PC: Puedes instalarla tocando los 3 puntos del navegador → 'Instalar aplicación' o 'Agregar a la pantalla principal'.",
+        windows: "En Windows: Abre Chrome o Edge → clic en el icono de instalar en la barra de direcciones o menú → 'Instalar SunAd'.",
+        linux: "Próximamente"
+      };
+      qsa("[data-platform]", m).forEach(b => b.addEventListener("click", () => {
+        const msg = a[b.dataset.platform] || "Próximamente";
+        if (window.SunModal) {
+          window.SunModal.alert({ title: "Instalación", message: msg, icon: "📲", confirmText: "Entendido" });
+        } else {
+          alert(msg);
+        }
+      }));
+    } catch (e) {
+      console.warn("abrirDescarga error:", e);
+      descargarApkDirecta();
+    }
   }
 
   /* ---------- PWA ---------- */
