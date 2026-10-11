@@ -531,6 +531,12 @@ body.light .album-seleccion-bar {
   box-sizing: border-box
 }
 
+.polaroid:fullscreen::before,
+.polaroid:-webkit-full-screen::before {
+  display: none !important;
+  content: none !important;
+}
+
 .polaroid:fullscreen .polaroid-close,
 .polaroid:-webkit-full-screen .polaroid-close,
 .polaroid:fullscreen .polaroid-edit,
@@ -554,43 +560,89 @@ body.light .album-seleccion-bar {
   visibility: hidden !important;
 }
 
+/* Botón Editar en Fullscreen: Glassmorphism moderno y elegante */
 .polaroid:fullscreen .polaroid-edit,
 .polaroid:-webkit-full-screen .polaroid-edit {
   position: fixed !important;
   top: 1.5rem !important;
   left: 1.5rem !important;
-  width: 46px !important;
-  height: 46px !important;
+  width: 48px !important;
+  height: 48px !important;
   border-radius: 50% !important;
-  background: rgba(55, 105, 190, .95) !important;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.85), rgba(37, 99, 235, 0.95)) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
   color: #fff !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, .5) !important;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35), 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
   z-index: 1000 !important;
   cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.25) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
+.polaroid:fullscreen .polaroid-edit:hover,
+.polaroid:-webkit-full-screen .polaroid-edit:hover {
+  transform: scale(1.1) translateY(-2px) !important;
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.55), 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.95), rgba(37, 99, 235, 1)) !important;
+}
+
+.polaroid:fullscreen .polaroid-edit:active,
+.polaroid:-webkit-full-screen .polaroid-edit:active {
+  transform: scale(0.95) !important;
+}
+
+.polaroid:fullscreen .polaroid-edit svg,
+.polaroid:-webkit-full-screen .polaroid-edit svg {
+  width: 22px !important;
+  height: 22px !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+/* Botón Salir/Cerrar en Fullscreen: Frosted Glass sofisticado */
 .polaroid:fullscreen .polaroid-close,
 .polaroid:-webkit-full-screen .polaroid-close {
   position: fixed !important;
   top: 1.5rem !important;
   right: 1.5rem !important;
-  width: 46px !important;
-  height: 46px !important;
+  width: 48px !important;
+  height: 48px !important;
   border-radius: 50% !important;
-  background: rgba(255, 255, 255, .22) !important;
-  backdrop-filter: blur(8px) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
   color: #fff !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, .5) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
   z-index: 1000 !important;
   cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.25) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.polaroid:fullscreen .polaroid-close:hover,
+.polaroid:-webkit-full-screen .polaroid-close:hover {
+  transform: scale(1.1) translateY(-2px) !important;
+  background: rgba(239, 68, 68, 0.85) !important;
+  box-shadow: 0 12px 28px rgba(239, 68, 68, 0.5), 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.polaroid:fullscreen .polaroid-close:active,
+.polaroid:-webkit-full-screen .polaroid-close:active {
+  transform: scale(0.95) !important;
+}
+
+.polaroid:fullscreen .polaroid-close svg,
+.polaroid:-webkit-full-screen .polaroid-close svg {
+  width: 22px !important;
+  height: 22px !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .polaroid:fullscreen .polaroid-visual {
@@ -8239,18 +8291,31 @@ body.player-abierto.player-provider-abierto .shop-bubble { bottom: 420px; }
   visibility: visible !important;
 }
 
-/* El de eliminar siempre encima de cualquier solape */
+/* El de eliminar siempre encima de cualquier solape en cuadrícula */
 .polaroid-delete { z-index: 7 !important; }
 .polaroid-edit   { z-index: 7 !important; }
 .polaroid-fullscreen { z-index: 7 !important; }
 
-/* En móvil, mostrar los botones permanentemente (no hay hover) */
+/* En móvil, mostrar los botones permanentemente (no hay hover), excepto en pantalla completa */
 @media (hover: none) {
-  .polaroid-delete,
-  .polaroid-edit,
-  .polaroid-fullscreen {
+  .polaroid:not(:fullscreen):not(:-webkit-full-screen) .polaroid-delete,
+  .polaroid:not(:fullscreen):not(:-webkit-full-screen) .polaroid-edit,
+  .polaroid:not(:fullscreen):not(:-webkit-full-screen) .polaroid-fullscreen {
     opacity: .9 !important;
   }
+}
+
+/* En pantalla completa NUNCA mostrar delete, fullscreen ni cápsula */
+.polaroid:fullscreen .polaroid-delete,
+.polaroid:-webkit-full-screen .polaroid-delete,
+.polaroid:fullscreen .polaroid-fullscreen,
+.polaroid:-webkit-full-screen .polaroid-fullscreen,
+.polaroid:fullscreen .polaroid-capsula,
+.polaroid:-webkit-full-screen .polaroid-capsula {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* ============================================================

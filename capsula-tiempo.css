@@ -57,6 +57,14 @@
   opacity: 1;
 }
 
+.polaroid:fullscreen .polaroid-capsula,
+.polaroid:-webkit-full-screen .polaroid-capsula {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 .polaroid-capsula:hover {
   transform: scale(1.18);
   background: rgba(214, 93, 177, 1);
