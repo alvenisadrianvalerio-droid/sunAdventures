@@ -1,0 +1,394 @@
+/* ============================================================
+   SISTEMA DE PAREJA, GRUPOS Y CHAT MEJORADO
+   ============================================================ */
+
+/* ---------- Tabs de Navegación del Chat ---------- */
+.chat-tabs-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.chat-tabs {
+  display: inline-flex;
+  gap: .35rem;
+  padding: .3rem;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+}
+
+body.light .chat-tabs {
+  background: rgba(0, 0, 0, .04);
+  border-color: rgba(0, 0, 0, .1);
+}
+
+.chat-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .5rem 1rem;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: .86rem;
+  font-weight: 800;
+  cursor: pointer;
+  opacity: .7;
+  transition: all .2s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.chat-tab:hover {
+  opacity: 1;
+  background: rgba(255, 217, 61, .1);
+}
+
+.chat-tab.active {
+  background: linear-gradient(135deg, #ffd93d, #ffae3d);
+  color: #2b2118 !important;
+  opacity: 1;
+  box-shadow: 0 4px 14px rgba(255, 217, 61, .35);
+  transform: translateY(-1px);
+}
+
+.chat-tab.chat-tab-pareja.active {
+  background: linear-gradient(135deg, #ff6ba8, #ff3366);
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(255, 51, 102, .4);
+}
+
+/* Selector / Banner de conversación activa */
+.chat-conv-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .65rem 1rem;
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 12px;
+  margin-bottom: .85rem;
+  font-size: .85rem;
+  font-weight: 700;
+}
+
+body.light .chat-conv-banner {
+  background: rgba(0, 0, 0, .03);
+  border-color: rgba(0, 0, 0, .08);
+  color: #3d2c1e;
+}
+
+.chat-conv-info {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.chat-conv-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+
+.chat-conv-badge.grupo {
+  background: rgba(255, 217, 61, .18);
+  color: #ffd93d;
+}
+
+.chat-conv-badge.pareja {
+  background: rgba(255, 107, 168, .2);
+  color: #ff6ba8;
+}
+
+.chat-conv-badge.privado {
+  background: rgba(108, 184, 255, .2);
+  color: #6cb8ff;
+}
+
+body.light .chat-conv-badge.grupo { color: #b57320; background: rgba(212, 148, 30, .15); }
+body.light .chat-conv-badge.pareja { color: #c41e6a; background: rgba(255, 107, 168, .2); }
+body.light .chat-conv-badge.privado { color: #0052cc; background: rgba(0, 100, 200, .12); }
+
+/* Reacciones rápidas de chat */
+.chat-quick-reactions {
+  display: flex;
+  gap: .4rem;
+  padding: .4rem 0 .6rem;
+  overflow-x: auto;
+}
+
+.chat-reaction-btn {
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 999px;
+  padding: .25rem .65rem;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: transform .15s, background .15s;
+  white-space: nowrap;
+}
+
+.chat-reaction-btn:hover {
+  background: rgba(255, 217, 61, .2);
+  transform: scale(1.1);
+}
+
+body.light .chat-reaction-btn {
+  background: rgba(0, 0, 0, .04);
+  border-color: rgba(0, 0, 0, .1);
+}
+
+/* Burbujas de chat enriquecidas */
+.chat-message {
+  transition: transform .15s;
+}
+
+.chat-message.pareja-msg {
+  border: 1px solid rgba(255, 107, 168, .35);
+  box-shadow: 0 4px 14px rgba(255, 107, 168, .12);
+}
+
+.chat-message.propio.pareja-msg {
+  background: linear-gradient(135deg, #fff2f7, #ffe3ef);
+  color: #4a2c5a;
+}
+
+/* Tarjeta de Pareja Especial */
+.pareja-status-card {
+  padding: 1.1rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255, 107, 168, .12), rgba(255, 51, 102, .05));
+  border: 2px solid rgba(255, 107, 168, .35);
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.pareja-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+}
+
+.pareja-titulo {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #ff6ba8;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+body.light .pareja-titulo {
+  color: #c41e6a;
+}
+
+.pareja-beneficios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: .55rem;
+}
+
+.pareja-beneficio {
+  padding: .55rem .7rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .08);
+  font-size: .75rem;
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+}
+
+body.light .pareja-beneficio {
+  background: rgba(255, 255, 255, .7);
+  border-color: rgba(255, 107, 168, .2);
+  color: #4a2c5a;
+}
+
+/* Modales separados: Pareja vs Grupo */
+.pareja-modal-content {
+  max-width: 540px;
+  background: linear-gradient(180deg, #17121b, #0e0a12);
+  border: 2px solid rgba(255, 107, 168, .4);
+}
+
+body.light .pareja-modal-content {
+  background: linear-gradient(180deg, #fffafc, #fff4f8);
+  border-color: rgba(255, 107, 168, .4);
+  color: #3d243b;
+}
+
+.pareja-tabs {
+  display: flex;
+  gap: .4rem;
+  margin-bottom: 1rem;
+  padding: .3rem;
+  background: rgba(255, 255, 255, .05);
+  border-radius: 12px;
+}
+
+.pareja-tab-btn {
+  flex: 1;
+  padding: .5rem .8rem;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: .85rem;
+  font-weight: 800;
+  cursor: pointer;
+  opacity: .7;
+  transition: all .2s;
+}
+
+.pareja-tab-btn.active {
+  background: linear-gradient(135deg, #ff6ba8, #ff3366);
+  color: #fff !important;
+  opacity: 1;
+}
+
+.pareja-coop-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .6rem;
+  margin-top: .6rem;
+}
+
+.btn-pareja {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  padding: .65rem 1rem;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #ff6ba8, #ff3366);
+  color: #fff;
+  font-family: inherit;
+  font-size: .85rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255, 51, 102, .35);
+  transition: transform .15s, box-shadow .2s;
+}
+
+.btn-pareja:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 51, 102, .5);
+}
+
+.btn-pareja-sec {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  padding: .65rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 107, 168, .4);
+  background: rgba(255, 107, 168, .1);
+  color: #ff6ba8;
+  font-family: inherit;
+  font-size: .85rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.btn-pareja-sec:hover {
+  background: rgba(255, 107, 168, .2);
+}
+
+/* Buscador de pareja y amigos elegante y responsive */
+.friend-search-form,
+#pareja-search-form {
+  display: flex !important;
+  align-items: center !important;
+  gap: .6rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin-top: .4rem !important;
+  margin-bottom: .6rem !important;
+}
+
+.friend-search-form input,
+#pareja-search-input {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  height: 42px !important;
+  padding: .55rem .95rem !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 107, 168, .35) !important;
+  background: rgba(255, 255, 255, .08) !important;
+  color: var(--text) !important;
+  font-family: inherit !important;
+  font-size: .88rem !important;
+  outline: none !important;
+  transition: border-color .2s, box-shadow .2s, background .2s !important;
+}
+
+.friend-search-form input:focus,
+#pareja-search-input:focus {
+  border-color: #ff6ba8 !important;
+  box-shadow: 0 0 0 3px rgba(255, 107, 168, .25) !important;
+  background: rgba(255, 255, 255, .12) !important;
+}
+
+body.light .friend-search-form input,
+body.light #pareja-search-input {
+  background: rgba(255, 255, 255, .9) !important;
+  border-color: rgba(255, 107, 168, .45) !important;
+  color: #3d243b !important;
+}
+
+.friend-search-form button,
+#pareja-search-form button {
+  flex: 0 0 auto !important;
+  height: 42px !important;
+  padding: 0 1.2rem !important;
+  white-space: nowrap !important;
+}
+
+.friend-list {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  max-height: 220px;
+  overflow-y: auto;
+  margin-bottom: .6rem;
+}
+
+.friend-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+  padding: .55rem .75rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .06);
+}
+
+body.light .friend-row {
+  background: rgba(255, 255, 255, .7);
+  border-color: rgba(255, 107, 168, .15);
+}
+

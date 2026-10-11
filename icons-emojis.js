@@ -1,39 +1,18 @@
-/* ============================================================
-   ICONOS SVG — Estilo único "SunAdventures" (línea gruesa dorada)
-   Reemplaza TODOS los emojis genéricos por SVG reutilizables.
-   Uso: ICONO.girasol, ICONO.corazon, ICONO.casa ...
-   ============================================================ */
+/* ICONOS SVG — Estilo único SunAd (línea gruesa dorada) */
 (function () {
-  /* SVG 24×24 con trazo (stroke) */
-  const S = (d, extra = "") =>
-    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${extra}>${d}</svg>`;
-  /* SVG 24×24 relleno (fill) */
-  const F = (d, extra = "") =>
-    `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" ${extra}>${d}</svg>`;
-  /* SVG 32×32 relleno (para comidas con más detalle) */
-  const F32 = (d) =>
-    `<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">${d}</svg>`;
+  const S = (d, e = "") => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${e}>${d}</svg>`;
+  const F = (d, e = "") => `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" ${e}>${d}</svg>`;
+  const F32 = (d) => `<svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true">${d}</svg>`;
 
   window.ICONO = {
-    /* ============================================================
-       NATURALEZA / MASCOTAS
-       ============================================================ */
-    girasol: F(`<circle cx="12" cy="12" r="2.4"/>
-      <ellipse cx="12" cy="5.6" rx="1.6" ry="2.3"/><ellipse cx="12" cy="18.4" rx="1.6" ry="2.3"/>
-      <ellipse cx="5.6" cy="12" rx="2.3" ry="1.6"/><ellipse cx="18.4" cy="12" rx="2.3" ry="1.6"/>
-      <ellipse cx="7.5" cy="7.5" rx="1.6" ry="2.3" transform="rotate(-45 7.5 7.5)"/>
-      <ellipse cx="16.5" cy="7.5" rx="1.6" ry="2.3" transform="rotate(45 16.5 7.5)"/>
-      <ellipse cx="7.5" cy="16.5" rx="1.6" ry="2.3" transform="rotate(45 7.5 16.5)"/>
-      <ellipse cx="16.5" cy="16.5" rx="1.6" ry="2.3" transform="rotate(-45 16.5 16.5)"/>`),
+    /* Naturaleza */
+    girasol: F(`<circle cx="12" cy="12" r="2.4"/><ellipse cx="12" cy="5.6" rx="1.6" ry="2.3"/><ellipse cx="12" cy="18.4" rx="1.6" ry="2.3"/><ellipse cx="5.6" cy="12" rx="2.3" ry="1.6"/><ellipse cx="18.4" cy="12" rx="2.3" ry="1.6"/><ellipse cx="7.5" cy="7.5" rx="1.6" ry="2.3" transform="rotate(-45 7.5 7.5)"/><ellipse cx="16.5" cy="7.5" rx="1.6" ry="2.3" transform="rotate(45 16.5 7.5)"/><ellipse cx="7.5" cy="16.5" rx="1.6" ry="2.3" transform="rotate(45 7.5 16.5)"/><ellipse cx="16.5" cy="16.5" rx="1.6" ry="2.3" transform="rotate(-45 16.5 16.5)"/>`),
     corazon: F(`<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>`),
     estrella: F(`<path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z"/><path d="M19 3l.7 2.8L22 6.5l-2.3.7L19 10l-.7-2.8L16 6.5l2.3-.7L19 3z" opacity=".7"/>`),
     huella: F(`<circle cx="6" cy="9" r="2"/><circle cx="10" cy="6" r="2"/><circle cx="14" cy="6" r="2"/><circle cx="18" cy="9" r="2"/><path d="M12 13c-3 0-6 2-6 4 0 2 1.5 3 3 3s2-1 3-1 2 1 3 1 3-1 3-3c0-2-3-4-6-4z"/>`),
     raiz: S(`<path d="M12 22v-8"/><path d="M12 14c-4 0-7-3-7-7 4 0 7 3 7 7z"/><path d="M12 14c0-4 3-7 7-7 0 4-3 7-7 7z"/>`),
     fuego: F(`<path d="M12 2c0 3 3 4 3 8 0 1.5-1 3-3 3s-3-1.5-3-3c0-1 1-2 1-3 0-1-1-2-1-3 2 0 3-1 3-2z"/><path d="M11 19c-3 0-6-2-6-6 0-1 1-3 2-4 0 2 1 3 2 3 0-2 1-3 2-4-1 3 3 5 3 8 0 2-1 3-3 3z"/>`),
-
-    /* ============================================================
-       NAVEGACIÓN
-       ============================================================ */
+    /* Navegación */
     casa: S(`<path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>`),
     camara: S(`<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`),
     nota: S(`<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>`),
@@ -41,19 +20,14 @@
     trofeo: S(`<path d="M6 9H4a2 2 0 0 1-2-2V6h4"/><path d="M18 9h2a2 2 0 0 0 2-2V6h-4"/><path d="M6 4h12v6a6 6 0 0 1-12 0z"/><path d="M12 16v4"/><path d="M8 20h8"/>`),
     mapa: S(`<path d="M9 4l6 2 6-2v14l-6 2-6-2-6 2V6z"/><path d="M9 4v14M15 6v14"/>`),
     chat: S(`<path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-6 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>`),
+    finanzas: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor" opacity=".14"/><path d="M16.2 8.2c-.8-.8-1.9-1.2-3.5-1.2-2 0-3.3 1-3.3 2.5 0 1.4 1.1 2 3.1 2.4 2 .4 3.2 1 3.2 2.5S14.3 17 12.3 17c-1.6 0-2.9-.5-3.8-1.5M12.3 5.5v13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
     descargar: S(`<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/>`),
     calendario: S(`<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>`),
-
-    /* ============================================================
-       TEMA
-       ============================================================ */
+    /* Tema */
     sol: S(`<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>`),
     luna: S(`<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>`),
     rayo: S(`<path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/>`),
-
-    /* ============================================================
-       ESTADOS
-       ============================================================ */
+    /* Estados */
     ok: S(`<path d="M20 6L9 17l-5-5"/>`),
     x: S(`<path d="M18 6L6 18M6 6l12 12"/>`),
     mas: S(`<path d="M12 5v14M5 12h14"/>`),
@@ -62,10 +36,7 @@
     flechaDer: S(`<path d="M9 6l6 6-6 6"/>`),
     flechaArr: S(`<path d="M6 9l6 6 6-6"/>`),
     reintentar: S(`<path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>`),
-
-    /* ============================================================
-       ACCIONES
-       ============================================================ */
+    /* Acciones */
     basura: S(`<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/>`),
     lapiz: S(`<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>`),
     expandir: S(`<path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/>`),
@@ -80,75 +51,101 @@
     regalo: S(`<path d="M20 12v10H4V12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>`),
     medalla: F(`<circle cx="12" cy="15" r="6"/><path d="M9 3l3 6 3-6" stroke="currentColor" stroke-width="2" fill="none"/>`),
     corona: F(`<path d="M3 18h18l-1.5-9-4.5 4L12 5 9 13 4.5 9 3 18z"/>`),
+    serpiente: S(`<path d="M4 5h4a3 3 0 0 1 0 6H7a3 3 0 0 0 0 6h7a3 3 0 0 0 0-6h-1a3 3 0 0 1 0-6h4"/><circle cx="19" cy="5" r="2"/><path d="M21 5h1.5M21 5l1.2-1"/>`),
     globo: S(`<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>`),
     imagen: S(`<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>`),
     comida: S(`<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>`),
-
-    /* ============================================================
-       ACCIONES MASCOTA
-       ============================================================ */
+    /* Acciones mascota */
     mimar: F(`<path d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21z"/>`),
     dormir: S(`<path d="M3 20v-8l7-2 5 2 6-3v11H3z"/><path d="M12 12c1-2 3-3 5-2v4h-5z"/><circle cx="17" cy="10" r="2"/>`),
     jugar: S(`<line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/>`),
-    moneda: F(`<circle cx="12" cy="12" r="10" fill="#ffd93d" stroke="#b8860b" stroke-width="1.5"/><circle cx="12" cy="12" r="7" fill="#ffe066"/><text x="12" y="16" font-size="9" fill="#8b6914" text-anchor="middle" font-weight="bold">S</text>`),
+   moneda: `<img src="img/items%20de%20aventura/icon.png" alt="SunCoin" class="coin-icon">`,
+    /* Comidas */
+    manzana: F32(`<path d="M16 9c-3-4-8-4-10 0-2 5 1 12 5 15 2 1 3 1 5 0 2 1 3 1 5 0 4-3 7-10 5-15-2-4-7-4-10 0z" fill="#e63946"/><path d="M16 4c0-2 1-3 3-3" stroke="#5a3010" stroke-width="1.5" fill="none" stroke-linecap="round"/>`),
+    zanahoria: F32(`<path d="M16 30L8 12c-1-3 1-6 4-6h8c3 0 5 3 4 6L16 30z" fill="#f77f00"/><path d="M12 6l4-4M16 6l2-5M20 6l4-4" stroke="#2a8a4a" stroke-width="2" fill="none" stroke-linecap="round"/>`),
+    pizza: F32(`<path d="M16 3L3 28h26L16 3z" fill="#f4a261"/><path d="M16 7L7 24h18L16 7z" fill="#e76f51"/><circle cx="13" cy="18" r="2" fill="#c1121f"/><circle cx="19" cy="20" r="2" fill="#c1121f"/><circle cx="16" cy="14" r="1.5" fill="#c1121f"/>`),
+    pescado: F32(`<path d="M4 16c4-6 10-8 16-6 3 1 5 3 6 6-1 3-3 5-6 6-6 2-12 0-16-6z" fill="#4cc9f0"/><path d="M26 16l4-4v8l-4-4z" fill="#4cc9f0"/><circle cx="10" cy="14" r="1.2" fill="#0a2540"/>`),
+    semillas: F32(`<ellipse cx="10" cy="12" rx="3" ry="4" fill="#c9a227" transform="rotate(-20 10 12)"/><ellipse cx="20" cy="10" rx="3" ry="4" fill="#e0b93d" transform="rotate(15 20 10)"/><ellipse cx="16" cy="20" rx="3.5" ry="4.5" fill="#c9a227" transform="rotate(-5 16 20)"/>`),
+    cupcake: F32(`<path d="M8 16h16l-2 12H10L8 16z" fill="#d4a373"/><path d="M7 16c0-4 3-7 9-7s9 3 9 7H7z" fill="#ff8fab"/><circle cx="16" cy="6" r="2" fill="#e63946"/>`),
+    agua: F32(`<path d="M16 3C10 11 6 16 6 21a10 10 0 0 0 20 0c0-5-4-10-10-18z" fill="#4cc9f0"/>`),
+    carbon: F32(`<path d="M6 20l4-10 8-4 8 6-2 12-10 4z" fill="#2b2b2b"/><circle cx="12" cy="18" r="1.5" fill="#ff6b35"/><circle cx="20" cy="16" r="1" fill="#ffb627"/>`),
 
-    /* ============================================================
-       COMIDAS (viewBox 32×32, más detalle)
-       ============================================================ */
-    manzana: F32(`
-      <path d="M16 9c-3-4-8-4-10 0-2 5 1 12 5 15 2 1 3 1 5 0 2 1 3 1 5 0 4-3 7-10 5-15-2-4-7-4-10 0z" fill="#e63946"/>
-      <path d="M16 4c0-2 1-3 3-3" stroke="#5a3010" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      <ellipse cx="12" cy="14" rx="2" ry="3" fill="#fff" opacity=".35"/>
-    `),
-    zanahoria: F32(`
-      <path d="M16 30L8 12c-1-3 1-6 4-6h8c3 0 5 3 4 6L16 30z" fill="#f77f00"/>
-      <path d="M12 6l4-4M16 6l2-5M20 6l4-4" stroke="#2a8a4a" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <path d="M13 14l1 6M19 14l-1 6" stroke="#c95e00" stroke-width="1" fill="none" stroke-linecap="round" opacity=".6"/>
-    `),
-    pizza: F32(`
-      <path d="M16 3L3 28h26L16 3z" fill="#f4a261"/>
-      <path d="M16 7L7 24h18L16 7z" fill="#e76f51"/>
-      <circle cx="13" cy="18" r="2" fill="#c1121f"/>
-      <circle cx="19" cy="20" r="2" fill="#c1121f"/>
-      <circle cx="16" cy="14" r="1.5" fill="#c1121f"/>
-      <path d="M16 3L3 28h26L16 3z" fill="none" stroke="#a0522d" stroke-width="1.5" stroke-linejoin="round"/>
-    `),
-    pescado: F32(`
-      <path d="M4 16c4-6 10-8 16-6 3 1 5 3 6 6-1 3-3 5-6 6-6 2-12 0-16-6z" fill="#4cc9f0"/>
-      <path d="M26 16l4-4v8l-4-4z" fill="#4cc9f0"/>
-      <circle cx="10" cy="14" r="1.2" fill="#0a2540"/>
-      <path d="M4 16c4-6 10-8 16-6" fill="none" stroke="#0096c7" stroke-width="1" opacity=".6"/>
-      <circle cx="14" cy="18" r="1" fill="#fff" opacity=".5"/>
-    `),
-    semillas: F32(`
-      <ellipse cx="10" cy="12" rx="3" ry="4" fill="#c9a227" transform="rotate(-20 10 12)"/>
-      <ellipse cx="20" cy="10" rx="3" ry="4" fill="#e0b93d" transform="rotate(15 20 10)"/>
-      <ellipse cx="16" cy="20" rx="3.5" ry="4.5" fill="#c9a227" transform="rotate(-5 16 20)"/>
-      <ellipse cx="24" cy="20" rx="2.5" ry="3.5" fill="#e0b93d" transform="rotate(30 24 20)"/>
-      <ellipse cx="8" cy="22" rx="2.5" ry="3.5" fill="#e0b93d" transform="rotate(-30 8 22)"/>
-    `),
-    cupcake: F32(`
-      <path d="M8 16h16l-2 12H10L8 16z" fill="#d4a373"/>
-      <path d="M10 18h12M11 22h10M12 26h8" stroke="#a0522d" stroke-width=".8" opacity=".6"/>
-      <path d="M7 16c0-4 3-7 9-7s9 3 9 7H7z" fill="#ff8fab"/>
-      <circle cx="16" cy="6" r="2" fill="#e63946"/>
-      <circle cx="11" cy="8" r="1.5" fill="#4cc9f0"/>
-      <circle cx="21" cy="8" r="1.5" fill="#ffd93d"/>
-      <path d="M16 3v2" stroke="#2a8a4a" stroke-width="1.5" stroke-linecap="round"/>
-    `),
-    agua: F32(`
-      <path d="M16 3C10 11 6 16 6 21a10 10 0 0 0 20 0c0-5-4-10-10-18z" fill="#4cc9f0"/>
-      <path d="M16 3C10 11 6 16 6 21a10 10 0 0 0 10 10" fill="none" stroke="#0096c7" stroke-width="1" opacity=".5"/>
-      <ellipse cx="12" cy="22" rx="2" ry="3" fill="#fff" opacity=".5"/>
-    `),
-    carbon: F32(`
-      <path d="M6 20l4-10 8-4 8 6-2 12-10 4z" fill="#2b2b2b"/>
-      <path d="M10 10l8-4 8 6" fill="none" stroke="#555" stroke-width="1.2"/>
-      <path d="M6 20l4-10" fill="none" stroke="#555" stroke-width="1.2"/>
-      <path d="M24 22l-2 4-10 2" fill="none" stroke="#555" stroke-width="1.2"/>
-      <circle cx="12" cy="18" r="1.5" fill="#ff6b35"/>
-      <circle cx="20" cy="16" r="1" fill="#ffb627"/>
-      <circle cx="16" cy="22" r="1.2" fill="#ff6b35"/>
-    `)
+    /* ============================================
+       ICONOS NUEVOS PARA LOS 20 JUEGOS
+       ============================================ */
+    // —— Objetos / símbolos ——
+    trofeoDiamante: F(`<path d="M12 2l3 6 6 1-4.5 4.5 1 6L12 16l-5.5 3.5 1-6L3 9l6-1 3-6z"/>`),
+    dado: F(`<rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="8" r="1.4"/><circle cx="16" cy="8" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="8" cy="16" r="1.4"/><circle cx="16" cy="16" r="1.4"/>`),
+    carta: S(`<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8l3 4 3-4"/><path d="M8 16h8"/>`),
+    sobre: S(`<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>`),
+    bombilla: S(`<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/>`),
+    huellaGirasol: F(`<circle cx="12" cy="12" r="3"/><ellipse cx="12" cy="4" rx="1.6" ry="2.2"/><ellipse cx="12" cy="20" rx="1.6" ry="2.2"/><ellipse cx="4" cy="12" rx="2.2" ry="1.6"/><ellipse cx="20" cy="12" rx="2.2" ry="1.6"/>`),
+    caracol: S(`<path d="M12 21a9 9 0 1 1 9-9"/><path d="M12 21a5 5 0 0 1 0-10 3 3 0 0 1 0 6"/><path d="M21 12h3"/>`),
+    nube: S(`<path d="M17.5 19a4.5 4.5 0 0 1-1-8.9A6 6 0 0 0 5 12a4 4 0 0 0 0 8h12.5z"/>`),
+    gota: F(`<path d="M12 2C8 8 5 12 5 16a7 7 0 0 0 14 0c0-4-3-8-7-14z"/>`),
+    copo: S(`<path d="M12 2v20M4 6l16 12M20 6L4 18"/><path d="M9 4l3 2 3-2M9 20l3-2 3 2"/>`),
+    rayoDoble: F(`<path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/><path d="M20 8l-1 4h3l-5 6" fill="none" stroke="currentColor" stroke-width="1.5"/>`),
+    escudo: S(`<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`),
+    espada: S(`<path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/>`),
+    llaveDorada: F(`<circle cx="8" cy="15" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.85 12.15L19 4M18 5l3 3M15 8l3 3" stroke="currentColor" stroke-width="2" fill="none"/>`),
+    mapaX: S(`<path d="M9 4l6 2 6-2v14l-6 2-6-2-6 2V6z"/><path d="M9 4v14M15 6v14"/><path d="M12 10l1.2 1.2L15 9.4"/>`),
+    brujula: S(`<circle cx="12" cy="12" r="10"/><path d="M16.5 7.5L13.5 13.5 7.5 16.5 10.5 10.5 16.5 7.5z"/>`),
+    reloj: S(`<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>`),
+    cronometro: S(`<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/><path d="M9 2h6"/><path d="M12 2v3"/>`),
+    calendarioDia: S(`<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><circle cx="12" cy="16" r="2" fill="currentColor"/>`),
+    pluma: S(`<path d="M20 4c-4 0-9 2-12 5-2 2-3 4-3 6 0 1 1 2 2 2h4l8-8c1-1 1-3 1-5z"/><path d="M4 20l6-6"/>`),
+    tintero: S(`<path d="M6 4h12v6a6 6 0 0 1-12 0V4z"/><path d="M9 14v6h6v-6"/><path d="M12 4v4"/>`),
+    pergamino: S(`<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4z"/><path d="M5 4a2 2 0 0 0-2 2v0a2 2 0 0 0 2 2"/><path d="M19 20a2 2 0 0 0 2-2v0a2 2 0 0 0-2-2"/>`),
+    pincel: S(`<path d="M14 2l8 8-9.5 9.5a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 2z"/><path d="M9 11l4 4"/>`),
+    paleta: S(`<path d="M12 3a9 9 0 0 0 0 18c1 0 2-1 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.2 0-1 .8-1.5 1.8-1.5H16a5 5 0 0 0 5-5c0-4-4-7-9-7z"/><circle cx="8" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="8" r="1"/>`),
+    balon: S(`<circle cx="12" cy="12" r="10"/><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/><circle cx="12" cy="12" r="3"/>`),
+    diana: S(`<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/>`),
+    cubo: S(`<path d="M12 2l9 5v10l-9 5-9-5V7l9-5z"/><path d="M12 22V12"/><path d="M3 7l9 5 9-5"/>`),
+    piezaTetris: F(`<path d="M3 3h6v3H6v3H3zM9 3h6v3H9zM15 3h6v3h-3v3h-3zM3 9h6v6H3zM15 9h6v6h-6z"/>`),
+    cuadricula: S(`<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>`),
+    banderaCuadros: S(`<path d="M4 22V4"/><path d="M4 4h12l-2 4 2 4H4"/>`),
+    bomba: S(`<circle cx="11" cy="13" r="7"/><path d="M16 8l2-2"/><path d="M18 4l1 1M20 6l1 1M18 2l1 1"/>`),
+    estrellaDoble: F(`<path d="M9 2l2 5 5 .5-4 3.5 1.5 5L9 13.5 4.5 16 6 11 2 7.5 7 7z"/><path d="M17 12l1 2.5 3 .3-2.3 1.7.8 2.5L17 17.7l-2.5 1.3.8-2.5L13 14.8l3-.3z"/>`),
+    caramelo: S(`<circle cx="12" cy="12" r="5"/><path d="M7 7l-3-3M17 7l3-3M7 17l-3 3M17 17l3 3"/>`),
+    gelatina: S(`<path d="M6 10h12l-1 10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 10z"/><path d="M5 10c0-3 3-5 7-5s7 2 7 5"/>`),
+    donut: S(`<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M8 6l1 1M16 6l-1 1M6 15l1-1M18 15l-1-1"/>`),
+    helado: S(`<path d="M8 10a4 4 0 1 1 8 0"/><path d="M8 10a4 4 0 0 0 4 4 4 4 0 0 0 4-4"/><path d="M12 14l-3 8h6l-3-8z"/>`),
+    pastel: S(`<path d="M4 20h16v-6H4z"/><path d="M4 14c0-2 2-4 8-4s8 2 8 4"/><path d="M12 6v4"/><circle cx="12" cy="4" r="1" fill="currentColor"/>`),
+    vela: S(`<rect x="9" y="8" width="6" height="12" rx="1"/><path d="M12 8V5"/><path d="M10 4c0-1 1-2 2-2s2 1 2 2-1 2-2 2-2-1-2-2z" fill="currentColor"/>`),
+    fuegoArtificial: S(`<path d="M12 12L4 4M12 12l8-8M12 12v10M12 12L4 20M12 12l8 8"/><circle cx="12" cy="12" r="2" fill="currentColor"/>`),
+    // —— Mascotas nuevas ——
+    pez: F(`<path d="M2 12c4-5 10-6 15-3 2 1 4 3 5 3-1 0-3 2-5 3-5 3-11 2-15-3z"/><path d="M22 12l-4-3v6l4-3z"/><circle cx="8" cy="11" r="1" fill="#fff"/>`),
+    pulpo: F(`<circle cx="12" cy="10" r="5"/><path d="M7 12c-1 3-2 4-3 5M9 13c-.5 3-1 4-2 5M12 14v6M15 13c.5 3 1 4 2 5M17 12c1 3 2 4 3 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>`),
+    tortuga: F(`<ellipse cx="12" cy="13" rx="8" ry="5"/><circle cx="12" cy="13" r="3"/><circle cx="5" cy="13" r="1.5"/><circle cx="19" cy="13" r="1.5"/><path d="M11 8l1-2 1 2" fill="none" stroke="currentColor" stroke-width="1.5"/>`),
+    abeja: F(`<ellipse cx="12" cy="13" rx="6" ry="4"/><path d="M6 11c0-3 3-5 6-5s6 2 6 5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 13h6M9 15h6" stroke="currentColor" stroke-width="1.5"/><ellipse cx="9" cy="9" rx="2" ry="3" transform="rotate(-30 9 9)" opacity=".6"/><ellipse cx="15" cy="9" rx="2" ry="3" transform="rotate(30 15 9)" opacity=".6"/>`),
+    mariposa: S(`<path d="M12 6v12"/><path d="M12 9c-3-4-8-3-8 1s5 6 8 3"/><path d="M12 9c3-4 8-3 8 1s-5 6-8 3"/><path d="M12 15c-2 2-6 2-6-1M12 15c2 2 6 2 6-1"/>`),
+    pajaro: S(`<path d="M16 8c2 0 4 2 4 4l-2 6H8c-3 0-5-2-5-5s2-5 5-5h2l3-3v3z"/><circle cx="8" cy="10" r=".8" fill="currentColor"/><path d="M20 12l2 1"/>`),
+    lagarto: S(`<path d="M4 16c2-4 6-6 10-6s6 2 6 6c0 2-1 3-3 3"/><circle cx="4" cy="16" r="2"/><circle cx="17" cy="8" r="1.5"/><path d="M9 13l-1 4M12 12l0 5M15 12l1 4"/>`),
+    // —— Especiales ——
+    arcoiris: S(`<path d="M3 18a9 9 0 0 1 18 0"/><path d="M6 18a6 6 0 0 1 12 0"/><path d="M9 18a3 3 0 0 1 6 0"/>`),
+    poción: S(`<path d="M9 2h6v4l3 6a6 6 0 0 1-6 6 6 6 0 0 1-6-6l3-6V2z"/><path d="M8 12h8"/>`),
+    varita: S(`<path d="M15 4l5 5M3 21l12-12"/><path d="M15 4l1 1M18 7l1 1M15 10l1 1M12 7l1 1"/>`),
+    castillo: S(`<path d="M4 21V8l4-2v3l4-3 4 3V6l4 2v13H4z"/><path d="M10 21v-6h4v6"/><path d="M4 8l1-2 1 2M18 8l1-2 1 2"/>`),
+    bosque: S(`<path d="M8 20h8"/><path d="M12 4l-4 6h3l-4 5h10l-4-5h3z"/><path d="M12 15v5"/>`),
+    montaña: S(`<path d="M3 20l6-10 4 6 3-4 5 8H3z"/><path d="M9 10l1 1.5"/>`),
+    isla: S(`<path d="M3 20h18"/><path d="M8 20c0-4 2-7 4-7s4 3 4 7"/><path d="M12 6v7"/><path d="M12 6c3 0 4 2 4 3-2 0-4-1-4-3z"/>`),
+    cofre: S(`<path d="M3 10h18v10H3z"/><path d="M3 10l2-4h14l2 4"/><rect x="10" y="12" width="4" height="4" rx="1" fill="currentColor"/>`),
+    pocionAmor: S(`<path d="M9 2h6v3H9z"/><path d="M9 5l-2 5v6a5 5 0 0 0 10 0v-6l-2-5"/><path d="M12 11c0 0 2 2 2 4a2 2 0 0 1-4 0c0-2 2-4 2-4z" fill="currentColor"/>`),
+    gema: F(`<path d="M12 2L4 9l8 13 8-13z"/><path d="M12 2v20M4 9h16" stroke="rgba(255,255,255,.3)" stroke-width="1"/>`),
+
+    /* —— Íconos temáticos para Fondos de la Tienda —— */
+    nocheEstrellada: S(`<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/><path d="M16 4l.8 1.6L18.4 6.4l-1.6.8L16 8.8l-.8-1.6-1.6-.8 1.6-.8z" fill="currentColor"/><circle cx="7" cy="8" r="1" fill="currentColor"/><circle cx="9" cy="16" r=".8" fill="currentColor"/><circle cx="17" cy="15" r="1.1" fill="currentColor"/>`),
+    arcoirisMagico: S(`<path d="M3 19a9 9 0 0 1 18 0"/><path d="M6 19a6 6 0 0 1 12 0"/><path d="M9 19a3 3 0 0 1 6 0"/><circle cx="12" cy="7" r="1.5" fill="currentColor"/><path d="M19 8l.7 1.4 1.4.7-1.4.7-.7 1.4-.7-1.4-1.4-.7 1.4-.7z" fill="currentColor"/><path d="M5 10l.5 1 1 .5-1 .5-.5 1-.5-1-1-.5 1-.5z" fill="currentColor"/>`),
+    infiernoArdiente: S(`<path d="M12 2c1.5 3 4 5 4 9a6 6 0 0 1-12 0c0-2.5 1.5-5 3-7 0 2.5 1.5 4 3 4s2-2 2-6z"/><path d="M9 18c0-2 1.5-3.5 3-3.5s3 1.5 3 3.5a3 3 0 0 1-6 0z" fill="currentColor"/><path d="M3 21h18"/>`),
+    bosqueProfundo: S(`<path d="M12 2l-5 7h3l-4 6h12l-4-6h3l-5-7z"/><path d="M12 15v7M8 22h8"/><circle cx="6" cy="18" r="1" fill="currentColor"/><circle cx="18" cy="17" r="1.2" fill="currentColor"/><circle cx="15" cy="9" r=".8" fill="currentColor"/>`),
+    oceanoProfundo: S(`<path d="M2 12c2.5-2 5-2 7.5 0s5 2 7.5 0 5-2 5 0"/><path d="M2 16c2.5-2 5-2 7.5 0s5 2 7.5 0 5-2 5 0"/><path d="M2 20c2.5-2 5-2 7.5 0s5 2 7.5 0 5-2 5 0"/><circle cx="7" cy="7" r="2.2"/><circle cx="16" cy="5" r="1.6"/><circle cx="18" cy="9" r="1.1"/>`),
+    desiertoDorado: S(`<circle cx="12" cy="7" r="3"/><path d="M12 2v2M12 10v2M7 7H5M19 7h-2M8.5 3.5l1.4 1.4M15.5 3.5l-1.4 1.4"/><path d="M2 20c4-4 8-4 12 0 3-3 6-3 8 0"/><path d="M2 22h20"/>`),
+    auroraBoreal: S(`<path d="M2 9c4-4 8 2 12-2s6 4 8 1"/><path d="M2 13c4-4 8 2 12-2s6 4 8 1"/><path d="M2 17c4-4 8 2 12-2s6 4 8 1"/><circle cx="7" cy="4" r="1" fill="currentColor"/><circle cx="17" cy="5" r="1.2" fill="currentColor"/><circle cx="21" cy="8" r=".8" fill="currentColor"/>`),
+    florSakura: S(`<circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M12 10c0-3.5 3-4.5 3.5-2.5S13.5 10 12 10zM12 14c0 3.5-3 4.5-3.5 2.5S10.5 14 12 14zM14 12c3.5 0 4.5 3 2.5 3.5S14 13.5 14 12zM10 12c-3.5 0-4.5-3-2.5-3.5S10 10.5 10 12zM13.5 10.5c2.5-2.5 4-.5 3 1s-2.5.5-3-.5zM10.5 13.5c-2.5 2.5-4 .5-3-1s2.5-.5 3 .5z"/>`),
+    cyberpunkCity: S(`<path d="M3 21V11l4-3v13M7 8l5-4v17M12 13l5-2v10M17 11l4-2v12"/><path d="M2 21h20"/><path d="M12 4V2M17 9V7"/><circle cx="5" cy="14" r=".8" fill="currentColor"/><circle cx="9.5" cy="10" r=".8" fill="currentColor"/><circle cx="14.5" cy="15" r=".8" fill="currentColor"/>`),
+    tormentaElectrica: S(`<path d="M17.5 12a4.5 4.5 0 0 0-8.5-1.5A5 5 0 0 0 4 15h15a3 3 0 0 0-.5-3z"/><path d="M11 15l-2 5h3.5l-1.5 4 4.5-6h-3l2-3z" fill="currentColor"/><path d="M6 19l-1 2M18 19l-1 2"/>`),
+    volcanErupcion: S(`<path d="M4 21L9 8h6l5 13H4z"/><path d="M9 8c1.5 1 4.5 1 6 0"/><path d="M12 8V2M9 4l1.5 2M15 4l-1.5 2"/><circle cx="8" cy="2" r="1" fill="currentColor"/><circle cx="16" cy="3" r="1.2" fill="currentColor"/><path d="M11 11l-1 4M13 11l1 5"/>`),
+    galaxiaEspacial: S(`<ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><circle cx="5" cy="6" r="1" fill="currentColor"/><circle cx="19" cy="17" r="1.2" fill="currentColor"/><circle cx="19" cy="7" r=".8" fill="currentColor"/><circle cx="5" cy="18" r=".8" fill="currentColor"/>`),
+    neonGlow: S(`<path d="M4 12h3l2-6 6 12 2-6h3"/><circle cx="12" cy="12" r="9"/><circle cx="9" cy="6" r="1" fill="currentColor"/><circle cx="15" cy="18" r="1" fill="currentColor"/>`)
   };
 })();
