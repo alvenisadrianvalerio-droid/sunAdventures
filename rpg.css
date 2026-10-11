@@ -2,11 +2,11 @@
    RPG — Aventura por turnos
    ============================================================ */
 .rpg-section {
-  padding: 4rem 3rem 6rem;
+  padding: .5rem clamp(.8rem, 3vw, 2.5rem) 6rem;
   max-width: 1100px;
   margin: 0 auto;
 }
-.rpg-header { text-align: center; margin-bottom: 2rem; }
+.rpg-header { display: none !important; }
 .rpg-title {
   font-size: clamp(2rem, 5vw, 3.5rem);
   color: var(--text);
@@ -812,7 +812,7 @@ html.animations-disabled .rpg-log-item { opacity: 1 !important; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 640px) {
-  .rpg-section { padding: 2.5rem clamp(.65rem, 3.5vw, 1.2rem) calc(5rem + env(safe-area-inset-bottom, 0px)); }
+  .rpg-section { padding: .5rem clamp(.65rem, 3.5vw, 1.2rem) calc(5rem + env(safe-area-inset-bottom, 0px)); }
   .rpg-hud { grid-template-columns: auto 1fr; gap: .8rem; padding: .8rem; }
   .rpg-coins { grid-column: 1 / -1; justify-self: end; }
   .rpg-batalla-top { grid-template-columns: 1fr; }

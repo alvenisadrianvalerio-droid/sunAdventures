@@ -9,7 +9,7 @@
   const CSS = `
     .rpg-mm-btn-floating{
       position:fixed;
-      top: 5.5rem;
+      top: 4.5rem;
       right: 1.2rem;
       z-index: 9000;
       display:none;

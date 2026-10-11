@@ -1,6 +1,6 @@
 .finanzas-section {
   min-height: 70vh;
-  padding: clamp(1rem, 4vw, 3rem) clamp(.8rem, 4vw, 2rem) 4rem;
+  padding: .5rem clamp(.8rem, 4vw, 2rem) 4rem;
   color: var(--text);
 }
 .finanzas-shell { width: min(1100px, 100%); margin: 0 auto; }
