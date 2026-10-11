@@ -172,9 +172,15 @@
         if (session) {
           const { error } = await sb.from("perfiles").update({ username: limpio }).eq("id", session.user.id);
           if (error) throw error;
+          try {
+            await sb.auth.updateUser({ email: `${limpio}@foursunflowers.local` });
+          } catch (e) { console.warn("updateUser email:", e); }
         }
       }
       localStorage.setItem("sunad_username", limpio);
+      localStorage.setItem("sunadventures_username", limpio);
+      if (localStorage.getItem("sunad_usuario_recordado")) localStorage.setItem("sunad_usuario_recordado", limpio);
+      if (localStorage.getItem("sunadventures_usuario_recordado")) localStorage.setItem("sunadventures_usuario_recordado", limpio);
       const ue = $("user-email"); if (ue) ue.textContent = limpio;
       const udn = $("user-dropdown-name"); if (udn) udn.textContent = limpio;
       alertar({ title:"¡Listo!", message:`Ahora te llamas @${limpio}`, variant:"success", icon:"✨" });
@@ -227,12 +233,19 @@
      10) 🎁 RECOMPENSA DIARIA RPG
      ============================================================ */
   const RK = () => `sa_rpg_diario_${getUser()}`;
+  let comprobandoRpgDiario = false;
   function rpgDiario() {
-    if (!localStorage.getItem("sunad_uid")) return;
+    if (comprobandoRpgDiario) return;
+    const uid = window._sunUserId || localStorage.getItem("sunad_uid");
+    if (!uid) return;
     const hoy = new Date().toISOString().slice(0,10);
     if (localStorage.getItem(RK()) === hoy) return;
+    comprobandoRpgDiario = true;
     localStorage.setItem(RK(), hoy);
     const st = window.Rpg?.state?.(), nivel = st?.nivel || 1;
+    const mon = Math.round(15 + nivel * 5);
+    const xp = Math.round(10 + nivel * 4);
+    try { window._setMonedas?.((window._getMonedas?.() || 0) + mon); } catch {}
     const iconoEspadas = window.ICONO?.espada || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>`;
     const iconoCorona = window.ICONO?.corona ? `<span class="modal-title-svg" style="display:inline-block;width:1.3em;height:1.3em;vertical-align:-0.2em;margin-right:0.35rem;color:#ffd93d;">${window.ICONO.corona}</span>` : "";
     const iconoMoneda = window.ICONO?.moneda || `<img src="img/items%20de%20aventura/icon.png" alt="SunCoin" class="coin-icon">`;
@@ -241,7 +254,7 @@
       message: `Has recibido <strong>+${mon}</strong> ${iconoMoneda} y <strong>+${xp} XP</strong> por tu visita diaria.`,
       variant: "success",
       icon: iconoEspadas
-    });
+    }).finally(() => { comprobandoRpgDiario = false; });
   }
   window.addEventListener("sunad:user-ready", () => setTimeout(rpgDiario, 4000));
   setTimeout(() => { if (localStorage.getItem("sunad_uid")) rpgDiario(); }, 6000);

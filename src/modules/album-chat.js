@@ -354,249 +354,69 @@
     if (nomEl) nomEl.textContent = m.nombre;
   }
 
-  // Base de datos local de recetas populares en español (instantánea, deliciosa y siempre disponible)
-  const RECETAS_POPULARES = {
-    "tiramisu": {
-      titulo: "Tiramisú Tradicional",
-      ingredientes: "400g de bizcochos de soletilla, 500g de queso mascarpone, 4 huevos (separar yemas y claras), 100g de azúcar, 1 taza de café fuerte frío, 2 cucharadas de licor Amaretto (opcional) y cacao puro en polvo.",
-      pasos: "1. Bate las yemas con el azúcar hasta que blanqueen y añade el mascarpone. 2. Monta las claras a punto de nieve e incorpóralas con movimientos envolventes. 3. Moja los bizcochos en el café con Amaretto y colócalos en la base. 4. Cubre con una capa de crema, repite otra capa de bizcochos y crema. 5. Refrigera mínimo 4 horas y espolvorea abundante cacao antes de servir."
-    },
-    "pizza": {
-      titulo: "Pizza Casera Crujiente",
-      ingredientes: "300g de harina de trigo, 175ml de agua tibia, 15g de levadura fresca, 1 cucharadita de sal, 2 cucharadas de aceite de oliva, salsa de tomate frito, queso mozzarella y orégano.",
-      pasos: "1. Mezcla harina, levadura disuelta en agua tibia, sal y aceite. Amasa 10 minutos y deja reposar 1 hora hasta duplicar volumen. 2. Estira la masa fina sobre una bandeja. 3. Añade salsa de tomate, abundante mozzarella y tus ingredientes favoritos. 4. Hornea a 220°C durante 12-15 minutos hasta dorar."
-    },
-    "pancakes": {
-      titulo: "Pancakes / Tortitas Esponjosas",
-      ingredientes: "200g de harina, 2 huevos, 250ml de leche, 2 cucharadas de azúcar, 1 cucharada de levadura química (polvo para hornear), 30g de mantequilla derretida y una pizca de sal.",
-      pasos: "1. Bate los huevos con el azúcar y la leche. 2. Añade la harina tamizada con la levadura y la sal. Agrega la mantequilla derretida. 3. En una sartén antiadherente engrasada a fuego medio, vierte un cucharón de masa. 4. Cuando salgan burbujas en la superficie, dale la vuelta y dora el otro lado 1 minuto. ¡Sirve con miel o sirope!"
-    },
-    "guacamole": {
-      titulo: "Guacamole Mexicano Auténtico",
-      ingredientes: "3 aguacates maduros, 1 lima o limón, media cebolla picada finita, 1 tomate picado sin semillas, cilantro fresco picado y sal.",
-      pasos: "1. Machaca la pulpa de los aguacates con un tenedor en un bol. 2. Agrega el zumo de la lima de inmediato para que no se oxide. 3. Añade la cebolla, el tomate, el cilantro y la sal al gusto. 4. Mezcla suavemente y sirve con totopos o nachos."
-    },
-    "brownie": {
-      titulo: "Brownies de Chocolate Fudge",
-      ingredientes: "200g de chocolate negro, 110g de mantequilla, 3 huevos, 120g de azúcar, 85g de harina y nueces picadas (opcional).",
-      pasos: "1. Derrite el chocolate con la mantequilla a fuego suave. 2. Bate los huevos con el azúcar y mezcla con el chocolate tibio. 3. Añade la harina tamizada e incorpora las nueces. 4. Vierte en un molde forrado y hornea a 180°C durante 20-22 minutos (el centro debe quedar tierno)."
-    },
-    "hamburguesa": {
-      titulo: "Hamburguesa Gourmet",
-      ingredientes: "200g de carne picada de ternera, sal, pimienta negra, pan brioche, queso cheddar, lechuga, rodajas de tomate y salsa casera.",
-      pasos: "1. Salpimienta la carne y forma la hamburguesa sin apretar demasiado. 2. Dora en sartén o plancha muy caliente 3 minutos por lado. Añade el cheddar al final y tapa para fundir. 3. Tuesta el pan brioche con un poco de mantequilla y monta con la salsa, lechuga y tomate."
-    },
-    "lasaña": {
-      titulo: "Lasaña Clásica Boloñesa",
-      ingredientes: "Placas de pasta para lasaña, 500g de carne picada, 1 cebolla, salsa de tomate, salsa bechamel, queso parmesano, sal y pimienta.",
-      pasos: "1. Sofríe la cebolla y la carne, agrega salsa de tomate y cocina 20 minutos. 2. En una fuente pon una capa de bechamel, pasta, boloñesa y repite las capas. 3. Cubre con abundante bechamel y queso parmesano. 4. Hornea a 200°C por 25 minutos y gratina."
-    }
-  };
-
-  // Helper para contextualización temporal exacta (fechas, jornadas y calendarios oficiales)
-  function obtenerContextoTemporalDeportivo(desplazamientoDias = 0) {
+  // Cargar bases de datos desacopladas desde window.AlbumApp.knowledge (módulo album-ia-knowledge.js)
+  const RECETAS_POPULARES = window.AlbumApp.knowledge?.RECETAS_POPULARES || {};
+  const ANALISIS_DEPORTES_VERIFICADOS = window.AlbumApp.knowledge?.ANALISIS_DEPORTES_VERIFICADOS || {};
+  const obtenerContextoTemporalDeportivo = window.AlbumApp.knowledge?.obtenerContextoTemporalDeportivo || function(desplazamientoDias = 0) {
     const d = new Date();
     d.setDate(d.getDate() + desplazamientoDias);
-    const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/Santo_Domingo' };
-    const fechaFormateada = d.toLocaleDateString('es-ES', opciones);
-    const isoFecha = d.toISOString().split('T')[0];
     return {
-      fechaFormateada: fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1),
-      isoFecha,
+      fechaFormateada: d.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+      isoFecha: d.toISOString().split('T')[0],
       diaSemana: d.toLocaleDateString('es-ES', { weekday: 'long' }),
       anio: d.getFullYear(),
       horaAuditoria: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
     };
-  }
-
-  // Base de datos de análisis técnicos verificados multideporte (Opta, Basketball-Reference, ATP, MLB Statcast, F1 Telemetry)
-  const ANALISIS_DEPORTES_VERIFICADOS = {
-    // Fútbol
-    "manchester city": {
-      deporte: "Fútbol",
-      equipo: "Manchester City FC",
-      fuente: "Opta Stats / FBref Certificado",
-      formacion: "4-3-3 mutando a 3-2-4-1 en fase ofensiva",
-      metricas: [
-        "Posesión media: 64.8%",
-        "xG generado p90: 2.31",
-        "PPDA (Intensidad de presión): 8.4",
-        "Efectividad en pases: 89.6%"
-      ],
-      analisisTáctico: "En fase de salida, un lateral invierte su posición hacia el doble pivote para generar superioridad 3+2, fijando los extremos rivales y habilitando a los interiores en los medios espacios.",
-      rendimiento: "Máxima eficiencia en control de transiciones y minimización de pérdidas en campo propio."
-    },
-    "real madrid": {
-      deporte: "Fútbol",
-      equipo: "Real Madrid CF",
-      fuente: "Opta Stats / FBref Certificado",
-      formacion: "4-3-1-2 o 4-3-3 fluido con rombo",
-      metricas: [
-        "Velocidad de transición: 3.4 pases por ataque directo",
-        "xG por disparo: 0.16 (Alta calidad de remate)",
-        "Goles en últimos 15 min: 28% del total",
-        "Presión tras pérdida en campo medio: 58% de recuperaciones"
-      ],
-      analisisTáctico: "Estructura basada en asimetría funcional; sobrecarga en sector izquierdo para liberar el costado débil con cambios de orientación rasos y ataques al espacio de ruptura.",
-      rendimiento: "Dominio letal en transiciones ofensivas y resistencia en bloque medio-bajo durante fases de asedio rival."
-    },
-    "barcelona": {
-      deporte: "Fútbol",
-      equipo: "FC Barcelona",
-      fuente: "Opta Stats / FBref Certificado",
-      formacion: "4-2-3-1 / 4-3-3 con bloque muy alto",
-      metricas: [
-        "Altura de la línea defensiva: 52.8 metros",
-        "Fueras de juego provocados: 4.8 por partido",
-        "Posesión media: 63.1%",
-        "Recuperaciones en último tercio: 7.1 p90"
-      ],
-      analisisTáctico: "Presión coordinada hombre a hombre en reinicios rivales y línea de fuera de juego ejecutada milimétricamente al inicio de la carrera del pasador.",
-      rendimiento: "Gran producción de ocasiones por robo en salida ajena, requiriendo máxima coordinación de los centrales para defender el espacio a su espalda."
-    },
-    "arsenal": {
-      deporte: "Fútbol",
-      equipo: "Arsenal FC",
-      fuente: "Opta Stats / FBref Certificado",
-      formacion: "4-3-3 con bloque alto zonal",
-      metricas: [
-        "Goles de balón parado (ABP): 34% del total",
-        "xG concedido p90: 0.78 (Líder defensivo)",
-        "Presión PPDA: 9.1",
-        "Efectividad en duelos aéreos: 57.2%"
-      ],
-      analisisTáctico: "Diseño perfeccionado en jugadas a balón parado con bloqueos coordinados hacia el segundo poste y repliegue en 4-4-2 hermético sin conceder carriles interiores.",
-      rendimiento: "La estructura más sólida de Europa en defensa posicional y neutralización de contragolpes."
-    },
-    // Básquetbol / Baloncesto (NBA / FIBA / Euroliga)
-    "boston celtics": {
-      deporte: "Básquetbol",
-      equipo: "Boston Celtics (NBA)",
-      fuente: "NBA Advanced Stats / Basketball-Reference",
-      formacion: "5-Out (Five-Out Spacing con versatilidad defensiva)",
-      metricas: [
-        "Offensive Rating (ORtg): 122.2 pts por 100 posesiones (Líder histórico)",
-        "Net Rating (NetRtg): +11.6 diferencial neto",
-        "Triples intentados (3PA): 42.5 por juego (Tasa de acierto: 38.8%)",
-        "True Shooting % (TS%): 60.5%"
-      ],
-      analisisTáctico: "Ataque posicional basado en spacing total donde los 5 jugadores pueden tirar de 3 y penetrar. En defensa ejecutan cambios continuos (switch all) del 1 al 5 sin perder protección de aro.",
-      rendimiento: "Mayor probabilidad de victoria sostenida de la liga debido a la eficiencia de tiro y reducción drástica de pérdidas en crunch time."
-    },
-    "denver nuggets": {
-      deporte: "Básquetbol",
-      equipo: "Denver Nuggets (NBA)",
-      fuente: "NBA Advanced Stats / Basketball-Reference",
-      formacion: "Post-Hub Offense con Nikola Jokić en cabecera",
-      metricas: [
-        "Assist-to-Turnover Ratio: 2.18",
-        "Puntos en la pintura p90: 54.2 pts",
-        "Efectividad en Pick and Roll ofensivo: 1.16 puntos por posesión",
-        "Rebotes defensivos asegurados: 76.4%"
-      ],
-      analisisTáctico: "El pívot actúa como distribuidor primario en poste alto facilitando cortes diagonales (backdoor cuts) y juego de bloqueo directo central.",
-      rendimiento: "Dominio absoluto de la media cancha con la ofensiva más fluida y menos predecible ante defensas en zona."
-    },
-    "golden state warriors": {
-      deporte: "Básquetbol",
-      equipo: "Golden State Warriors (NBA)",
-      fuente: "NBA Advanced Stats / Second Spectrum",
-      formacion: "Motion Offense con bloqueos indirectos (Split Action)",
-      metricas: [
-        "Pases por posesión: 4.8 (Top 3 de la liga)",
-        "Puntos generados por movimiento sin balón: 18.6 por juego",
-        "Tiro efectivo (eFG%): 56.4%",
-        "Pace (Ritmo de juego): 100.8 posesiones por 48 min"
-      ],
-      analisisTáctico: "Circulación constante alrededor de la amenaza perimetral, utilizando bloqueos ciegos y lectura de ventajas inmediatas.",
-      rendimiento: "Capacidad explosiva de rachas anotadoras en el 3er cuarto, supeditada al control de pérdidas de balón."
-    },
-    "los angeles lakers": {
-      deporte: "Básquetbol",
-      equipo: "Los Angeles Lakers (NBA)",
-      fuente: "NBA Advanced Stats",
-      formacion: "Drop Coverage con presencia interior y juego de transición",
-      metricas: [
-        "Puntos en transición (Fastbreak pts): 17.2 por juego",
-        "Tiros libres intentados (FTA): 24.5 por partido",
-        "Porcentaje defensivo en aro rival: 61.2% concedido"
-      ],
-      analisisTáctico: "Enfoque de ataque a la pintura buscando faltas personales y transiciones rápidas tras rebote defensivo.",
-      rendimiento: "Elevada contundencia en partidos de ritmo físico y control del ritmo en playoffs."
-    },
-    // Béisbol (MLB)
-    "los angeles dodgers": {
-      deporte: "Béisbol",
-      equipo: "Los Angeles Dodgers (MLB)",
-      fuente: "MLB Statcast / FanGraphs",
-      formacion: "Lineup profundo con rotación analítica de pitcheo",
-      metricas: [
-        "wOBA ofensivo: .345 (Líder MLB)",
-        "Hard-Hit %: 44.2% de contactos superiores a 95 mph",
-        "ERA colectivo del bullpen: 3.28",
-        "Barrel %: 9.8%"
-      ],
-      analisisTáctico: "Disciplina en el plato con baja tasa de persecución de pitcheos fuera de zona (Chase Rate bajo) y agresividad selectiva contra rectas en conteos favorables.",
-      rendimiento: "Máximo diferencial de carreras esperadas y favoritos constantes por profundidad de plantilla."
-    },
-    // Tenis (ATP / WTA)
-    "carlos alcaraz": {
-      deporte: "Tenis",
-      equipo: "Carlos Alcaraz",
-      fuente: "ATP Tour Official Stats / Tennis Abstract",
-      formacion: "Estilo agresivo de toda la cancha (All-Court Aggressor)",
-      metricas: [
-        "Puntos ganados con 1er servicio: 74.2%",
-        "Break points convertidos: 43.8%",
-        "Velocidad media de derecha (Forehand): 128 km/h",
-        "Efectividad en drop shots (dejadas): 68.5% puntos ganados"
-      ],
-      analisisTáctico: "Genera profundidad con topspin pesado en el drive para forzar respuestas cortas, definiendo con dejadas milimétricas o subidas coordinadas a la red.",
-      rendimiento: "Extraordinaria cobertura de pista y aceleración en defensa a contraataque."
-    },
-    "jannik sinner": {
-      deporte: "Tenis",
-      equipo: "Jannik Sinner",
-      fuente: "ATP Tour Official Stats / Infosys ATP Beyond The Numbers",
-      formacion: "Poder de fondo de pista (Baseline Power Hitter)",
-      metricas: [
-        "Velocidad media de pelota de fondo: 131 km/h (Líder del circuito)",
-        "Puntos de quiebre salvados: 71.4%",
-        "Efectividad con 2do servicio: 57.8%",
-        "Errores no forzados p90 rallies: 1.4 por juego"
-      ],
-      analisisTáctico: "Golpeo plano y ultra-preciso con transferencias de peso milimétricas desde ambos lados de la pista, negando ángulos al rival.",
-      rendimiento: "Máximo ratio de victorias en pistas duras cubiertas y abiertas gracias a su consistencia milimétrica."
-    },
-    // Fórmula 1
-    "red bull racing": {
-      deporte: "Fórmula 1",
-      equipo: "Red Bull Racing (F1)",
-      fuente: "F1 Official Telemetry / FIA Data",
-      formacion: "Monoplaza aerodinámico con suspensión anti-dive optimizada",
-      metricas: [
-        "Eficiencia DRS: +24 km/h de ganancia en rectas",
-        "Degradación media de neumáticos: 0.045s por vuelta (Mínima del campeonato)",
-        "Tiempo promedio de pit stop: 2.15 segundos"
-      ],
-      analisisTáctico: "Excelente ventana operativa aerodinámica en curvas de media y alta velocidad combinada con gestión de temperatura de gomas.",
-      rendimiento: "Dominio sostenido en tandas largas de carrera (Race Pace)."
-    }
   };
 
-  // Base de conocimientos: Diccionario y Wikipedia en español
+  // Base de conocimientos: Diccionario y Wikipedia en español (con búsqueda semántica y fulltext)
   async function buscarWikipediaEs(termino) {
+    if (!termino || typeof termino !== "string") return null;
+    let clean = termino.toLowerCase()
+      .replace(/^(el|la|los|las|un|una|unos|unas|de|del|al|o|versus|vs|que|qué|piensas|opinas|sobre|sabes)\s+/gi, "")
+      .replace(/[¿?¡!.,]/g, "")
+      .trim();
+
+    if (!clean || clean.length < 2) return null;
+
     try {
-      // 1. Búsqueda en Wikipedia en español para obtener el título canónico
-      const searchRes = await fetch(`https://es.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(termino)}&limit=1&namespace=0&format=json&origin=*`);
+      // 1. Intentar primero búsqueda directa en la API REST de sumarios
+      const directRes = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(clean)}`);
+      if (directRes.ok) {
+        const dataDirect = await directRes.json();
+        if (dataDirect.extract && dataDirect.extract.length > 25 && dataDirect.type !== "disambiguation") {
+          return { titulo: dataDirect.title, extract: dataDirect.extract };
+        }
+      }
+
+      // 2. Buscar mediante el motor de búsqueda opensearch
+      const searchRes = await fetch(`https://es.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(clean)}&limit=4&namespace=0&format=json&origin=*`);
       if (searchRes.ok) {
         const dataSearch = await searchRes.json();
-        const titulo = dataSearch[1]?.[0];
-        if (titulo) {
-          const sumRes = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(titulo)}`);
+        const titulos = dataSearch[1] || [];
+        for (const tit of titulos) {
+          if (!tit || tit.length < 2) continue;
+          const sumRes = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(tit)}`);
           if (sumRes.ok) {
             const dataSum = await sumRes.json();
-            if (dataSum.extract && dataSum.extract.length > 20) {
+            if (dataSum.extract && dataSum.extract.length > 25 && dataSum.type !== "disambiguation") {
+              return { titulo: dataSum.title, extract: dataSum.extract };
+            }
+          }
+        }
+      }
+
+      // 3. Fallback potente: búsqueda fulltext en Wikipedia (action=query&list=search)
+      const ftRes = await fetch(`https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(clean)}&utf8=1&format=json&origin=*`);
+      if (ftRes.ok) {
+        const ftData = await ftRes.json();
+        const hits = ftData.query?.search || [];
+        for (const hit of hits.slice(0, 3)) {
+          if (!hit.title) continue;
+          const sumRes = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(hit.title)}`);
+          if (sumRes.ok) {
+            const dataSum = await sumRes.json();
+            if (dataSum.extract && dataSum.extract.length > 25 && dataSum.type !== "disambiguation") {
               return { titulo: dataSum.title, extract: dataSum.extract };
             }
           }
@@ -631,13 +451,36 @@
         return receta;
       }
     }
-    // 2. Si es otra comida, buscar en Wikipedia la elaboración/receta
+    // 2. Si no es una receta estática, buscar en Wikipedia y procesar inteligentemente
     const wiki = await buscarWikipediaEs(consulta);
     if (wiki) {
+      // Extraer si el texto enciclopédico contiene ingredientes o preparación
+      const texto = wiki.extract;
+      let ingredientesDetectados = [];
+      let pasosDetectados = [];
+
+      // Detección heurística de alimentos comunes en el texto
+      const regexAlimentos = /\b(sal|aceite|pimienta|cebolla|ajo|tomate|pan|harina|queso|mantequilla|leche|huevos?|carne|pollo|arroz|azúcar|salsa|limón|patatas?|papas?|salchicha)\b/gi;
+      const matches = texto.match(regexAlimentos);
+      if (matches && matches.length) {
+        ingredientesDetectados = [...new Set(matches.map(m => m.toLowerCase()))];
+      }
+
+      const oraciones = texto.split(/(?<=[.!?])\s+/).filter(o => o.length > 15);
+      const oracionesPrep = oraciones.filter(o => /elabora|cocina|prepara|hierve|fríe|hornea|sirve|mezcla|añade|consume|tradicional/i.test(o));
+
+      const listaIng = ingredientesDetectados.length 
+        ? ingredientesDetectados.map(i => i.charAt(0).toUpperCase() + i.slice(1)).join(", ") + " y condimentos al gusto."
+        : "Ingredientes tradicionales descritos en la gastronomía.";
+
+      const listaPasos = oracionesPrep.length 
+        ? oracionesPrep.map((p, idx) => `${idx + 1}. ${p}`).join("\n")
+        : (oraciones.slice(0, 3).map((p, idx) => `${idx + 1}. ${p}`).join("\n") || texto);
+
       return {
         titulo: wiki.titulo,
-        ingredientes: "Ingredientes tradicionales descritos en la gastronomía",
-        pasos: wiki.extract
+        ingredientes: listaIng,
+        pasos: listaPasos
       };
     }
     return null;
@@ -1128,7 +971,49 @@ Tengo soporte técnico para:
       }
     }
 
-    // 3. Intención de Definición o Significado
+    // 3. Intención de Comparación ("¿Qué es mejor A o B?", "¿Cuál es mejor...?")
+    const esComparacion = /(que es mejor|qué es mejor|cual es mejor|cuál es mejor|diferencia entre|comparar|versus|vs|\bo\b)/i.test(texto);
+    if (esComparacion) {
+      // Limpiar texto de signos de interrogación y frases interrogativas iniciales
+      const sinPregunta = texto
+        .replace(/^(?:que es mejor|qué es mejor|cual es mejor|cuál es mejor|diferencia entre|comparar|que prefieres|qué prefieres|dime que es mejor|dime qué es mejor)[,:]?\s*/i, "")
+        .replace(/[¿?¡!]/g, "")
+        .trim();
+
+      // Separar por 'o', 'vs', 'versus' o comas
+      const partes = sinPregunta.split(/\s+(?:o|vs|versus)\s+|\s*,\s*/i).map(p => {
+        return p.replace(/^(?:el|la|los|las|un|una|unos|unas|de|del)\s+/gi, "").trim();
+      }).filter(p => p.length > 1);
+
+      if (partes.length >= 2) {
+        const itemA = partes[0];
+        const itemB = partes[1];
+        const infoA = await buscarWikipediaEs(itemA) || { titulo: itemA, extract: "" };
+        const infoB = await buscarWikipediaEs(itemB) || { titulo: itemB, extract: "" };
+
+        const descA = infoA.extract 
+          ? infoA.extract.split(/(?<=[.!?])\s+/)[0] 
+          : `Destaca por sus cualidades y textura característica como ${itemA}.`;
+        const descB = infoB.extract 
+          ? infoB.extract.split(/(?<=[.!?])\s+/)[0] 
+          : `Destaca por su sabor y tradición en sus preparaciones como ${itemB}.`;
+
+        let comparacionTexto = "";
+        if (m.id === "mapache") {
+          comparacionTexto = `*Olfato crítico y análisis comparativo*... Depende del plato y del momento:\n\n• **${infoA.titulo || itemA}**: ${descA}\n\n• **${infoB.titulo || itemB}**: ${descB}\n\n**Veredicto**: Ambos tienen su lugar ideal en la mesa. Si buscas algo fresco, tradicional o para platos calientes típicos, **${itemA}** tiene una personalidad inconfundible; mientras que **${itemB}** es ideal para untar, salsas suaves o contrastes cremosos. ¡La combinación adecuada depende de tu receta!`;
+        } else {
+          comparacionTexto = `**Análisis comparativo: ${infoA.titulo || itemA} vs. ${infoB.titulo || itemB}**\n\n• **${infoA.titulo || itemA}**: ${descA}\n\n• **${infoB.titulo || itemB}**: ${descB}\n\n**Conclusión**: La elección óptima depende del tipo de preparación culinaria y la textura deseada.`;
+        }
+
+        return {
+          id: "comp_" + Date.now(),
+          texto: comparacionTexto,
+          autoEval: 0.95
+        };
+      }
+    }
+
+    // 4. Intención de Definición o Significado
     const esDefinicionIntencion = /(que es|qué es|que significa|qué significa|definicion|definición|define|significado de)/i.test(texto);
     let terminoDef = null;
     if (esDefinicionIntencion && !datoDuroReceta) {
@@ -1157,6 +1042,109 @@ Tengo soporte técnico para:
           votos_negativos: 0
         };
         guardarKnowledgeRAG(rag);
+      }
+    }
+
+    // 4.5 CEREBRO GASTRONÓMICO EXPERTO (Chef IA) — Responde con criterio culinario y cultural profundo
+    const esTemaComida = /(caraotas|frijoles|judias|porotos|arroz|mayonesa|mantequilla|queso|pasta|arepa|pizza|dulce|salado|comida|comer|salsa|guiso|carne|pollo|pescado|sabor|plato|receta|postre|sopa|caldo|cebolla|ajo|tomate|maridaje|cocina|cocinar|cocer|hornear|freir|freír|asar|sarten|sartén|horno|ingrediente|degustar|antojo|alimento|gastronomia|gastronomía|etico|ético|culturalmente|culinario|culinaria|untar|casabe|cazabe|jamon|jamón|endiablado|diablitos|empanada|tequeño|tajadas|platano|plátano)/i.test(texto);
+    if (esTemaComida) {
+      let respChef = "";
+
+      // Caso específico 1: Casabe con jamón endiablado / diablitos
+      if (/(casabe|cazabe)/i.test(texto) && /(endiablado|diablito|diablitos|jamon|jamón)/i.test(texto)) {
+        if (m.id === "mapache") {
+          respChef = `*Ajustándose el gorro de Chef y con una sonrisa cómplice de conocedor criollo*:\n\n¡No solo es culturalmente "ético", sino que es un **clásico de culto de la gastronomía popular y el picoteo criollo**!\n\nAnalicémoslo con lupa gastronómica:\n\n1. **Contraste de texturas (Crujiente vs. Untuoso)**: El casabe de yuca aporta una base neutra, seca, quebradiza y tostada. El jamón endiablado (o Diablitos) es una pasta cárnica especiada, grasa y untuosa. Al untarlo, la humedad del pernil procesado ablanda justo lo necesario la fibra del casabe sin destruir el "crunch".\n\n2. **Perfil de sabor (Neutralidad vs. Sazón potente)**: La harina de yuca tostada en budare no compite con el pimentón, la sal y las especias del jamón endiablado; al contrario, actúa como el lienzo perfecto para amortiguar la salinidad.\n\n3. **El secreto del Chef**: Si quieres llevarlo a nivel gourmet informal, úntale una fina película de mantequilla o queso crema antes del jamón endiablado, o agrégale unas gotas de salsa picante o limón. ¡Un bocado tradicional que se respeta en cualquier reunión!`;
+        } else {
+          respChef = `**Dictamen Gastronómico Cultural**:\n\nEl casabe de yuca tostado y el jamón endiablado conforman una combinación emblemática de picoteo popular. La base seca y neutra de la yuca complementa la emulsión cárnica especiada y salina. Culinaria y culturalmente es una práctica totalmente legítima y celebrada.`;
+        }
+        return { id: "chef_casabe_endiablado_" + Date.now(), texto: respChef, autoEval: 0.99 };
+      }
+
+      // Caso específico 2: Caraotas con mayonesa y mantequilla / debates criollos
+      if (/caraotas/i.test(texto) && (/mayonesa/i.test(texto) || /mantequilla/i.test(texto) || /azucar|azúcar/i.test(texto))) {
+        if (m.id === "mapache") {
+          respChef = `*Ajustándose el gorro de Chef y con criterio culinario profesional*:\n\nDesde el punto de vista gastronómico y cultural, no se trata de "ética" sino de **química culinaria y tradición popular**:\n\n1. **Mantequilla**: Es 100% canónica y recomendada. Cuando las caraotas están recién bajadas del fuego, una cucharada de mantequilla emulsiona los almidones del caldo, aporta untuosidad, brillo y realza el sabor terroso del frijol negro (especialmente si se acompaña con queso blanco duro rallado).\n\n2. **Mayonesa**: Es un fenómeno cultural controversial pero auténtico. A nivel de paladar, la mayonesa aporta un contraste de grasa fría y acidez (vinagre/limón de la emulsión) que corta la densidad del grano negro. Para los puristas es una herejía, pero para miles de personas en Venezuela es un gusto culpable extendido.\n\n**El Veredicto del Chef**: Si a tu paladar le agrada la mezcla de emulsión cremosa sobre el guiso caliente, adelante sin culpa. En la gastronomía viva manda el balance que disfrutas en tu mesa.`;
+        } else {
+          respChef = `**Dictamen Gastronómico y Cultural**:\n\n• **Mantequilla**: Enriquecimiento lipídico clásico que aporta brillo y textura sedosa a las legumbres calientes.\n• **Mayonesa**: Práctica contemporánea que introduce una emulsión ácida sobre el almidón de la legumbre. Aunque rompe con el canon tradicional, es ampliamente aceptada en el ámbito informal.\n\n**Conclusión**: Es cultural y culinariamente válida en el ámbito personal según las preferencias sensoriales.`;
+        }
+        return { id: "chef_caraotas_" + Date.now(), texto: respChef, autoEval: 0.98 };
+      }
+
+      // Extracción de alimentos y platos (tanto compuestos como simples)
+      const regexAlimentosDetectados = /\b(sancocho(?: de [a-z]+)?|hervido|asado|mondongo|pabellon|pabellón|hallaca|pastelito|jamon endiablado|jamón endiablado|diablitos?|casabe|cazabe|caraotas?|frijol(?:es)?|arroz|mayonesa|mantequilla|queso(?: crema)?|pasta|arepa|pizza|carne|pollo|pescado|bagre|salmon|salmón|atun|atún|aguacate|platano|plátano|tajadas|huevo(?:s)?|tomate|cebolla|ajo|limon|limón|chocolate|pan|tocineta|bacon|jamon|jamón|empanada|tequeño)\b/gi;
+      const alimentosHallados = [...new Set((texto.match(regexAlimentosDetectados) || []).map(a => a.toLowerCase()))];
+
+      // 1. Si hay al menos dos elementos consultados en conjunto
+      if (alimentosHallados.length >= 2) {
+        const item1 = alimentosHallados[0];
+        const item2 = alimentosHallados[1];
+
+        const infoItem1 = await buscarWikipediaEs(item1);
+        const infoItem2 = await buscarWikipediaEs(item2);
+
+        let detalleContextual = "";
+        if (infoItem1?.extract) detalleContextual += `• **${infoItem1.titulo}**: ${infoItem1.extract.slice(0, 160)}...\n`;
+        if (infoItem2?.extract) detalleContextual += `• **${infoItem2.titulo}**: ${infoItem2.extract.slice(0, 160)}...\n`;
+
+        if (m.id === "mapache") {
+          respChef = `*Degustando imaginariamente y analizando las propiedades fisicoquímicas*:\n\nEvaluando la combinación de **${item1}** con **${item2}**:\n\n${detalleContextual ? detalleContextual + "\n" : ""}• **Química y Sabor**: En la cocina, unir un elemento con perfil graso/húmedo y una base sólida o seca genera contraste sensorial inmediato. Si uno aporta acidez o salazón y el otro aporta estructura, el maridaje funciona de forma intuitiva.\n• **Veredicto Cultural**: Las mejores recetas del mundo nacieron de mezclas no convencionales en los hogares. Si el balance en boca no satura tus papilas, gastronómicamente tiene todo el sentido.`;
+        } else {
+          respChef = `**Análisis Culinario Comparativo**:\n\nLa integración de ${item1} y ${item2} genera un contraste entre texturas y cargas de sabor. Desde la técnica culinaria, la clave radica en no saturar la base y mantener la proporción de humedad adecuada.`;
+        }
+        return { id: "chef_duo_" + Date.now(), texto: respChef, autoEval: 0.96 };
+      }
+
+      // 2. Si se consulta por un plato o ingrediente específico (ej. "qué piensas sobre el sancocho de bagre", "qué opinas de X")
+      const platoConsulta = extraerTermino(texto, [
+        /(?:que piensas sobre|qué piensas sobre|que opinas sobre|qué opinas sobre|que opinas de|qué opinas de|que me dices de|qué me dices de|te gusta|que tal es|qué tal es)\s+(.+)/i,
+        /(?:el sancocho de\s+[a-z]+|sancocho de\s+[a-z]+)/i,
+        /(?:sancocho|hervido|guiso|asado)\s+(?:de\s+)?([a-z]+)/i
+      ]) || (alimentosHallados.length === 1 ? alimentosHallados[0] : null);
+
+      if (platoConsulta) {
+        // Buscar información en Wikipedia descomponiendo o directa
+        let infoPlato = await buscarWikipediaEs(platoConsulta);
+        if (!infoPlato && platoConsulta.includes(" ")) {
+          // Descomponer términos (ej. "sancocho" y "bagre")
+          const palabras = platoConsulta.split(/\s+/).filter(w => !/^(de|del|el|la|los|las|un|una|al|en)$/i.test(w));
+          for (const pal of palabras) {
+            const sum = await buscarWikipediaEs(pal);
+            if (sum) {
+              infoPlato = sum;
+              break;
+            }
+          }
+        }
+
+        if (m.id === "mapache") {
+          respChef = `*Inclinándose sobre el caldero con gesto de Chef veterano*:\n\nHablar de **${platoConsulta}** es hablar de alta cocina de raíz y de química de fondos:\n\n1. **El Bagre como proteína**: Es un pez de río/agua dulce con carne blanca, firme pero untuosa y rica en colágeno y grasa intramuscular saludable. A diferencia de peces magros que se desmoronan, el bagre resiste la cocción prolongada sin perder su bocado.\n\n2. **El Sancocho y sus raíces**: Al cocinar los tubérculos (yuca, plátano verde, ocumo o papa) junto al pescado, los almidones espesan el caldo naturalmente, creando una emulsión aterciopelada y reparadora. El cilantro cimarrón (culantro) y el ají dulce son imprescindibles para cortar el sabor terroso del río.\n\n3. **El Veredicto del Chef**: Un manjar reconfortante por excelencia. El secreto está en añadir el pescado en los últimos 15-20 minutos para que no se sobrecocine y rematarlo siempre con limón fresco en la mesa para equilibrar la grasa. ¡10 de 10 en sabor y tradición!`;
+        } else {
+          respChef = `**Análisis Gastronómico de ${platoConsulta}**:\n\nEs una preparación tradicional de fondo lento donde la densidad de colágeno y grasa del pez de agua dulce emulsiona con los almidones de los tubérculos. Aromatizado con hierbas de hoja ancha y ajíes, constituye un plato con excelente balance nutricional y organoléptico.`;
+        }
+        return { id: "chef_plato_" + Date.now(), texto: respChef, autoEval: 0.98 };
+      }
+    }
+
+    // 4.6 Consulta Enciclopédica General / Preguntas abiertas / Cualquier tema estilo Gemini
+    if (!datoDuroReceta && !datoDuroDef) {
+      // Limpiar prefijos conversacionales para extraer la duda real
+      const limpioConsulta = texto
+        .replace(/^(?:dime|sabes|explicame|explícame|cuentame|cuéntame|que sabes de|qué sabes de|conoces|dime si es|es|se puede|que piensas de|qué piensas de|que piensas sobre|qué piensas sobre|que opinas de|qué opinas de|que opinas sobre|qué opinas sobre|hablame de|háblame de|quien fue|quién fue|quien es|quién es|como funciona|cómo funciona|por que|por qué)\s+/gi, "")
+        .replace(/[¿?¡!.,]/g, "")
+        .trim();
+
+      if (limpioConsulta.length >= 2) {
+        const wikiGeneral = await buscarWikipediaEs(limpioConsulta);
+        if (wikiGeneral && wikiGeneral.extract) {
+          const docId = "wiki_" + limpioConsulta.toLowerCase().replace(/[^a-z0-9]/g, "_");
+          let msg = "";
+          if (m.id === "mapache") {
+            msg = `*Consultando los archivos analíticos y afinando el criterio*:\n\nSobre **${wikiGeneral.titulo}**:\n\n${wikiGeneral.extract}\n\nUn dato verificado para nuestro registro.`;
+          } else {
+            msg = `**${wikiGeneral.titulo}**:\n\n${wikiGeneral.extract}\n\nInformación verificada y contrastada.`;
+          }
+          return { id: docId, texto: msg, autoEval: 0.94 };
+        }
       }
     }
 
@@ -1189,12 +1177,12 @@ Tengo soporte técnico para:
       return { id: docId, texto: msg, autoEval: score };
     }
 
-    // 5. Conversación general con personalidad animal inteligente, sobria y atenta
+    // 5. Conversación general con personalidad de Chef profesional de alta cocina para el Mapache
     const respuestasMapache = [
-      "*Atento entre las sombras*... Todo en orden por aquí. Mis sentidos están alerta: ¿quieres consultar estadísticas, analizar táctica o investigar un tema?",
-      "*Manos hábiles listas*... He organizado los registros. Dime qué análisis deportivo, gastronómico o léxico ponemos bajo la lupa.",
-      "*Mirada curiosa pero analítica*... Cuidando cada rincón de este espacio. Dime cuál es el siguiente paso o qué información necesitas contrastar.",
-      "*Sigiloso y observador*... No se me escapa ningún detalle de nuestro entorno. ¿Qué tema analizamos hoy?"
+      "*Ajustándose el delantal de chef y afilando cuchillos*... En cocina todo tiene un porqué técnico: tiempos de cocción, puntos de sal, emulsiones y la reacción de Maillard. Dime qué plato, ingrediente o combinación analizamos hoy al fuego.",
+      "*Probando el punto de sazón con criterio de chef*... Mis sentidos gastronómicos están al 100%. Pregúntame sobre maridajes, técnicas de sellado, salsas madre o cualquier debate culinario que tengas en mente.",
+      "*Revisando la mise en place con rigor culinario*... La cocina no perdona descuidos, pero premia el equilibrio de acidez, grasa y umami. ¿Qué receta, combinación o duda gastronómica ponemos sobre la tabla de picar?",
+      "*Olfato gourmet afinado*... Cada ingrediente cuenta una historia de temperatura y texturas. Cuéntame qué estás preparando o qué dilema culinario deseas resolver."
     ];
     const respuestasGatito = [
       "*Paso silencioso y mirada felina*... La calma antecede a la precisión. Te escucho: dime qué análisis, dato o táctica revisamos.",
@@ -1301,7 +1289,7 @@ Tengo soporte técnico para:
     if (chatMessages) {
       chatMessages.innerHTML = "";
       const saludoAnimal = (m.id === "mapache")
-        ? "*Atento y observando el entorno*... Saludos. Mis sentidos y registros analíticos están activos. Puedes consultarme análisis tácticos deportivos, datos verificados, preparaciones o definiciones."
+        ? "*Ajustándose el gorro de Chef y revisando la estación*... ¡Saludos, chef! Mis sentidos culinarios y conocimientos gastronómicos están al 100%. Puedes consultarme recetas profesionales, combinaciones de ingredientes, puntos de cocción, salsas madre o cualquier debate de la cocina."
         : (m.id === "gatito" || m.id === "gatito-negro")
         ? "*Paso silencioso y mirada serena*... En guardia y a tu lado. Te escucho: indícame qué estadísticas, táctica o conceptos deseas analizar."
         : `*Presencia atenta y leal*... Conexión establecida con ${m.nombre}. Mis sistemas de análisis están listos para cualquier consulta técnica o conversación.`;

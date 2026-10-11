@@ -1558,20 +1558,24 @@ body.light .mascota-burbuja::after {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  animation: loadingSpin 1.5s ease-in-out infinite;
+  width: 5rem;
+  height: 5rem;
+  transform-origin: center center;
+  -webkit-transform-origin: center center;
+  animation: loadingSpin 1.5s ease-in-out infinite !important;
   filter: drop-shadow(0 6px 15px rgba(255, 217, 61, .4));
-  will-change: transform
+  will-change: transform;
 }
 
 .loading-flower img {
-  width: 5rem;
-  height: 5rem;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   image-rendering: pixelated;
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
-  mix-blend-mode: multiply
+  display: block;
 }
 
 .loading-text {
@@ -1580,7 +1584,7 @@ body.light .mascota-burbuja::after {
   font-weight: bold;
   letter-spacing: .1em;
   text-transform: uppercase;
-  animation: loadingPulse 1.5s ease-in-out infinite
+  animation: loadingPulse 1.5s ease-in-out infinite !important;
 }
 
 body.light .loading-screen {
@@ -1589,15 +1593,15 @@ body.light .loading-screen {
 
 @keyframes loadingSpin {
   0% {
-    transform: rotate(0) scale(1)
+    transform: rotate(0deg) scale(1);
   }
 
   50% {
-    transform: rotate(180deg) scale(1.15)
+    transform: rotate(180deg) scale(1.15);
   }
 
   100% {
-    transform: rotate(360deg) scale(1)
+    transform: rotate(360deg) scale(1);
   }
 }
 
@@ -1986,6 +1990,16 @@ html.animations-disabled *::after {
   animation: none !important;
   transition: none !important;
   scroll-behavior: auto !important;
+}
+
+/* El spinner y texto de carga siempre deben animar para indicar que el sistema está trabajando */
+html.animations-disabled .loading-flower,
+html.animations-disabled .loading-flower img {
+  animation: loadingSpin 1.5s ease-in-out infinite !important;
+}
+
+html.animations-disabled .loading-text {
+  animation: loadingPulse 1.5s ease-in-out infinite !important;
 }
 
 /* Elementos cuya visibilidad inicial dependía de animación fadeIn */

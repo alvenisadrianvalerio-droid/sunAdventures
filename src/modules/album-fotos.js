@@ -5,6 +5,7 @@
   const {
     supabase,
     BUCKET_NAME,
+    R2_PUBLIC_URL,
     URL_EXPIRY,
     DURACION_CACHE_URL,
     LIMITE_CONCURRENCIA_URLS,
@@ -91,14 +92,35 @@
   const eliminarFotoTabla = async id => { const { error } = await supabase.from("fotos").delete().eq("id", id); if (error) throw error; };
   const actualizarFotoTabla = async (id, fecha, nota, lat, lng) => { const { data, error } = await supabase.from("fotos").update({ fecha: fecha || null, nota: nota || null, lat: lat || null, lng: lng || null }).eq("id", id).select().single(); if (error) throw error; return data; };
 
-  async function obtenerUrlFirmada(path) {
+  async function obtenerUrlFirmada(path, forzarSupabase = false) {
     try {
-      const g = urlsFirmadasCache.get(path);
+      if (!path) return null;
+      if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("blob:") || path.startsWith("data:")) {
+        return path;
+      }
+      const cacheKey = forzarSupabase ? `sb_${path}` : path;
+      const g = urlsFirmadasCache.get(cacheKey);
       if (g && g.expira > Date.now()) return g.url;
-      if (window.SunOffline) { const off = await window.SunOffline.obtenerImagenOffline(path); if (off) { urlsFirmadasCache.set(path, { url: off, expira: Date.now() + 24 * 3600 * 1000 }); return off; } }
+      if (window.SunOffline) {
+        const off = await window.SunOffline.obtenerImagenOffline(path);
+        if (off) {
+          urlsFirmadasCache.set(cacheKey, { url: off, expira: Date.now() + 24 * 3600 * 1000 });
+          return off;
+        }
+      }
+
+      // 1. Usar Cloudflare R2 si está configurado (a menos que se pida forzar Supabase tras error)
+      if (R2_PUBLIC_URL && !forzarSupabase) {
+        const limpiaPath = path.startsWith("/") ? path.slice(1) : path;
+        const r2Url = `${R2_PUBLIC_URL}/${limpiaPath}`;
+        urlsFirmadasCache.set(cacheKey, { url: r2Url, expira: Date.now() + DURACION_CACHE_URL });
+        return r2Url;
+      }
+
+      // 2. Fallback o subidas recientes directas en Supabase storage
       const { data, error } = await supabase.storage.from(BUCKET_NAME).createSignedUrl(path, URL_EXPIRY);
       if (error) return null;
-      urlsFirmadasCache.set(path, { url: data.signedUrl, expira: Date.now() + DURACION_CACHE_URL });
+      urlsFirmadasCache.set(cacheKey, { url: data.signedUrl, expira: Date.now() + DURACION_CACHE_URL });
       return data.signedUrl;
     } catch (err) { console.warn("obtenerUrlFirmada:", err); return null; }
   }
@@ -161,8 +183,7 @@
             if (el) {
               const img = el.querySelector(".polaroid-visual img");
               if (img) {
-                img.src = url;
-                img.style.opacity = "1";
+                asignarUrlImagen(img, f.path, url);
               }
             }
           }
@@ -172,6 +193,25 @@
       if (document.querySelector("[data-view].active")?.dataset.view === "mapa") renderMapa();
     } catch (err) { console.warn("render:", err); }
     finally { renderEnCurso = false; if (renderPendiente) { renderPendiente = false; render(); } }
+  }
+
+  function asignarUrlImagen(img, path, url) {
+    if (!img) return;
+    img.onerror = async () => {
+      img.onerror = null; // evitar bucle infinito
+      console.warn("Fallo al cargar imagen desde CDN/R2, recurriendo a Supabase:", path);
+      try {
+        const fallbackUrl = await obtenerUrlFirmada(path, true);
+        if (fallbackUrl && fallbackUrl !== img.src) {
+          img.src = fallbackUrl;
+          img.style.opacity = "1";
+        }
+      } catch (e) {
+        console.warn("Error en fallback de imagen:", e);
+      }
+    };
+    img.src = url;
+    img.style.opacity = "1";
   }
 
   function crearPolaroid(foto, url) {
@@ -206,8 +246,7 @@
 
       const img = document.createElement("img");
       if (url) {
-        img.src = url;
-        img.style.opacity = "1";
+        asignarUrlImagen(img, foto.path, url);
       } else {
         img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='rgba(255,255,255,0.04)'/%3E%3C/svg%3E";
         img.style.opacity = "0.35";

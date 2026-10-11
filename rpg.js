@@ -22,218 +22,13 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const SVG_SPARKLES = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;display:inline-block;vertical-align:-3px;margin-right:5px;"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z"/><path d="M19 2l1.2 3.3L23.5 6.5l-3.3 1.2L19 11l-1.2-3.3L14.5 6.5l3.3-1.2L19 2z" opacity="0.75"/></svg>';
   const SVG_RUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;display:inline-block;vertical-align:-3px;margin-right:5px;"><circle cx="14" cy="4" r="2"/><path d="m9 20 3-6-3-3 4-2 3 3h4"/><path d="m6 16 3-3"/><path d="M14 14l2 6"/></svg>';
 
-  const DIR_48 = 'img/48x48/';
-  const SPR_ENEMIGO = {
-    // --- Murciélagos (Bats) ---
-    "murcielago-comun": "Bats/Bat 01 48.png",
-    "murcielago-vampiro": "Bats/Bat 02 48.png",
-    "murcielago-abismal": "Bats/Bat 03 48.png",
-    // --- Hongos (Fungi) ---
-    "hongo-espora": "Fungi/Fungus 01 48.png",
-    "hongo-venenoso": "Fungi/Fungus 02 48.png",
-    "hongo-alucinogeno": "Fungi/Fungus 03 48.png",
-    "hongo-anciano": "Fungi/Fungus 04 48.png",
-    // --- Fantasmas (Ghosts) ---
-    "espectro-errante": "Ghosts/Ghost 01 48.png",
-    "fantasma-vengativo": "Ghosts/Ghost 02 48.png",
-    "alma-en-pena": "Ghosts/Ghost 03 48.png",
-    // --- Orbinautas (Orbinauts) ---
-    "orbinauta-azul": "Orbinauts/Orbinaut 01 48.png",
-    "orbinauta-fuego": "Orbinauts/Orbinaut 02 48.png",
-    "orbinauta-electrico": "Orbinauts/Orbinaut 03 48.png",
-    "orbinauta-vacio": "Orbinauts/Orbinaut 04 48.png",
-    // --- Orcos (Orcs) ---
-    "orco-guerrero": "Orcs/Enemy Orc 01 48.png",
-    // --- Ratas (Rats) ---
-    "rata-de-cloaca": "Rats/Rat 01 48.png",
-    "rata-rabiosa": "Rats/Rat 02 48.png",
-    "rata-plagada": "Rats/Rat 03 48.png",
-    // --- Esqueletos (Skeletons) ---
-    "esqueleto-soldado": "Skeletons/Skeleton 01 48.png",
-    "esqueleto-arquero": "Skeletons/Skeleton 02 48.png",
-    "esqueleto-armadurado": "Skeletons/Skeleton 03 48.png",
-    // --- Slimes bebés y normales (Slimes) ---
-    "slime-bebe-verde": "Slimes/Baby Slime 01 48.png",
-    "slime-bebe-azul": "Slimes/Baby Slime 02 48.png",
-    "slime-bebe-rojo": "Slimes/Baby Slime 03 48.png",
-    "slime-bebe-dorado": "Slimes/Baby Slime 04 48.png",
-    "slime-verde": "Slimes/Slime 01 48.png",
-    "slime-azul": "Slimes/Slime 02 48.png",
-    "slime-rojo": "Slimes/Slime 03 48.png",
-    "slime-dorado": "Slimes/Slime 04 48.png",
-    // --- Serpientes (Snakes) ---
-    "serpiente-cascabel": "Snakes/Snake 01 48.png",
-    "serpiente-esmeralda": "Snakes/Snake 02 48.png",
-    "serpiente-coral": "Snakes/Snake 03 48.png",
-    // --- Zombis (Zombies) ---
-    "zombi-podrido": "Zombies/Zombie 01 48.png",
-    "zombi-infectado": "Zombies/Zombie 02 48.png",
-    "zombi-voraz": "Zombies/Zombie 03 48.png",
-    // --- Vehículos y Objetos Mágicos ---
-    "vagoneta-poseida": "Vehicles/Minecart 01 48.png",
-    "espada-viviente": "Weapons/Sword 01 48.png",
-    // --- Jefes (Bosses) ---
-    "reina-arana": "Bosses/arana.png",
-    "demonio-ancestral": "Bosses/demonio.png",
-    "dragon-supremo": "Bosses/dragon.png",
-    "golem-colosal": "Bosses/golem.png",
-    "kraken-abisal": "Bosses/kraken.png",
-    "rey-bestia-leon": "Bosses/leon.png",
-    "lobo-alfa-ancestral": "Bosses/lobo.png",
-    "archimago-oscuro": "Bosses/mago.webp",
-    "sapo-gigante-rey": "Bosses/rana.png",
-    "rey-rata": "Bosses/rata.png",
-    "escorpion-emperador": "Bosses/scorpion.png",
-    "gran-serpiente-antigua": "Bosses/serpiente.webp",
-    "senor-tengu": "Bosses/tengu.png",
-    "troll-titánico": "Bosses/troll.webp",
-    "lord-vampiro": "Bosses/vampiro.png",
-    "patriarca-zombi": "Bosses/zombie.png"
-  };
-
-  const SPR_REGION = {
-    praderas: "Bosses/arana.png",
-    bosque: "Bosses/rana.png",
-    cueva: "Bosses/golem.png",
-    desierto: "Bosses/scorpion.png",
-    glaciar: "Bosses/lobo.png",
-    volcan: "Bosses/dragon.png",
-    ruinas: "Bosses/mago.webp",
-    sombras: "Bosses/vampiro.png",
-    abismo: "Bosses/demonio.png",
-    selva: "Bosses/leon.png",
-    pantano: "Bosses/zombie.png",
-    tundra: "Bosses/troll.webp",
-    cielo: "Bosses/tengu.png",
-    inframundo: "Bosses/serpiente.webp",
-    vacio: "Bosses/kraken.png"
-  };
-
-  // Metadatos de columnas y filas (de 48x48 px por frame)
-  // Las últimas 2 columnas de las hojas de 6, 9 y 10 cols corresponden a los frames de recibir daño (hurt).
-  const SPRITE_METADATA_48 = {
-    // Bats (9 cols x 4 rows) -> Primeros 7 frames idle (0..6), cols 7 y 8 hurt
-    "Bats/Bat 01 48.png": { cols: 9, rows: 4, idleFrames: 7, hurtCol: 7, animKey: "anim-mob-idle-7-of-9", fps: 8 },
-    "Bats/Bat 02 48.png": { cols: 9, rows: 4, idleFrames: 7, hurtCol: 7, animKey: "anim-mob-idle-7-of-9", fps: 8 },
-    "Bats/Bat 03 48.png": { cols: 9, rows: 4, idleFrames: 7, hurtCol: 7, animKey: "anim-mob-idle-7-of-9", fps: 8 },
-    // Fungi (6 cols x 8 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
-    "Fungi/Fungus 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
-    "Fungi/Fungus 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
-    "Fungi/Fungus 03 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
-    "Fungi/Fungus 04 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
-    // Ghosts (6 cols x 4 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
-    "Ghosts/Ghost 01 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
-    "Ghosts/Ghost 02 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
-    "Ghosts/Ghost 03 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
-    // Orbinauts (3 cols x 1 row) -> 3 frames de giro normal
-    "Orbinauts/Orbinaut 01 48.png": { cols: 3, rows: 1, idleFrames: 3, hurtCol: 1, animKey: "anim-mob-idle-3-of-3", fps: 6 },
-    "Orbinauts/Orbinaut 02 48.png": { cols: 3, rows: 1, idleFrames: 3, hurtCol: 1, animKey: "anim-mob-idle-3-of-3", fps: 6 },
-    "Orbinauts/Orbinaut 03 48.png": { cols: 3, rows: 1, idleFrames: 3, hurtCol: 1, animKey: "anim-mob-idle-3-of-3", fps: 6 },
-    "Orbinauts/Orbinaut 04 48.png": { cols: 3, rows: 1, idleFrames: 3, hurtCol: 1, animKey: "anim-mob-idle-3-of-3", fps: 6 },
-    // Orcs (10 cols x 16 rows) -> Primeros 4 frames idle (0..3), cols 8 y 9 hurt (daño)
-    "Orcs/Enemy Orc 01 48.png": { cols: 10, rows: 16, idleFrames: 4, hurtCol: 8, animKey: "anim-mob-idle-4-of-10", fps: 6 },
-    // Rats (6 cols x 8 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
-    "Rats/Rat 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
-    "Rats/Rat 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
-    "Rats/Rat 03 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
-    // Skeletons (10 cols x 16 rows) -> Primeros 4 frames idle (0..3), cols 8 y 9 hurt (daño)
-    "Skeletons/Skeleton 01 48.png": { cols: 10, rows: 16, idleFrames: 4, hurtCol: 8, animKey: "anim-mob-idle-4-of-10", fps: 6 },
-    "Skeletons/Skeleton 02 48.png": { cols: 10, rows: 16, idleFrames: 4, hurtCol: 8, animKey: "anim-mob-idle-4-of-10", fps: 6 },
-    "Skeletons/Skeleton 03 48.png": { cols: 10, rows: 16, idleFrames: 4, hurtCol: 8, animKey: "anim-mob-idle-4-of-10", fps: 6 },
-    // Slimes Baby (6 cols x 4 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
-    "Slimes/Baby Slime 01 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
-    "Slimes/Baby Slime 02 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
-    "Slimes/Baby Slime 03 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
-    "Slimes/Baby Slime 04 48.png": { cols: 6, rows: 4, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
-    // Slimes Grandes (6 cols x 8 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
-    "Slimes/Slime 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
-    "Slimes/Slime 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
-    "Slimes/Slime 03 48.png": { cols: 6, rows: 8, idleFrames: 6, fps: 7 },
-    "Slimes/Slime 04 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 7 },
-    // Snakes (6 cols x 8 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
-    "Snakes/Snake 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
-    "Snakes/Snake 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
-    "Snakes/Snake 03 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 },
-    // Vehicles / Weapons (8 cols x 16 rows) -> Primeros 4 frames idle
-    "Vehicles/Minecart 01 48.png": { cols: 8, rows: 16, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-8", fps: 6 },
-    "Weapons/Sword 01 48.png": { cols: 8, rows: 16, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-8", fps: 6 },
-    // Zombies (6 cols x 8 rows) -> Primeros 4 frames idle (0..3), cols 4 y 5 hurt (daño)
-    "Zombies/Zombie 01 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 5 },
-    "Zombies/Zombie 02 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 5 },
-    "Zombies/Zombie 03 48.png": { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 5 }
-  };
-
-  function renderMobAnimado(relPath, size = 96, cls = "") {
-    if (!relPath) return "";
-    // Los jefes son ilustraciones completas HD (768x768), no spritesheets cortados
-    if (relPath.startsWith("Bosses/")) {
-      const fullUrl = `img/48x48/${relPath}`;
-      return `<img src="${fullUrl}" alt="" class="rpg-boss-animado ${cls}" style="width:${size}px;height:${size}px;" onerror="this.onerror=null;this.src='img/girasol-loading.png'">`;
-    }
-
-    const cleanPath = (relPath || "").trim();
-    const meta = SPRITE_METADATA_48[cleanPath] || { cols: 6, rows: 8, idleFrames: 4, hurtCol: 4, animKey: "anim-mob-idle-4-of-6", fps: 6 };
-    const duracion = ((meta.idleFrames || 4) / (meta.fps || 6)).toFixed(2);
-    const bgW = meta.cols * 100;
-    const bgH = meta.rows * 100;
-    const fullUrl = `img/48x48/${encodeURI(cleanPath)}`;
-    const animName = meta.animKey || `anim-mob-${meta.idleFrames}`;
-    const hurtPct = meta.cols > 1 ? ((meta.hurtCol || 4) / (meta.cols - 1) * 100).toFixed(3) : 0;
-
-    return `<div class="rpg-mob-animado ${cls}" style="
-      --mob-cols:${meta.cols};
-      --mob-rows:${meta.rows};
-      --mob-frames:${meta.idleFrames};
-      --mob-dur:${duracion}s;
-      --mob-hurt-x:${hurtPct}%;
-      width:${size}px;
-      height:${size}px;
-      min-width:${size}px;
-      min-height:${size}px;
-      background-image:url('${fullUrl}');
-      background-repeat:no-repeat;
-      background-size:${bgW}% ${bgH}%;
-      background-position:0% 0%;
-      image-rendering:pixelated;
-      display:inline-block;
-      flex-shrink:0;
-      animation:${animName} ${duracion}s steps(${meta.idleFrames}) infinite;
-    "></div>`;
-  }
-
-  function spriteHtml(rutaOClave, cls = "rpg-sprite-img", alt = "") {
-    if (!rutaOClave) return "";
-    let rel = (SPR_ENEMIGO[rutaOClave] || SPR_REGION[rutaOClave] || rutaOClave).trim();
-    if (rel.startsWith("img/48x48/")) rel = rel.replace("img/48x48/", "");
-
-    // Si es un Jefe de la carpeta Bosses, mostrarlo directamente como imagen completa
-    if (rel.startsWith("Bosses/")) {
-      const fullUrl = `img/48x48/${encodeURI(rel)}`;
-      return `<img class="${cls}" src="${fullUrl}" alt="${alt}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='img/girasol-loading.png'">`;
-    }
-
-    const meta = SPRITE_METADATA_48[rel];
-
-    // Si es un spritesheet de 48x48, mostramos el primer frame recortado limpiamente
-    if (meta) {
-      const bgW = meta.cols * 100;
-      const bgH = meta.rows * 100;
-      const fullUrl = `img/48x48/${encodeURI(rel)}`;
-      return `<div class="${cls} rpg-sprite-thumb-48" style="
-        width:32px;
-        height:32px;
-        background-image:url('${fullUrl}');
-        background-repeat:no-repeat;
-        background-size:${bgW}% ${bgH}%;
-        background-position:0% 0%;
-        image-rendering:pixelated;
-        display:inline-block;
-      "></div>`;
-    }
-
-    let ruta = rel.startsWith("img/") ? encodeURI(rel) : `${DIR_48}${encodeURI(rel)}`;
-    return `<img class="${cls}" src="${ruta}" alt="${alt}" loading="lazy" decoding="async">`;
-  }
+  const D = window.RpgData || {};
+  const DIR_48 = D.DIR_48 || 'img/48x48/';
+  const SPR_ENEMIGO = D.SPR_ENEMIGO || {};
+  const SPR_REGION = D.SPR_REGION || {};
+  const SPRITE_METADATA_48 = D.SPRITE_METADATA_48 || {};
+  const renderMobAnimado = D.renderMobAnimado || (() => "");
+  const spriteHtml = D.spriteHtml || (() => "");
 
   const REGIONES = [
     {
@@ -328,91 +123,10 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     }
   ];
 
-  const BIOMAS = {
-    praderas: { imagen: "img/biomas/gen-5480873c-7b50-45b8-a3c1-abc457a2f0fa.png", acento: "#ffd84d", ambiente: "Campo de girasoles" },
-    bosque: { imagen: "img/biomas/gen-df614595-485a-47f1-a074-7d4b4aa3d08e.png", acento: "#65d68b", ambiente: "Senderos del bosque" },
-    cueva: { imagen: "img/biomas/gen-e46023c3-4ac1-4361-b312-e6f525bcead6.png", acento: "#81ddff", ambiente: "Cueva de cristal" },
-    desierto: { imagen: "img/biomas/gen-3b1ee61a-d08b-44bc-a27b-9c56f5e009ef.png", acento: "#ffc36e", ambiente: "Dunas antiguas" },
-    glaciar: { imagen: "img/biomas/gen-02a9154e-49f2-4451-b734-a787ce316fd5.png", acento: "#a8eaff", ambiente: "Glaciar eterno" },
-    volcan: { imagen: "img/biomas/gen-6148d727-5f04-4360-b612-587e58fbd20d.png", acento: "#ff7958", ambiente: "Cráter en erupción" },
-    ruinas: { imagen: "img/biomas/gen-5510680d-7fe8-4834-b72d-04dd75fc60e2.png", acento: "#e9bd78", ambiente: "Ruinas sepultadas" },
-    sombras: { imagen: "img/biomas/gen-710f318c-55ee-45ba-aad5-7afcca056906.png", acento: "#b89aff", ambiente: "Bosque encantado" },
-    abismo: { imagen: "img/biomas/gen-7f3a60dc-0b7b-4b78-9ae9-e63140799a1c.png", acento: "#ff8268", ambiente: "Abismo de lava" },
-    selva: { imagen: "img/biomas/gen-54356df9-2637-441f-96a0-4742f61f6a57.png", acento: "#74dc8a", ambiente: "Selva ancestral" },
-    pantano: { imagen: "img/biomas/gen-675040d8-722c-4ac6-bf7d-6d236587f618.png", acento: "#76dfc2", ambiente: "Pantano de los espíritus" },
-    tundra: { imagen: "img/biomas/gen-b8ac5df4-7a81-443c-8cec-4d4f30bef9aa.png", acento: "#caeaff", ambiente: "Bosque de escarcha" },
-    cielo: { imagen: "img/biomas/gen-ef4c41e3-8713-47f7-acde-eefb81a85d11.png", acento: "#ffb3dc", ambiente: "Jardines celestiales" },
-    inframundo: { imagen: "img/biomas/gen-f34b37dd-a44a-4ac1-8ef3-a5b18a314480.png", acento: "#ff9a55", ambiente: "Tierras del inframundo" },
-    vacio: { imagen: "img/biomas/gen-a36ad96d-725f-45b4-8793-4f27add89fb3.png", acento: "#b6a2ff", ambiente: "Ciudad del vacío" }
-  };
+  const BIOMAS = D.BIOMAS || {};
   REGIONES.forEach(r => r.bioma = BIOMAS[r.id]);
 
-  const NOMBRES = {
-    // Murciélagos
-    "murcielago-comun": "Murciélago Común",
-    "murcielago-vampiro": "Murciélago Vampiro",
-    "murcielago-abismal": "Murciélago Abismal",
-    // Hongos
-    "hongo-espora": "Hongo de Esporas",
-    "hongo-venenoso": "Hongo Venenoso",
-    "hongo-alucinogeno": "Hongo Hechicero",
-    "hongo-anciano": "Hongo Anciano",
-    // Fantasmas
-    "espectro-errante": "Espectro Errante",
-    "fantasma-vengativo": "Fantasma Vengativo",
-    "alma-en-pena": "Alma en Pena",
-    // Orbinautas
-    "orbinauta-azul": "Orbinauta Arcano",
-    "orbinauta-fuego": "Orbinauta Ígneo",
-    "orbinauta-electrico": "Orbinauta de Trueno",
-    "orbinauta-vacio": "Orbinauta Cósmico",
-    // Orcos
-    "orco-guerrero": "Orco Berserker",
-    // Ratas
-    "rata-de-cloaca": "Rata de Cloaca",
-    "rata-rabiosa": "Rata Rabiosa",
-    "rata-plagada": "Rata Infectada",
-    // Esqueletos
-    "esqueleto-soldado": "Esqueleto Guerrero",
-    "esqueleto-arquero": "Esqueleto Arquero",
-    "esqueleto-armadurado": "Caballero Calavera",
-    // Slimes
-    "slime-bebe-verde": "Slime Bebé Verde",
-    "slime-bebe-azul": "Slime Bebé Azul",
-    "slime-bebe-rojo": "Slime Bebé Carmesí",
-    "slime-bebe-dorado": "Slime Bebé Áureo",
-    "slime-verde": "Slime Ácido",
-    "slime-azul": "Slime Glacial",
-    "slime-rojo": "Slime de Fuego",
-    "slime-dorado": "Slime Dorado",
-    // Serpientes
-    "serpiente-cascabel": "Serpiente de Cascabel",
-    "serpiente-esmeralda": "Víbora Esmeralda",
-    "serpiente-coral": "Cobra Venenosa",
-    // Zombis
-    "zombi-podrido": "Zombi Descompuesto",
-    "zombi-infectado": "Caminante Infectado",
-    "zombi-voraz": "Zombi Feroz",
-    // Especiales
-    "vagoneta-poseida": "Vagoneta Encantada",
-    "espada-viviente": "Espada Maldita",
-    // Jefes
-    "reina-arana": "Reina Araña",
-    "sapo-gigante-rey": "Rey Sapo del Pantano",
-    "golem-colosal": "Golem Colosal de Piedra",
-    "escorpion-emperador": "Emperador Escorpión",
-    "lobo-alfa-ancestral": "Lobo Alfa del Invierno",
-    "dragon-supremo": "Dragón Supremo de Fuego",
-    "archimago-oscuro": "Archimago Sombrío",
-    "lord-vampiro": "Señor de la Sangre Vampiro",
-    "demonio-ancestral": "Señor Demonio del Abismo",
-    "rey-bestia-leon": "León Rey de las Bestias",
-    "patriarca-zombi": "Patriarca Zombi Resucitado",
-    "troll-titánico": "Troll Titánico de las Nieves",
-    "senor-tengu": "Gran Señor Tengu",
-    "gran-serpiente-antigua": "Basilisco Antiguo de Fuego",
-    "kraken-abisal": "Kraken Abisal de las Mareas"
-  };
+  const NOMBRES = D.NOMBRES || {};
 
   /* ---------- Zonas (BALANCE v13 - Progresión Proporcional) ---------- */
   const ZONAS = (() => {
@@ -451,13 +165,104 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     nivelMin: i * 10 + 1, nivelMax: (i + 1) * 10
   }));
 
-  const KEY = () => `sa_rpg_${getUserId()}`;
+  const resolveUid = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || localStorage.getItem("sunadventures_uid") || (typeof getUserId === "function" ? getUserId() : "local");
+  const KEY = () => `sa_rpg_${resolveUid()}`;
   const def = () => ({ nivel: 1, xp: 0, hp: 120, enemigosDerrotados: 0, jefesDerrotados: [], zonasConquistadas: [], zonaActual: null, statsBase: { atk: 14, def: 5 } });
-  const cargar = () => { try { const r = localStorage.getItem(KEY()); return r ? { ...def(), ...JSON.parse(r) } : def(); } catch { return def(); } };
-  const guardar = s => { try { localStorage.setItem(KEY(), JSON.stringify(s)); } catch { } };
+
+  // Recupera datos existentes buscando en la clave actual y haciendo fallback si está vacío
+  const cargar = () => {
+    try {
+      const u = resolveUid();
+      const kPrincipal = `sa_rpg_${u}`;
+      const candidatas = [kPrincipal];
+      if (u !== "local") candidatas.push("sa_rpg_local");
+      const legacyUid = localStorage.getItem("sunadventures_uid");
+      if (legacyUid && legacyUid !== u) candidatas.push(`sa_rpg_${legacyUid}`);
+
+      // Buscar si alguna de las claves candidatas tiene datos reales
+      let encontrado = null;
+      let claveGanadora = null;
+
+      for (const k of candidatas) {
+        const raw = localStorage.getItem(k);
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === "object") {
+              const tieneProgreso = (parsed.nivel && parsed.nivel > 1) ||
+                (parsed.xp && parsed.xp > 0) ||
+                (parsed.zonasConquistadas && parsed.zonasConquistadas.length > 0) ||
+                (parsed.enemigosDerrotados && parsed.enemigosDerrotados > 0);
+              if (tieneProgreso) {
+                encontrado = parsed;
+                claveGanadora = k;
+                break;
+              } else if (!encontrado) {
+                encontrado = parsed;
+                claveGanadora = k;
+              }
+            }
+          } catch {}
+        }
+      }
+
+      // Si no encontró en candidatas conocidas, buscar en cualquier sa_rpg_* que tenga progreso
+      if (!encontrado || ((encontrado.nivel || 1) === 1 && !(encontrado.zonasConquistadas?.length))) {
+        try {
+          let mejorProgreso = null;
+          let mejorNivel = 1;
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith("sa_rpg_") && !key.startsWith("sa_rpg_stats_") && !key.startsWith("sa_rpg_loot_") && !key.startsWith("sa_rpg_cofres_") && !key.startsWith("sa_rpg_jefes_") && !key.startsWith("sa_rpg_loadout_") && !key.startsWith("sa_rpg_items_") && !key.startsWith("sa_rpg_habs_") && !key.startsWith("sa_rpg_encantamientos_") && !key.startsWith("sa_rpg_sets_") && !key.startsWith("sa_rpg_diario_") && !key.startsWith("sa_rpg_tamano_")) {
+              try {
+                const p = JSON.parse(localStorage.getItem(key));
+                if (p && ((p.nivel || 1) > mejorNivel || (p.zonasConquistadas?.length || 0) > 0)) {
+                  mejorNivel = p.nivel || 1;
+                  mejorProgreso = p;
+                  claveGanadora = key;
+                }
+              } catch {}
+            }
+          }
+          if (mejorProgreso) encontrado = mejorProgreso;
+        } catch {}
+      }
+
+      if (encontrado) {
+        const merged = { ...def(), ...encontrado };
+        // Migrar a la clave del usuario autenticado si provenía de un fallback
+        if (claveGanadora && claveGanadora !== kPrincipal && u !== "local") {
+          try { localStorage.setItem(kPrincipal, JSON.stringify(merged)); } catch {}
+        }
+        return merged;
+      }
+      return def();
+    } catch {
+      return def();
+    }
+  };
+
+  const guardar = s => {
+    try {
+      localStorage.setItem(KEY(), JSON.stringify(s));
+    } catch { }
+  };
 
   const STATS_DEF = { atkBonus: 0, defBonus: 0, hpBonus: 0, critBonus: 0, esqBonus: 0, velBonus: 0, manaBonus: 0, lifestealBonus: 0, thornsBonus: 0, regenBonus: 0, xpBonus: 0, oroBonus: 0, suerteBonus: 0, fuegoBonus: 0, hieloBonus: 0, rayoBonus: 0, venenoBonus: 0 };
-  const statsLoot = () => { try { const r = localStorage.getItem(`sa_rpg_stats_${getUserId()}`); return r ? { ...STATS_DEF, ...JSON.parse(r) } : { ...STATS_DEF }; } catch { return { ...STATS_DEF }; } };
+  const statsLoot = () => {
+    try {
+      const u = resolveUid();
+      const k = `sa_rpg_stats_${u}`;
+      let r = localStorage.getItem(k);
+      if (!r && u !== "local") {
+        r = localStorage.getItem("sa_rpg_stats_local");
+        if (r) { try { localStorage.setItem(k, r); } catch {} }
+      }
+      return r ? { ...STATS_DEF, ...JSON.parse(r) } : { ...STATS_DEF };
+    } catch {
+      return { ...STATS_DEF };
+    }
+  };
   const bonus = () => { try { return window._getBonusActivos?.() || []; } catch { return []; } };
   const bonusTipo = t => bonus().filter(x => x.tipo === t).reduce((s, x) => s + (x.val || 0), 0);
   const tieneBonus = t => bonus().some(x => x.tipo === t);
@@ -506,7 +311,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if ($("rpg")) return;
     const sec = document.createElement("section");
     sec.id = "rpg"; sec.className = "rpg-section view"; sec.dataset.view = "rpg";
-    sec.innerHTML = `<div class="rpg-header"><p class="rpg-subtitle">15 regiones, 150 zonas</p></div><div id="rpg-content"></div>`;
+    sec.innerHTML = `<div class="rpg-header"><p class="rpg-subtitle">${REGIONES.length} regiones, ${REGIONES.length * 10} zonas</p></div><div id="rpg-content"></div>`;
     const f = qs(".site-footer");
     f ? f.parentNode.insertBefore(sec, f) : document.body.appendChild(sec);
   }
@@ -602,7 +407,9 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     }).join("")}
       </div>
       <div style="display:flex;justify-content:center;margin:1rem 0;">
-        <button type="button" class="rpg-btn huir" data-rpg-accion="descansar" style="max-width:300px;padding:.8rem 1.4rem;">💤 Descansar <span id="rpg-rest-cost" style="margin-left:.4rem;opacity:.85;">—</span></button>
+        <button type="button" class="rpg-btn huir" data-rpg-accion="descansar" style="max-width:300px;padding:.8rem 1.4rem;" ${state.hp >= hpMax() ? "disabled style='opacity:0.6;cursor:not-allowed;max-width:300px;padding:.8rem 1.4rem;'" : ""}>
+          💤 Descansar <span id="rpg-rest-cost" style="margin-left:.4rem;opacity:.85;">${state.hp >= hpMax() ? "(Vida Completa)" : `(Gratis · +${Math.round(hpMax() - state.hp)} HP)`}</span>
+        </button>
       </div>
       <div class="rpg-idle">
         <div class="rpg-idle-icono">${ICONO.espada || ""}</div>
@@ -694,6 +501,20 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   }
 
   document.addEventListener("click", e => {
+    const btnDescansar = e.target.closest('[data-rpg-accion="descansar"]');
+    if (btnDescansar && !btnDescansar.disabled) {
+      e.preventDefault(); e.stopPropagation();
+      const faltante = hpMax() - state.hp;
+      if (faltante > 0) {
+        state.hp = hpMax();
+        state.sangrado = 0;
+        guardar(state);
+        SND("curar");
+        notifMascota?.("Descanso", `¡Has descansado y recuperado ${Math.round(faltante)} HP!`);
+        render();
+      }
+      return;
+    }
     const card = e.target.closest(".rpg-grupo-card");
     if (card && !card.disabled) {
       e.preventDefault(); e.stopPropagation();
@@ -2065,7 +1886,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if (eraJefe && !state.jefesDerrotados.includes(state.zonaActual)) state.jefesDerrotados.push(state.zonaActual);
     if (eraJefe) {
       try {
-        const u = getUserId(), mascota = localStorage.getItem("mascota_actual") || "mapache";
+        const u = resolveUid(), mascota = localStorage.getItem("mascota_actual") || "mapache";
         const k = `sa_rpg_jefes_mascota_${u}`;
         const logData = JSON.parse(localStorage.getItem(k) || "{}");
         logData[mascota] = logData[mascota] || [];
@@ -2091,7 +1912,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     SND("victoria");
     try { window._darPremio?.(0, 10, "¡Victoria!"); } catch { }
     try {
-      const u = getUserId();
+      const u = resolveUid();
       const kXp = `sa_experiencia_extra_${u}`;
       const actualXp = Math.max(0, Number(localStorage.getItem(kXp)) || 0);
       const xpGanado = Math.max(2, Math.round(xp * 0.25));
@@ -2235,5 +2056,5 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   window._rpgEntrarZona = entrarZona;
   window._comprobarPasivas = comprobarPasivas;
 
-  console.log("✅ rpg.js v12 · balance + loadout + pasivas");
+  console.log("✅ rpg.js v14 · balance + loadout + pasivas");
 })();

@@ -6,6 +6,7 @@
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzb2JwbXVsbnZhandscmdrb3hyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyODMyOTgsImV4cCI6MjEwNTg1OTI5OH0.j7Q8Zv02QhXxC9v-7MS1ZWeZyd18dN0TKFrbEhDs96Y";
   const BUCKET_NAME = "album";
   const BUCKET_CANCIONES = "canciones";
+  const R2_PUBLIC_URL = "https://pub-834bce82ae304eb8abdd44f9daafe3e6.r2.dev";
   const URL_EXPIRY = 3600;
   const URL_EXPIRY_CANCIONES = 14400;
   const DURACION_CACHE_URL = (URL_EXPIRY - 60) * 1000;
@@ -129,6 +130,7 @@
     supabase,
     BUCKET_NAME,
     BUCKET_CANCIONES,
+    R2_PUBLIC_URL,
     URL_EXPIRY,
     URL_EXPIRY_CANCIONES,
     DURACION_CACHE_URL,

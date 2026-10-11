@@ -215,12 +215,35 @@
             return;
           }
         } else {
-          const { error } = await supabase.auth.signInWithPassword({ email, password });
-          if (error) throw error;
+          let loginRes = await supabase.auth.signInWithPassword({ email, password });
+          if (loginRes.error) {
+            // Si falló el login directo con su nuevo usuario, intentar buscar si el usuario tenía un correo previo
+            let resuelto = false;
+            try {
+              // Si coincide con usuario recordado previo
+              const rec = localStorage.getItem("sunad_usuario_recordado") || localStorage.getItem("sunadventures_usuario_recordado");
+              if (rec && rec !== usuario) {
+                const altRes = await supabase.auth.signInWithPassword({ email: `${rec}@foursunflowers.local`, password });
+                if (!altRes.error && altRes.data?.session) {
+                  loginRes = altRes;
+                  resuelto = true;
+                  // Auto-actualizar email en Supabase Auth al nuevo username
+                  try { await supabase.auth.updateUser({ email }); } catch {}
+                }
+              }
+            } catch {}
+
+            if (!resuelto && loginRes.error) throw loginRes.error;
+          }
         }
         const recordar = $("auth-recordar");
-        if (recordar?.checked) localStorage.setItem("sunad_usuario_recordado", usuario);
-        else localStorage.removeItem("sunad_usuario_recordado");
+        if (recordar?.checked) {
+          localStorage.setItem("sunad_usuario_recordado", usuario);
+          localStorage.setItem("sunadventures_usuario_recordado", usuario);
+        } else {
+          localStorage.removeItem("sunad_usuario_recordado");
+          localStorage.removeItem("sunadventures_usuario_recordado");
+        }
       } catch (err) {
         ocultarLoading();
         mostrarError(traducirError(err.message));

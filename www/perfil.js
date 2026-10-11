@@ -140,12 +140,36 @@
         avatar_url = urlData.publicUrl;
       }
 
+      const antiguoUsername = perfil.username;
       const { error } = await sb().from("perfiles").update({ username, avatar_url }).eq("id", session.user.id);
       if (error) throw error;
 
+      // 🔐 Actualizar email de autenticación en Supabase Auth
+      try {
+        await sb().auth.updateUser({ email: `${username}@foursunflowers.local` });
+      } catch (authErr) {
+        console.warn("updateUser email:", authErr);
+      }
+
+      // Migrar posibles claves legacy guardadas con el antiguo username
+      if (antiguoUsername && antiguoUsername !== username) {
+        try {
+          const prefijos = ["sa_rpg_", "sa_rpg_stats_", "sa_rpg_loot_", "sa_rpg_cofres_", "sa_rl_meta_", "sa_rl_run_"];
+          prefijos.forEach(pfx => {
+            const valAntiguo = localStorage.getItem(`${pfx}${antiguoUsername}`);
+            if (valAntiguo && !localStorage.getItem(`${pfx}${session.user.id}`)) {
+              localStorage.setItem(`${pfx}${session.user.id}`, valAntiguo);
+            }
+          });
+        } catch {}
+      }
+
       perfil.username = username;
       perfil.avatar_url = avatar_url;
+      localStorage.setItem("sunad_username", username);
       localStorage.setItem("sunadventures_username", username);
+      if (localStorage.getItem("sunad_usuario_recordado")) localStorage.setItem("sunad_usuario_recordado", username);
+      if (localStorage.getItem("sunadventures_usuario_recordado")) localStorage.setItem("sunadventures_usuario_recordado", username);
 
       const ue = $("user-email"); if (ue) ue.textContent = username;
       const udn = $("user-dropdown-name"); if (udn) udn.textContent = username;
@@ -155,6 +179,7 @@
       archivoAvatar = null;
       limpiarPreview();
       cerrar();
+      window.dispatchEvent(new Event("sunad:perfil-actualizado"));
       window.dispatchEvent(new Event("sunadventures:perfil-actualizado"));
     } catch (e) {
       alert("Error: " + (e.message || e));

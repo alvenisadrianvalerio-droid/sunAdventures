@@ -48,6 +48,7 @@
   function guardarDiario(d) { try { localStorage.setItem(DIARIO_KEY(), JSON.stringify(d)); } catch {} }
 
   function mostrarModalDiario(recompensa, racha, esNuevo) {
+    if (document.querySelector(".daily-reward-overlay")) return;
     const card = document.createElement("div");
     card.className = "daily-reward-overlay";
     const icoPrincipal = resolverIconoPremio(recompensa.tipo);
@@ -85,11 +86,15 @@
     });
   }
 
+  let comprobandoDiario = false;
   function comprobarDiario() {
-    if (!window._getUserIdSafe && !localStorage.getItem("sunad_uid")) return;
+    if (comprobandoDiario) return;
+    const uid = window._sunUserId || localStorage.getItem("sunad_uid");
+    if (!uid) return;
     const d = cargarDiario();
     if (d.ultimo === hoyISO()) return;
 
+    comprobandoDiario = true;
     const ayer = new Date(); ayer.setDate(ayer.getDate() - 1);
     const ayerISO = ayer.toISOString().slice(0,10);
     let nuevaRacha = d.ultimo === ayerISO ? (d.racha + 1) : 1;
@@ -97,10 +102,13 @@
 
     const recompensa = RECOMPENSAS_DIARIAS[nuevaRacha - 1];
     guardarDiario({ ultimo: hoyISO(), racha: nuevaRacha });
-    setTimeout(() => mostrarModalDiario(recompensa, nuevaRacha, true), 1500);
+    setTimeout(() => {
+      mostrarModalDiario(recompensa, nuevaRacha, true);
+      comprobandoDiario = false;
+    }, 1500);
   }
   // Ejecutar cuando el usuario esté listo
-  window.addEventListener("sunad:user-ready", () => setTimeout(comprobarDiario, 2000));
+  window.addEventListener("sunad:user-ready", () => setTimeout(comprobarDiario, 1200));
   setTimeout(() => { if (localStorage.getItem("sunad_uid")) comprobarDiario(); }, 3500);
 
   /* ============================================================
@@ -122,9 +130,15 @@
         if (session) {
           const { error } = await sb.from("perfiles").update({ username: limpio }).eq("id", session.user.id);
           if (error) throw error;
+          try {
+            await sb.auth.updateUser({ email: `${limpio}@foursunflowers.local` });
+          } catch (e) { console.warn("updateUser email:", e); }
         }
       }
       localStorage.setItem("sunad_username", limpio);
+      localStorage.setItem("sunadventures_username", limpio);
+      if (localStorage.getItem("sunad_usuario_recordado")) localStorage.setItem("sunad_usuario_recordado", limpio);
+      if (localStorage.getItem("sunadventures_usuario_recordado")) localStorage.setItem("sunadventures_usuario_recordado", limpio);
       const ue = $("user-email"); if (ue) ue.textContent = limpio;
       const udn = $("user-dropdown-name"); if (udn) udn.textContent = limpio;
       alertar({ title:"¡Listo!", message:`Ahora te llamas @${limpio}`, variant:"success", icon:"✨" });

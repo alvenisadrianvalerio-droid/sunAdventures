@@ -45,9 +45,16 @@
   /* ---------- Descargar imagen ---------- */
   async function descargarImagen(foto, onProgress) {
     try {
-      const r = await sb().storage.from("album").createSignedUrl(foto.path, 3600);
-      if (r.error || !r.data?.signedUrl) throw new Error("Sin URL");
-      const resp = await fetch(r.data.signedUrl);
+      let url = null;
+      if (window.AlbumApp?.R2_PUBLIC_URL) {
+        const limpia = foto.path?.startsWith("/") ? foto.path.slice(1) : foto.path;
+        url = `${window.AlbumApp.R2_PUBLIC_URL}/${limpia}`;
+      } else {
+        const r = await sb().storage.from("album").createSignedUrl(foto.path, 3600);
+        if (r.error || !r.data?.signedUrl) throw new Error("Sin URL");
+        url = r.data.signedUrl;
+      }
+      const resp = await fetch(url);
       if (!resp.ok) throw new Error("HTTP " + resp.status);
       const blob = await resp.blob();
       await DB().guardarImagen({

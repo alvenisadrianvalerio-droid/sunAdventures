@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const SUPABASE_URL = "https://fsobpmulnvajwlrgkoxr.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZzb2JwbXVsbnZhandscmdrb3hyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyODMyOTgsImV4cCI6MjEwNTg1OTI5OH0.j7Q8Zv02QhXxC9v-7MS1ZWeZyd18dN0TKFrbEhDs96Y";
   const BUCKET_NAME = "album", BUCKET_CANCIONES = "canciones";
+  const R2_PUBLIC_URL = "https://pub-834bce82ae304eb8abdd44f9daafe3e6.r2.dev";
   const URL_EXPIRY = 3600, URL_EXPIRY_CANCIONES = 14400, DURACION_CACHE_URL = (URL_EXPIRY - 60) * 1000;
   const CENSURA_KEY = "sunadventures_censura_activa";
   const PUSH_VAPID_PUBLIC_KEY = "BGFg_T3XTTCpN0aIKRXGq3sBvh0RGWOFmxx25tdpQ5OhNgHmuFDJ7TiXLfmgy4ktdqfE81uODV_PLKFqu_vy7_w";
@@ -485,9 +486,19 @@ Object.defineProperty(window, "_fotos",     { get: () => fotos,     configurable
 
   async function obtenerUrlFirmada(path) {
     try {
+      if (!path) return null;
+      if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("blob:") || path.startsWith("data:")) {
+        return path;
+      }
       const g = urlsFirmadasCache.get(path);
       if (g && g.expira > Date.now()) return g.url;
       if (window.SunOffline) { const offlineUrl = await window.SunOffline.obtenerImagenOffline(path); if (offlineUrl) { urlsFirmadasCache.set(path, { url:offlineUrl, expira: Date.now()+24*3600*1000 }); return offlineUrl; } }
+      if (R2_PUBLIC_URL) {
+        const limpiaPath = path.startsWith("/") ? path.slice(1) : path;
+        const r2Url = `${R2_PUBLIC_URL}/${limpiaPath}`;
+        urlsFirmadasCache.set(path, { url: r2Url, expira: Date.now() + DURACION_CACHE_URL });
+        return r2Url;
+      }
       const { data, error } = await supabase.storage.from(BUCKET_NAME).createSignedUrl(path, URL_EXPIRY);
       if (error) return null;
       urlsFirmadasCache.set(path, { url:data.signedUrl, expira: Date.now()+DURACION_CACHE_URL });
@@ -1752,10 +1763,32 @@ setTimeout(async () => {
       mostrarLoading(modoRegistro ? "Creando tu cuenta..." : "Entrando...");
       try {
         if (modoRegistro) { const { data, error } = await supabase.auth.signUp({ email, password }); if (error) throw error; if (data.user && !data.session) { ocultarLoading(); mostrarError("Cuenta creada. Revisa tu correo para confirmarla."); if (authSubmit) { authSubmit.disabled = false; authSubmit.textContent = "Crear cuenta"; } return; } }
-        else { const { error } = await supabase.auth.signInWithPassword({ email, password }); if (error) throw error; }
+        else {
+          let loginRes = await supabase.auth.signInWithPassword({ email, password });
+          if (loginRes.error) {
+            let resuelto = false;
+            try {
+              const rec = localStorage.getItem("sunad_usuario_recordado") || localStorage.getItem("sunadventures_usuario_recordado");
+              if (rec && rec !== usuario) {
+                const altRes = await supabase.auth.signInWithPassword({ email: `${rec}@foursunflowers.local`, password });
+                if (!altRes.error && altRes.data?.session) {
+                  loginRes = altRes;
+                  resuelto = true;
+                  try { await supabase.auth.updateUser({ email }); } catch {}
+                }
+              }
+            } catch {}
+            if (!resuelto && loginRes.error) throw loginRes.error;
+          }
+        }
         const recordar = document.getElementById("auth-recordar");
-        if (recordar?.checked) localStorage.setItem("sunadventures_usuario_recordado", usuario);
-        else localStorage.removeItem("sunadventures_usuario_recordado");
+        if (recordar?.checked) {
+          localStorage.setItem("sunad_usuario_recordado", usuario);
+          localStorage.setItem("sunadventures_usuario_recordado", usuario);
+        } else {
+          localStorage.removeItem("sunad_usuario_recordado");
+          localStorage.removeItem("sunadventures_usuario_recordado");
+        }
       } catch (err) { ocultarLoading(); mostrarError(traducirError(err.message)); if (authSubmit) { authSubmit.disabled = false; authSubmit.textContent = modoRegistro ? "Crear cuenta" : "Entrar"; } }
     } catch (err) { console.warn("auth submit:", err); }
   });

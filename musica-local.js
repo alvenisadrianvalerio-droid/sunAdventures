@@ -296,7 +296,20 @@
   function abrirPL(id) {
     const pl = state.playlists.find(p => p.id === id); if (!pl) return;
     const disp = pl.canciones.filter(c => state.tracks.some(t => t.hash === c.hash));
-    if (!disp.length) return alert(`Esta playlist tiene ${pl.canciones.length} canción(es), pero no tienes ninguna en tu dispositivo.\n\nPide a la otra persona que te comparta los archivos, o añade los tuyos propios.`);
+    if (!disp.length) {
+      if (window.SunModal) {
+        window.SunModal.alert({
+          title: "Archivos no disponibles",
+          message: `Esta playlist tiene <strong>${pl.canciones.length} canción(es)</strong>, pero aún no tienes los archivos en este dispositivo.<br><br><span style="opacity:0.85;font-size:0.88rem;">Pide a la otra persona que te comparta los archivos de audio, o añade los tuyos propios a tu biblioteca.</span>`,
+          icon: "🎵",
+          variant: "warning",
+          confirmText: "Entendido"
+        });
+      } else {
+        alert(`Esta playlist tiene ${pl.canciones.length} canción(es), pero no tienes ninguna en tu dispositivo.\n\nPide a la otra persona que te comparta los archivos, o añade los tuyos propios.`);
+      }
+      return;
+    }
     state.queue = disp.map(c => state.tracks.find(t => t.hash === c.hash)).filter(Boolean);
     state.queueIndex = 0;
     reproducirActual();
@@ -304,7 +317,19 @@
   }
 
   function addAPlaylist(hash) {
-    if (!state.playlists.length) return alert("Primero crea una playlist con el botón «+ Nueva playlist».");
+    if (!state.playlists.length) {
+      if (window.SunModal) {
+        window.SunModal.alert({
+          title: "Sin playlists",
+          message: "Primero crea una playlist con el botón <strong>«+ Nueva playlist»</strong> para poder organizar tus canciones.",
+          icon: "📁",
+          confirmText: "Entendido"
+        });
+      } else {
+        alert("Primero crea una playlist con el botón «+ Nueva playlist».");
+      }
+      return;
+    }
     const op = state.playlists.map((p, i) => `${i + 1}. ${p.nombre}`).join("\n");
     const pick = prompt("¿A qué playlist quieres añadirla?\n\n" + op);
     const i = Number(pick) - 1;

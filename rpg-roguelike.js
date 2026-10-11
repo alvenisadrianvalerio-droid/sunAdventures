@@ -434,11 +434,44 @@ function sustituirEmojis(root) {
   /* ============================================================
      ESTADO
      ============================================================ */
-  const KEY_META = () => `sa_rl_meta_${getUserId()}`;
-  const KEY_RUN  = () => `sa_rl_run_${getUserId()}`;
+  const resolveUid = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || localStorage.getItem("sunadventures_uid") || (typeof getUserId === "function" ? getUserId() : "local");
+  const KEY_META = () => `sa_rl_meta_${resolveUid()}`;
+  const KEY_RUN  = () => `sa_rl_run_${resolveUid()}`;
 
   const metaDef = () => ({ runs:0, mejorPiso:0, victorias:0, desbloqueos:[], maldicionesTotales:0, bossesDerrotados:0 });
-  const cargarMeta = () => { try { return { ...metaDef(), ...JSON.parse(localStorage.getItem(KEY_META()) || '{}') }; } catch { return metaDef(); } };
+  const cargarMeta = () => {
+    try {
+      const u = resolveUid();
+      const kPrincipal = KEY_META();
+      let raw = localStorage.getItem(kPrincipal);
+      let parsed = null;
+      if (raw) {
+        try { parsed = JSON.parse(raw); } catch {}
+      }
+      // Si el usuario actual no tiene runs o está vacío y está logueado, chequear fallback local o legacy
+      if ((!parsed || (!parsed.runs && !parsed.victorias)) && u !== "local") {
+        const fallbackKeys = ["sa_rl_meta_local"];
+        const leg = localStorage.getItem("sunadventures_uid");
+        if (leg && leg !== u) fallbackKeys.push(`sa_rl_meta_${leg}`);
+        for (const fk of fallbackKeys) {
+          const fRaw = localStorage.getItem(fk);
+          if (fRaw) {
+            try {
+              const fp = JSON.parse(fRaw);
+              if (fp && ((fp.runs && fp.runs > 0) || (fp.victorias && fp.victorias > 0) || (fp.bossesDerrotados && fp.bossesDerrotados > 0))) {
+                parsed = fp;
+                localStorage.setItem(kPrincipal, JSON.stringify(fp));
+                break;
+              }
+            } catch {}
+          }
+        }
+      }
+      return { ...metaDef(), ...(parsed || {}) };
+    } catch {
+      return metaDef();
+    }
+  };
   const guardarMeta = m => { try { localStorage.setItem(KEY_META(), JSON.stringify(m)); } catch {} };
 
   function bonosMeta(m) {
@@ -491,18 +524,25 @@ function sustituirEmojis(root) {
   }
 
   const cargarRun = () => {
-  try {
-    const r = localStorage.getItem(KEY_RUN());
-    if (!r) return null;
-    const saved = JSON.parse(r);
-    if (!saved || typeof saved !== "object") return null;
-    /* ✅ Merge: los valores guardados pisan los defaults,
-       pero cualquier propiedad NUEVA (reliquias, maldiciones, mapa, etc.)
-       que falte en el save antiguo se rellena con el default. */
-    const base = nuevoRun(saved.mascota || localStorage.getItem("mascota_actual") || "mapache");
-    return { ...base, ...saved };
-  } catch { return null; }
-};
+    try {
+      const u = resolveUid();
+      let r = localStorage.getItem(KEY_RUN());
+      if (!r && u !== "local") {
+        r = localStorage.getItem("sa_rl_run_local");
+        if (r) {
+          try { localStorage.setItem(KEY_RUN(), r); } catch {}
+        }
+      }
+      if (!r) return null;
+      const saved = JSON.parse(r);
+      if (!saved || typeof saved !== "object") return null;
+      /* ✅ Merge: los valores guardados pisan los defaults,
+         pero cualquier propiedad NUEVA (reliquias, maldiciones, mapa, etc.)
+         que falte en el save antiguo se rellena con el default. */
+      const base = nuevoRun(saved.mascota || localStorage.getItem("mascota_actual") || "mapache");
+      return { ...base, ...saved };
+    } catch { return null; }
+  };
   const guardarRun = s => { try { localStorage.setItem(KEY_RUN(), JSON.stringify(s)); } catch {} };
   const limpiarRun = () => { try { localStorage.removeItem(KEY_RUN()); } catch {} };
 
@@ -1546,7 +1586,7 @@ function sustituirEmojis(root) {
       guardarRun(state);
       // Experiencia hacia el nivel general de la cuenta
       try {
-        const uId = (typeof getUserIdSafe === 'function') ? getUserIdSafe() : (localStorage.getItem('currentUser') || 'default');
+        const uId = resolveUid();
         const xpGeneral = Math.max(2, Math.round((e.xp || 10) * 0.25));
         const kExtra = `sa_experiencia_extra_${uId}`;
         const exActual = parseInt(localStorage.getItem(kExtra) || '0', 10);
@@ -1602,20 +1642,21 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
     guardarRun(state);
     // Gran bonus de XP para el nivel general de la cuenta
     try {
-      const uId = (typeof getUserIdSafe === 'function') ? getUserIdSafe() : (localStorage.getItem('currentUser') || 'default');
+      const uId = resolveUid();
       const kExtra = `sa_experiencia_extra_${uId}`;
       const exActual = parseInt(localStorage.getItem(kExtra) || '0', 10);
       localStorage.setItem(kExtra, String(exActual + 150));
       window.dispatchEvent(new Event('sunad:progress'));
     } catch (err) {}
     setTimeout(() => {
+      const COIN = '<img class="rpg-rl-inline-icon" src="img/items%20de%20aventura/icon.png" alt="">';
       mostrarRecompensa('🏆 ¡VICTORIA!', [
-  `Conquistaste los ${PISOS_MAX} pisos`,
-  `Nivel final: ${state.nivel}`,
-  `${state.reliquias.length} reliquias`,
-  `${state.maldiciones.length} maldiciones`,
-  `+500 ${COIN} bonus`
-], () => { limpiarRun(); state = null; renderPanel(); });
+        `Conquistaste los ${PISOS_MAX} pisos`,
+        `Nivel final: ${state.nivel}`,
+        `${state.reliquias.length} reliquias`,
+        `${state.maldiciones.length} maldiciones`,
+        `+500 ${COIN} bonus`
+      ], () => { limpiarRun(); state = null; renderPanel(); });
     }, 700);
   }
 
@@ -2238,6 +2279,21 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
       const p = $("rpg-roguelike-panel");
       if (p) p.style.display = "none";
     }
+  });
+
+  /* Recargar run y meta-progresión al autenticarse el usuario */
+  window.addEventListener("sunad:user-ready", () => {
+    state = cargarRun();
+    const p = $("rpg-roguelike-panel");
+    if (p && p.style.display !== "none") {
+      renderPanel();
+    }
+  });
+
+  window.addEventListener("sunad:user-logout", () => {
+    state = null;
+    const p = $("rpg-roguelike-panel");
+    if (p) p.style.display = "none";
   });
 
   console.log('✅ rpg-roguelike.js v3 listo · panel auto-reinyectable');

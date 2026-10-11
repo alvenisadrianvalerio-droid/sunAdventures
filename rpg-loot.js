@@ -37,21 +37,52 @@
   }
 
   /* ---------- Persistencia ---------- */
+  const resolveUid = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || localStorage.getItem("sunadventures_uid") || (typeof getUserId === "function" ? getUserId() : "local");
   const K = {
-    loot:  () => "sa_rpg_loot_"  + getUserId(),
-    stats: () => "sa_rpg_stats_" + getUserId(),
-    rpg:   () => "sa_rpg_"       + getUserId(),
-    cofres:() => "sa_rpg_cofres_"+ getUserId()
+    loot:   () => "sa_rpg_loot_"   + resolveUid(),
+    stats:  () => "sa_rpg_stats_"  + resolveUid(),
+    rpg:    () => "sa_rpg_"        + resolveUid(),
+    cofres: () => "sa_rpg_cofres_" + resolveUid()
   };
   const load  = (k, def) => { try { return JSON.parse(localStorage.getItem(k) || def); } catch { return JSON.parse(def); } };
   const save  = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
-  const cargarLoot  = () => load(K.loot(), "{}");
+
+  const cargarLoot = () => {
+    const u = resolveUid();
+    const kPrincipal = K.loot();
+    let l = load(kPrincipal, null);
+    if ((!l || Object.keys(l).length === 0) && u !== "local") {
+      const fallbackLocal = load("sa_rpg_loot_local", null);
+      if (fallbackLocal && Object.keys(fallbackLocal).length > 0) {
+        l = fallbackLocal;
+        save(kPrincipal, l);
+      }
+    }
+    return l || {};
+  };
   const guardarLoot = o => save(K.loot(), o);
-  const cargarStats = () => load(K.stats(), '{"atkBonus":0,"defBonus":0,"hpBonus":0}');
-  const guardarStats= o => save(K.stats(), o);
-  const cargarEstado= () => load(K.rpg(), '{"nivel":1,"xp":0,"hp":100,"statsBase":{"atk":10,"def":3}}');
-  const guardarEstado=s => save(K.rpg(), s);
-  const hpMaxRpg   = s => 100 + (s.nivel || 1) * 25 + (cargarStats().hpBonus || 0);
+
+  const cargarStats = () => {
+    const u = resolveUid();
+    const kPrincipal = K.stats();
+    let s = load(kPrincipal, null);
+    if ((!s || (!s.atkBonus && !s.defBonus && !s.hpBonus)) && u !== "local") {
+      const fallbackLocal = load("sa_rpg_stats_local", null);
+      if (fallbackLocal && (fallbackLocal.atkBonus || fallbackLocal.defBonus || fallbackLocal.hpBonus)) {
+        s = fallbackLocal;
+        save(kPrincipal, s);
+      }
+    }
+    return s || { atkBonus: 0, defBonus: 0, hpBonus: 0 };
+  };
+  const guardarStats = o => save(K.stats(), o);
+
+  const cargarEstado = () => {
+    if (window.Rpg?.state) return window.Rpg.state();
+    return load(K.rpg(), '{"nivel":1,"xp":0,"hp":100,"statsBase":{"atk":10,"def":3}}');
+  };
+  const guardarEstado = s => save(K.rpg(), s);
+  const hpMaxRpg = s => 100 + (s.nivel || 1) * 25 + (cargarStats().hpBonus || 0);
 
   /* ---------- Rarezas / calidades ---------- */
   const RAREZAS = {
@@ -926,6 +957,13 @@
     mostrarPopup(item);
     notifMascota?.("¡Botín!", `${RAREZAS[item.rar].label}: ${item.nombre}`);
     renderColeccion();
+  });
+
+  window.addEventListener("sunad:user-ready", () => {
+    try {
+      renderColeccion();
+      window.dispatchEvent(new Event("rpg:stats-cambiados"));
+    } catch {}
   });
 
   /* ---------- API pública ---------- */
