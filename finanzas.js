@@ -946,6 +946,13 @@
           ${svgSparkles} Gestionar
         </button>
       </form>
+      <div class="finanzas-mascota-shortcuts">
+        <button type="button" class="finanzas-mascota-chip" data-ai-prompt="Diagnóstico 50/30/20">📊 Regla 50/30/20</button>
+        <button type="button" class="finanzas-mascota-chip" data-ai-prompt="¿Cuánto puedo gastar al día?">🗓️ Presupuesto diario</button>
+        <button type="button" class="finanzas-mascota-chip" data-ai-prompt="¿En qué he gastado más?">🔍 Fuga de dinero</button>
+        <button type="button" class="finanzas-mascota-chip" data-ai-prompt="Fondo de emergencia">🛡️ Fondo emergencia</button>
+        <button type="button" class="finanzas-mascota-chip" data-ai-prompt="Consejos para ahorrar">💡 Consejos de ahorro</button>
+      </div>
       <div id="finanzas-mascota-feedback" class="finanzas-mascota-feedback"></div>
     </section>`;
 
