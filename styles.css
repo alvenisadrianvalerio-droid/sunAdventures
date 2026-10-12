@@ -1797,13 +1797,14 @@ body.light .download-option:hover {
     opacity: 0;
     pointer-events: none;
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
-    z-index: 99;
+    z-index: 9999;
+    touch-action: pan-y;
   }
 
   .nav-links.mobile-open {
     transform: translateY(0);
     opacity: 1;
-    pointer-events: auto;
+    pointer-events: auto !important;
   }
 
   body.light .nav-links {
@@ -1823,6 +1824,9 @@ body.light .download-option:hover {
     justify-content: flex-start;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(255, 217, 61, 0.3);
+    touch-action: manipulation;
   }
 
   body.light .nav-link {

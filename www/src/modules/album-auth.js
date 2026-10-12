@@ -289,52 +289,45 @@
       if (e.cancelable && e.type !== "click") e.preventDefault();
     }
     const a = item.dataset.action;
-    cerrarMenuPerfil();
 
-    if (a === "perfil") {
-      if (typeof window.abrirPerfilModal === "function") window.abrirPerfilModal();
-    }
-    else if (a === "pareja") {
-      if (typeof window.ParejaSistema?.abrirModal === "function") window.ParejaSistema.abrirModal();
-    }
-    else if (a === "ajustes") {
-      window.AlbumApp.modules.grupo?.abrirAjustes?.();
-    }
-    else if (a === "amigos") {
-      window.AlbumApp.modules.grupo?.abrirAmigosModal?.();
-    }
-    else if (a === "descargar") {
-      if (typeof window.abrirDescarga === "function") window.abrirDescarga();
-      else if (typeof window.descargarApkDirecta === "function") window.descargarApkDirecta();
-      else {
-        const btnDesc = document.querySelector('.lobby-btn[data-action="descargar"]');
-        if (btnDesc) btnDesc.click();
+    try {
+      if (a === "perfil") {
+        if (typeof window.abrirPerfilModal === "function") window.abrirPerfilModal();
       }
-    }
-    else if (a === "offline") {
-      if (window.SunOffline?.estadoUso) {
-        const uso = await window.SunOffline.estadoUso();
-        const msg = (uso.imagenes || uso.canciones)
-          ? `Ya tienes descargado:<br>📸 ${uso.imagenes} imágenes<br>🎵 ${uso.canciones} canciones<br>💾 ${uso.tamanoMB} MB<br><br>¿Descargar de nuevo todo lo nuevo?`
-          : "¿Descargar todas las imágenes y canciones para uso sin conexión?";
-        const ok = await window.AlbumApp.confirmar({ title: "Descargar contenido", message: msg, variant: "success", icon: "📥", confirmText: "Descargar", cancelText: "Cancelar" });
-        if (ok) await window.SunOffline.descargarTodo();
+      else if (a === "pareja") {
+        if (typeof window.ParejaSistema?.abrirModal === "function") window.ParejaSistema.abrirModal();
       }
+      else if (a === "ajustes") {
+        window.AlbumApp.modules.grupo?.abrirAjustes?.();
+      }
+      else if (a === "amigos") {
+        window.AlbumApp.modules.grupo?.abrirAmigosModal?.();
+      }
+      else if (a === "descargar") {
+        if (typeof window.abrirDescarga === "function") window.abrirDescarga();
+        else if (typeof window.descargarApkDirecta === "function") window.descargarApkDirecta();
+        else {
+          const btnDesc = document.querySelector('.lobby-btn[data-action="descargar"]');
+          if (btnDesc) btnDesc.click();
+        }
+      }
+      else if (a === "offline") {
+        if (window.SunOffline?.estadoUso) {
+          const uso = await window.SunOffline.estadoUso();
+          const msg = (uso.imagenes || uso.canciones)
+            ? `Ya tienes descargado:<br>📸 ${uso.imagenes} imágenes<br>🎵 ${uso.canciones} canciones<br>💾 ${uso.tamanoMB} MB<br><br>¿Descargar de nuevo todo lo nuevo?`
+            : "¿Descargar todas las imágenes y canciones para uso sin conexión?";
+          const ok = await window.AlbumApp.confirmar({ title: "Descargar contenido", message: msg, variant: "success", icon: "📥", confirmText: "Descargar", cancelText: "Cancelar" });
+          if (ok) await window.SunOffline.descargarTodo();
+        }
+      }
+    } finally {
+      setTimeout(() => { cerrarMenuPerfil(); }, 120);
     }
   };
 
   userDropdown?.querySelectorAll("[data-action]").forEach(item => {
-    let touched = false;
-    item.addEventListener("touchend", e => {
-      touched = true;
-      e.stopPropagation();
-      e.preventDefault();
-      ejecutarAccionDropdown(item, e);
-      setTimeout(() => { touched = false; }, 400);
-    }, { passive: false });
-
     item.addEventListener("click", e => {
-      if (touched) return;
       e.preventDefault();
       e.stopPropagation();
       ejecutarAccionDropdown(item, e);
@@ -343,11 +336,8 @@
 
   // Enlaces de vistas (Mapa, Logros, Notitas, Playlists)
   userDropdown?.querySelectorAll("a.user-dropdown-item").forEach(link => {
-    link.addEventListener("touchend", e => {
-      e.stopPropagation();
-    }, { passive: true });
     link.addEventListener("click", () => {
-      cerrarMenuPerfil();
+      setTimeout(() => { cerrarMenuPerfil(); }, 120);
     });
   });
 
