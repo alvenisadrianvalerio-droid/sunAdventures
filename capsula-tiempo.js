@@ -760,7 +760,8 @@
     const capsulasBloqueadas = [];
 
     polaroids.forEach((article, index) => {
-      const foto = fotos[index];
+      const fotoId = article.dataset.fotoId || article.getAttribute("data-foto-id");
+      const foto = (fotoId ? fotos.find(f => String(f.id) === String(fotoId)) : null) || fotos[index];
       if (!foto) return;
       article.setAttribute("data-foto-id", foto.id);
 

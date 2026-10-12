@@ -230,6 +230,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
       if (encontrado) {
         const merged = { ...def(), ...encontrado };
+        if (!merged.statsBase) merged.statsBase = { atk: 14, def: 5 };
         // Migrar a la clave del usuario autenticado si provenía de un fallback
         if (claveGanadora && claveGanadora !== kPrincipal && u !== "local") {
           try { localStorage.setItem(kPrincipal, JSON.stringify(merged)); } catch {}
@@ -269,6 +270,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
   let state = cargar();
   if (!Array.isArray(state.zonasConquistadas)) state.zonasConquistadas = [];
+  if (!state.statsBase) state.statsBase = { atk: 14, def: 5 };
 
   // Desbloqueo estricto secuencial:
   // 1) En la primera región, la zona 1 siempre está abierta.
@@ -375,14 +377,27 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const hpPct = clamp(state.hp / hpMax() * 100);
     const xpReq = xpParaSubir();
     const xpPct = esNivelMax ? 100 : clamp(state.xp / (isFinite(xpReq) ? xpReq : 1) * 100);
-    const st = statsLoot();
-    const bonusTxt = (st.atkBonus + st.defBonus + st.hpBonus) > 0 ? `<span style="font-size:.68rem;opacity:.75;margin-left:.4rem;">+${st.atkBonus}ATK +${st.defBonus}DEF +${st.hpBonus}HP</span>` : "";
+    const totalAtk = Math.round(atkTotal());
+    const totalDef = Math.round(defTotal());
+    const totalHpMax = Math.round(hpMax());
+    const critPct = Math.round(critTotal() * 100);
+    const esqPct = Math.round(esqTotal() * 100);
+
     return `
       <div class="rpg-hud">
         <div class="rpg-hero-avatar"><img src="${m.imagen}" alt="${m.nombre}" style="width:58px;height:58px;max-width:58px;max-height:58px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'"></div>
         <div class="rpg-hero-info">
-          <div class="rpg-hero-name">${m.nombre} <span class="rpg-hero-lvl">${esNivelMax ? `Nv ${NIVEL_MAX} (MÁX)` : `Nv ${state.nivel}`}</span>${bonusTxt}</div>
-          <div class="rpg-barra-label"><span>HP</span><span>${Math.round(state.hp)} / ${hpMax()}</span></div>
+          <div class="rpg-hero-name">
+            <span>${m.nombre}</span>
+            <span class="rpg-hero-lvl">${esNivelMax ? `Nv ${NIVEL_MAX} (MÁX)` : `Nv ${state.nivel}`}</span>
+            <div class="rpg-hero-stats-badges">
+              <span class="rpg-stat-badge" title="Ataque">⚔️ ${totalAtk}</span>
+              <span class="rpg-stat-badge" title="Defensa">🛡️ ${totalDef}</span>
+              ${critPct > 15 ? `<span class="rpg-stat-badge" title="Crítico">⚡ ${critPct}%</span>` : ""}
+              ${esqPct > 0 ? `<span class="rpg-stat-badge" title="Esquiva">💨 ${esqPct}%</span>` : ""}
+            </div>
+          </div>
+          <div class="rpg-barra-label"><span>HP</span><span>${Math.round(state.hp)} / ${totalHpMax}</span></div>
           <div class="rpg-barra hp"><span style="width:${hpPct}%"></span></div>
           <div class="rpg-barra-label"><span>XP</span><span>${esNivelMax ? 'NIVEL MÁXIMO' : `${state.xp} / ${xpReq}`}</span></div>
           <div class="rpg-barra xp"><span style="width:${xpPct}%"></span></div>
@@ -591,12 +606,23 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       eContent = eSpriteEl || eIcon;
     }
 
+    const totalAtkCombat = Math.round(atkTotal());
+    const totalDefCombat = Math.round(defTotal());
+    const totalHpMaxCombat = Math.round(hpMax());
+
     c.innerHTML = `
       <div class="rpg-hud">
         <div class="rpg-hero-avatar"><img src="${m.imagen}" alt="${m.nombre}" style="width:58px;height:58px;max-width:58px;max-height:58px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'"></div>
         <div class="rpg-hero-info">
-          <div class="rpg-hero-name">${m.nombre} <span class="rpg-hero-lvl">${state.nivel >= NIVEL_MAX ? `Nv ${NIVEL_MAX} (MÁX)` : `Nv ${state.nivel}`}</span></div>
-          <div class="rpg-barra-label"><span>HP</span><span>${Math.round(state.hp)} / ${hpMax()}</span></div>
+          <div class="rpg-hero-name">
+            <span>${m.nombre}</span>
+            <span class="rpg-hero-lvl">${state.nivel >= NIVEL_MAX ? `Nv ${NIVEL_MAX} (MÁX)` : `Nv ${state.nivel}`}</span>
+            <div class="rpg-hero-stats-badges">
+              <span class="rpg-stat-badge" title="Ataque">⚔️ ${totalAtkCombat}</span>
+              <span class="rpg-stat-badge" title="Defensa">🛡️ ${totalDefCombat}</span>
+            </div>
+          </div>
+          <div class="rpg-barra-label"><span>HP</span><span>${Math.round(state.hp)} / ${totalHpMaxCombat}</span></div>
           <div class="rpg-barra hp"><span style="width:${hpPct}%"></span></div>
           ${enemigo.dot ? `<div class="rpg-barra-label" style="color:#ff9a3d"><span>🔥 Quemadura</span><span>${enemigo.dot} dmg/turno</span></div>` : ""}
           ${state.sangrado > 0 ? `<div class="rpg-barra-label" style="color:#ff5470"><span>🩸 Sangrado</span><span>${state.sangrado} dmg/turno</span></div>` : ""}
@@ -2041,6 +2067,10 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   window.Rpg = {
     state: () => state,
     enemigo: () => enemigo,
+    hpMax: () => hpMax(),
+    atkTotal: () => atkTotal(),
+    defTotal: () => defTotal(),
+    statsLoot: () => statsLoot(),
     zonas: ZONAS,
     grupos: GRUPOS,
     regiones: REGIONES,

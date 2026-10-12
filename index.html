@@ -1213,11 +1213,15 @@ Artista - Canción
         if (document.fullscreenElement === pol) return;
         const r = pol.getBoundingClientRect();
         const x = e.clientX - r.left, y = e.clientY - r.top;
-        const enZona = (bx, by, w = 32, h = 32) => x >= bx && x <= bx + w && y >= by && y <= by + h;
-        if (enZona(r.width - 40, 8)) { e.preventDefault(); pol.querySelector(".polaroid-delete")?.click(); }
-        else if (enZona(8, 8)) { e.preventDefault(); pol.querySelector(".polaroid-edit")?.click(); }
-        else if (enZona(44, 8)) { e.preventDefault(); pol.querySelector(".polaroid-capsula")?.click(); }
-        else if (enZona(r.width - 76, 8)) { e.preventDefault(); pol.querySelector(".polaroid-fullscreen")?.click(); }
+        const enZona = (bx, by, w = 36, h = 36) => x >= bx && x <= bx + w && y >= by && y <= by + h;
+        // Delete (arriba a la derecha)
+        if (enZona(r.width - 44, 4)) { e.preventDefault(); pol.querySelector(".polaroid-delete")?.click(); }
+        // Edit (arriba a la izquierda)
+        else if (enZona(4, 4)) { e.preventDefault(); pol.querySelector(".polaroid-edit")?.click(); }
+        // Fullscreen (arriba a la derecha, al lado de delete)
+        else if (enZona(r.width - 80, 4)) { e.preventDefault(); pol.querySelector(".polaroid-fullscreen")?.click(); }
+        // Cápsula (abajo a la izquierda, sin ningún solape)
+        else if (enZona(4, r.height - 44)) { e.preventDefault(); pol.querySelector(".polaroid-capsula")?.click(); }
       }, true);
 
       // Gestor táctil en responsive (móvil / tablet)
@@ -1295,14 +1299,20 @@ Artista - Canción
 
         // Si fue un toque corto (Tap) sin desplazamiento y sin ser long-press
         if (!touchMoved && !fueLongPress && duration < 380) {
-          // Si el toque fue cerca de las zonas de botones superiores, no abrir fullscreen aquí
+          // Si el toque fue cerca de las zonas de botones superiores o dentro de los márgenes de controles, no abrir fullscreen aquí
           const r = pol.getBoundingClientRect();
           const changedTouch = e.changedTouches ? e.changedTouches[0] : null;
           if (changedTouch) {
             const x = changedTouch.clientX - r.left;
             const y = changedTouch.clientY - r.top;
-            const enZona = (bx, by, w = 38, h = 38) => x >= bx && x <= bx + w && y >= by && y <= by + h;
-            if (enZona(r.width - 44, 4) || enZona(4, 4) || enZona(40, 4) || enZona(r.width - 80, 4)) {
+            // Zonas superiores donde están los botones (editar: izq, cápsula: izq-centro, fullscreen: der-centro, delete: der)
+            const esZonaBotonSuperior = y <= 56 && (x <= 90 || x >= r.width - 90);
+            if (esZonaBotonSuperior) {
+              // Si el usuario tocó en la zona de eliminar, disparar click en delete
+              if (x >= r.width - 50 && y <= 50) {
+                const btnDel = pol.querySelector(".polaroid-delete");
+                if (btnDel) btnDel.click();
+              }
               targetPolaroid = null;
               return;
             }

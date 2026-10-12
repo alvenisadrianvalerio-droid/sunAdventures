@@ -134,9 +134,9 @@
     }
   };
 
-  document.addEventListener("click", cerrarSiAfuera, true);
-  document.addEventListener("touchstart", cerrarSiAfuera, { passive: true, capture: true });
-  document.addEventListener("pointerdown", cerrarSiAfuera, true);
+  document.addEventListener("click", cerrarSiAfuera);
+  document.addEventListener("touchend", cerrarSiAfuera);
+  document.addEventListener("pointerup", cerrarSiAfuera);
 
   window.addEventListener("keydown", e => {
     if (e.key === "Escape" && popover && !popover.hidden) {

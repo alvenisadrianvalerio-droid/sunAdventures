@@ -203,12 +203,20 @@
       try {
         const fallbackUrl = await obtenerUrlFirmada(path, true);
         if (fallbackUrl && fallbackUrl !== img.src) {
+          img.onerror = () => {
+            img.onerror = null;
+            img.style.opacity = "0.6";
+            img.alt = "Imagen no disponible (puedes borrarla)";
+          };
           img.src = fallbackUrl;
           img.style.opacity = "1";
+          return;
         }
       } catch (e) {
         console.warn("Error en fallback de imagen:", e);
       }
+      img.style.opacity = "0.6";
+      img.alt = "Imagen no disponible (puedes borrarla)";
     };
     img.src = url;
     img.style.opacity = "1";
@@ -235,13 +243,6 @@
           e.stopPropagation();
           toggleSeleccionFoto(foto.id);
         });
-      } else {
-        fullscreenInteractivo(article);
-        const btnDel = crearBtn("polaroid-delete", SVG.trash, "Eliminar foto", e => { e.stopPropagation(); eliminarFoto(foto.id); });
-        const btnEdit = crearBtn("polaroid-edit", SVG.edit, "Editar", e => { e.preventDefault(); e.stopPropagation(); abrirModal(foto); });
-        const btnFull = crearBtn("polaroid-fullscreen", SVG.expand, "Pantalla completa", e => { e.preventDefault(); e.stopPropagation(); if (document.fullscreenElement === article) { cerrarFullscreen(); return; } activarFullscreen(article, btnFull); });
-        const btnClose = crearBtn("polaroid-close", SVG.close, "Salir", e => { e.preventDefault(); e.stopPropagation(); cerrarFullscreen(); });
-        article.append(btnDel, btnEdit, btnFull, btnClose);
       }
 
       const img = document.createElement("img");
@@ -259,6 +260,40 @@
       if (foto.nota) { const p = document.createElement("p"); p.textContent = foto.nota; nota.appendChild(p); }
       const visual = document.createElement("div"); visual.className = "polaroid-visual"; visual.append(img, nota);
       article.append(visual);
+
+      if (!modoSeleccionFotos) {
+        fullscreenInteractivo(article);
+        const btnDel = crearBtn("polaroid-delete", SVG.trash, "Eliminar foto", e => {
+          e.preventDefault();
+          e.stopPropagation();
+          eliminarFoto(foto.id);
+        });
+        const btnEdit = crearBtn("polaroid-edit", SVG.edit, "Editar", e => {
+          e.preventDefault();
+          e.stopPropagation();
+          abrirModal(foto);
+        });
+        const btnFull = crearBtn("polaroid-fullscreen", SVG.expand, "Pantalla completa", e => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (document.fullscreenElement === article) { cerrarFullscreen(); return; }
+          activarFullscreen(article, btnFull);
+        });
+        const btnClose = crearBtn("polaroid-close", SVG.close, "Salir", e => {
+          e.preventDefault();
+          e.stopPropagation();
+          cerrarFullscreen();
+        });
+
+        // Asegurar que toques en dispositivos táctiles no sean interceptados por gestos de la tarjeta
+        [btnDel, btnEdit, btnFull, btnClose].forEach(btn => {
+          btn.addEventListener("touchstart", e => e.stopPropagation(), { passive: true });
+          btn.addEventListener("touchend", e => e.stopPropagation());
+        });
+
+        article.append(btnDel, btnEdit, btnFull, btnClose);
+      }
+
       return article;
     } catch (err) { console.warn("crearPolaroid:", err); return null; }
   }
@@ -568,7 +603,7 @@
   btnEliminarSeleccionadas?.addEventListener("click", async () => {
     const ids = Array.from(fotosSeleccionadasIds);
     if (!ids.length) return;
-    const ok = await confirmar({ title: `¿Eliminar ${ids.length} polaroid${ids.length === 1 ? '' : 's'}?`, message: "Las fotos seleccionadas se borrarán permanentemente del álbum.", variant: "danger", icon: "🗑️", confirmText: `Sí, eliminar ${ids.length}`, cancelText: "Cancelar" });
+    const ok = await confirmar({ title: `¿Eliminar ${ids.length} polaroid${ids.length === 1 ? '' : 's'}?`, message: "Las fotos seleccionadas se borrarán permanentemente del álbum.", variant: "danger", icon: SVG.trash, confirmText: `Sí, eliminar ${ids.length}`, cancelText: "Cancelar" });
     if (!ok) return;
 
     mostrarLoading(`Eliminando ${ids.length} polaroids...`);
@@ -589,7 +624,7 @@
       activarModoSeleccion(false);
       await render();
       window.dispatchEvent(new Event("sunad:progress"));
-      alertar({ title: "Fotos eliminadas", message: `Se eliminaron correctamente ${ids.length} polaroid${ids.length === 1 ? '' : 's'}.`, icon: "🗑️" });
+      alertar({ title: "Fotos eliminadas", message: `Se eliminaron correctamente ${ids.length} polaroid${ids.length === 1 ? '' : 's'}.`, icon: SVG.trash });
     } catch (err) {
       console.error("Error al eliminar fotos seleccionadas:", err);
       alertar({ title: "Error al eliminar", message: "Ocurrió un problema: " + (err.message || err), variant: "danger" });
@@ -600,16 +635,53 @@
 
   async function eliminarFoto(id) {
     try {
-      const ok = await confirmar({ title: "¿Eliminar esta aventura?", message: "La foto se borrará del álbum para siempre.", variant: "danger", icon: "🗑️", confirmText: "Sí, eliminar", cancelText: "Cancelar" });
-      if (!ok) return;
       const foto = fotos.find(f => f.id === id);
-      if (!foto) return;
-      try { await supabase.storage.from(BUCKET_NAME).remove([foto.path]); } catch { }
-      await eliminarFotoTabla(foto.id);
-      fotos = fotos.filter(f => f.id !== id);
-      urlsFirmadasCache.delete(foto.path);
-      await render();
-    } catch (err) { alertar({ title: "Error", message: "No se pudo eliminar: " + (err.message || err), variant: "danger" }); }
+      if (!foto) {
+        console.warn("eliminarFoto: No se encontró la foto con id:", id);
+        return;
+      }
+
+      const ok = await confirmar({
+        title: "¿Eliminar esta aventura?",
+        message: "La foto se borrará del álbum para siempre.",
+        variant: "danger",
+        icon: SVG.trash,
+        confirmText: "Sí, eliminar",
+        cancelText: "Cancelar"
+      });
+      if (!ok) return;
+
+      mostrarLoading("Eliminando polaroid...");
+      try {
+        if (foto.path) {
+          try { await supabase.storage.from(BUCKET_NAME).remove([foto.path]); } catch (eStorage) { console.warn("Fallo storage remove:", eStorage); }
+        }
+        await eliminarFotoTabla(foto.id);
+        fotos = fotos.filter(f => f.id !== id);
+        if (foto.path) urlsFirmadasCache.delete(foto.path);
+
+        // Limpiar de cápsula si estuviera registrada
+        try {
+          const uid = window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || "local";
+          const storageKey = `sunad_capsulas_${uid}`;
+          const capsulas = JSON.parse(localStorage.getItem(storageKey) || "{}");
+          if (capsulas[foto.id]) {
+            delete capsulas[foto.id];
+            localStorage.setItem(storageKey, JSON.stringify(capsulas));
+          }
+        } catch (_) { }
+
+        await render();
+        window.dispatchEvent(new Event("sunad:progress"));
+        alertar({ title: "Foto eliminada", message: "La polaroid ha sido eliminada con éxito.", icon: SVG.trash });
+      } finally {
+        ocultarLoading();
+      }
+    } catch (err) {
+      console.error("Error al eliminar foto:", err);
+      ocultarLoading();
+      alertar({ title: "Error al eliminar", message: "No se pudo eliminar: " + (err.message || err), variant: "danger" });
+    }
   }
 
   window.addEventListener("sunad:fotos-recargar", () => { cargarFotos().then(render); });
