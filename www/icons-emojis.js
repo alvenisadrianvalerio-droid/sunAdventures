@@ -1,4 +1,4 @@
-/* ICONOS SVG — Estilo único SunAdventures (línea gruesa dorada) */
+/* ICONOS SVG — Estilo único SunAd (línea gruesa dorada) */
 (function () {
   const S = (d, e = "") => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" ${e}>${d}</svg>`;
   const F = (d, e = "") => `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" ${e}>${d}</svg>`;
@@ -20,6 +20,7 @@
     trofeo: S(`<path d="M6 9H4a2 2 0 0 1-2-2V6h4"/><path d="M18 9h2a2 2 0 0 0 2-2V6h-4"/><path d="M6 4h12v6a6 6 0 0 1-12 0z"/><path d="M12 16v4"/><path d="M8 20h8"/>`),
     mapa: S(`<path d="M9 4l6 2 6-2v14l-6 2-6-2-6 2V6z"/><path d="M9 4v14M15 6v14"/>`),
     chat: S(`<path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-6 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>`),
+    finanzas: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor" opacity=".14"/><path d="M16.2 8.2c-.8-.8-1.9-1.2-3.5-1.2-2 0-3.3 1-3.3 2.5 0 1.4 1.1 2 3.1 2.4 2 .4 3.2 1 3.2 2.5S14.3 17 12.3 17c-1.6 0-2.9-.5-3.8-1.5M12.3 5.5v13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
     descargar: S(`<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/>`),
     calendario: S(`<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>`),
     /* Tema */
@@ -50,6 +51,7 @@
     regalo: S(`<path d="M20 12v10H4V12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>`),
     medalla: F(`<circle cx="12" cy="15" r="6"/><path d="M9 3l3 6 3-6" stroke="currentColor" stroke-width="2" fill="none"/>`),
     corona: F(`<path d="M3 18h18l-1.5-9-4.5 4L12 5 9 13 4.5 9 3 18z"/>`),
+    serpiente: S(`<path d="M4 5h4a3 3 0 0 1 0 6H7a3 3 0 0 0 0 6h7a3 3 0 0 0 0-6h-1a3 3 0 0 1 0-6h4"/><circle cx="19" cy="5" r="2"/><path d="M21 5h1.5M21 5l1.2-1"/>`),
     globo: S(`<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>`),
     imagen: S(`<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>`),
     comida: S(`<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>`),
@@ -57,7 +59,7 @@
     mimar: F(`<path d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21z"/>`),
     dormir: S(`<path d="M3 20v-8l7-2 5 2 6-3v11H3z"/><path d="M12 12c1-2 3-3 5-2v4h-5z"/><circle cx="17" cy="10" r="2"/>`),
     jugar: S(`<line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/>`),
-    moneda: F(`<circle cx="12" cy="12" r="10" fill="#ffd93d" stroke="#b8860b" stroke-width="1.5"/><circle cx="12" cy="12" r="7" fill="#ffe066"/><text x="12" y="16" font-size="9" fill="#8b6914" text-anchor="middle" font-weight="bold">S</text>`),
+   moneda: `<img src="img/items%20de%20aventura/icon.png" alt="SunCoin" class="coin-icon">`,
     /* Comidas */
     manzana: F32(`<path d="M16 9c-3-4-8-4-10 0-2 5 1 12 5 15 2 1 3 1 5 0 2 1 3 1 5 0 4-3 7-10 5-15-2-4-7-4-10 0z" fill="#e63946"/><path d="M16 4c0-2 1-3 3-3" stroke="#5a3010" stroke-width="1.5" fill="none" stroke-linecap="round"/>`),
     zanahoria: F32(`<path d="M16 30L8 12c-1-3 1-6 4-6h8c3 0 5 3 4 6L16 30z" fill="#f77f00"/><path d="M12 6l4-4M16 6l2-5M20 6l4-4" stroke="#2a8a4a" stroke-width="2" fill="none" stroke-linecap="round"/>`),
@@ -129,6 +131,21 @@
     isla: S(`<path d="M3 20h18"/><path d="M8 20c0-4 2-7 4-7s4 3 4 7"/><path d="M12 6v7"/><path d="M12 6c3 0 4 2 4 3-2 0-4-1-4-3z"/>`),
     cofre: S(`<path d="M3 10h18v10H3z"/><path d="M3 10l2-4h14l2 4"/><rect x="10" y="12" width="4" height="4" rx="1" fill="currentColor"/>`),
     pocionAmor: S(`<path d="M9 2h6v3H9z"/><path d="M9 5l-2 5v6a5 5 0 0 0 10 0v-6l-2-5"/><path d="M12 11c0 0 2 2 2 4a2 2 0 0 1-4 0c0-2 2-4 2-4z" fill="currentColor"/>`),
-    gema: F(`<path d="M12 2L4 9l8 13 8-13z"/><path d="M12 2v20M4 9h16" stroke="rgba(255,255,255,.3)" stroke-width="1"/>`)
+    gema: F(`<path d="M12 2L4 9l8 13 8-13z"/><path d="M12 2v20M4 9h16" stroke="rgba(255,255,255,.3)" stroke-width="1"/>`),
+
+    /* —— Íconos temáticos para Fondos de la Tienda —— */
+    nocheEstrellada: S(`<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/><path d="M16 4l.8 1.6L18.4 6.4l-1.6.8L16 8.8l-.8-1.6-1.6-.8 1.6-.8z" fill="currentColor"/><circle cx="7" cy="8" r="1" fill="currentColor"/><circle cx="9" cy="16" r=".8" fill="currentColor"/><circle cx="17" cy="15" r="1.1" fill="currentColor"/>`),
+    arcoirisMagico: S(`<path d="M3 19a9 9 0 0 1 18 0"/><path d="M6 19a6 6 0 0 1 12 0"/><path d="M9 19a3 3 0 0 1 6 0"/><circle cx="12" cy="7" r="1.5" fill="currentColor"/><path d="M19 8l.7 1.4 1.4.7-1.4.7-.7 1.4-.7-1.4-1.4-.7 1.4-.7z" fill="currentColor"/><path d="M5 10l.5 1 1 .5-1 .5-.5 1-.5-1-1-.5 1-.5z" fill="currentColor"/>`),
+    infiernoArdiente: S(`<path d="M12 2c1.5 3 4 5 4 9a6 6 0 0 1-12 0c0-2.5 1.5-5 3-7 0 2.5 1.5 4 3 4s2-2 2-6z"/><path d="M9 18c0-2 1.5-3.5 3-3.5s3 1.5 3 3.5a3 3 0 0 1-6 0z" fill="currentColor"/><path d="M3 21h18"/>`),
+    bosqueProfundo: S(`<path d="M12 2l-5 7h3l-4 6h12l-4-6h3l-5-7z"/><path d="M12 15v7M8 22h8"/><circle cx="6" cy="18" r="1" fill="currentColor"/><circle cx="18" cy="17" r="1.2" fill="currentColor"/><circle cx="15" cy="9" r=".8" fill="currentColor"/>`),
+    oceanoProfundo: S(`<path d="M2 12c2.5-2 5-2 7.5 0s5 2 7.5 0 5-2 5 0"/><path d="M2 16c2.5-2 5-2 7.5 0s5 2 7.5 0 5-2 5 0"/><path d="M2 20c2.5-2 5-2 7.5 0s5 2 7.5 0 5-2 5 0"/><circle cx="7" cy="7" r="2.2"/><circle cx="16" cy="5" r="1.6"/><circle cx="18" cy="9" r="1.1"/>`),
+    desiertoDorado: S(`<circle cx="12" cy="7" r="3"/><path d="M12 2v2M12 10v2M7 7H5M19 7h-2M8.5 3.5l1.4 1.4M15.5 3.5l-1.4 1.4"/><path d="M2 20c4-4 8-4 12 0 3-3 6-3 8 0"/><path d="M2 22h20"/>`),
+    auroraBoreal: S(`<path d="M2 9c4-4 8 2 12-2s6 4 8 1"/><path d="M2 13c4-4 8 2 12-2s6 4 8 1"/><path d="M2 17c4-4 8 2 12-2s6 4 8 1"/><circle cx="7" cy="4" r="1" fill="currentColor"/><circle cx="17" cy="5" r="1.2" fill="currentColor"/><circle cx="21" cy="8" r=".8" fill="currentColor"/>`),
+    florSakura: S(`<circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M12 10c0-3.5 3-4.5 3.5-2.5S13.5 10 12 10zM12 14c0 3.5-3 4.5-3.5 2.5S10.5 14 12 14zM14 12c3.5 0 4.5 3 2.5 3.5S14 13.5 14 12zM10 12c-3.5 0-4.5-3-2.5-3.5S10 10.5 10 12zM13.5 10.5c2.5-2.5 4-.5 3 1s-2.5.5-3-.5zM10.5 13.5c-2.5 2.5-4 .5-3-1s2.5-.5 3 .5z"/>`),
+    cyberpunkCity: S(`<path d="M3 21V11l4-3v13M7 8l5-4v17M12 13l5-2v10M17 11l4-2v12"/><path d="M2 21h20"/><path d="M12 4V2M17 9V7"/><circle cx="5" cy="14" r=".8" fill="currentColor"/><circle cx="9.5" cy="10" r=".8" fill="currentColor"/><circle cx="14.5" cy="15" r=".8" fill="currentColor"/>`),
+    tormentaElectrica: S(`<path d="M17.5 12a4.5 4.5 0 0 0-8.5-1.5A5 5 0 0 0 4 15h15a3 3 0 0 0-.5-3z"/><path d="M11 15l-2 5h3.5l-1.5 4 4.5-6h-3l2-3z" fill="currentColor"/><path d="M6 19l-1 2M18 19l-1 2"/>`),
+    volcanErupcion: S(`<path d="M4 21L9 8h6l5 13H4z"/><path d="M9 8c1.5 1 4.5 1 6 0"/><path d="M12 8V2M9 4l1.5 2M15 4l-1.5 2"/><circle cx="8" cy="2" r="1" fill="currentColor"/><circle cx="16" cy="3" r="1.2" fill="currentColor"/><path d="M11 11l-1 4M13 11l1 5"/>`),
+    galaxiaEspacial: S(`<ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><circle cx="5" cy="6" r="1" fill="currentColor"/><circle cx="19" cy="17" r="1.2" fill="currentColor"/><circle cx="19" cy="7" r=".8" fill="currentColor"/><circle cx="5" cy="18" r=".8" fill="currentColor"/>`),
+    neonGlow: S(`<path d="M4 12h3l2-6 6 12 2-6h3"/><circle cx="12" cy="12" r="9"/><circle cx="9" cy="6" r="1" fill="currentColor"/><circle cx="15" cy="18" r="1" fill="currentColor"/>`)
   };
 })();

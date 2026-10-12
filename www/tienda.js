@@ -1,5 +1,5 @@
 /* ============================================================
-   TIENDA.JS — Tienda de SunAdventures
+   TIENDA.JS — Tienda de SunAd
    · Pestaña embebida (Tienda.montar) + overlay (Tienda.abrir)
    · Soporta sprite sheets con fallback automático a SVG
    · Auto-refresco al comprar / equipar / abrir
@@ -10,10 +10,13 @@
     let n = 0;
     const it = () => {
       if (window._TiendaAPI) return boot();
-      if (++n > 50) return console.warn("tienda.js: _TiendaAPI no llegó");
+      if (++n > 100) return console.warn("tienda.js: _TiendaAPI no llegó tras 10s");
       setTimeout(it, 100);
     };
-    window.addEventListener("sunadventures:api-ready", boot, { once: true });
+    // ✅ Escuchar el evento Y hacer polling
+    window.addEventListener("sunad:api-ready", () => {
+      if (window._TiendaAPI) boot();
+    }, { once: true });
     return setTimeout(it, 100);
   }
 
@@ -22,7 +25,9 @@
     getMonedas, setMonedas,
     getSkinsC, setSkinsC, getSkinsE, setSkinsE,
     cargarInv, guardarInv,
-    notifMascota, aplicarSkins, getUserId
+    notifMascota, aplicarSkins,
+    comprarMascota, esComprable, desbloqueada, getMascotasCompradas, DESBLOQUEO, MASCOTAS,
+    getUserId
   } = API;
 
   const $   = id => document.getElementById(String(id).replace(/^#/, ""));
@@ -54,37 +59,54 @@
     tienda: { url: "img/tienda/tienda-sheet.png", cols: 5, rows: 5 }
   };
 
-  function construirPreview(item, esComida) {
+  function construirPreview(item, esComida, id, cat) {
+    if (cat === "mascotas") {
+      const srcImg = item.imagen || (MASCOTAS?.[id]?.imagen) || "img/mapache.png";
+      return `<div class="tienda-item-preview tienda-item-preview-mascota"><img src="${srcImg}" alt="${item.nombre}" style="width:58px;height:58px;object-fit:contain;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png';"></div>`;
+    }
+    if (cat === "fondos") {
+      const clsFondo = `tienda-preview-fondo-${id}`;
+      return `<div class="tienda-item-preview tienda-item-preview-fondo ${clsFondo}">${ICONO[item.icono] || ICONO.estrella || ""}</div>`;
+    }
+    if (item.spriteFile) {
+      return `<div class="tienda-item-preview tienda-item-preview-fondo"><img class="tienda-item-sprite-custom" src="${item.spriteFile}" alt="${item.nombre}" loading="lazy" decoding="async"></div>`;
+    }
     if (Array.isArray(item.sprite) && item.sprite.length === 2) {
       const key = item.sheet || (esComida ? "comida" : "tienda");
       const s = SHEETS[key] || SHEETS.tienda;
       const [col, row] = item.sprite;
-      const px = s.cols > 1 ? (col / (s.cols - 1)) * 100 : 50;
-      const py = s.rows > 1 ? (row / (s.rows - 1)) * 100 : 50;
-      return `<div class="tienda-item-preview"><div class="tienda-item-sprite" style="background-image:url('${s.url}');background-size:${s.cols * 100}% ${s.rows * 100}%;background-position:${px}% ${py}%"></div></div>`;
+      if (Number.isInteger(col) && Number.isInteger(row) && col >= 0 && col < s.cols && row >= 0 && row < s.rows) {
+        const px = s.cols > 1 ? (col / (s.cols - 1)) * 100 : 50;
+        const py = s.rows > 1 ? (row / (s.rows - 1)) * 100 : 50;
+        return `<div class="tienda-item-preview"><div class="tienda-item-sprite" style="background-image:url('${s.url}');background-size:${s.cols * 100}% ${s.rows * 100}%;background-position:${px}% ${py}%"></div></div>`;
+      }
     }
     return `<div class="tienda-item-preview">${ICONO[item.icono] || ICONO.estrella || ""}</div>`;
   }
 
   /* ---------- HTML interno ---------- */
   function htmlTienda() {
+    const cats = ["mascotas", ...Object.keys(TIENDA_ITEMS)];
     return `
       <div class="tienda-header">
         <h2 class="tienda-titulo">Tienda</h2>
-        <span class="tienda-monedero">${ICONO.moneda || ""} <span class="tienda-monedas">0</span></span>
+        <div class="tienda-header-acciones">
+          <span class="tienda-monedero">${ICONO.moneda || ""} <span class="tienda-monedas">0</span></span>
+          <button type="button" class="tienda-cerrar-btn" aria-label="Cerrar tienda" title="Cerrar">✕</button>
+        </div>
       </div>
       <div class="tienda-buscador">
-        <input type="text" class="tienda-buscar" placeholder="Buscar objeto..." autocomplete="off">
+        <input type="text" class="tienda-buscar" placeholder="Buscar objeto o mascota..." autocomplete="off" value="${busqueda || ""}">
         <div class="tienda-filtros">
-          <button type="button" class="tienda-filtro active" data-filtro="todos">Todos</button>
-          <button type="button" class="tienda-filtro" data-filtro="nuevos">Nuevos</button>
-          <button type="button" class="tienda-filtro" data-filtro="comprados">Comprados</button>
-          <button type="button" class="tienda-filtro" data-filtro="favoritos">★ Favoritos</button>
+          <button type="button" class="tienda-filtro ${filtroActivo === "todos" ? "active" : ""}" data-filtro="todos">Todos</button>
+          <button type="button" class="tienda-filtro ${filtroActivo === "nuevos" ? "active" : ""}" data-filtro="nuevos">Nuevos</button>
+          <button type="button" class="tienda-filtro ${filtroActivo === "comprados" ? "active" : ""}" data-filtro="comprados">Comprados</button>
+          <button type="button" class="tienda-filtro ${filtroActivo === "favoritos" ? "active" : ""}" data-filtro="favoritos">★ Favoritos</button>
         </div>
       </div>
       <div class="tienda-categorias" role="tablist">
-        ${Object.keys(TIENDA_ITEMS).map((c, i) => `
-          <button type="button" class="tienda-categoria ${i === 0 ? "active" : ""}" data-cat="${c}">${labelCat(c)}</button>
+        ${cats.map((c) => `
+          <button type="button" class="tienda-categoria ${c === categoriaActiva ? "active" : ""}" data-cat="${c}">${labelCat(c)}</button>
         `).join("")}
       </div>
       <div class="tienda-grid"></div>
@@ -93,6 +115,7 @@
   }
 
   const labelCat = c => ({
+    mascotas:"🐾 Mascotas",
     comida:"Comida", cabeza:"Cabeza", cuello:"Cuello",
     ojos:"Ojos", fondos:"Fondos", efectos:"Efectos"
   })[c] || (c[0].toUpperCase() + c.slice(1));
@@ -123,6 +146,10 @@
       busqueda = buscador.value.trim().toLowerCase();
       render();
     });
+    const btnCerrar = qs(".tienda-cerrar-btn", container);
+    btnCerrar?.addEventListener("click", () => {
+      cerrar();
+    });
   }
 
   function activar(nuevoContainer) {
@@ -148,6 +175,23 @@
       overlay.setAttribute("aria-hidden", "true");
       document.body.appendChild(overlay);
       overlay.addEventListener("click", e => { if (e.target === overlay) cerrar(); });
+      // Detener propagación de eventos táctiles, clicks y scroll para que no afecten a la pantalla principal
+      ["touchstart", "touchmove", "touchend", "pointerdown", "pointerup", "pointermove", "click", "dblclick", "contextmenu"].forEach(evtName => {
+        overlay.addEventListener(evtName, e => {
+          e.stopPropagation();
+          // Si el gesto ocurre en el fondo/backdrop fuera del panel de la tienda, prevenir acciones por defecto
+          if (e.target === overlay && (evtName === "touchmove" || evtName === "wheel")) {
+            e.preventDefault();
+          }
+        }, { passive: false });
+      });
+      // Prevenir rebote de scroll al llegar al borde del panel de la tienda
+      overlay.addEventListener("wheel", e => {
+        if (e.target === overlay) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }, { passive: false });
       document.addEventListener("keydown", e => {
         if (e.key === "Escape" && overlay?.classList.contains("active")) cerrar();
       });
@@ -156,13 +200,17 @@
     activar(qs(".tienda-panel", overlay));
     overlay.classList.add("active");
     overlay.setAttribute("aria-hidden", "false");
+    document.documentElement.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
   }
 
   function cerrar() {
     overlay?.classList.remove("active");
     overlay?.setAttribute("aria-hidden", "true");
+    document.documentElement.style.overflow = "";
     document.body.style.overflow = "";
+    document.body.style.touchAction = "";
   }
 
   /* ---------- Precio con descuento ---------- */
@@ -181,17 +229,42 @@
     const g = qs(".tienda-grid", container);
     if (!g) return;
 
-    const items    = TIENDA_ITEMS[categoriaActiva] || {};
+    const esMascotas = categoriaActiva === "mascotas";
     const esComida = categoriaActiva === "comida";
+    let items = {};
+    if (esMascotas) {
+      Object.keys(MASCOTAS || {}).forEach(id => {
+        const d = DESBLOQUEO?.[id] || { tipo:"compra", precio:1000 };
+        const m = MASCOTAS[id];
+        items[id] = {
+          nombre: m.nombre,
+          precio: d.precio || 1000,
+          reqNivel: d.reqNivel || 1,
+          tipo: d.tipo,
+          imagen: m.imagen,
+          desc: `Mascota compañera (${m.favorita ? "le gusta " + m.favorita : "fiel"})`
+        };
+      });
+    } else {
+      items = TIENDA_ITEMS[categoriaActiva] || {};
+    }
+
     const co   = getSkinsC();
     const eq   = getSkinsE(getMascota());
     const favs = getFavs();
     const hist = getHist();
     const histIds = new Set(hist.slice(0, 20).map(h => h.id));
+    const compMascotas = getMascotasCompradas?.() || [];
 
     let lista = Object.entries(items);
     if (busqueda) lista = lista.filter(([_, it]) => it.nombre.toLowerCase().includes(busqueda));
-    if (filtroActivo === "comprados") lista = lista.filter(([id]) => esComida ? false : co.includes(id));
+    if (filtroActivo === "comprados") {
+      lista = lista.filter(([id, it]) => {
+        if (esMascotas) return it.tipo === "inicial" || compMascotas.includes(id);
+        if (esComida) return false;
+        return co.includes(id);
+      });
+    }
     if (filtroActivo === "nuevos")    lista = lista.filter(([id]) => !histIds.has(id));
     if (filtroActivo === "favoritos") lista = lista.filter(([id]) => favs.includes(id));
 
@@ -202,7 +275,7 @@
       v.textContent = "Sin resultados.";
       frag.appendChild(v);
     } else {
-      lista.forEach(([id, item]) => frag.appendChild(crearItem(id, item, esComida, co, eq, favs)));
+      lista.forEach(([id, item]) => frag.appendChild(crearItem(id, item, esComida, esMascotas, co, eq, favs, compMascotas)));
     }
     g.innerHTML = "";
     g.appendChild(frag);
@@ -212,33 +285,42 @@
     window.hidratarIconos?.(g);
   }
 
-  function crearItem(id, item, esComida, co, eq, favs) {
+  function crearItem(id, item, esComida, esMascotas, co, eq, favs, compMascotas = []) {
     const it = document.createElement("article");
     it.className = "tienda-item";
-    const comprado = !esComida && co.includes(id);
-    const equipado = !esComida && eq[categoriaActiva] === id;
-    const esFav    = favs.includes(id);
-    const precio   = precioConDescuento(item, esComida);
-    const puede    = getMonedas() >= precio;
+    const mascComprada = esMascotas && (item.tipo === "inicial" || compMascotas.includes(id));
+    const mascEnUso    = esMascotas && (getMascota() === id);
+    const comprado     = esMascotas ? mascComprada : (!esComida && co.includes(id));
+    const equipado     = esMascotas ? mascEnUso : (!esComida && eq[categoriaActiva] === id);
+    const esFav        = favs.includes(id);
+    const precio       = (esComida || esMascotas) ? item.precio : precioConDescuento(item, esComida);
+    const puede        = getMonedas() >= precio;
 
     if (comprado) it.classList.add("comprado");
     if (equipado) it.classList.add("equipado");
 
-    const desc = esComida
-      ? `<span class="tienda-item-desc">+${item.efecto.hambre} <span data-icono="comida"></span> +${item.efecto.felicidad} <span data-icono="corazon"></span></span>`
-      : `<span class="tienda-item-desc">${item.desc || "Adorno"}</span>`;
+    let desc = "";
+    if (esMascotas) {
+      desc = `<span class="tienda-item-desc">${mascEnUso ? "⭐ En uso actual" : item.desc}</span>`;
+    } else if (esComida) {
+      desc = `<span class="tienda-item-desc">+${item.efecto?.hambre || 10} <span data-icono="comida"></span> +${item.efecto?.felicidad || 10} <span data-icono="corazon"></span></span>`;
+    } else {
+      desc = `<span class="tienda-item-desc">${item.desc || "Adorno"}</span>`;
+    }
 
-    const precioHtml = precio < item.precio
-      ? `<span class="tienda-item-precio ${puede ? "" : "no-alcanza"}">${ICONO.moneda || ""} <s style="opacity:.5;font-size:.8em">${item.precio}</s> ${precio}</span>`
-      : `<span class="tienda-item-precio ${puede ? "" : "no-alcanza"}">${ICONO.moneda || ""} ${item.precio}</span>`;
+    const precioHtml = (!comprado && item.tipo !== "inicial")
+      ? (precio < item.precio
+          ? `<span class="tienda-item-precio ${puede ? "" : "no-alcanza"}">${ICONO.moneda || ""} <s style="opacity:.5;font-size:.8em">${item.precio}</s> ${precio}</span>`
+          : `<span class="tienda-item-precio ${puede ? "" : "no-alcanza"}">${ICONO.moneda || ""} ${item.precio}</span>`)
+      : `<span class="tienda-item-precio" style="color:var(--accent);">✓ Desbloqueada</span>`;
 
-    const bonusBadge = (!esComida && item.bonus?.desc)
+    const bonusBadge = (!esComida && !esMascotas && item.bonus?.desc)
       ? `<span class="tienda-item-efecto">⚡ ${item.bonus.desc}</span>`
       : "";
 
     it.innerHTML = `
       <button type="button" class="tienda-fav ${esFav ? "activo" : ""}" title="Favorito">★</button>
-      ${construirPreview(item, esComida)}
+      ${construirPreview(item, esComida, id, categoriaActiva)}
       <span class="tienda-item-nombre">${item.nombre}</span>
       ${desc}
       ${bonusBadge}
@@ -257,7 +339,32 @@
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "tienda-item-btn";
-    if (esComida) {
+
+    if (esMascotas) {
+      if (mascEnUso) {
+        btn.textContent = "En uso";
+        btn.classList.add("equipado");
+        btn.disabled = true;
+      } else if (mascComprada) {
+        btn.textContent = "Acompañar";
+        btn.addEventListener("click", () => {
+          localStorage.setItem("mascota_actual", id);
+          window._snd?.("blip");
+          window.dispatchEvent(new Event("sunad:mascota-cambiada"));
+          window.dispatchEvent(new Event("sunad:progress"));
+          render();
+        });
+      } else {
+        btn.textContent = puede ? "Comprar" : "No alcanza";
+        if (!puede) { btn.disabled = true; btn.classList.add("no-alcanza"); }
+        btn.addEventListener("click", () => {
+          if (comprarMascota(id)) {
+            pushHist({ id, nombre: item.nombre, cat: "mascotas" });
+            render();
+          }
+        });
+      }
+    } else if (esComida) {
       btn.textContent = puede ? "Comprar x1" : "No alcanza";
       if (!puede) { btn.disabled = true; btn.classList.add("no-alcanza"); }
       btn.addEventListener("click", () => comprarComida(id, item));
@@ -301,9 +408,9 @@
     window._snd?.("moneda");
     notifMascota?.("¡Comprado!", `${item.nombre} (+1)`);
     pushHist({ id, nombre: item.nombre, cat: "comida" });
-    window.dispatchEvent(new Event("sunadventures:tienda-compra"));
+    window.dispatchEvent(new Event("sunad:tienda-compra"));
     render();
-    window.dispatchEvent(new Event("sunadventures:inventario-refresh"));
+    window.dispatchEvent(new Event("sunad:inventario-refresh"));
   }
 
   function comprarSkin(id, item) {
@@ -316,7 +423,7 @@
     window._snd?.("compra");
     notifMascota?.("¡Comprado!", item.nombre);
     pushHist({ id, nombre: item.nombre, cat: categoriaActiva });
-    window.dispatchEvent(new Event("sunadventures:tienda-compra"));
+    window.dispatchEvent(new Event("sunad:tienda-compra"));
     render();
   }
 
@@ -331,11 +438,11 @@
   }
 
   /* ---------- Listeners globales ---------- */
-  window.addEventListener("sunadventures:tienda-compra", () => { if (container) render(); });
-  window.addEventListener("sunadventures:mascota-cambiada", () => { if (container) render(); });
+  window.addEventListener("sunad:tienda-compra", () => { if (container) render(); });
+  window.addEventListener("sunad:mascota-cambiada", () => { if (container) render(); });
 
   /* ---------- API pública ---------- */
   window.Tienda = { abrir, cerrar, render, montar };
-  window.dispatchEvent(new Event("sunadventures:tienda-ready"));
+  window.dispatchEvent(new Event("sunad:tienda-ready"));
   console.log("✅ tienda.js listo");
 })();

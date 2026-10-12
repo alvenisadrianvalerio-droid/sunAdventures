@@ -1,5 +1,5 @@
 /* ============================================================
-   SCRIPT.JS — SunAdventures (núcleo compacto y optimizado)
+   SCRIPT.JS — SunAd · v5 compacto
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
   /* ---------- Helpers ---------- */
@@ -15,41 +15,136 @@ document.addEventListener("DOMContentLoaded", () => {
     windows: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5l7.5-1v7H3v-6zm0 13l7.5 1v-7H3v6zm8.5 1.2L21 21V12.5h-9.5v7.2zm0-15.4v7.2H21V3l-9.5 1.3z"/></svg>',
     linux: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-2.2 0-4 1.8-4 4 0 1.2.5 2.2 1.3 2.9C8.2 9.6 7 11 6.3 12.9c-.2.5-.8 1.9-1.4 3.2-.5 1.2-.9 2.4-.5 3 .3.5 1 .7 1.8.6.7 0 1.5-.2 2.2-.5.6-.3 1.5-.5 2.6-.5h2c1.1 0 2 .2 2.6.5.7.3 1.5.5 2.2.5.8.1 1.5-.1 1.8-.6.4-.6 0-1.8-.5-3-.6-1.3-1.2-2.7-1.4-3.2-.7-1.9-1.9-3.3-3-4 .8-.7 1.3-1.7 1.3-2.9 0-2.2-1.8-4-4-4z"/></svg>'
   };
-  const getUserId = () => window._sunUserId || localStorage.getItem("sunadventures_uid") || "local";
-  const randomDe  = a => (Array.isArray(a) && a.length) ? a[Math.floor(Math.random() * a.length)] : "";
-  const clamp     = (n, min = 0, max = 100) => Math.max(min, Math.min(max, n));
-  const hoyISO    = () => new Date().toISOString().slice(0, 10);
-  const numLS     = k => Number(localStorage.getItem(k) || 0);
-  const setNumLS  = (k, v) => localStorage.setItem(k, String(v));
+  const getUserId = () => window._sunUserId || localStorage.getItem("sunad_uid") || "local";
+  const randomDe = a => (Array.isArray(a) && a.length) ? a[Math.floor(Math.random() * a.length)] : "";
+  const clamp = (n, min = 0, max = 100) => Math.max(min, Math.min(max, n));
+  const hoyISO = () => new Date().toISOString().slice(0, 10);
+  const numLS = k => Number(localStorage.getItem(k) || 0);
+  const setNumLS = (k, v) => localStorage.setItem(k, String(v));
 
-  /* ---------- Girasol lobby + Tema ---------- */
+  /* ---------- Girasol lobby ---------- */
   try {
     const g = qs(".girasol-wrapper"), pop = $("pop"), b = qs(".burbuja");
     if (g && pop) {
       pop.volume = 0.4;
       const fr = [
-        "Mi lugar favorito", "Contigo hasta el infinito", "Cada día te elijo",
-        "Eres mi casualidad más bonita", "Mi persona favorita en el mundo",
-        "Gracias por existir", "Siempre tú, siempre yo, siempre nosotros",
-        "Te pensé, y apareciste"
+        "Mi lugar favorito",
+        "Contigo hasta el infinito",
+        "Cada día te elijo",
+        "Eres mi casualidad más bonita",
+        "Mi persona favorita en el mundo",
+        "Gracias por existir",
+        "Siempre tú, siempre yo, siempre nosotros",
+        "Te pensé, y apareciste",
+        "Tú haces que todo sea más bonito",
+        "Mi hogar eres tú",
+        "El amor de mi vida entero",
+        "Mi corazón late por ti",
+        "Juntos somos invencibles",
+        "Tu sonrisa ilumina mis días",
+        "Te amo más que ayer y menos que mañana"
       ];
+      let ultFrase = b?.textContent || "";
+      let timerBurbuja = null;
+
+      const cambiarFrase = () => {
+        let nueva = randomDe(fr);
+        let intentos = 0;
+        while (nueva === ultFrase && intentos < 8) {
+          nueva = randomDe(fr);
+          intentos++;
+        }
+        ultFrase = nueva;
+        if (b) {
+          b.textContent = nueva;
+          b.classList.add("visible");
+          if (timerBurbuja) clearTimeout(timerBurbuja);
+          timerBurbuja = setTimeout(() => {
+            b.classList.remove("visible");
+          }, 3500);
+        }
+      };
+
+      const lanzarCorazones = (origX, origY) => {
+        const paleta = ["#ff3366", "#ff6b8b", "#ff4081", "#ff1744", "#f50057", "#e91e63", "#ff79a8"];
+        const rect = g.getBoundingClientRect();
+        const baseLeft = (typeof origX === "number" && !isNaN(origX)) ? origX : (rect.width / 2);
+        const baseTop = (typeof origY === "number" && !isNaN(origY)) ? origY : (rect.height / 2);
+
+        const svgCorazon = SVG.heart || '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+
+        for (let i = 0; i < 7; i++) {
+          const h = document.createElement("div");
+          h.innerHTML = svgCorazon;
+          const tam = 1.6 + Math.random() * 0.8; // 1.6rem a 2.4rem
+          const color = paleta[Math.floor(Math.random() * paleta.length)];
+          const dx = (Math.random() - 0.5) * 110;
+          const rot = (Math.random() - 0.5) * 50;
+          const posX = baseLeft + (Math.random() - 0.5) * 36;
+          const posY = baseTop + (Math.random() - 0.5) * 36;
+
+          h.style.cssText = `position:absolute;pointer-events:none;width:${tam}rem;height:${tam}rem;color:${color};filter:drop-shadow(0 2px 8px rgba(255,51,102,0.65));animation:heartFloat 1.4s cubic-bezier(0.2,0.8,0.3,1) forwards;animation-delay:${i * 0.04}s;left:${posX}px;top:${posY}px;--dx:${dx}px;--rot:${rot}deg;z-index:99;display:flex;align-items:center;justify-content:center;`;
+          const svgInside = h.querySelector("svg");
+          if (svgInside) {
+            svgInside.style.width = "100%";
+            svgInside.style.height = "100%";
+            svgInside.style.filter = "drop-shadow(0 0 4px rgba(255,255,255,0.7))";
+          }
+          g.appendChild(h);
+          setTimeout(() => h.remove(), 1600);
+        }
+      };
+
+      const accionarGirasol = e => {
+        pop.currentTime = 0;
+        pop.play().catch(() => {});
+        cambiarFrase();
+
+        let x = null, y = null;
+        if (e) {
+          if (e.touches && e.touches[0]) {
+            const r = g.getBoundingClientRect();
+            x = e.touches[0].clientX - r.left;
+            y = e.touches[0].clientY - r.top;
+          } else if (e.changedTouches && e.changedTouches[0]) {
+            const r = g.getBoundingClientRect();
+            x = e.changedTouches[0].clientX - r.left;
+            y = e.changedTouches[0].clientY - r.top;
+          } else if (typeof e.offsetX === "number") {
+            x = e.offsetX;
+            y = e.offsetY;
+          }
+        }
+        lanzarCorazones(x, y);
+
+        // Efecto rebote en el girasol
+        g.classList.add("activo");
+        setTimeout(() => g.classList.remove("activo"), 600);
+      };
+
       g.addEventListener("mouseenter", () => {
         pop.currentTime = 0;
         pop.play().catch(() => {});
-        if (b) b.textContent = randomDe(fr);
+        cambiarFrase();
       });
+
+      let touchHandled = false;
+      g.addEventListener("touchstart", e => {
+        touchHandled = true;
+        accionarGirasol(e);
+      }, { passive: true });
+
       g.addEventListener("click", e => {
-        for (let i = 0; i < 5; i++) {
-          const h = document.createElement("div");
-          h.innerHTML = SVG.heart;
-          h.style.cssText = `position:absolute;pointer-events:none;width:1.5rem;height:1.5rem;color:#a684f0;animation:heartFloat 1.5s ease-out forwards;animation-delay:${i * 0.05}s;left:${e.offsetX + (Math.random() - .5) * 40}px;top:${e.offsetY + (Math.random() - .5) * 40}px;--dx:${(Math.random() - .5) * 80}px`;
-          g.appendChild(h);
-          setTimeout(() => h.remove(), 1800);
+        if (touchHandled) {
+          touchHandled = false;
+          return;
         }
+        accionarGirasol(e);
       });
     }
   } catch {}
 
+  /* ---------- Tema ---------- */
   try {
     const t = $("theme-toggle");
     if (t) {
@@ -60,162 +155,204 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   } catch {}
 
-  /* ---------- Datos: mascotas + frases ---------- */
+  /* ---------- Datos ---------- */
   const MASCOTAS = {
-  mapache:          { nombre: "Mapache",        imagen: "img/mapache.png",        sonido: "chitter", favorita: "pizza" },
-  girasol:          { nombre: "Girasol",        imagen: "img/mascota-girasol.png", sonido: "twinkle", favorita: "agua" },
-  gatito:           { nombre: "Siamesa",        imagen: "img/siamesa.png",         sonido: "meow",    favorita: "pescado" },
-  "gatito-negro":   { nombre: "Armstrong",      imagen: "img/gatito-negro.png",    sonido: "meow",    favorita: "pescado" },
-  hamburguesa:      { nombre: "Hamburguesa",    imagen: "img/hamburguesa.png",     sonido: "crunch",  favorita: "pizza" },
-  oveja:            { nombre: "Oveja",          imagen: "img/oveja.png",           sonido: "baa",     favorita: "manzana" },
-  pollito:          { nombre: "Pollito",        imagen: "img/pollito.png",         sonido: "peep",    favorita: "semillas" },
-  jirafa:           { nombre: "Jirafa",         imagen: "img/jirafa.png",          sonido: "blip",    favorita: "manzana" },
-  unicornio:        { nombre: "Unicornio",      imagen: "img/unicornio.png",       sonido: "sparkle", favorita: "cupcake" },
-  conejo:           { nombre: "Conejito",       imagen: "img/conejito.png",        sonido: "hop",     favorita: "zanahoria" },
-  "dragon-bebe":    { nombre: "Dragón Bebé",    imagen: "img/dragon-bebe.png",     sonido: "fireball",favorita: "carbon" },
-  "dragon-anciano": { nombre: "Dragón Anciano", imagen: "img/dragon-anciano.png",  sonido: "growl",   favorita: "carbon" }
-};
+    mapache:{nombre:"Mapache",imagen:"img/mapache.png",sonido:"chitter",favorita:"pizza"},
+    girasol:{nombre:"Girasol",imagen:"img/mascota-girasol.png",sonido:"twinkle",favorita:"agua"},
+    gatito:{nombre:"Siamesa",imagen:"img/siamesa.png",sonido:"meow",favorita:"pescado"},
+    "gatito-negro":{nombre:"Armstrong",imagen:"img/gatito-negro.png",sonido:"meow",favorita:"pescado"},
+    hamburguesa:{nombre:"Hamburguesa",imagen:"img/hamburguesa.png",sonido:"crunch",favorita:"pizza"},
+    oveja:{nombre:"Oveja",imagen:"img/oveja.png",sonido:"baa",favorita:"manzana"},
+    pollito:{nombre:"Pollito",imagen:"img/pollito.png",sonido:"peep",favorita:"semillas"},
+    jirafa:{nombre:"Jirafa",imagen:"img/jirafa.png",sonido:"blip",favorita:"manzana"},
+    unicornio:{nombre:"Unicornio",imagen:"img/unicornio.png",sonido:"sparkle",favorita:"cupcake"},
+    conejo:{nombre:"Conejito",imagen:"img/conejito.png",sonido:"hop",favorita:"zanahoria"},
+    "dragon-bebe":{nombre:"Dragón Bebé",imagen:"img/dragon-bebe.png",sonido:"fireball",favorita:"carbon"},
+    "dragon-anciano":{nombre:"Dragón Anciano",imagen:"img/dragon-anciano.png",sonido:"growl",favorita:"carbon"}
+  };
   const FRASES = {
-    mapache: ["¡Hola! Soy tu mapache", "Ñam ñam...", "¡Súbeme una foto!", "¡Qué bonito todo!", "Te acompaño siempre"],
-    girasol: ["Eres mi luz del sol", "Siempre mirando al sol", "¡Qué calorcito!", "¡Sonríe!"],
-    gatito: ["¿Quieres acompañarme al cementerio a buscar fuegos fatuos?", "Odio a la gente imprudente, no los aguanto.", "La dualidad es uno de mis conceptos favoritos.", "Los dragones son las criaturas más tercas y complejas.", "Valoro mucho la discreción.", "Soy pragmática, no pendeja.", "Odio a los dragones.", "Hollymolly :D"],
-    "gatito-negro": ["Miau miau...", "Ronroneo activado", "¿Me das mimos?", "Miau elegante"],
-    hamburguesa: ["Con queso y todo", "¡A comer!", "Ñam ñam ñam...", "¿Me pides?"],
-    oveja: ["¡Beee!", "¿Cuentas ovejitas?", "Soy de lana suavecita", "¡Qué sueñito!"],
-    pollito: ["¡Pío pío!", "¡Qué bonito día!", "¿Jugamos?", "Pío pío pío"],
-    jirafa: ["Veo todo desde aquí arriba", "Tengo manchitas bonitas", "Hola desde las nubes", "¡Un abrazo largoooo!"],
-    unicornio: ["Soy mágico", "Vengo del arcoíris", "¡Abracadabra!", "Hago magia a tu lado"],
-    conejo: ["¡Ay, brinquemos!", "¿Y esa zanahoria?", "¡Brinco de alegría!", "Me encanta estar contigo"],
-    "dragon-bebe": ["¡Fire Ball!", "¡Mis escamas son de acero!", "Yo creo en mí", "Las brasas guían mi camino"],
-    "dragon-anciano": ["Cof... otro amanecer más", "Los años pesan, joven", "La sabiduría da paz", "100 años no significan nada"]
+    mapache:["¡Hola! Soy tu mapache","Ñam ñam...","¡Súbeme una foto!","¡Qué bonito todo!","Te acompaño siempre"],
+    girasol:["Eres mi luz del sol","Siempre mirando al sol","¡Qué calorcito!","¡Sonríe!"],
+    gatito:["¿Quieres acompañarme al cementerio a buscar fuegos fatuos?","Odio a la gente imprudente, no los aguanto.","La dualidad es uno de mis conceptos favoritos.","Los dragones son las criaturas más tercas y complejas.","Valoro mucho la discreción.","Soy pragmática, no pendeja.","Odio a los dragones.","Hollymolly :D"],
+    "gatito-negro":["Miau miau...","Ronroneo activado","¿Me das mimos?","Miau elegante"],
+    hamburguesa:["Con queso y todo","¡A comer!","Ñam ñam ñam...","¿Me pides?"],
+    oveja:["¡Beee!","¿Cuentas ovejitas?","Soy de lana suavecita","¡Qué sueñito!"],
+    pollito:["¡Pío pío!","¡Qué bonito día!","¿Jugamos?","Pío pío pío"],
+    jirafa:["Veo todo desde aquí arriba","Tengo manchitas bonitas","Hola desde las nubes","¡Un abrazo largoooo!"],
+    unicornio:["Soy mágico","Vengo del arcoíris","¡Abracadabra!","Hago magia a tu lado"],
+    conejo:["¡Ay, brinquemos!","¿Y esa zanahoria?","¡Brinco de alegría!","Me encanta estar contigo"],
+    "dragon-bebe":["¡Fire Ball!","¡Mis escamas son de acero!","Yo creo en mí","Las brasas guían mi camino"],
+    "dragon-anciano":["Cof... otro amanecer más","Los años pesan, joven","La sabiduría da paz","100 años no significan nada"]
   };
 
-  /* ---------- Datos: tienda ---------- */
+  /* ---------- TIENDA ---------- */
   const TIENDA_ITEMS = {
     comida: {
-      manzana: { nombre: "Manzana", precio: 5, icono: "manzana", sprite: [0, 0], efecto: { hambre: 15, felicidad: 5 } },
-      tomate: { nombre: "Tomate", precio: 4, icono: "manzana", sprite: [1, 0], efecto: { hambre: 12, felicidad: 6 } },
-      pimiento: { nombre: "Pimiento", precio: 5, icono: "manzana", sprite: [2, 0], efecto: { hambre: 13, felicidad: 7 } },
-      pera: { nombre: "Pera", precio: 5, icono: "manzana", sprite: [3, 0], efecto: { hambre: 14, felicidad: 8 } },
-      cerezas: { nombre: "Cerezas", precio: 6, icono: "manzana", sprite: [4, 0], efecto: { hambre: 10, felicidad: 12 } },
-      sandia: { nombre: "Sandía", precio: 7, icono: "manzana", sprite: [0, 1], efecto: { hambre: 18, felicidad: 10 } },
-      naranja: { nombre: "Naranja", precio: 5, icono: "manzana", sprite: [1, 1], efecto: { hambre: 14, felicidad: 8 } },
-      platano: { nombre: "Plátano", precio: 4, icono: "manzana", sprite: [2, 1], efecto: { hambre: 12, felicidad: 7 } },
-      pan: { nombre: "Pan", precio: 6, icono: "manzana", sprite: [3, 1], efecto: { hambre: 16, felicidad: 6 } },
-      uvas: { nombre: "Uvas", precio: 8, icono: "manzana", sprite: [4, 1], efecto: { hambre: 12, felicidad: 14 } },
-      fresa: { nombre: "Fresa", precio: 5, icono: "manzana", sprite: [0, 2], efecto: { hambre: 10, felicidad: 15 } },
-      hotdog: { nombre: "Hot Dog", precio: 10, icono: "pizza", sprite: [1, 2], efecto: { hambre: 25, felicidad: 15 } },
-      hamburguesa: { nombre: "Hamburguesa", precio: 12, icono: "pizza", sprite: [2, 2], efecto: { hambre: 30, felicidad: 18 } },
-      sandwich: { nombre: "Sándwich", precio: 9, icono: "pizza", sprite: [3, 2], efecto: { hambre: 22, felicidad: 14 } },
-      papas: { nombre: "Papas fritas", precio: 8, icono: "pizza", sprite: [4, 2], efecto: { hambre: 18, felicidad: 20 } },
-      pollo: { nombre: "Pollo", precio: 11, icono: "pizza", sprite: [0, 3], efecto: { hambre: 28, felicidad: 12 } },
-      huevo: { nombre: "Huevo", precio: 5, icono: "manzana", sprite: [1, 3], efecto: { hambre: 14, felicidad: 6 } },
-      queso: { nombre: "Queso", precio: 7, icono: "manzana", sprite: [2, 3], efecto: { hambre: 16, felicidad: 12 } },
-      tocino: { nombre: "Tocino", precio: 9, icono: "pizza", sprite: [3, 3], efecto: { hambre: 22, felicidad: 14 } },
-      pizza: { nombre: "Pizza", precio: 14, icono: "pizza", sprite: [4, 3], efecto: { hambre: 32, felicidad: 18 } },
-      sushi: { nombre: "Sushi", precio: 15, icono: "pizza", sprite: [0, 4], efecto: { hambre: 26, felicidad: 22 } },
-      nigiri: { nombre: "Nigiri", precio: 13, icono: "pizza", sprite: [1, 4], efecto: { hambre: 24, felicidad: 20 } },
-      hogaza: { nombre: "Hogaza", precio: 8, icono: "manzana", sprite: [2, 4], efecto: { hambre: 20, felicidad: 8 } },
-      refresco: { nombre: "Refresco", precio: 6, icono: "agua", sprite: [3, 4], efecto: { hambre: 8, felicidad: 16 } },
-      helado: { nombre: "Helado", precio: 10, icono: "helado", sprite: [4, 4], efecto: { hambre: 12, felicidad: 30 } }
+      manzana:{nombre:"Manzana",precio:5,icono:"manzana",sprite:[0,0],efecto:{hambre:15,felicidad:5}},
+      tomate:{nombre:"Tomate",precio:4,icono:"manzana",sprite:[1,0],efecto:{hambre:12,felicidad:6}},
+      pimiento:{nombre:"Pimiento",precio:5,icono:"manzana",sprite:[2,0],efecto:{hambre:13,felicidad:7}},
+      pera:{nombre:"Pera",precio:5,icono:"manzana",sprite:[3,0],efecto:{hambre:14,felicidad:8}},
+      cerezas:{nombre:"Cerezas",precio:6,icono:"manzana",sprite:[4,0],efecto:{hambre:10,felicidad:12}},
+      sandia:{nombre:"Sandía",precio:7,icono:"manzana",sprite:[0,1],efecto:{hambre:18,felicidad:10}},
+      naranja:{nombre:"Naranja",precio:5,icono:"manzana",sprite:[1,1],efecto:{hambre:14,felicidad:8}},
+      platano:{nombre:"Plátano",precio:4,icono:"manzana",sprite:[2,1],efecto:{hambre:12,felicidad:7}},
+      pan:{nombre:"Pan",precio:6,icono:"manzana",sprite:[3,1],efecto:{hambre:16,felicidad:6}},
+      uvas:{nombre:"Uvas",precio:8,icono:"manzana",sprite:[4,1],efecto:{hambre:12,felicidad:14}},
+      fresa:{nombre:"Fresa",precio:5,icono:"manzana",sprite:[0,2],efecto:{hambre:10,felicidad:15}},
+      hotdog:{nombre:"Hot Dog",precio:10,icono:"pizza",sprite:[1,2],efecto:{hambre:25,felicidad:15}},
+      hamburguesa:{nombre:"Hamburguesa",precio:12,icono:"pizza",sprite:[2,2],efecto:{hambre:30,felicidad:18}},
+      sandwich:{nombre:"Sándwich",precio:9,icono:"pizza",sprite:[3,2],efecto:{hambre:22,felicidad:14}},
+      papas:{nombre:"Papas fritas",precio:8,icono:"pizza",sprite:[4,2],efecto:{hambre:18,felicidad:20}},
+      pollo:{nombre:"Pollo",precio:11,icono:"pizza",sprite:[0,3],efecto:{hambre:28,felicidad:12}},
+      huevo:{nombre:"Huevo",precio:5,icono:"manzana",sprite:[1,3],efecto:{hambre:14,felicidad:6}},
+      queso:{nombre:"Queso",precio:7,icono:"manzana",sprite:[2,3],efecto:{hambre:16,felicidad:12}},
+      tocino:{nombre:"Tocino",precio:9,icono:"pizza",sprite:[3,3],efecto:{hambre:22,felicidad:14}},
+      pizza:{nombre:"Pizza",precio:14,icono:"pizza",sprite:[4,3],efecto:{hambre:32,felicidad:18}},
+      sushi:{nombre:"Sushi",precio:15,icono:"pizza",sprite:[0,4],efecto:{hambre:26,felicidad:22}},
+      nigiri:{nombre:"Nigiri",precio:13,icono:"pizza",sprite:[1,4],efecto:{hambre:24,felicidad:20}},
+      hogaza:{nombre:"Hogaza",precio:8,icono:"manzana",sprite:[2,4],efecto:{hambre:20,felicidad:8}},
+      refresco:{nombre:"Refresco",precio:6,icono:"agua",sprite:[3,4],efecto:{hambre:8,felicidad:16}},
+      helado:{nombre:"Helado",precio:10,icono:"helado",sprite:[4,4],efecto:{hambre:12,felicidad:30}}
     },
     cabeza: {
-      corona:   { nombre: "Corona",           precio: 80,  icono: "corona",     sheet: "tienda", sprite: [0, 0], desc: "Para la realeza",     bonus: { tipo: "monedas_victoria", val: 10, desc: "+10 monedas al vencer" } },
-      gorro:    { nombre: "Chistera",         precio: 60,  icono: "tienda",     sheet: "tienda", sprite: [1, 0], desc: "Muy elegante",        bonus: { tipo: "xp_extra",         val: 15, desc: "+15% XP por victoria" } },
-      birrete:  { nombre: "Birrete",          precio: 100, icono: "medalla",    sheet: "tienda", sprite: [2, 0], desc: "Sabio oficial",       bonus: { tipo: "xp_extra",         val: 25, desc: "+25% XP por victoria" } },
-      hongo:    { nombre: "Honguito",         precio: 40,  icono: "girasol",    sheet: "tienda", sprite: [3, 0], desc: "Adorable",            bonus: { tipo: "nada",             val: 0,  desc: "Solo estilo" } },
-      laurel:   { nombre: "Laurel",           precio: 120, icono: "trofeo",     sheet: "tienda", sprite: [4, 0], desc: "Solo campeones",      bonus: { tipo: "monedas_victoria", val: 25, desc: "+25 monedas al vencer" } },
-      santa:    { nombre: "Gorro Navidad",    precio: 70,  icono: "regalo",     sheet: "tienda", sprite: [0, 1], desc: "Festivo",             bonus: { tipo: "curar_victoria",   val: 10, desc: "Cura 10 HP tras vencer" } },
-      casco:    { nombre: "Casco vikingo",    precio: 150, icono: "escudo",     sheet: "tienda", sprite: [1, 1], desc: "A la batalla",        bonus: { tipo: "atk_fijo",         val: 5,  desc: "+5 ATK en combate" } },
-      sombrero: { nombre: "Sombrero mágico",  precio: 180, icono: "varita",     sheet: "tienda", sprite: [2, 1], desc: "De un mago",          bonus: { tipo: "crit_jefe",        val: 20, desc: "+20% daño a jefes" } },
-      diadema:  { nombre: "Diadema",          precio: 90,  icono: "estrella",   sheet: "tienda", sprite: [3, 1], desc: "Princesa total",      bonus: { tipo: "regen_turno",      val: 5,  desc: "+5 HP al inicio de turno" } }
+      corona:{nombre:"Corona",precio:80,icono:"corona",sheet:"tienda",sprite:[0,0],desc:"Para la realeza",bonus:{tipo:"monedas_victoria",val:10,desc:"+10 monedas al vencer"}},
+      gorro:{nombre:"Chistera",precio:60,icono:"tienda",sheet:"tienda",sprite:[1,0],desc:"Muy elegante",bonus:{tipo:"xp_extra",val:15,desc:"+15% XP por victoria"}},
+      birrete:{nombre:"Birrete",precio:100,icono:"medalla",sheet:"tienda",sprite:[2,0],desc:"Sabio oficial",bonus:{tipo:"xp_extra",val:25,desc:"+25% XP por victoria"}},
+      hongo:{nombre:"Honguito",precio:40,icono:"girasol",sheet:"tienda",sprite:[3,0],desc:"Adorable",bonus:{tipo:"nada",val:0,desc:"Solo estilo"}},
+      laurel:{nombre:"Laurel",precio:120,icono:"trofeo",sheet:"tienda",sprite:[4,0],desc:"Solo campeones",bonus:{tipo:"monedas_victoria",val:25,desc:"+25 monedas al vencer"}},
+      santa:{nombre:"Gorro Navidad",precio:70,icono:"regalo",sheet:"tienda",sprite:[0,1],desc:"Festivo",bonus:{tipo:"curar_victoria",val:10,desc:"Cura 10 HP tras vencer"}},
+      casco:{nombre:"Casco vikingo",precio:150,icono:"escudo",sheet:"tienda",sprite:[1,1],desc:"A la batalla",bonus:{tipo:"atk_fijo",val:5,desc:"+5 ATK en combate"}},
+      sombrero:{nombre:"Sombrero mágico",precio:180,icono:"varita",sheet:"tienda",sprite:[2,1],desc:"De un mago",bonus:{tipo:"crit_jefe",val:20,desc:"+20% daño a jefes"}},
+      diadema:{nombre:"Diadema",precio:90,icono:"estrella",sheet:"tienda",sprite:[3,1],desc:"Princesa total",bonus:{tipo:"regen_turno",val:5,desc:"+5 HP al inicio de turno"}}
     },
     cuello: {
-      pajarita: { nombre: "Pajarita", precio: 50,  icono: "estrella",   sheet: "tienda", sprite: [4, 1], desc: "Elegante",     bonus: { tipo: "monedas_victoria", val: 5,  desc: "+5 monedas al vencer" } },
-      corbata:  { nombre: "Corbata",  precio: 45,  icono: "tienda",     sheet: "tienda", sprite: [0, 2], desc: "Formal",       bonus: { tipo: "descuento_tienda", val: 15, desc: "15% descuento en tienda" } },
-      collar:   { nombre: "Collar",   precio: 55,  icono: "llave",      sheet: "tienda", sprite: [1, 2], desc: "Mágico",       bonus: { tipo: "loot_extra",       val: 1,  desc: "Doble prob. de loot" } },
-      bufanda:  { nombre: "Bufanda",  precio: 65,  icono: "nube",       sheet: "tienda", sprite: [2, 2], desc: "Calentita",    bonus: { tipo: "def_fijo",         val: 4,  desc: "+4 DEF en combate" } },
-      medallon: { nombre: "Medallón", precio: 110, icono: "llaveDorada",sheet: "tienda", sprite: [3, 2], desc: "Reliquia",     bonus: { tipo: "hp_max",           val: 30, desc: "+30 HP máximo" } }
+      pajarita:{nombre:"Pajarita",precio:50,icono:"estrella",sheet:"tienda",sprite:[4,1],desc:"Elegante",bonus:{tipo:"monedas_victoria",val:5,desc:"+5 monedas al vencer"}},
+      corbata:{nombre:"Corbata",precio:45,icono:"tienda",sheet:"tienda",sprite:[0,2],desc:"Formal",bonus:{tipo:"descuento_tienda",val:15,desc:"15% descuento en tienda"}},
+      collar:{nombre:"Collar",precio:55,icono:"llave",sheet:"tienda",sprite:[1,2],desc:"Mágico",bonus:{tipo:"loot_extra",val:1,desc:"Doble prob. de loot"}},
+      bufanda:{nombre:"Bufanda",precio:65,icono:"nube",sheet:"tienda",sprite:[2,2],desc:"Calentita",bonus:{tipo:"def_fijo",val:4,desc:"+4 DEF en combate"}},
+      medallon:{nombre:"Medallón",precio:110,icono:"llaveDorada",sheet:"tienda",sprite:[3,2],desc:"Reliquia",bonus:{tipo:"hp_max",val:30,desc:"+30 HP máximo"}}
     },
     ojos: {
-      gafas:    { nombre: "Gafas sol", precio: 65,  icono: "globo",    sheet: "tienda", sprite: [4, 2], desc: "Cool total",     bonus: { tipo: "esquivar",  val: 10, desc: "10% prob. de esquivar" } },
-      monoculo: { nombre: "Monóculo",  precio: 90,  icono: "ajustes",  sheet: "tienda", sprite: [0, 3], desc: "Distinguido",    bonus: { tipo: "crit_pct",  val: 15, desc: "+15% golpe crítico" } },
-      antifaz:  { nombre: "Antifaz",   precio: 75,  icono: "candado",  sheet: "tienda", sprite: [1, 3], desc: "Misterioso",     bonus: { tipo: "escape_seguro", val: 1, desc: "Escape garantizado" } },
-      gafas3d:  { nombre: "Gafas 3D",  precio: 100, icono: "cubo",     sheet: "tienda", sprite: [2, 3], desc: "Cine retro",     bonus: { tipo: "crit_pct",  val: 10, desc: "+10% golpe crítico" } }
+      gafas:{nombre:"Gafas sol",precio:65,icono:"globo",sheet:"tienda",sprite:[4,2],desc:"Cool total",bonus:{tipo:"esquivar",val:10,desc:"10% prob. de esquivar"}},
+      monoculo:{nombre:"Monóculo",precio:80,icono:"ajustes",sheet:"tienda",sprite:[0,3],desc:"Distinguido",bonus:{tipo:"crit_pct",val:8,desc:"+8% golpe crítico"}},
+      antifaz:{nombre:"Antifaz",precio:75,icono:"candado",sheet:"tienda",sprite:[1,3],desc:"Misterioso",bonus:{tipo:"escape_seguro",val:1,desc:"Escape garantizado"}},
+      gafas3d:{nombre:"Gafas 3D",precio:120,icono:"cubo",sheet:"tienda",sprite:[2,3],desc:"Cine retro",bonus:{tipo:"crit_pct",val:12,desc:"+12% golpe crítico"}}
     },
     fondos: {
-      noche:    { nombre: "Fondo Noche estrellada", precio: 5000,  icono: "luna",    sheet: "tienda", sprite: [3, 3], desc: "Cambia toda la web", bonus: { tipo: "tema_noche",    val: 1, desc: "Temática nocturna estelar" } },
-      arcoiris: { nombre: "Fondo Arcoíris mágico",  precio: 8000,  icono: "arcoiris",sheet: "tienda", sprite: [4, 3], desc: "Cambia toda la web", bonus: { tipo: "tema_arcoiris", val: 1, desc: "Temática pastel de arcoíris" } },
-      fuego:    { nombre: "Fondo Infierno ardiente",precio: 12000, icono: "fuego",   sheet: "tienda", sprite: [0, 4], desc: "Cambia toda la web", bonus: { tipo: "tema_fuego",    val: 1, desc: "Temática volcánica ardiente" } }
+      noche:{nombre:"Fondo Noche estrellada",precio:5000,icono:"nocheEstrellada",desc:"Cambia toda la web",bonus:{tipo:"tema_noche",val:1,desc:"Temática nocturna estelar"}},
+      arcoiris:{nombre:"Fondo Arcoíris mágico",precio:8000,icono:"arcoirisMagico",desc:"Cambia toda la web",bonus:{tipo:"tema_arcoiris",val:1,desc:"Temática pastel de arcoíris"}},
+      fuego:{nombre:"Fondo Infierno ardiente",precio:12000,icono:"infiernoArdiente",desc:"Cambia toda la web",bonus:{tipo:"tema_fuego",val:1,desc:"Temática volcánica ardiente"}},
+      bosque:{nombre:"Fondo Bosque profundo",precio:6000,icono:"bosqueProfundo",desc:"Cambia toda la web",bonus:{tipo:"tema_bosque",val:1,desc:"Temática bosque húmedo"}},
+      oceano:{nombre:"Fondo Océano profundo",precio:9000,icono:"oceanoProfundo",desc:"Cambia toda la web",bonus:{tipo:"tema_oceano",val:1,desc:"Temática abisal con burbujas"}},
+      desierto:{nombre:"Fondo Desierto dorado",precio:7500,icono:"desiertoDorado",desc:"Cambia toda la web",bonus:{tipo:"tema_desierto",val:1,desc:"Temática duna y calor"}},
+      aurora:{nombre:"Fondo Aurora boreal",precio:15000,icono:"auroraBoreal",desc:"Cambia toda la web",bonus:{tipo:"tema_aurora",val:1,desc:"Temática aurora polar"}},
+      sakura:{nombre:"Fondo Sakura",precio:11000,icono:"florSakura",desc:"Cambia toda la web",bonus:{tipo:"tema_sakura",val:1,desc:"Temática flor de cerezo"}},
+      cyberpunk:{nombre:"Fondo Cyberpunk",precio:22000,icono:"cyberpunkCity",desc:"Cambia toda la web",bonus:{tipo:"tema_cyberpunk",val:1,desc:"Temática neón futurista"}},
+      tormenta:{nombre:"Fondo Tormenta eléctrica",precio:18000,icono:"tormentaElectrica",desc:"Cambia toda la web",bonus:{tipo:"tema_tormenta",val:1,desc:"Temática lluvia y relámpagos"}},
+      volcan:{nombre:"Fondo Volcán",precio:9500,icono:"volcanErupcion",desc:"Cambia toda la web",bonus:{tipo:"tema_volcan",val:1,desc:"Temática volcánica ardiente"}},
+      galaxia:{nombre:"Fondo Galaxia",precio:14000,icono:"galaxiaEspacial",desc:"Cambia toda la web",bonus:{tipo:"tema_galaxia",val:1,desc:"Temática cósmica"}},
+      neon:{nombre:"Fondo Neón",precio:20000,icono:"neonGlow",desc:"Cambia toda la web",bonus:{tipo:"tema_neon",val:1,desc:"Temática cyberpunk neón"}},
     },
     efectos: {
-      chispas:   { nombre: "Chispas",   precio: 150, icono: "rayoDoble",     sheet: "tienda", sprite: [1, 4], desc: "Al hacer clic",       bonus: { tipo: "stun_pct",       val: 8,  desc: "8% aturdimiento en ataque" } },
-      corazones: { nombre: "Corazones", precio: 180, icono: "corazon",       sheet: "tienda", sprite: [2, 4], desc: "Vuelan alrededor",    bonus: { tipo: "curar_victoria", val: 20, desc: "Cura 20 HP tras vencer" } },
-      estrellas: { nombre: "Estrellas", precio: 220, icono: "estrellaDoble", sheet: "tienda", sprite: [3, 4], desc: "Caen del cielo",      bonus: { tipo: "monedas_victoria", val: 15, desc: "+15 monedas al vencer" } }
+      chispas:{nombre:"Chispas",precio:150,icono:"rayoDoble",sheet:"tienda",sprite:[1,4],desc:"Al hacer clic",bonus:{tipo:"stun_pct",val:8,desc:"8% aturdimiento en ataque"}},
+      corazones:{nombre:"Corazones",precio:180,icono:"corazon",sheet:"tienda",sprite:[2,4],desc:"Vuelan alrededor",bonus:{tipo:"curar_victoria",val:20,desc:"Cura 20 HP tras vencer"}},
+      estrellas:{nombre:"Estrellas",precio:220,icono:"estrellaDoble",sheet:"tienda",sprite:[3,4],desc:"Caen del cielo",bonus:{tipo:"monedas_victoria",val:15,desc:"+15 monedas al vencer"}}
     }
   };
   const COMIDAS = TIENDA_ITEMS.comida;
   const SKINS = { ...TIENDA_ITEMS.cabeza, ...TIENDA_ITEMS.cuello, ...TIENDA_ITEMS.ojos, ...TIENDA_ITEMS.fondos, ...TIENDA_ITEMS.efectos };
 
-  /* ---------- Desbloqueos ---------- */
+  /* ============================================================
+     NIVEL — función HOISTEADA (definir ANTES de desbloqueada)
+     ============================================================ */
+  function getNivel() {
+    try {
+      const xp = window._experienciaActual || 0;
+      const NIVELES = [0, 100, 500, 1000, 5000];
+      for (let i = NIVELES.length - 1; i >= 0; i--) if (xp >= NIVELES[i]) return i + 1;
+      return 1;
+    } catch { return 1; }
+  }
+  window.getNivel = getNivel;
+
+  /* ============================================================
+     DESBLOQUEOS
+     ============================================================ */
   const DESBLOQUEO = {
-    mapache: { tipo: "inicial" },
-    girasol: { tipo: "nivel", nivel: 2 },
-    gatito: { tipo: "logro", id: "fotografos" },
-    "gatito-negro": { tipo: "inicial" },
-    hamburguesa: { tipo: "logro", id: "dj" },
-    oveja: { tipo: "logro", id: "racha" },
-    pollito: { tipo: "logro", id: "poetas" },
-    jirafa: { tipo: "logro", id: "trotamundos" },
-    unicornio: { tipo: "logro", id: "racha-365" },
-    conejo: { tipo: "logro", id: "clics-mapache" },
-    "dragon-bebe": { tipo: "nivel", nivel: 3 },
-    "dragon-anciano": { tipo: "nivel", nivel: 5 }
+    mapache:         { tipo:"inicial" },
+    "gatito-negro":  { tipo:"inicial" },
+    // 🐾 Mascotas de compra directa
+    girasol:         { tipo:"compra", precio:250, reqNivel:1 },
+    gatito:          { tipo:"compra", precio:400, reqNivel:1 },
+    hamburguesa:     { tipo:"compra", precio:500, reqNivel:1 },
+    pollito:         { tipo:"compra", precio:600, reqNivel:1 },
+    oveja:           { tipo:"compra", precio:800, reqNivel:1 },
+    conejo:          { tipo:"compra", precio:1200, reqNivel:1 },
+    jirafa:          { tipo:"compra", precio:1800, reqNivel:1 },
+    unicornio:       { tipo:"compra", precio:3000, reqNivel:1 },
+    "dragon-bebe":   { tipo:"compra", precio:4500, reqNivel:1 },
+    "dragon-anciano":{ tipo:"compra", precio:7500, reqNivel:1 }
   };
-  const NIVELES = [0, 100, 500, 1000, 5000];
-  const getNivel = () => {
-    const xp = window._experienciaActual || 0;
-    for (let i = NIVELES.length - 1; i >= 0; i--) if (xp >= NIVELES[i]) return i + 1;
-    return 1;
+  const KEY_MASCOTAS_COMPRADAS = () => `sa_mascotas_compradas_${getUserId()}`;
+  const getMascotasCompradas = () => { try { return JSON.parse(localStorage.getItem(KEY_MASCOTAS_COMPRADAS()) || "[]"); } catch { return []; } };
+  const setMascotasCompradas = (a) => { try { localStorage.setItem(KEY_MASCOTAS_COMPRADAS(), JSON.stringify(a)); } catch {} };
+
+  const comprarMascota = (id) => {
+    const d = DESBLOQUEO[id];
+    if (!d || d.tipo !== "compra") return false;
+    const compradas = getMascotasCompradas();
+    if (compradas.includes(id)) return true;
+    const nivelActual = getNivel();
+    if (nivelActual < (d.reqNivel || 1)) { notifMascota("Nivel bajo", `Necesitas nivel ${d.reqNivel}`); return false; }
+    if (getMonedas() < d.precio) { notifMascota("Sin monedas", `Necesitas ${d.precio} SunCoins`); return false; }
+    setMonedas(getMonedas() - d.precio);
+    compradas.push(id);
+    setMascotasCompradas(compradas);
+    notifMascota("¡Desbloqueado!", `Nueva mascota: ${MASCOTAS[id]?.nombre || id}`);
+    try { snd("compra"); } catch {}
+    window.dispatchEvent(new Event("sunad:progress"));
+    window.dispatchEvent(new Event("sunad:tienda-compra"));
+    return true;
   };
   const desbloqueada = id => {
     const d = DESBLOQUEO[id];
     if (!d) return true;
-    if (d.tipo === "inicial") return true;
-    if (d.tipo === "nivel") return getNivel() >= d.nivel;
-    if (d.tipo === "logro") return !!(window._logrosDesbloqueados || {})[d.id];
+    try {
+      if (d.tipo === "inicial") return true;
+      if (d.tipo === "compra") {
+        return getMascotasCompradas().includes(id);
+      }
+      if (d.tipo === "nivel") return getNivel() >= d.nivel;
+      if (d.tipo === "logro") return !!(window._logrosDesbloqueados || {})[d.id];
+    } catch (err) { console.warn("desbloqueada:", id, err); }
     return false;
+  };
+  const esComprable = id => {
+    const d = DESBLOQUEO[id];
+    return d && d.tipo === "compra" && !getMascotasCompradas().includes(id);
   };
 
   /* ---------- Persistencia ---------- */
   const KEY = {
-    stats: (u, m) => `mascota_stats_${u}_${m}`,
-    inv: u => `mascota_inventario_${u}`,
-    mon: u => `mascota_monedas_${u}`,
-    skinsC: u => `mascota_skins_${u}`,
-    skinsE: (u, m) => `mascota_skins_eq_${u}_${m}`,
-    amistad: u => `mascota_amistad_${u}`,
-    cuidado: (u, m) => `mascota_cuidado_${u}_${m}`
+    stats:(u,m)=>`mascota_stats_${u}_${m}`,
+    inv:u=>`mascota_inventario_${u}`,
+    mon:u=>`mascota_monedas_${u}`,
+    skinsC:u=>`mascota_skins_${u}`,
+    skinsE:(u,m)=>`mascota_skins_eq_${u}_${m}`,
+    amistad:u=>`mascota_amistad_${u}`,
+    cuidado:(u,m)=>`mascota_cuidado_${u}_${m}`
   };
-  const statsDef = () => ({ hambre: 80, felicidad: 100, energia: 100, ultimaActualizacion: Date.now(), durmiendo: false });
+  const statsDef = () => ({ hambre:80, felicidad:100, energia:100, ultimaActualizacion:Date.now(), durmiendo:false });
   const cargarStats = m => {
     try {
       const r = localStorage.getItem(KEY.stats(getUserId(), m));
       if (!r) return statsDef();
       const s = JSON.parse(r);
-      return {
-        hambre: typeof s.hambre === "number" ? s.hambre : 80,
-        felicidad: typeof s.felicidad === "number" ? s.felicidad : 100,
-        energia: typeof s.energia === "number" ? s.energia : 100,
-        ultimaActualizacion: s.ultimaActualizacion || Date.now(),
-        durmiendo: !!s.durmiendo
-      };
+      return { hambre:s.hambre??80, felicidad:s.felicidad??100, energia:s.energia??100, ultimaActualizacion:s.ultimaActualizacion||Date.now(), durmiendo:!!s.durmiendo };
     } catch { return statsDef(); }
   };
-  const guardarStats = (m, s) => {
-    try { s.ultimaActualizacion = Date.now(); localStorage.setItem(KEY.stats(getUserId(), m), JSON.stringify(s)); } catch {}
-  };
-  const DEC = { hambre: 100 / (12 * 3600000), felicidad: 100 / (24 * 3600000), energia: 100 / (6 * 3600000) };
+  const guardarStats = (m, s) => { try { s.ultimaActualizacion = Date.now(); localStorage.setItem(KEY.stats(getUserId(), m), JSON.stringify(s)); } catch {} };
+  const DEC = { hambre:100/(12*3600000), felicidad:100/(24*3600000), energia:100/(6*3600000) };
   const decaer = s => {
     if (!s) return s;
     const d = Math.max(0, Date.now() - (s.ultimaActualizacion || Date.now()));
@@ -225,7 +362,7 @@ document.addEventListener("DOMContentLoaded", () => {
     s.energia   = Math.max(0, s.energia   - d * DEC.energia * fe);
     return s;
   };
-  const invInicial = () => ({ manzana: 5, zanahoria: 3, semillas: 3, agua: 3 });
+  const invInicial = () => ({ manzana:5, zanahoria:3, semillas:3, agua:3 });
   const cargarInv = () => {
     try {
       const r = localStorage.getItem(KEY.inv(getUserId()));
@@ -247,8 +384,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const setSkinsC = a => { try { localStorage.setItem(KEY.skinsC(getUserId()), JSON.stringify(a)); } catch {} };
   const getSkinsE = m => { try { return JSON.parse(localStorage.getItem(KEY.skinsE(getUserId(), m)) || "{}"); } catch { return {}; } };
   const setSkinsE = (m, e) => { try { localStorage.setItem(KEY.skinsE(getUserId(), m), JSON.stringify(e)); } catch {} };
-  const cargarAm   = () => { try { return JSON.parse(localStorage.getItem(KEY.amistad(getUserId())) || "{}"); } catch { return {}; } };
-  const guardarAm  = a => { try { localStorage.setItem(KEY.amistad(getUserId()), JSON.stringify(a)); } catch {} };
+  const cargarAm  = () => { try { return JSON.parse(localStorage.getItem(KEY.amistad(getUserId())) || "{}"); } catch { return {}; } };
+  const guardarAm = a => { try { localStorage.setItem(KEY.amistad(getUserId()), JSON.stringify(a)); } catch {} };
   const getAmistad = (a, b) => cargarAm()[[a, b].sort().join("__")] || 0;
   const subirAmistad = (a, b, d) => {
     const am = cargarAm();
@@ -260,22 +397,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const cargarCuidado = m => {
     try {
       const r = localStorage.getItem(KEY.cuidado(getUserId(), m));
-      if (!r) return { fecha: hoyISO(), tareas: [], racha: 0, ultimaCompletada: null };
+      if (!r) return { fecha:hoyISO(), tareas:[], racha:0, ultimaCompletada:null };
       const c = JSON.parse(r);
-      if (c.fecha !== hoyISO()) return { fecha: hoyISO(), tareas: [], racha: c.racha || 0, ultimaCompletada: c.ultimaCompletada || null };
+      if (c.fecha !== hoyISO()) return { fecha:hoyISO(), tareas:[], racha:c.racha||0, ultimaCompletada:c.ultimaCompletada||null };
       return c;
-    } catch { return { fecha: hoyISO(), tareas: [], racha: 0, ultimaCompletada: null }; }
+    } catch { return { fecha:hoyISO(), tareas:[], racha:0, ultimaCompletada:null }; }
   };
   const guardarCuidado = (m, c) => { try { localStorage.setItem(KEY.cuidado(getUserId(), m), JSON.stringify(c)); } catch {} };
 
   /* ---------- Audio ---------- */
   let ac = null;
+  const appSoundVolume = () => {
+    const value = Number(localStorage.getItem("app_volume") ?? "0.8");
+    return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0.8;
+  };
   const getAC = () => {
     if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch { return null; } }
     if (ac.state === "suspended") ac.resume().catch(() => {});
     return ac;
   };
   const tono = (f, d, t = "sine", v = 0.15, dl = 0, ff = null) => {
+    v *= appSoundVolume();
+    if (v <= 0) return;
     const c = getAC(); if (!c) return;
     const ti = c.currentTime + dl;
     const o = c.createOscillator(), g = c.createGain();
@@ -288,6 +431,8 @@ document.addEventListener("DOMContentLoaded", () => {
     o.start(ti); o.stop(ti + d + 0.05);
   };
   const ruido = (d = 0.15, v = 0.2) => {
+    v *= appSoundVolume();
+    if (v <= 0) return;
     const c = getAC(); if (!c) return;
     const ti = c.currentTime, s = c.sampleRate * d;
     const b = c.createBuffer(1, s, c.sampleRate), da = b.getChannelData(0);
@@ -300,33 +445,32 @@ document.addEventListener("DOMContentLoaded", () => {
     sr.start(ti);
   };
   const SND = {
-    fireball: () => { ruido(0.25, 0.3); tono(180, 0.4, "sawtooth", 0.12, 0, 60); },
-    growl:    () => { tono(120, 0.6, "sawtooth", 0.1, 0, 80); tono(90, 0.5, "sawtooth", 0.08, 0.2, 60); },
-    chitter:  () => [0, 0.07, 0.14].forEach(d => tono(1200 + (d ? 200 : 0), 0.05, "square", 0.08, d)),
-    twinkle:  () => { tono(880, 0.3, "sine", 0.12); tono(1320, 0.4, "sine", 0.1, 0.1); },
-    meow:     () => { tono(500, 0.15, "sine", 0.15, 0, 800); tono(800, 0.4, "sine", 0.15, 0.15, 400); },
-    crunch:   () => { ruido(0.15, 0.2); ruido(0.1, 0.15); },
-    baa:      () => tono(600, 0.6, "sawtooth", 0.08, 0, 400),
-    peep:     () => { tono(1800, 0.1, "sine", 0.12); tono(2000, 0.08, "sine", 0.12, 0.12); },
-    blip:     () => { tono(300, 0.3, "sine", 0.15); tono(400, 0.2, "sine", 0.12, 0.15); },
-    sparkle:  () => { [660, 880, 1100].forEach((f, i) => tono(f, 0.15, "sine", 0.1, i * 0.1)); tono(1320, 0.3, "sine", 0.1, 0.3); },
-    hop:      () => [420, 620, 860].forEach((f, i) => tono(f, 0.1, "triangle", 0.1, i * 0.08)),
-    mimos:    () => [660, 880, 990].forEach((f, i) => tono(f, 0.18, "sine", 0.1, i * 0.08)),
-    dormir:   () => { tono(440, 0.5, "sine", 0.12, 0, 220); tono(330, 0.6, "sine", 0.08, 0.4, 165); },
-    despertar:() => [523, 659, 784].forEach((f, i) => tono(f, 0.15, "sine", 0.12, i * 0.1)),
-    comer:    () => { ruido(0.12, 0.15); ruido(0.08, 0.12); tono(600, 0.2, "sine", 0.1, 0.15); },
-    moneda:   () => { tono(900, 0.08, "square", 0.1); tono(1300, 0.12, "square", 0.1, 0.06); },
-    compra:   () => [523, 659, 784, 1046].forEach((f, i) => tono(f, 0.12, "sine", 0.1, i * 0.07)),
-    atrapado: () => { tono(880, 0.06, "square", 0.08); tono(1320, 0.08, "square", 0.08, 0.04); },
-    victoria: () => [523, 659, 784, 1046, 1318].forEach((f, i) => tono(f, 0.18, "triangle", 0.12, i * 0.09)),
-    derrota:  () => [600, 500, 400, 300].forEach((f, i) => tono(f, 0.2, "sine", 0.1, i * 0.1))
+    fireball:()=>{ruido(0.25,0.3);tono(180,0.4,"sawtooth",0.12,0,60);},
+    growl:()=>{tono(120,0.6,"sawtooth",0.1,0,80);tono(90,0.5,"sawtooth",0.08,0.2,60);},
+    chitter:()=>[0,0.07,0.14].forEach(d=>tono(1200+(d?200:0),0.05,"square",0.08,d)),
+    twinkle:()=>{tono(880,0.3,"sine",0.12);tono(1320,0.4,"sine",0.1,0.1);},
+    meow:()=>{tono(500,0.15,"sine",0.15,0,800);tono(800,0.4,"sine",0.15,0.15,400);},
+    crunch:()=>{ruido(0.15,0.2);ruido(0.1,0.15);},
+    baa:()=>tono(600,0.6,"sawtooth",0.08,0,400),
+    peep:()=>{tono(1800,0.1,"sine",0.12);tono(2000,0.08,"sine",0.12,0.12);},
+    blip:()=>{tono(300,0.3,"sine",0.15);tono(400,0.2,"sine",0.12,0.15);},
+    sparkle:()=>{[660,880,1100].forEach((f,i)=>tono(f,0.15,"sine",0.1,i*0.1));tono(1320,0.3,"sine",0.1,0.3);},
+    hop:()=>[420,620,860].forEach((f,i)=>tono(f,0.1,"triangle",0.1,i*0.08)),
+    mimos:()=>[660,880,990].forEach((f,i)=>tono(f,0.18,"sine",0.1,i*0.08)),
+    dormir:()=>{tono(440,0.5,"sine",0.12,0,220);tono(330,0.6,"sine",0.08,0.4,165);},
+    despertar:()=>[523,659,784].forEach((f,i)=>tono(f,0.15,"sine",0.12,i*0.1)),
+    comer:()=>{ruido(0.12,0.15);ruido(0.08,0.12);tono(600,0.2,"sine",0.1,0.15);},
+    moneda:()=>{tono(900,0.08,"square",0.1);tono(1300,0.12,"square",0.1,0.06);},
+    compra:()=>[523,659,784,1046].forEach((f,i)=>tono(f,0.12,"sine",0.1,i*0.07)),
+    atrapado:()=>{tono(880,0.06,"square",0.08);tono(1320,0.08,"square",0.08,0.04);},
+    victoria:()=>[523,659,784,1046,1318].forEach((f,i)=>tono(f,0.18,"triangle",0.12,i*0.09)),
+    derrota:()=>[600,500,400,300].forEach((f,i)=>tono(f,0.2,"sine",0.1,i*0.1))
   };
   const snd = t => { if (!t) return; try { (SND[t] || (() => tono(600, 0.2)))(); } catch {} };
-  const getNombre = () => localStorage.getItem("sunadventures_username") || window._sunUserEmail?.split("@")[0] || "";
+  const getNombre = () => localStorage.getItem("sunad_username") || window._sunUserEmail?.split("@")[0] || "";
 
   /* ---------- Notificación ---------- */
-  let notifT = null;
-  let _notifEl = null;
+  let notifT = null, _notifEl = null;
   function notifMascota(t, txt, d = 4000) {
     try {
       if (!_notifEl || !_notifEl.isConnected) {
@@ -359,26 +503,47 @@ document.addEventListener("DOMContentLoaded", () => {
       s.ultimaActualizacion = Date.now();
       localStorage.setItem(k, JSON.stringify(s));
     } catch {}
-    try { setNumLS(`sa_minijuegos_jugados_${getUserId()}`, numLS(`sa_minijuegos_jugados_${getUserId()}`) + 1); } catch {}
+    try {
+      const u = getUserId();
+      setNumLS(`sa_minijuegos_jugados_${u}`, numLS(`sa_minijuegos_jugados_${u}`) + 1);
+      // Ganar XP de nivel general por cada partida ganada o jugada
+      const xpPremio = Math.max(3, Math.round(m * 0.4));
+      const kXp = `sa_experiencia_extra_${u}`;
+      const actualXp = Math.max(0, Number(localStorage.getItem(kXp)) || 0);
+      localStorage.setItem(kXp, String(actualXp + xpPremio));
+    } catch {}
     if (window.decirMascota) window.decirMascota(mot || `+${m}`, 2500);
-    window.dispatchEvent(new Event("sunadventures:progress"));
+    window.dispatchEvent(new Event("sunad:progress"));
   };
 
-  /* ---------- Mascota flotante ---------- */
-  const mascota = qs(".mascota"),
-        mascotaImg = qs(".mascota-img"),
-        mascotaBurbuja = qs(".mascota-burbuja");
-
+  /* ============================================================
+     MASCOTA FLOTANTE
+     ============================================================ */
+  const mascota = qs(".mascota"), mascotaImg = qs(".mascota-img"), mascotaBurbuja = qs(".mascota-burbuja");
   let mascotaActual = localStorage.getItem("mascota_actual") || "mapache";
-  if (!MASCOTAS[mascotaActual]) {
-    mascotaActual = "mapache";
-    try { localStorage.setItem("mascota_actual", "mapache"); } catch {}
-  }
+  if (!MASCOTAS[mascotaActual]) { mascotaActual = "mapache"; try { localStorage.setItem("mascota_actual", "mapache"); } catch {} }
 
   let burbujaT = null, statsM = null, cdMimos = 0, cdDormir = 0, inv = cargarInv();
+  const _imgRotas = new Set();
+
+  function setMascotaImg(img, src, alt, fallbackSrc) {
+    if (!img) return;
+    img.alt = alt || "";
+    const fallback = fallbackSrc || "img/girasol-loading.png";
+    const finalSrc = _imgRotas.has(src) ? fallback : src;
+    if (img.dataset.currentSrc === finalSrc) return;
+    img.onerror = () => {
+      img.onerror = null;
+      _imgRotas.add(src);
+      if (img.src.endsWith(fallback)) return;
+      img.dataset.currentSrc = fallback;
+      img.src = fallback;
+    };
+    img.dataset.currentSrc = finalSrc;
+    img.src = finalSrc;
+  }
 
   if (mascota && mascotaImg && mascotaBurbuja) {
-    /* — API de habla — */
     window.decirMascota = (t, d = 3000) => {
       try {
         mascotaBurbuja.textContent = t;
@@ -387,44 +552,8 @@ document.addEventListener("DOMContentLoaded", () => {
         burbujaT = setTimeout(() => mascotaBurbuja.classList.remove("visible"), d);
       } catch {}
     };
-
-    /* — Setear sprite con cache — */
-    function setMascotaImg(img, src, alt) {
-      if (!img) return;
-      img.alt = alt || "";
-      img.onerror = () => { img.onerror = null; img.src = "img/girasol-loading.png"; };
-      if (img.dataset.currentSrc === src) return;
-      img.dataset.currentSrc = src;
-      img.src = src;
-      /* — Setear sprite con cache + fallback en cascada — */
-const _imgRotas = new Set(); // ⚡ evita reintentar paths que ya sabemos rotos
-
-function setMascotaImg(img, src, alt, fallbackSrc) {
-  if (!img) return;
-  img.alt = alt || "";
-  const fallback = fallbackSrc || "img/girasol-loading.png";
-
-  // Si ya sabemos que este path falla → saltamos directo al fallback
-  const finalSrc = _imgRotas.has(src) ? fallback : src;
-
-  if (img.dataset.currentSrc === finalSrc) return;
-
-  img.onerror = () => {
-    img.onerror = null;
-    _imgRotas.add(src);                 // recordar que este path no existe
-    if (img.src.endsWith(fallback)) return; // ya estamos en el fallback → stop
-    img.dataset.currentSrc = fallback;
-    img.src = fallback;
-  };
-
-  img.dataset.currentSrc = finalSrc;
-  img.src = finalSrc;
-}
-window._setMascotaImg = setMascotaImg;
-    }
     window._setMascotaImg = setMascotaImg;
 
-    /* — Aplicar skins equipadas — */
     function aplicarSkins() {
       try {
         if (!mascota) return;
@@ -445,19 +574,14 @@ window._setMascotaImg = setMascotaImg;
     }
     window._aplicarSkins = aplicarSkins;
 
-    /* — Actualiza el modal (faltaba, se llamaba desde 6 sitios) — */
     function actualizarModalMascota() {
       try {
         const modal = $("mascota-modal");
         if (!modal?.classList.contains("active")) return;
         const m = MASCOTAS[mascotaActual];
         if (!m || !statsM) return;
-
-        const av = $("mm-avatar-img");
-        if (av) { av.src = m.imagen; av.alt = m.nombre; }
-
+        const av = $("mm-avatar-img"); if (av) { av.src = m.imagen; av.alt = m.nombre; }
         const nom = $("mm-nombre-txt"); if (nom) nom.textContent = m.nombre;
-
         const est = $("mm-estado");
         if (est) {
           let estado = "Tranquila";
@@ -468,75 +592,45 @@ window._setMascotaImg = setMascotaImg;
           else if (statsM.energia < 25) estado = "Cansada";
           est.textContent = estado;
         }
-
         const mon = $("mm-monedas"); if (mon) mon.textContent = getMonedas();
-
-        const hp = Math.round(statsM.hambre),
-              fp = Math.round(statsM.felicidad),
-              ep = Math.round(statsM.energia);
+        const hp = Math.round(statsM.hambre), fp = Math.round(statsM.felicidad), ep = Math.round(statsM.energia);
         const hv = $("mm-stat-hambre-val"), fv = $("mm-stat-felicidad-val"), ev = $("mm-stat-energia-val");
-        if (hv) hv.textContent = hp + "%";
-        if (fv) fv.textContent = fp + "%";
-        if (ev) ev.textContent = ep + "%";
+        if (hv) hv.textContent = hp + "%"; if (fv) fv.textContent = fp + "%"; if (ev) ev.textContent = ep + "%";
         const bh = $("mm-stat-hambre"), bf = $("mm-stat-felicidad"), be = $("mm-stat-energia");
-        if (bh) bh.style.width = hp + "%";
-        if (bf) bf.style.width = fp + "%";
-        if (be) be.style.width = ep + "%";
-
+        if (bh) bh.style.width = hp + "%"; if (bf) bf.style.width = fp + "%"; if (be) be.style.width = ep + "%";
         const btn = qs('[data-accion="dormir"] [data-txt-dormir]', modal);
         if (btn) btn.textContent = statsM.durmiendo ? "Despertar" : "Dormir";
       } catch (e) { console.warn("actualizarModalMascota:", e); }
     }
+    window._actualizarModalMascota = actualizarModalMascota;
 
-    /* — UNA SOLA definición de visual() — */
     function visual() {
-  try {
-    if (!mascota || !statsM) return;
-    const meta = MASCOTAS[mascotaActual];
-
-    mascota.classList.toggle("dormida", !!statsM.durmiendo);
-    mascota.classList.toggle("hambrienta", statsM.hambre < 25 && !statsM.durmiendo);
-
-    // ✅ Cadena de fallback:
-    //   · Si duerme y hay imagenDormida → intenta dormida, si falla → normal
-    //   · Si despierta → intenta normal, si falla → girasol-loading
-    if (statsM.durmiendo && meta.imagenDormida) {
-      setMascotaImg(mascotaImg, meta.imagenDormida, meta.nombre, meta.imagen);
-    } else {
-      setMascotaImg(mascotaImg, meta.imagen, meta.nombre, );
+      try {
+        if (!mascota || !statsM) return;
+        const meta = MASCOTAS[mascotaActual];
+        mascota.classList.toggle("dormida", !!statsM.durmiendo);
+        mascota.classList.toggle("hambrienta", statsM.hambre < 25 && !statsM.durmiendo);
+        if (statsM.durmiendo && meta.imagenDormida) setMascotaImg(mascotaImg, meta.imagenDormida, meta.nombre, meta.imagen);
+        else setMascotaImg(mascotaImg, meta.imagen, meta.nombre);
+        let z = qs(".mascota-zzz-cont", mascota);
+        if (statsM.durmiendo && !z) {
+          const c = document.createElement("div");
+          c.className = "mascota-zzz-cont";
+          for (let i = 0; i < 3; i++) { const s = document.createElement("span"); s.className = "mascota-zzz"; s.textContent = "z"; c.appendChild(s); }
+          mascota.appendChild(c);
+        } else if (!statsM.durmiendo && z) z.remove();
+        aplicarSkins();
+      } catch {}
     }
 
-    // Zzz
-    let z = qs(".mascota-zzz-cont", mascota);
-    if (statsM.durmiendo && !z) {
-      const c = document.createElement("div");
-      c.className = "mascota-zzz-cont";
-      for (let i = 0; i < 3; i++) {
-        const s = document.createElement("span");
-        s.className = "mascota-zzz";
-        s.textContent = "z";
-        c.appendChild(s);
-      }
-      mascota.appendChild(c);
-    } else if (!statsM.durmiendo && z) z.remove();
-
-    aplicarSkins();
-  } catch {}
-}
-
-    /* — Abrir / cerrar modal — */
     window.abrirMascotaModal = () => {
       const m = $("mascota-modal"); if (!m) return;
       m.classList.add("active");
       m.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
       actualizarModalMascota();
-      renderInv();
-      renderCuidado();
-      renderCambiarMascota();
-      window.dispatchEvent(new Event("sunadventures:mascota-cambiada"));
-      const embed = $("tienda-embed");
-      if (embed && window.Tienda?.montar) window.Tienda.montar(embed);
+      renderInv(); renderCuidado(); renderCambiarMascota();
+      window.dispatchEvent(new Event("sunad:mascota-cambiada"));
     };
     window.cerrarMascotaModal = () => {
       const m = $("mascota-modal"); if (!m) return;
@@ -545,7 +639,6 @@ window._setMascotaImg = setMascotaImg;
       document.body.style.overflow = "";
     };
 
-    /* — Inventario — */
     function renderInv() {
       const c = $("mm-inventario"); if (!c) return;
       if (!inv) inv = cargarInv();
@@ -567,41 +660,47 @@ window._setMascotaImg = setMascotaImg;
         if (cant > 0) {
           b.draggable = true;
           b.addEventListener("click", e => { e.stopPropagation(); darComida(id); });
-          b.addEventListener("dragstart", e => {
-            try { e.dataTransfer.setData("text/plain", id); e.dataTransfer.effectAllowed = "move"; } catch {}
-          });
+          b.addEventListener("dragstart", e => { try { e.dataTransfer.setData("text/plain", id); e.dataTransfer.effectAllowed = "move"; } catch {} });
         } else b.disabled = true;
         c.appendChild(b);
       });
     }
+    window._renderInv = renderInv;
 
-    /* — Cuidado diario — */
     function renderCuidado() {
       const c = $("mm-cuidado-diario"); if (!c) return;
       const cu = cargarCuidado(mascotaActual);
       const t = [
-        { id: "alimentar", icono: ICONO.manzana, txt: "Alimentar" },
-        { id: "jugar",     icono: ICONO.jugar,   txt: "Jugar" },
-        { id: "mimar",     icono: ICONO.mimar,   txt: "Mimar" }
+        { id:"alimentar", icono:ICONO.manzana, txt:"Alimentar" },
+        { id:"jugar",     icono:ICONO.jugar,   txt:"Jugar" },
+        { id:"mimar",     icono:ICONO.mimar,   txt:"Mimar" }
       ];
       c.innerHTML = `<div class="cuidado-diario-titulo"><span>Cuidado diario</span><span class="cuidado-diario-racha">${cu.racha || 0} ${cu.racha === 1 ? "día" : "días"}</span></div><div class="cuidado-diario-tareas">${t.map(x => `<div class="cuidado-tarea ${cu.tareas.includes(x.id) ? "hecha" : ""}"><span class="cuidado-tarea-emoji">${x.icono || ""}</span><span class="cuidado-tarea-txt">${x.txt}</span>${cu.tareas.includes(x.id) ? '<span class="cuidado-tarea-check">✓</span>' : ''}</div>`).join("")}</div>`;
     }
+    window._renderCuidado = renderCuidado;
 
-    /* — Cambiar mascota — */
     function renderCambiarMascota() {
       const c = $("mm-cambiar-lista"); if (!c) return;
       c.innerHTML = "";
       Object.keys(MASCOTAS).forEach(id => {
         const ok = desbloqueada(id);
+        const comprable = esComprable(id);
+        const d = DESBLOQUEO[id];
         const item = document.createElement("button");
         item.type = "button";
-        item.className = "mm-cambiar-item" + (id === mascotaActual ? " activa" : "") + (!ok ? " bloqueada" : "");
-        item.innerHTML = `<img alt="">`;
+        item.className = "mm-cambiar-item" + (id === mascotaActual ? " activa" : "") + (!ok ? " bloqueada" : "") + (comprable ? " comprable" : "");
+        item.innerHTML = `<img alt=""><span class="mm-cambiar-info"></span>`;
         const im = item.querySelector("img");
         im.onerror = () => { im.onerror = null; im.src = "img/girasol-loading.png"; };
         im.src = MASCOTAS[id].imagen;
-        item.title = MASCOTAS[id].nombre;
-        if (ok && id !== mascotaActual) {
+        const info = item.querySelector(".mm-cambiar-info");
+        if (comprable && d) {
+          info.textContent = `${d.precio} 🪙`;
+          item.title = `Comprar ${MASCOTAS[id].nombre} (nivel ${d.reqNivel})`;
+        } else {
+          item.title = MASCOTAS[id].nombre;
+        }
+        if (ok && id !== mascotaActual && !comprable) {
           item.addEventListener("click", () => {
             localStorage.setItem("mascota_actual", id);
             mascotaActual = id;
@@ -610,18 +709,19 @@ window._setMascotaImg = setMascotaImg;
             guardarStats(mascotaActual, statsM);
             visual();
             actualizarModalMascota();
-            renderInv();
-            renderCuidado();
-            renderCambiarMascota();
+            renderInv(); renderCuidado(); renderCambiarMascota();
             decirMascota(`¡Hola! Ahora soy ${MASCOTAS[mascotaActual].nombre}`);
-            window.dispatchEvent(new Event("sunadventures:mascota-cambiada"));
+            window.dispatchEvent(new Event("sunad:mascota-cambiada"));
+          });
+        } else if (comprable) {
+          item.addEventListener("click", () => {
+            if (comprarMascota(id)) { renderCambiarMascota(); renderGrid(); }
           });
         }
         c.appendChild(item);
       });
     }
 
-    /* — Tareas de cuidado — */
     function marcarTarea(t) {
       try {
         const c = cargarCuidado(mascotaActual);
@@ -640,16 +740,12 @@ window._setMascotaImg = setMascotaImg;
       } catch {}
     }
 
-    /* — Acciones — */
     function hacerMimos() {
       try {
         if (!statsM) return;
         const a = Date.now(), CD = 30000;
         const b = qs('[data-accion="mimos"]', $("mascota-modal"));
-        if (a < cdMimos) {
-          decirMascota(`Espera ${Math.ceil((cdMimos - a) / 1000)}s...`, 2000);
-          return;
-        }
+        if (a < cdMimos) { decirMascota(`Espera ${Math.ceil((cdMimos - a) / 1000)}s...`, 2000); return; }
         cdMimos = a + CD;
         lanzarCorazones(6);
         snd("mimos");
@@ -722,8 +818,7 @@ window._setMascotaImg = setMascotaImg;
         if (!statsM) return;
         if (!inv[id] || inv[id] <= 0) { decirMascota("No me queda de eso... ve a la tienda", 2500); return; }
         if (statsM.durmiendo) { decirMascota("Shhh... estoy durmiendo", 2000); return; }
-        inv[id]--;
-        guardarInv(inv);
+        inv[id]--; guardarInv(inv);
         const c = COMIDAS[id], fav = MASCOTAS[mascotaActual].favorita === id, m = fav ? 1.5 : 1;
         statsM.hambre    = clamp(statsM.hambre    + c.efecto.hambre * m);
         statsM.felicidad = clamp(statsM.felicidad + c.efecto.felicidad * m);
@@ -736,10 +831,9 @@ window._setMascotaImg = setMascotaImg;
         decirMascota(randomDe(fav ? ["¡PIZZA! ¡Mi favorita!", "¡Ñam ñam!", "¡Eres el mejor!"] : ["¡Gracias por la comida!", "Ñam ñam...", "¡Qué rico!"]));
         if (fav) { setMonedas(getMonedas() + 3); notifMascota("+3", "¡Comida favorita!"); }
         actualizarModalMascota();
-        renderInv();
-        renderCuidado();
-        visual();
-        window.dispatchEvent(new Event("sunadventures:progress"));
+        renderInv(); renderCuidado(); visual();
+        window.dispatchEvent(new CustomEvent("sunad:mascota-accion", { detail: { tipo: "alimentar", id, mascota: mascotaActual } }));
+        window.dispatchEvent(new Event("sunad:progress"));
       } catch {}
     }
 
@@ -749,14 +843,9 @@ window._setMascotaImg = setMascotaImg;
         const z = document.createElement("div");
         z.className = "mascota-dropzone";
         mascota.appendChild(z);
-        ["dragenter", "dragover"].forEach(e => mascota.addEventListener(e, ev => {
-          ev.preventDefault();
-          ev.stopPropagation();
-          mascota.classList.add("drop-hover");
-        }));
+        ["dragenter", "dragover"].forEach(e => mascota.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); mascota.classList.add("drop-hover"); }));
         ["dragleave", "drop"].forEach(e => mascota.addEventListener(e, ev => {
-          ev.preventDefault();
-          ev.stopPropagation();
+          ev.preventDefault(); ev.stopPropagation();
           if (e === "dragleave" && ev.relatedTarget && mascota.contains(ev.relatedTarget)) return;
           mascota.classList.remove("drop-hover");
         }));
@@ -785,9 +874,7 @@ window._setMascotaImg = setMascotaImg;
           o.className = "amistad-overlay";
           o.innerHTML = `<div class="amistad-panel"><h3 class="amistad-titulo">Amistades de ${MASCOTAS[mascotaActual].nombre}</h3><p class="amistad-sub">Aliméntalas, juega con ellas y sube su amistad.</p><div class="amistad-lista" id="amistad-lista"></div><div style="text-align:right;margin-top:1rem;"><button type="button" class="btn-secondary" data-close-amistad>Cerrar</button></div></div>`;
           document.body.appendChild(o);
-          o.addEventListener("click", e => {
-            if (e.target === o || e.target.hasAttribute("data-close-amistad")) o.classList.remove("active");
-          });
+          o.addEventListener("click", e => { if (e.target === o || e.target.hasAttribute("data-close-amistad")) o.classList.remove("active"); });
         }
         const l = qs("#amistad-lista", o);
         l.innerHTML = "";
@@ -805,30 +892,118 @@ window._setMascotaImg = setMascotaImg;
       } catch {}
     }
 
-    /* — Init mascota (UNA sola vez, sin duplicar) — */
+    /* ---------- INIT mascota ---------- */
     statsM = cargarStats(mascotaActual);
     decaer(statsM);
     guardarStats(mascotaActual, statsM);
-    visual(); // ⬅️ aplica clase, sprite correcto y skins
+    visual();
 
-    mascotaImg.addEventListener("click", e => {
-      e.stopPropagation();
+    /* Taps y clics */
+    let _pressT = null, _pressDisparo = false, _ultimoTap = 0;
+
+    function _contarClick() {
+      try {
+        const u = getUserId();
+        const k = `mascota_clicks_${u}_${mascotaActual}`;
+        const actual = Number(localStorage.getItem(k) || 0) + 1;
+        localStorage.setItem(k, String(actual));
+        window.dispatchEvent(new Event("sunad:progress"));
+      } catch {}
+    }
+    function _interactuar() {
       snd(MASCOTAS[mascotaActual].sonido);
       mascota.classList.remove("saludo");
       void mascota.offsetWidth;
       mascota.classList.add("saludo");
       decirMascota(randomDe(FRASES[mascotaActual]));
+      _contarClick();
+    }
+
+    function _estaEnRpg() {
+      return document.body.classList.contains("rpg-abierto") ||
+             location.hash === "#rpg" ||
+             !!document.querySelector('[data-view="rpg"].active') ||
+             !!document.querySelector('#rpg.active') ||
+             !!document.querySelector('#rpg-roguelike-panel');
+    }
+
+    let _touchStartX = 0, _touchStartY = 0, _touchMovido = false;
+
+    function _iniciarTouch(e) {
+      if (_estaEnRpg()) return;
+      _pressDisparo = false;
+      _touchMovido = false;
+      if (e.touches && e.touches[0]) {
+        _touchStartX = e.touches[0].clientX;
+        _touchStartY = e.touches[0].clientY;
+      }
+      mascota.classList.add("activo-tap");
+      _pressT = setTimeout(() => {
+        if (_estaEnRpg() || _touchMovido) return;
+        _pressDisparo = true;
+        mascota.classList.remove("activo-tap");
+        abrirMascotaModal();
+        snd("blip");
+        try { navigator.vibrate?.(15); } catch {}
+      }, 500);
+    }
+
+    function _moverTouch(e) {
+      if (!_pressT) return;
+      if (e.touches && e.touches[0]) {
+        const dx = Math.abs(e.touches[0].clientX - _touchStartX);
+        const dy = Math.abs(e.touches[0].clientY - _touchStartY);
+        if (dx > 10 || dy > 10) {
+          _touchMovido = true;
+          mascota.classList.remove("activo-tap");
+          clearTimeout(_pressT);
+          _pressT = null;
+        }
+      }
+    }
+
+    function _terminarTouch(e) {
+      mascota.classList.remove("activo-tap");
+      if (_pressT) { clearTimeout(_pressT); _pressT = null; }
+      if (_estaEnRpg() || _touchMovido) return;
+      if (_pressDisparo) { _pressDisparo = false; return; }
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
+      _ultimoTap = Date.now();
+      setTimeout(() => { _ultimoTap = 0; }, 400);
+      _interactuar();
+    }
+
+    function _cancelarTouch() {
+      mascota.classList.remove("activo-tap");
+      if (_pressT) { clearTimeout(_pressT); _pressT = null; }
+      _pressDisparo = false;
+      _touchMovido = false;
+    }
+
+    mascota.addEventListener("click", e => {
+      if (_estaEnRpg() || e.pointerType === "touch" || _ultimoTap > 0) return;
+      e.stopPropagation();
+      _interactuar();
     });
 
-    // Long-press → abrir modal
-    let pressT = null;
-    const onPS = () => { pressT = setTimeout(() => { abrirMascotaModal(); snd("blip"); }, 500); };
-    const onPE = () => { if (pressT) clearTimeout(pressT); };
-    mascotaImg.addEventListener("mousedown", onPS);
-    mascotaImg.addEventListener("mouseup", onPE);
-    mascotaImg.addEventListener("mouseleave", onPE);
-    mascotaImg.addEventListener("touchstart", onPS, { passive: true });
-    mascotaImg.addEventListener("touchend", onPE);
+    mascota.addEventListener("touchstart", _iniciarTouch, { passive: true });
+    mascota.addEventListener("touchmove", _moverTouch, { passive: true });
+    mascota.addEventListener("touchend", _terminarTouch, { passive: false });
+    mascota.addEventListener("touchcancel", _cancelarTouch, { passive: true });
+
+    let _pressMouseT = null;
+    mascota.addEventListener("mousedown", () => {
+      _pressMouseT = setTimeout(() => { _pressDisparo = true; abrirMascotaModal(); snd("blip"); }, 500);
+    });
+    mascota.addEventListener("mouseup", () => {
+      if (_pressMouseT) { clearTimeout(_pressMouseT); _pressMouseT = null; }
+      if (_pressDisparo) _pressDisparo = false;
+    });
+    mascota.addEventListener("mouseleave", () => {
+      if (_pressMouseT) { clearTimeout(_pressMouseT); _pressMouseT = null; }
+      _pressDisparo = false;
+    });
     mascota.addEventListener("contextmenu", e => { e.preventDefault(); abrirMascotaModal(); });
 
     qsa("[data-close-mascota]").forEach(el => el.addEventListener("click", cerrarMascotaModal));
@@ -839,57 +1014,75 @@ window._setMascotaImg = setMascotaImg;
       qs('[data-accion="mimos"]',   mModal)?.addEventListener("click", e => { e.stopPropagation(); hacerMimos(); });
       qs('[data-accion="dormir"]',  mModal)?.addEventListener("click", e => { e.stopPropagation(); dormir(); });
       qs('[data-accion="jugar"]',   mModal)?.addEventListener("click", e => { e.stopPropagation(); juegoGirasol(); });
-      qs('[data-accion="tienda"]',  mModal)?.addEventListener("click", e => { e.stopPropagation(); window.Tienda?.abrir(); });
       qs('[data-accion="amistad"]', mModal)?.addEventListener("click", e => { e.stopPropagation(); abrirAmistad(); });
     }
+
+    const activarPestanaMascota = (modal, tab) => {
+      const target = tab.dataset.mmTab;
+      qsa("[data-mm-tab]", modal).forEach(t => {
+        const activa = t === tab;
+        t.classList.toggle("active", activa);
+        t.setAttribute("aria-selected", String(activa));
+        t.tabIndex = activa ? 0 : -1;
+      });
+      qsa("[data-mm-panel]", modal).forEach(p => {
+        const activa = p.dataset.mmPanel === target;
+        p.classList.toggle("active", activa);
+        p.hidden = !activa;
+      });
+      if (target === "inventario") renderInv?.();
+    };
 
     document.addEventListener("click", e => {
       const tab = e.target.closest("[data-mm-tab]");
       if (!tab) return;
-      const target = tab.dataset.mmTab;
       const modal = tab.closest("#mascota-modal");
       if (!modal) return;
-      qsa("[data-mm-tab]", modal).forEach(t => t.classList.toggle("active", t === tab));
-      qsa("[data-mm-panel]", modal).forEach(p => p.classList.toggle("active", p.dataset.mmPanel === target));
-      if (target === "tienda") {
-        const embed = $("tienda-embed");
-        if (embed && window.Tienda?.montar) window.Tienda.montar(embed);
-      }
-      if (target === "inventario") renderInv?.();
+      activarPestanaMascota(modal, tab);
+    });
+    mModal?.querySelector(".mm-tabs")?.addEventListener("keydown", e => {
+      const tabs = qsa("[data-mm-tab]", mModal);
+      const actual = tabs.indexOf(document.activeElement);
+      let indice = actual;
+      if (e.key === "ArrowRight") indice = (actual + 1) % tabs.length;
+      else if (e.key === "ArrowLeft") indice = (actual - 1 + tabs.length) % tabs.length;
+      else if (e.key === "Home") indice = 0;
+      else if (e.key === "End") indice = tabs.length - 1;
+      else return;
+      e.preventDefault();
+      tabs[indice].focus();
+      activarPestanaMascota(mModal, tabs[indice]);
     });
 
-    // Enables drop de comida sobre la mascota (CSS ya existía, función sin llamar)
     dropEnMascota();
-
     setTimeout(() => decirMascota(`¡Hola${getNombre() ? " " + getNombre() : ""}! Soy tu ${MASCOTAS[mascotaActual].nombre.toLowerCase()}`), 1500);
 
-    // Intervalos guardados (evita duplicación si el bloque se reejecutara)
     if (window._mascotaIntervals) window._mascotaIntervals.forEach(clearInterval);
     window._mascotaIntervals = [
-      setInterval(() => {
-        try { if (!mascotaBurbuja.classList.contains("visible")) decirMascota(randomDe(FRASES[mascotaActual])); } catch {}
-      }, 45000),
-      setInterval(() => {
-        try {
-          decaer(statsM);
-          guardarStats(mascotaActual, statsM);
-          actualizarModalMascota();
-          visual();
-        } catch {}
-      }, 60000)
+      setInterval(() => { try { if (!mascotaBurbuja.classList.contains("visible")) decirMascota(randomDe(FRASES[mascotaActual])); } catch {} }, 45000),
+      setInterval(() => { try { decaer(statsM); guardarStats(mascotaActual, statsM); actualizarModalMascota(); visual(); } catch {} }, 60000)
     ];
   }
 
-  /* ---------- Minijuegos (3 del panel) ---------- */
+  /* ============================================================
+     MINIJUEGOS (3 del panel)
+     ============================================================ */
   function crearOverlay(id, html) {
     document.getElementById(id)?.remove();
     const o = document.createElement("div");
-    o.id = id;
-    o.className = "minijuego-overlay";
+    o.id = id; o.className = "minijuego-overlay";
     o.innerHTML = `<div class="minijuego-panel"><button class="minijuego-cerrar" data-close-juego>×</button>${html}</div>`;
     document.body.appendChild(o);
+    const cleanups = new Set();
+    let cerrado = false;
+    o._registrarCleanup = fn => { if (typeof fn === "function") cleanups.add(fn); };
     o.addEventListener("click", e => {
       if (e.target === o || e.target.hasAttribute("data-close-juego")) {
+        if (!cerrado) {
+          cerrado = true;
+          cleanups.forEach(fn => fn());
+          cleanups.clear();
+        }
         o.classList.remove("active");
         setTimeout(() => o.remove(), 250);
       }
@@ -908,33 +1101,11 @@ window._setMascotaImg = setMascotaImg;
       </div>
       <div class="jg-barra"><span id="jg-barra-fill"></span></div>
       <div class="jg-campo" id="jg-wrap"></div>
-      <div class="jg-inicio" id="jg-inicio">
-        <div class="jg-inicio-card">
-          <div class="jg-inicio-emoji">${ICONO.girasol || ""}</div>
-          <h3>¿Listo para atrapar?</h3>
-          <p>Tienes <strong>35 segundos</strong>.<br>Los <strong>dorados</strong> valen <strong>3 puntos</strong></p>
-          <button type="button" class="btn-primary" id="jg-empezar">¡Empezar!</button>
-        </div>
-      </div>
-    `);
+      <div class="jg-inicio" id="jg-inicio"><div class="jg-inicio-card"><div class="jg-inicio-emoji">${ICONO.girasol || ""}</div><h3>¿Listo para atrapar?</h3><p>Tienes <strong>35 segundos</strong>.<br>Los <strong>dorados</strong> valen <strong>3 puntos</strong></p><button type="button" class="btn-primary" id="jg-empezar">¡Empezar!</button></div></div>`);
     o.classList.add("active");
     const w = $("jg-wrap"), eP = $("jg-puntos"), eT = $("jg-tiempo"), barra = $("jg-barra-fill"), inicio = $("jg-inicio"), b = $("jg-empezar");
     const SPRITE = "img/girasol-loading.png";
     let act = false, pts = 0, t = 35, tk = null, st = null, finalizado = false;
-
-    const crearG = (x, y, dor) => {
-      const g = document.createElement("div");
-      g.className = "jg-girasol" + (dor ? " jg-girasol-dorado" : "");
-      g.style.left = x + "px"; g.style.top = y + "px";
-      const img = document.createElement("img");
-      img.src = SPRITE; img.alt = "girasol";
-      img.onerror = () => { img.style.display = "none"; };
-      g.appendChild(img);
-      const aura = document.createElement("span");
-      aura.className = "jg-girasol-aura";
-      g.appendChild(aura);
-      return g;
-    };
 
     const sp = () => {
       if (!act || finalizado) return;
@@ -942,42 +1113,42 @@ window._setMascotaImg = setMascotaImg;
       const x = Math.random() * Math.max(20, r.width - s - 20) + 10;
       const y = Math.random() * Math.max(20, r.height - s - 20) + 10;
       const dor = Math.random() < 0.12;
-      const g = crearG(x, y, dor);
+      const g = document.createElement("div");
+      g.className = "jg-girasol" + (dor ? " jg-girasol-dorado" : "");
+      g.style.left = x + "px"; g.style.top = y + "px";
+      const img = document.createElement("img"); img.src = SPRITE; img.alt = "girasol";
+      img.onerror = () => { img.style.display = "none"; };
+      g.appendChild(img);
+      const aura = document.createElement("span"); aura.className = "jg-girasol-aura"; g.appendChild(aura);
       g.dataset.pts = dor ? 3 : 1;
       const rc = ev => {
         ev.stopPropagation();
         if (!act || g.classList.contains("atrapado") || finalizado) return;
         g.classList.add("atrapado");
-        const p = Number(g.dataset.pts);
-        pts += p;
-        eP.textContent = pts;
+        const p = Number(g.dataset.pts); pts += p; eP.textContent = pts;
         const pp = document.createElement("span");
         pp.className = "minijuego-pop";
-        pp.style.left = (x + s / 2) + "px";
-        pp.style.top = y + "px";
-        pp.textContent = "+" + p;
-        w.appendChild(pp);
-        setTimeout(() => pp.remove(), 800);
+        pp.style.left = (x + s / 2) + "px"; pp.style.top = y + "px"; pp.textContent = "+" + p;
+        w.appendChild(pp); setTimeout(() => pp.remove(), 800);
         snd(dor ? "moneda" : "atrapado");
         setTimeout(() => g.remove(), 400);
       };
       g.addEventListener("click", rc);
       g.addEventListener("touchstart", rc, { passive: true });
       w.appendChild(g);
-      setTimeout(() => {
-        if (!g.classList.contains("atrapado")) {
-          g.classList.add("escapando");
-          setTimeout(() => g.remove(), 400);
-        }
-      }, 1000 + Math.random() * 500);
+      setTimeout(() => { if (!g.classList.contains("atrapado")) { g.classList.add("escapando"); setTimeout(() => g.remove(), 400); } }, 1000 + Math.random() * 500);
       st = setTimeout(sp, Math.max(200, 500 - (35 - t) * 5));
     };
+    o._registrarCleanup(() => {
+      act = false;
+      clearInterval(tk);
+      clearTimeout(st);
+    });
 
     const term = () => {
       if (finalizado) return;
       finalizado = true; act = false;
-      clearInterval(tk);
-      clearTimeout(st);
+      clearInterval(tk); clearTimeout(st);
       qsa(".jg-girasol", w).forEach(x => x.remove());
       const m = Math.max(1, Math.floor(pts / 2));
       const f = Math.min(20, Math.floor(pts / 2));
@@ -993,18 +1164,12 @@ window._setMascotaImg = setMascotaImg;
     const emp = () => {
       act = true; pts = 0; t = 35; finalizado = false;
       inicio.classList.add("hidden");
-      eP.textContent = "0";
-      eT.textContent = "35s";
-      barra.style.width = "100%";
-      eT.classList.remove("urgente");
-      qsa(".jg-girasol", w).forEach(x => x.remove());
+      eP.textContent = "0"; eT.textContent = "35s"; barra.style.width = "100%";
+      eT.classList.remove("urgente"); qsa(".jg-girasol", w).forEach(x => x.remove());
       for (let i = 0; i < 4; i++) setTimeout(sp, i * 200);
       tk = setInterval(() => {
-        t--;
-        eT.textContent = t + "s";
-        barra.style.width = (t / 35 * 100) + "%";
-        eT.classList.toggle("urgente", t <= 10);
-        barra.classList.toggle("urgente", t <= 10);
+        t--; eT.textContent = t + "s"; barra.style.width = (t / 35 * 100) + "%";
+        eT.classList.toggle("urgente", t <= 10); barra.classList.toggle("urgente", t <= 10);
         if (t <= 0) term();
       }, 1000);
     };
@@ -1025,31 +1190,53 @@ window._setMascotaImg = setMascotaImg;
         <div class="jm-hud-card jm-hud-time"><span class="jm-hud-icon">${ICONO.calendario || ""}</span><div class="jm-hud-info"><span class="jm-hud-label">Tiempo</span><strong id="jm-tiempo">40s</strong></div></div>
       </div>
       <div class="jm-progreso"><span id="jm-progreso-fill"></span></div>
-      <div class="memoria-grid jm-grid" id="jm-grid"></div>
-    `);
+      <div class="memoria-grid jm-grid" id="jm-grid"></div>`);
     o.classList.add("active");
     const g = $("jm-grid"), eP = $("jm-parejas"), eI = $("jm-intentos"), eT = $("jm-tiempo"), barra = $("jm-progreso-fill");
-    let pr = null, sg = null, bl = false, pa = 0, it = 0, tiempoRestante = 40;
+    let pr = null, sg = null, bl = false, pa = 0, it = 0, tr = 40;
+    let finalizado = false, ivT = null;
+    const timeouts = new Set();
+    const programar = (fn, ms) => {
+      const id = setTimeout(() => {
+        timeouts.delete(id);
+        if (!finalizado && o.isConnected) fn();
+      }, ms);
+      timeouts.add(id);
+      return id;
+    };
+    const limpiar = () => {
+      finalizado = true;
+      clearInterval(ivT);
+      timeouts.forEach(clearTimeout);
+      timeouts.clear();
+    };
+    o._registrarCleanup(limpiar);
 
-    const intervaloTiempo = setInterval(() => {
-      tiempoRestante--;
-      if (eT) {
-        eT.textContent = tiempoRestante + "s";
-        eT.classList.toggle("urgente", tiempoRestante <= 10);
-      }
-      if (tiempoRestante <= 0) { clearInterval(intervaloTiempo); terminarPorTiempo(); }
-    }, 1000);
-
-    function terminarPorTiempo() {
+    function terminar(completado) {
+      if (finalizado) return;
+      finalizado = true;
+      clearInterval(ivT);
+      timeouts.forEach(clearTimeout);
+      timeouts.clear();
       [...g.children].forEach(c => c.disabled = true);
-      const m = Math.max(1, pa * 2);
-      darPremio(m, 5, `¡Se acabó! ${pa}/${eleg.length} parejas`);
+      const m = completado ? Math.max(5, 25 - it + Math.max(0, tr)) : Math.max(1, pa * 2);
+      darPremio(m, completado ? 15 : 5, completado
+        ? `¡Memoria completada! +${m}`
+        : `¡Se acabó! ${pa}/${eleg.length} parejas`);
       const p = qs(".minijuego-panel", o), r = document.createElement("div");
       r.className = "minijuego-mensaje jm-final";
-      r.innerHTML = `<div class="jg-final-emoji">${ICONO.reintentar || ""}</div><h2>¡Se acabó!</h2><p>Encontraste <strong>${pa}</strong> de <strong>${eleg.length}</strong> parejas</p><p style="color:#ffd93d;font-weight:bold;">+${m}</p><div class="minijuego-botones"><button type="button" class="btn-primary" id="jm-otra">Otra vez</button></div>`;
+      r.innerHTML = completado
+        ? `<div class="jg-final-emoji">${it <= 12 ? (ICONO.trofeo || "") : it <= 20 ? (ICONO.estrella || "") : (ICONO.imagen || "")}</div><h2>¡Lo lograste!</h2><p>En <strong>${it}</strong> intentos con <strong>${tr}s</strong> restantes</p><p class="jm-recompensa">+${m} · +15 XP</p><div class="minijuego-botones"><button type="button" class="btn-primary" id="jm-otra">Otra vez</button></div>`
+        : `<div class="jg-final-emoji">${ICONO.reintentar || ""}</div><h2>¡Se acabó!</h2><p>Encontraste <strong>${pa}</strong> de <strong>${eleg.length}</strong> parejas</p><p class="jm-recompensa">+${m}</p><div class="minijuego-botones"><button type="button" class="btn-primary" id="jm-otra">Otra vez</button></div>`;
       p.appendChild(r);
       qs("#jm-otra", r).addEventListener("click", () => { o.remove(); juegoMemoria(); });
     }
+
+    ivT = setInterval(() => {
+      tr--;
+      if (eT) { eT.textContent = tr + "s"; eT.classList.toggle("urgente", tr <= 10); }
+      if (tr <= 0) terminar(false);
+    }, 1000);
 
     cart.forEach((c, i) => {
       const el = document.createElement("button");
@@ -1065,38 +1252,18 @@ window._setMascotaImg = setMascotaImg;
         snd("blip");
         if (!pr) { pr = el; return; }
         if (pr === el) return;
-        sg = el;
-        it++;
-        eI.textContent = it;
-        bl = true;
+        sg = el; it++; eI.textContent = it; bl = true;
         if (pr.dataset.id === sg.dataset.id) {
-          setTimeout(() => {
-            pr.classList.add("emparejada");
-            sg.classList.add("emparejada");
-            pa++;
-            eP.textContent = pa;
+          programar(() => {
+            pr.classList.add("emparejada"); sg.classList.add("emparejada");
+            pa++; eP.textContent = pa;
             barra.style.width = (pa / eleg.length * 100) + "%";
             snd("moneda");
-            pr = sg = null;
-            bl = false;
-            if (pa === eleg.length) {
-              clearInterval(intervaloTiempo);
-              const m = Math.max(5, 25 - it + Math.max(0, tiempoRestante));
-              darPremio(m, 15, `¡Memoria completada! +${m}`);
-              const p = qs(".minijuego-panel", o), r = document.createElement("div");
-              r.className = "minijuego-mensaje jm-final";
-              r.innerHTML = `<div class="jg-final-emoji">${it <= 12 ? (ICONO.trofeo || "") : it <= 20 ? (ICONO.estrella || "") : (ICONO.imagen || "")}</div><h2>¡Lo lograste!</h2><p>En <strong>${it}</strong> intentos con <strong>${tiempoRestante}s</strong> restantes</p><p style="color:#ffd93d;font-weight:bold;">+${m} · +15</p><div class="minijuego-botones"><button type="button" class="btn-primary" id="jm-otra">Otra vez</button></div>`;
-              p.appendChild(r);
-              qs("#jm-otra", r).addEventListener("click", () => { o.remove(); juegoMemoria(); });
-            }
+            pr = sg = null; bl = false;
+            if (pa === eleg.length) terminar(true);
           }, 500);
         } else {
-          setTimeout(() => {
-            pr.classList.remove("volteada");
-            sg.classList.remove("volteada");
-            pr = sg = null;
-            bl = false;
-          }, 900);
+          programar(() => { pr.classList.remove("volteada"); sg.classList.remove("volteada"); pr = sg = null; bl = false; }, 900);
         }
       });
       g.appendChild(el);
@@ -1107,7 +1274,7 @@ window._setMascotaImg = setMascotaImg;
     const pool = Object.keys(MASCOTAS).filter(desbloqueada);
     const pf = pool.length >= 4 ? pool : Object.keys(MASCOTAS);
     const TOTAL = 20, SEG = 5, OPC = 6;
-    let r = 0, a = 0, cor = "", racha = 0, timer = null, tr = SEG, bl = false, vidas = 2;
+    let r = 0, a = 0, cor = "", racha = 0, timer = null, nextTimer = null, tr = SEG, bl = false, vidas = 2, finalizado = false;
     const o = crearOverlay("juego-adivina-overlay", `
       <h2 class="minijuego-titulo">Adivina la mascota · Difícil</h2>
       <p class="minijuego-desc">¿Quién ha dicho esta frase? ¡Solo ${SEG}s por ronda y ${vidas} vidas!</p>
@@ -1123,11 +1290,15 @@ window._setMascotaImg = setMascotaImg;
         <div class="ja-burbuja"><div class="ja-burbuja-icono">${ICONO.chat || ""}</div><p class="adivina-frase ja-frase" id="ja-frase">Cargando...</p></div>
         <div class="adivina-sprite-wrap ja-sprite-wrap"><img class="adivina-sprite ja-sprite" id="ja-sprite" src="" alt=""><span class="ja-sprite-aura"></span></div>
         <div class="adivina-opciones ja-opciones" id="ja-opciones"></div>
-      </div>
-    `);
+      </div>`);
     o.classList.add("active");
     const eA = $("ja-aciertos"), eR = $("ja-ronda"), eRa = $("ja-racha"), eT = $("ja-tiempo"), eV = $("ja-vidas");
     const barra = $("ja-progreso-fill"), sprite = $("ja-sprite"), frase = $("ja-frase"), op = $("ja-opciones");
+    o._registrarCleanup(() => {
+      finalizado = true;
+      clearInterval(timer);
+      clearTimeout(nextTimer);
+    });
     const frases = pf.flatMap(id => (FRASES[id] || []).map(f => ({ id, frase: f })));
     let usadas = new Set();
 
@@ -1138,7 +1309,6 @@ window._setMascotaImg = setMascotaImg;
       if (usadas.size > frases.length - 5) usadas.clear();
       return e;
     }
-
     function iniciarTimer() {
       clearInterval(timer);
       tr = SEG;
@@ -1149,17 +1319,16 @@ window._setMascotaImg = setMascotaImg;
         if (tr <= 0) {
           clearInterval(timer);
           if (bl) return;
-          bl = true;
-          racha = 0; eRa.textContent = racha;
+          bl = true; racha = 0; eRa.textContent = racha;
           vidas--; eV.textContent = vidas;
           snd("derrota");
           [...op.children].forEach(x => { x.disabled = true; if (x.dataset.id === cor) x.classList.add("correcta"); });
-          setTimeout(() => { if (vidas <= 0) return term(); nR(); }, 1200);
+          nextTimer = setTimeout(() => { if (vidas <= 0) return term(); nR(); }, 1200);
         }
       }, 1000);
     }
-
     const nR = () => {
+      if (finalizado) return;
       r++;
       if (r > TOTAL) return term();
       bl = false;
@@ -1169,29 +1338,37 @@ window._setMascotaImg = setMascotaImg;
       cor = id;
       frase.textContent = `"${texto}"`;
       sprite.src = MASCOTAS[cor].imagen;
-      sprite.onerror = () => { sprite.style.display = "none"; };
+sprite.onerror = () => { sprite.style.display = "none"; };
+// ✅ Ocultar hasta que responda
+sprite.style.filter = "blur(14px) brightness(0.4)";
+sprite.style.transform = "scale(.6)";
+sprite.style.transition = "filter .5s, transform .5s";
+sprite.style.opacity = "0.25";
       const dist = pf.filter(x => x !== cor).sort(() => Math.random() - 0.5).slice(0, OPC - 1);
       const ops = [...dist, cor].sort(() => Math.random() - 0.5);
       op.innerHTML = "";
       ops.forEach((id2, i) => {
         const b = document.createElement("button");
-        b.type = "button";
-        b.className = "adivina-opcion ja-opcion";
-        b.dataset.id = id2;
+        b.type = "button"; b.className = "adivina-opcion ja-opcion"; b.dataset.id = id2;
         b.innerHTML = `<span class="ja-opcion-letra">${String.fromCharCode(65 + i)}</span><span class="ja-opcion-nombre">${MASCOTAS[id2].nombre}</span>`;
         b.addEventListener("click", () => resp(b, id2));
         op.appendChild(b);
       });
       iniciarTimer();
     };
-
     const resp = (b, id) => {
-      if (bl) return;
-      bl = true;
-      clearInterval(timer);
+  if (bl) return;
+  bl = true;
+  clearInterval(timer);
+  // ✅ Revelar sprite
+  sprite.style.filter = "blur(0) brightness(1)";
+  sprite.style.transform = "scale(1)";
+  sprite.style.opacity = "1";
+      
+      
+      
       if (id === cor) {
-        b.classList.add("correcta");
-        a++; eA.textContent = a;
+        b.classList.add("correcta"); a++; eA.textContent = a;
         const bonus = tr >= SEG / 2 ? 3 : 1;
         racha += bonus; eRa.textContent = racha;
         snd("moneda");
@@ -1203,10 +1380,11 @@ window._setMascotaImg = setMascotaImg;
         [...op.children].forEach(x => { if (x.dataset.id === cor) x.classList.add("correcta"); });
       }
       [...op.children].forEach(x => x.disabled = true);
-      setTimeout(() => { if (vidas <= 0) return term(); nR(); }, 1100);
+      nextTimer = setTimeout(() => { if (vidas <= 0) return term(); nR(); }, 1100);
     };
-
     const term = () => {
+      if (finalizado) return;
+      finalizado = true;
       clearInterval(timer);
       const m = a * 3 + Math.floor(racha / 3);
       darPremio(m, Math.min(20, a * 2), `¡${a}/${TOTAL} aciertos! +${m}`);
@@ -1217,11 +1395,12 @@ window._setMascotaImg = setMascotaImg;
       p.appendChild(rr);
       qs("#ja-otra", rr).addEventListener("click", () => { o.remove(); juegoAdivina(); });
     };
-
     nR();
   }
 
-  /* ---------- Grid mascotas ---------- */
+  /* ============================================================
+     GRID MASCOTAS
+     ============================================================ */
   function renderGrid() {
     const g = $("mascotas-grid"), e = $("mascotas-empty");
     if (!g) return;
@@ -1229,7 +1408,7 @@ window._setMascotaImg = setMascotaImg;
     g.innerHTML = "";
     let cnt = 0;
     Object.keys(MASCOTAS).forEach(id => {
-      const info = MASCOTAS[id], ok = desbloqueada(id);
+      const info = MASCOTAS[id], ok = desbloqueada(id), comprable = esComprable(id);
       if (ok) cnt++;
       const c = document.createElement("article");
       c.className = "mascota-card " + (ok ? "desbloqueada" : "bloqueada");
@@ -1237,20 +1416,26 @@ window._setMascotaImg = setMascotaImg;
       if (!ok) { const l = document.createElement("span"); l.className = "mascota-card-lock"; l.innerHTML = ICONO.candado || ""; c.appendChild(l); }
       if (id === act && ok) { const b = document.createElement("span"); b.className = "mascota-card-activa-badge"; b.textContent = "✓"; c.appendChild(b); }
       const im = document.createElement("img");
-      im.className = "mascota-card-img";
-      im.alt = info.nombre;
-      im.loading = "lazy";
-      im.decoding = "async";
+      im.className = "mascota-card-img"; im.alt = info.nombre; im.loading = "lazy"; im.decoding = "async";
       im.onerror = () => { im.onerror = null; im.src = "img/girasol-loading.png"; };
       im.src = info.imagen;
       const h = document.createElement("h3"); h.className = "mascota-card-nombre"; h.textContent = info.nombre;
-      const p = document.createElement("p");  p.className = "mascota-card-desc";   p.textContent = ok ? "Te acompaña" : "Aún no desbloqueada";
+      const p = document.createElement("p");  p.className = "mascota-card-desc";
       const b = document.createElement("button");
-      b.type = "button";
-      b.className = "mascota-card-btn";
-      if (!ok) { b.textContent = "Bloqueada"; b.disabled = true; }
-      else if (id === act) { b.textContent = "En uso"; b.classList.add("activo"); }
-      else { b.textContent = "Usar"; b.addEventListener("click", () => { localStorage.setItem("mascota_actual", id); window.location.reload(); }); }
+      b.type = "button"; b.className = "mascota-card-btn";
+      const d = DESBLOQUEO[id];
+      if (!ok) {
+        if (comprable && d) {
+          const reqTxt = (d.reqNivel && d.reqNivel > 1) ? `Nivel req: ${d.reqNivel}` : "Disponible para adopción";
+          p.textContent = reqTxt;
+          b.textContent = `${d.precio} 🪙 Comprar`;
+          b.disabled = getNivel() < (d.reqNivel || 1);
+          b.addEventListener("click", () => { if (comprarMascota(id)) renderGrid(); });
+        }
+        else { p.textContent = "Aún no desbloqueada"; b.textContent = "Bloqueada"; b.disabled = true; }
+      }
+      else if (id === act) { p.textContent = "Te acompaña"; b.textContent = "En uso"; b.classList.add("activo"); }
+      else { p.textContent = "Disponible"; b.textContent = "Usar"; b.addEventListener("click", () => { localStorage.setItem("mascota_actual", id); window.location.reload(); }); }
       c.append(im, h, p, b);
       g.appendChild(c);
     });
@@ -1262,8 +1447,8 @@ window._setMascotaImg = setMascotaImg;
   $("btn-juego-memoria")?.addEventListener("click", juegoMemoria);
   $("btn-juego-adivina")?.addEventListener("click", juegoAdivina);
   setTimeout(renderGrid, 600);
-  window.addEventListener("sunadventures:progress", renderGrid);
-  window.addEventListener("sunadventures:user-ready", () => setTimeout(renderGrid, 400));
+  window.addEventListener("sunad:progress", renderGrid);
+  window.addEventListener("sunad:user-ready", () => setTimeout(renderGrid, 400));
 
   /* ---------- Hidratar iconos ---------- */
   function hidratarIconos(root = document) {
@@ -1275,7 +1460,6 @@ window._setMascotaImg = setMascotaImg;
   window.hidratarIconos = hidratarIconos;
   hidratarIconos();
 
-  // ⚡ Batch con rAF
   let _hidraPend = false;
   const _hidraCola = new Set();
   const _hidraFlush = () => {
@@ -1308,9 +1492,25 @@ window._setMascotaImg = setMascotaImg;
     }
   });
 
+  function descargarApkDirecta(e) {
+    if (e) e.preventDefault();
+    try {
+      const enlace = document.createElement("a");
+      enlace.href = "./app/sunad.apk";
+      enlace.download = "SunAd-1.5.apk";
+      enlace.target = "_blank";
+      enlace.rel = "noopener noreferrer";
+      document.body.appendChild(enlace);
+      enlace.click();
+      setTimeout(() => enlace.remove(), 100);
+    } catch {
+      window.open("./app/sunad.apk", "_blank");
+    }
+  }
+
   function abrirDescarga() {
     try {
-      const modalExistente = document.getElementById("descarga-app-modal");
+      const modalExistente = $("descarga-app-modal");
       if (modalExistente) modalExistente.remove();
 
       const m = document.createElement("div");
@@ -1346,7 +1546,7 @@ window._setMascotaImg = setMascotaImg;
       document.body.style.overflow = "hidden";
       const c = () => { m.remove(); document.body.style.overflow = ""; };
       qsa("[data-close]", m).forEach(el => el.addEventListener("click", c));
-
+      
       const apkBtn = m.querySelector("#btn-descargar-apk");
       const apkBtnInmediato = m.querySelector("#btn-descarga-inmediata-apk");
       [apkBtn, apkBtnInmediato].forEach(btn => {
@@ -1362,34 +1562,29 @@ window._setMascotaImg = setMascotaImg;
       });
 
       const a = {
-        windows: "En Windows: Abre Chrome o Edge → clic en el icono de instalar en la barra de direcciones → 'Instalar SunAd'.",
+        windows: "En Windows: Abre Chrome o Edge → clic en el icono de instalar en la barra de direcciones o menú → 'Instalar SunAd'.",
         linux: "Próximamente"
       };
-      qsa("[data-platform]", m).forEach(b => b.addEventListener("click", () => alert(a[b.dataset.platform] || "Próximamente")));
-    } catch {
-      window.open("./app/sunad.apk", "_blank");
+      qsa("[data-platform]", m).forEach(b => b.addEventListener("click", () => {
+        const msg = a[b.dataset.platform] || "Próximamente";
+        if (window.SunModal) {
+          window.SunModal.alert({ title: "Instalación", message: msg, icon: "📲", confirmText: "Entendido" });
+        } else {
+          alert(msg);
+        }
+      }));
+    } catch (e) {
+      console.warn("abrirDescarga error:", e);
+      descargarApkDirecta();
     }
   }
 
   /* ---------- PWA ---------- */
-  /* ---------- PWA (con auto-update) ---------- */
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", async () => {
-    try {
-      const reg = await navigator.serviceWorker.register("./service-worker.js");
-      setInterval(() => reg.update(), 60000);
-      reg.addEventListener("updatefound", () => {
-        const nuevo = reg.installing;
-        nuevo?.addEventListener("statechange", () => {
-          if (nuevo.state === "installed" && navigator.serviceWorker.controller) {
-            nuevo.postMessage("SKIP_WAITING");
-            setTimeout(() => location.reload(), 300);
-          }
-        });
-      });
-    } catch (e) { console.warn("SW:", e); }
-  });
-}
+  try {
+    if ("serviceWorker" in navigator)
+      window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(e => console.warn("SW:", e)));
+  } catch {}
+
   /* ---------- Recuperar contraseña ---------- */
   (function initRecuperar() {
     const modal = $("recuperar-modal"); if (!modal) return;
@@ -1409,20 +1604,15 @@ if ("serviceWorker" in navigator) {
       document.body.style.overflow = "hidden";
       setTimeout(() => $("recuperar-usuario")?.focus(), 100);
     };
-    const cerrar = () => {
-      modal.classList.remove("active");
-      modal.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    };
+    const cerrar = () => { modal.classList.remove("active"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; };
 
     $("recuperar-btn-1")?.addEventListener("click", async () => {
       const u = $("recuperar-usuario")?.value.trim().toLowerCase();
       if (!u || !/^[a-z0-9_-]{3,20}$/.test(u)) return mostrarError("recuperar-error-1", "Usuario inválido (3-20 letras, números, _ o -).");
       usuario = u;
-      const btn = $("recuperar-btn-1");
-      btn.disabled = true; btn.textContent = "Generando...";
+      const btn = $("recuperar-btn-1"); btn.disabled = true; btn.textContent = "Generando...";
       try {
-        const { data, error } = await window._supabase.functions.invoke("reset-password", { body: { action: "solicitar", usuario } });
+        const { data, error } = await window._supabase.functions.invoke("reset-password", { body:{ action:"solicitar", usuario } });
         if (error) throw error;
         if (data?.error) throw new Error(data.error);
         if (!data.codigo) throw new Error("Este usuario no existe.");
@@ -1452,10 +1642,9 @@ if ("serviceWorker" in navigator) {
       const p2 = $("recuperar-pass2")?.value || "";
       if (p1.length < 6) return mostrarError("recuperar-error-3", "La contraseña debe tener al menos 6 caracteres.");
       if (p1 !== p2) return mostrarError("recuperar-error-3", "Las contraseñas no coinciden.");
-      const btn = $("recuperar-btn-3");
-      btn.disabled = true; btn.textContent = "Cambiando...";
+      const btn = $("recuperar-btn-3"); btn.disabled = true; btn.textContent = "Cambiando...";
       try {
-        const { data, error } = await window._supabase.functions.invoke("reset-password", { body: { action: "confirmar", usuario, codigo, nuevaPassword: p1 } });
+        const { data, error } = await window._supabase.functions.invoke("reset-password", { body:{ action:"confirmar", usuario, codigo, nuevaPassword:p1 } });
         if (error) throw error;
         if (data?.error) throw new Error(data.error);
         mostrarPaso("ok");
@@ -1479,13 +1668,16 @@ if ("serviceWorker" in navigator) {
     });
   })();
 
-  /* ---------- API pública ---------- */
+  /* ============================================================
+     API PÚBLICA
+     ============================================================ */
   window._TiendaAPI = {
     ICONO, TIENDA_ITEMS, COMIDAS, SKINS, MASCOTAS,
     getMonedas, setMonedas, getSkinsC, setSkinsC, getSkinsE, setSkinsE,
     cargarInv, guardarInv,
     notifMascota: (t, txt) => { try { notifMascota(t, txt, 2500); } catch {} },
     aplicarSkins: () => { try { window._aplicarSkins?.(); } catch {} },
+    comprarMascota, esComprable, desbloqueada, getMascotasCompradas, DESBLOQUEO,
     getUserId
   };
   window._MASCOTAS = MASCOTAS;
@@ -1511,17 +1703,44 @@ if ("serviceWorker" in navigator) {
   window._setMonedas = setMonedas;
   window._getMonedas = getMonedas;
   window._desbloqueada = desbloqueada;
+  window._esComprable = esComprable;
+  window._comprarMascota = comprarMascota;
   window._getUserId = getUserId;
   window._registrarMinijuego = () => {
     const u = getUserId();
     setNumLS(`sa_minijuegos_jugados_${u}`, numLS(`sa_minijuegos_jugados_${u}`) + 1);
-    window.dispatchEvent(new Event("sunadventures:progress"));
+    window.dispatchEvent(new Event("sunad:progress"));
   };
 
-  window.dispatchEvent(new Event("sunadventures:api-ready"));
+  /* ---------- Aplicar tema de fondo comprado ---------- */
+  const TEMAS_FONDO = [
+    "tema-fondo-noche","tema-fondo-arcoiris","tema-fondo-fuego",
+    "tema-fondo-bosque","tema-fondo-oceano","tema-fondo-desierto",
+    "tema-fondo-aurora","tema-fondo-sakura","tema-fondo-cyberpunk",
+    "tema-fondo-tormenta", "tema-fondo-galaxia","tema-fondo-cueva","tema-fondo-volcan",
+    "tema-fondo-espacial","tema-fondo-campo","tema-fondo-ciudad","tema-fondo-montana" 
+  ];
+  window._aplicarTemaFondo = function () {
+    try {
+      document.body.classList.remove(...TEMAS_FONDO);
+      const userId = getUserId();
+      const mascota = localStorage.getItem("mascota_actual") || "mapache";
+      const eq = JSON.parse(localStorage.getItem(`mascota_skins_eq_${userId}_${mascota}`) || "{}");
+      const fondoId = eq.fondos;
+      if (!fondoId) return;
+      const f = TIENDA_ITEMS.fondos?.[fondoId];
+      if (f?.bonus?.tipo?.startsWith("tema_")) {
+        const clase = "tema-fondo-" + f.bonus.tipo.replace("tema_", "");
+        document.body.classList.add(clase);
+      }
+    } catch (e) { console.warn("_aplicarTemaFondo:", e); }
+  };
+  try { window._aplicarTemaFondo(); } catch {}
+
+  window.dispatchEvent(new Event("sunad:api-ready"));
 
   /* ---------- Contadores extra ---------- */
-  window.addEventListener("sunadventures:tienda-compra", () => {
+  window.addEventListener("sunad:tienda-compra", () => {
     const u = getUserId();
     setNumLS(`sa_tienda_compras_${u}`, numLS(`sa_tienda_compras_${u}`) + 1);
   });
@@ -1531,19 +1750,19 @@ if ("serviceWorker" in navigator) {
     if (actual > numLS(`sa_monedas_max_${u}`)) setNumLS(`sa_monedas_max_${u}`, actual);
   }, 5000);
 
-  // Sanity check
   Object.entries(SKINS).forEach(([id, s]) => {
     if (s.icono && !ICONO[s.icono]) console.warn(`[Skin] ${id}: icono "${s.icono}" no existe en ICONO`);
   });
 
-  /* ---------- Refrescos globales ---------- */
-  window.addEventListener("sunadventures:inventario-refresh", () => { try { renderInv?.(); } catch {} });
-  window.addEventListener("sunadventures:tienda-compra", () => {
+  window.addEventListener("sunad:inventario-refresh", () => { try { window._renderInv?.(); } catch {} });
+  window.addEventListener("sunad:tienda-compra", () => {
     try {
-      const embed = $("tienda-embed");
-      if (embed && window.Tienda?.render) window.Tienda.render();
+      window._actualizarModalMascota?.();
     } catch {}
   });
+  window.addEventListener("sunad:perfil-actualizado", () => {
+    try { window._aplicarTemaFondo?.(); } catch {}
+  });
 
-  console.log("✅ script.js cargado (optimizado)");
+  console.log("✅ script.js v5 cargado (getNivel hoisteada)");
 });

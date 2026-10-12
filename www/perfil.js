@@ -117,12 +117,28 @@
   }
 
   async function guardar() {
-    if (!perfil) return;
-    const nombreEl = $("perfil-username");
-    const username = nombreEl?.value.trim().toLowerCase();
-    if (!username || !/^[a-z0-9_-]{3,20}$/.test(username)) {
-      return alert("Usuario inválido (3-20 letras, números, _ o -).");
+  if (!perfil) return;
+  const nombreEl = $("perfil-username");
+  let username = (nombreEl?.value || "").trim().toLowerCase();
+
+  // 🧹 Sanear: quitar cualquier carácter no permitido automáticamente
+  const limpio = username.replace(/[^a-z0-9_-]/g, "");
+  if (nombreEl && nombreEl.value !== limpio) nombreEl.value = limpio;
+  username = limpio;
+
+  // ✅ Validar con modal bonito en vez de alert nativo
+  if (!username || username.length < 3 || username.length > 20) {
+    if (window.SunModal) {
+      return window.SunModal.alert({
+        title: "Nombre no válido",
+        message: "Debe tener entre <strong>3 y 20 caracteres</strong>.<br>Solo <strong>letras, números, _ y -</strong> (sin puntos ni espacios).",
+        variant: "warning",
+        icon: "✏️",
+        confirmText: "Entendido"
+      });
     }
+    return alert("Usuario inválido (3-20 letras, números, _ o -).");
+  }
     const btn = $("perfil-guardar");
     if (btn) { btn.disabled = true; btn.textContent = "Guardando..."; }
     try {
@@ -144,11 +160,13 @@
       const { error } = await sb().from("perfiles").update({ username, avatar_url }).eq("id", session.user.id);
       if (error) throw error;
 
-      // 🔐 Actualizar email de autenticación en Supabase Auth
+      // 🔐 Mantener credenciales y sesión sincronizadas con el nuevo nombre:
+      // Actualizamos el email del usuario en Supabase Auth para que pueda seguir iniciando sesión con su nuevo nombre
+      const nuevoEmail = `${username}@foursunflowers.local`;
       try {
-        await sb().auth.updateUser({ email: `${username}@foursunflowers.local` });
+        await sb().auth.updateUser({ email: nuevoEmail });
       } catch (authErr) {
-        console.warn("updateUser email:", authErr);
+        console.warn("No se pudo actualizar el email de auth inmediatamente:", authErr);
       }
 
       // Migrar posibles claves legacy guardadas con el antiguo username
@@ -168,8 +186,12 @@
       perfil.avatar_url = avatar_url;
       localStorage.setItem("sunad_username", username);
       localStorage.setItem("sunadventures_username", username);
-      if (localStorage.getItem("sunad_usuario_recordado")) localStorage.setItem("sunad_usuario_recordado", username);
-      if (localStorage.getItem("sunadventures_usuario_recordado")) localStorage.setItem("sunadventures_usuario_recordado", username);
+      if (localStorage.getItem("sunad_usuario_recordado")) {
+        localStorage.setItem("sunad_usuario_recordado", username);
+      }
+      if (localStorage.getItem("sunadventures_usuario_recordado")) {
+        localStorage.setItem("sunadventures_usuario_recordado", username);
+      }
 
       const ue = $("user-email"); if (ue) ue.textContent = username;
       const udn = $("user-dropdown-name"); if (udn) udn.textContent = username;

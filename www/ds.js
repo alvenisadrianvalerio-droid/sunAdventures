@@ -3,7 +3,7 @@
    Guarda blobs de imágenes y canciones para uso sin internet.
    ============================================================ */
 (function () {
-  const DB_NAME = "sunadventures-offline";
+  const DB_NAME = "sunad-offline";
   const DB_VERSION = 1;
   const STORE_IMGS = "imagenes";
   const STORE_SONGS = "canciones";
