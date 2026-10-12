@@ -4,9 +4,10 @@
 (function() {
   const { $, ocultarLoading } = window.AlbumApp;
 
-  const VISTAS = () => ["inicio", "album", "mapa", "chat", "logros", "notas", "playlists", "calendario", "mascotas", "finanzas", ...(window._extraVistas || [])];
+  const VISTAS = () => ["inicio", "album", "chat", "logros", "notas", "playlists", "calendario", "mascotas", "finanzas", ...(window._extraVistas || [])];
   const rutaDesdeHash = () => {
     const h = (location.hash || "").replace(/^#/, "").trim();
+    if (h === "mapa") return "inicio";
     return VISTAS().includes(h) ? h : "inicio";
   };
 
@@ -41,8 +42,6 @@
         window.AlbumApp.modules.logros?.renderLogros({ notificar: false });
       } else if (nombre === "inicio") {
         window.AlbumApp.modules.logros?.renderExperiencia();
-      } else if (nombre === "mapa") {
-        window.AlbumApp.modules.fotos?.renderMapa();
       } else if (nombre === "mascotas" && typeof window._renderMascotasGrid === "function") {
         window._renderMascotasGrid();
       }
