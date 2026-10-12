@@ -6,13 +6,13 @@
 
   const STORAGE_KEY_PREFIX = "sunad_capsulas_";
   const SVG_CAPSULE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>';
-  const SVG_HOURGLASS = '<svg viewBox="0 0 24 24" fill="none" stroke="#ffd93d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>';
+  const SVG_HOURGLASS = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px;margin-right:6px;filter:drop-shadow(0 2px 4px rgba(255,217,61,0.4));color:#ffd93d;"><path d="M5 2h14M5 22h14"/><path d="M17 2v4.5a2 2 0 0 1-.6 1.4L12 12l-4.4-4.1A2 2 0 0 1 7 6.5V2"/><path d="M7 22v-4.5a2 2 0 0 1 .6-1.4L12 12l4.4 4.1a2 2 0 0 1 .6 1.4V22"/></svg>';
   const SVG_LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
   const SVG_UNLOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>';
   const SVG_GIFT = '<svg viewBox="0 0 24 24" fill="none" stroke="#ffd93d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5" rx="1"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>';
-  const SVG_CARDS = '<svg viewBox="0 0 24 24" fill="none" stroke="#ffd93d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="13" height="15" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v13"/></svg>';
+  const SVG_CARDS = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-3px;margin-right:6px;filter:drop-shadow(0 2px 4px rgba(255,217,61,0.4));color:#ffd93d;"><rect x="3" y="7" width="13" height="15" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v13"/></svg>';
   const SVG_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="#51cf66" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M20 6L9 17l-5-5"/></svg>';
-  const SVG_SPARKLE = '<svg viewBox="0 0 24 24" fill="#ffd93d" stroke="#ffd93d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;display:inline-block;vertical-align:-2px;margin-right:4px;"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"/></svg>';
+  const SVG_SPARKLE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" stroke="none" style="display:inline-block;vertical-align:-2px;margin-right:5px;filter:drop-shadow(0 2px 6px rgba(255,217,61,0.6));"><path d="M12 0l2.8 8.2L23 11l-8.2 2.8L12 22l-2.8-8.2L1 11l8.2-2.8L12 0zm6.5 15.5l1.2 3.5 3.5 1.2-3.5 1.2-1.2 3.5-1.2-3.5-3.5-1.2 3.5-1.2 1.2-3.5z"/></svg>';
   const SVG_BOX = '<svg viewBox="0 0 24 24" fill="none" stroke="#d65db1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;display:inline-block;vertical-align:-3px;margin-right:6px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
   const SVG_LOCK_INLINE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:5px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
   const SVG_SPARKLE_MEDAL = '<svg viewBox="0 0 24 24" fill="#ffd93d" stroke="#ffd93d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:34px;height:34px;display:block;"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"/></svg>';
@@ -274,7 +274,7 @@
 
         <div class="capsula-options-grid">
           <button type="button" class="capsula-opt-btn ${fechaElegida === fechaHoy ? 'active' : ''}" data-dias="0" style="border-color:rgba(255,217,61,0.5);">
-            <span class="capsula-opt-btn-label">✨ Abrir hoy</span>
+            <span class="capsula-opt-btn-label" style="display:inline-flex;align-items:center;justify-content:center;gap:4px;">${SVG_SPARKLE}<span>Abrir hoy</span></span>
             <span class="capsula-opt-btn-sub">${formatearFechaBonita(fechaHoy)}</span>
           </button>
           <button type="button" class="capsula-opt-btn ${fechaElegida === sumarDias(7) ? 'active' : ''}" data-dias="7">
@@ -944,7 +944,7 @@
           </button>
         </div>
         <div class="polaroid-nota">
-          <p style="text-align:center;font-weight:700;color:#ffd93d;">🎴 Baraja de Recuerdos</p>
+          <p style="text-align:center;font-weight:700;color:#ffd93d;display:flex;align-items:center;justify-content:center;gap:4px;">${SVG_CARDS}<span>Baraja de Recuerdos</span></p>
         </div>
       `;
 
@@ -995,8 +995,8 @@
             Abre en ${diasMin} día${diasMin === 1 ? '' : 's'} (${fechaTexto})
           </small>
           <div style="display:flex;gap:0.4rem;margin-top:0.6rem;width:100%;justify-content:center;flex-wrap:wrap;">
-            <button type="button" class="polaroid-capsula-overlay-btn btn-abrir-stack-hoy" style="margin-top:0;background:linear-gradient(135deg,#ffd93d,#ff6f91);color:#2b2118;font-weight:800;padding:0.4rem 0.8rem;box-shadow:0 3px 12px rgba(255,217,61,0.4);">
-              ✨ Abrir hoy
+            <button type="button" class="polaroid-capsula-overlay-btn btn-abrir-stack-hoy" style="margin-top:0;background:linear-gradient(135deg,#ffd93d,#ff6f91);color:#2b2118;font-weight:800;padding:0.4rem 0.85rem;box-shadow:0 3px 12px rgba(255,217,61,0.4);display:inline-flex;align-items:center;justify-content:center;gap:4px;">
+              ${SVG_SPARKLE}<span>Abrir hoy</span>
             </button>
             <button type="button" class="polaroid-capsula-overlay-btn btn-ver-stack-lista" style="margin-top:0;background:rgba(255,255,255,0.15);color:#fff;box-shadow:none;padding:0.4rem 0.75rem;">
               Ver lista
@@ -1004,7 +1004,7 @@
           </div>
         </div>
         <div class="polaroid-nota">
-          <p style="text-align:center;font-weight:700;color:#cba6f7;">⏳ Cofre del Tiempo (${count})</p>
+          <p style="text-align:center;font-weight:700;color:#cba6f7;display:flex;align-items:center;justify-content:center;gap:4px;">${SVG_HOURGLASS}<span>Cofre del Tiempo (${count})</span></p>
         </div>
       `;
 
