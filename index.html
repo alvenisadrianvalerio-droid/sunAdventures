@@ -1195,6 +1195,65 @@ Artista - Canción
 
       document.addEventListener("click", onLinkTrigger, true);
 
+      // ===== FIX TÁCTIL DEFINITIVO =====
+      // Busca el elemento del menú bajo el dedo con elementsFromPoint (ignora capas
+      // invisibles que tapen el menú) y ejecuta la acción en el mismo touchend.
+      var tStart = null, ignorarClickHasta = 0;
+      function menusAbiertos() {
+        var nav = document.getElementById("main-nav-links");
+        var dd = document.getElementById("user-dropdown");
+        return (nav && nav.classList.contains("mobile-open")) || (dd && dd.classList.contains("open"));
+      }
+      function itemBajoDedo(x, y) {
+        var els = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [document.elementFromPoint(x, y)];
+        for (var i = 0; i < els.length; i++) {
+          var el = els[i];
+          if (!el || !el.closest) continue;
+          var it = el.closest("#main-nav-links [data-view-link], #user-dropdown [data-view-link], #user-dropdown [data-action]");
+          if (it) return it;
+        }
+        return null;
+      }
+      function forzarVista(v) {
+        var destino = document.querySelector('[data-view="' + v + '"]');
+        if (!destino) return;
+        if (!destino.classList.contains("active")) {
+          document.querySelectorAll("[data-view]").forEach(function (el) { el.classList.toggle("active", el === destino); });
+          document.querySelectorAll("[data-view-link]").forEach(function (el) { el.classList.toggle("active", el.dataset.viewLink === v); });
+        }
+      }
+      window.addEventListener("touchstart", function (e) {
+        if (!menusAbiertos() || !e.touches[0]) { tStart = null; return; }
+        tStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }, { capture: true, passive: true });
+      window.addEventListener("touchend", function (e) {
+        if (!tStart || !e.changedTouches[0]) return;
+        var t = e.changedTouches[0];
+        var movido = Math.abs(t.clientX - tStart.x) > 12 || Math.abs(t.clientY - tStart.y) > 12;
+        tStart = null;
+        if (movido) return;
+        var it = itemBajoDedo(t.clientX, t.clientY);
+        if (!it) return;
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+        ignorarClickHasta = Date.now() + 700;
+        if (it.dataset.viewLink) {
+          var v = it.dataset.viewLink;
+          navegarHacia(v);
+          setTimeout(function () { forzarVista(v); }, 150);
+        } else {
+          it.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+        }
+      }, { capture: true, passive: false });
+      // Bloquear el click "fantasma" posterior al touchend (evita que cierre/reabra menús)
+      window.addEventListener("click", function (e) {
+        if (Date.now() < ignorarClickHasta && e.isTrusted) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+        }
+      }, true);
+
       function init() {
         var h = (location.hash || "").replace(/^#/, "").trim();
         if (!h) return;
