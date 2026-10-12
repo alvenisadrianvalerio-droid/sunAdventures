@@ -127,12 +127,9 @@
     if (!dd) return;
     const W = window.innerWidth < 600 ? "250px" : "290px";
 
-    dd.style.setProperty("display", "grid", "important");
-    dd.style.setProperty("grid-template-columns", "minmax(0, 1fr)", "important");
     dd.style.setProperty("width", W, "important");
     dd.style.setProperty("min-width", W, "important");
     dd.style.setProperty("max-width", W, "important");
-    dd.style.setProperty("overflow", "hidden", "important");
     dd.style.setProperty("box-sizing", "border-box", "important");
 
     dd.querySelectorAll(".user-dropdown-item, .user-dropdown-header, .user-dropdown-divider").forEach(el => {

@@ -30,11 +30,47 @@
 
   const cargarCapsulas = () => {
     try {
-      return JSON.parse(localStorage.getItem(getStorageKey()) || "{}");
+      const primaryKey = getStorageKey();
+      let raw = localStorage.getItem(primaryKey);
+      if (raw && raw !== "{}") {
+        return JSON.parse(raw);
+      }
+      // Si la clave primaria está vacía (por ejemplo antes de que cargue el user id o si se guardó bajo 'local'), buscar cualquier clave de cápsulas que contenga datos
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith(STORAGE_KEY_PREFIX)) {
+          const val = localStorage.getItem(k);
+          if (val && val !== "{}") {
+            try {
+              const parsed = JSON.parse(val);
+              if (parsed && Object.keys(parsed).length > 0) {
+                // Migrar a la clave actual si difiere
+                if (k !== primaryKey) {
+                  localStorage.setItem(primaryKey, val);
+                }
+                return parsed;
+              }
+            } catch (_) {}
+          }
+        }
+      }
+      return {};
     } catch {
       return {};
     }
   };
+
+  const esFotoCapsulaActiva = (fotoId) => {
+    if (!fotoId) return false;
+    const caps = cargarCapsulas();
+    const c = caps[fotoId];
+    return !!(c && !c.abierta);
+  };
+
+  // Exponer inmediatamente helper para el módulo de fotos
+  window.SunCapsulaTiempo = window.SunCapsulaTiempo || {};
+  window.SunCapsulaTiempo.cargarCapsulas = cargarCapsulas;
+  window.SunCapsulaTiempo.esFotoCapsulaActiva = esFotoCapsulaActiva;
 
   const guardarCapsulas = (capsulas) => {
     try {
@@ -59,6 +95,45 @@
     const d = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
     return d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
   };
+
+  /* Desbloquear todas las cápsulas selladas para abrirse hoy */
+  async function abrirTodasLasCapsulasHoy(autoIniciarDeck = true) {
+    const capsulas = cargarCapsulas();
+    const keys = Object.keys(capsulas);
+    if (!keys.length) return false;
+
+    const hoyISO = new Date().toISOString().split("T")[0];
+    let cambiadas = 0;
+    keys.forEach(id => {
+      if (!capsulas[id].abierta) {
+        capsulas[id].fechaDesbloqueo = hoyISO;
+        cambiadas++;
+      }
+    });
+
+    if (cambiadas > 0) {
+      guardarCapsulas(capsulas);
+      sonarFanfarria();
+      dispararCelebracion(window.innerWidth / 2, window.innerHeight / 2);
+      aplicarCapsulasAlGrid();
+      actualizarBotonHeader();
+
+      if (autoIniciarDeck) {
+        // Buscar el stack de listas recién generado y activarlo
+        setTimeout(() => {
+          const btnDeck = document.getElementById("btn-abrir-stack-deck");
+          if (btnDeck) {
+            btnDeck.click();
+          } else {
+            const stack = document.getElementById("polaroid-capsula-stack-card");
+            if (stack) stack.click();
+          }
+        }, 120);
+      }
+      return true;
+    }
+    return false;
+  }
 
   const diasRestantes = (fechaISO) => {
     if (!fechaISO) return 0;
@@ -168,11 +243,12 @@
       return res.toISOString().split("T")[0];
     };
 
+    const fechaHoy = hoy.toISOString().split("T")[0];
     const fecha1Mes = sumarMeses(1);
     const fecha6Meses = sumarMeses(6);
     const fecha1Ano = sumarMeses(12);
 
-    let fechaElegida = capsulaExistente?.fechaDesbloqueo || fecha1Mes;
+    let fechaElegida = capsulaExistente?.fechaDesbloqueo || fechaHoy;
 
     const modal = document.createElement("div");
     modal.className = "modal active";
@@ -197,6 +273,10 @@
         </div>
 
         <div class="capsula-options-grid">
+          <button type="button" class="capsula-opt-btn ${fechaElegida === fechaHoy ? 'active' : ''}" data-dias="0" style="border-color:rgba(255,217,61,0.5);">
+            <span class="capsula-opt-btn-label">✨ Abrir hoy</span>
+            <span class="capsula-opt-btn-sub">${formatearFechaBonita(fechaHoy)}</span>
+          </button>
           <button type="button" class="capsula-opt-btn ${fechaElegida === sumarDias(7) ? 'active' : ''}" data-dias="7">
             <span class="capsula-opt-btn-label">En 1 semana</span>
             <span class="capsula-opt-btn-sub">${formatearFechaBonita(sumarDias(7))}</span>
@@ -204,10 +284,6 @@
           <button type="button" class="capsula-opt-btn ${fechaElegida === fecha1Mes ? 'active' : ''}" data-dias="30">
             <span class="capsula-opt-btn-label">En 1 mes</span>
             <span class="capsula-opt-btn-sub">${formatearFechaBonita(fecha1Mes)}</span>
-          </button>
-          <button type="button" class="capsula-opt-btn ${fechaElegida === fecha6Meses ? 'active' : ''}" data-dias="180">
-            <span class="capsula-opt-btn-label">En 6 meses</span>
-            <span class="capsula-opt-btn-sub">${formatearFechaBonita(fecha6Meses)}</span>
           </button>
           <button type="button" class="capsula-opt-btn ${fechaElegida === fecha1Ano ? 'active' : ''}" data-dias="365">
             <span class="capsula-opt-btn-label">En 1 año</span>
@@ -217,7 +293,7 @@
 
         <div class="capsula-custom-date-wrap">
           <label for="capsula-custom-date">O elige una fecha exacta para abrirla:</label>
-          <input type="date" id="capsula-custom-date" min="${sumarDias(1)}" value="${fechaElegida}">
+          <input type="date" id="capsula-custom-date" min="${fechaHoy}" value="${fechaElegida}">
         </div>
 
         <div class="capsula-modal-actions">
@@ -247,7 +323,7 @@
         optBtns.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         const dias = Number(btn.dataset.dias);
-        fechaElegida = sumarDias(dias);
+        fechaElegida = dias === 0 ? fechaHoy : sumarDias(dias);
         inputFecha.value = fechaElegida;
       });
     });
@@ -432,6 +508,8 @@
       itemsHtml += `</div>`;
     }
 
+    const selladasSinAbrir = keys.filter(id => capsulas[id] && !capsulas[id].abierta);
+
     modal.innerHTML = `
       <div class="modal-backdrop" data-close-capsula></div>
       <div class="modal-content capsula-modal-content">
@@ -441,6 +519,13 @@
           <p class="capsula-modal-desc">
             Momentos sellados esperando su fecha señalada para volver a brillar.
           </p>
+          ${selladasSinAbrir.length > 0 ? `
+            <div style="margin-top:0.85rem;">
+              <button type="button" class="btn-primary" id="btn-abrir-todas-hoy-modal" style="background:linear-gradient(135deg,#ffd93d,#ff6f91);color:#2b2118;font-weight:800;padding:0.55rem 1.1rem;box-shadow:0 4px 15px rgba(255,217,61,0.45);display:inline-flex;align-items:center;gap:6px;font-size:0.9rem;">
+                ${SVG_GIFT} Abrir todas las cápsulas hoy (${selladasSinAbrir.length})
+              </button>
+            </div>
+          ` : ''}
         </div>
 
         ${itemsHtml}
@@ -474,6 +559,26 @@
     };
 
     modal.querySelectorAll("[data-close-capsula]").forEach(el => el.addEventListener("click", cerrar));
+
+    // Botón abrir todas hoy desde el modal de listado
+    const btnAbrirTodasHoy = modal.querySelector("#btn-abrir-todas-hoy-modal");
+    if (btnAbrirTodasHoy) {
+      btnAbrirTodasHoy.addEventListener("click", async () => {
+        const ok = window.SunModal?.confirm
+          ? await window.SunModal.confirm({
+              title: `Abrir Cápsula Hoy <span style="width:20px;height:20px;display:inline-block;vertical-align:-3px;margin-left:4px;">${SVG_GIFT}</span>`,
+              message: `¿Deseas desbloquear todas tus ${selladasSinAbrir.length} cápsulas para abrirlas hoy mismo?`,
+              icon: SVG_GIFT,
+              confirmText: "¡Sí, abrir ahora!",
+              cancelText: "Cancelar"
+            })
+          : confirm(`¿Deseas desbloquear tus ${selladasSinAbrir.length} cápsulas hoy?`);
+        if (ok) {
+          cerrar();
+          await abrirTodasLasCapsulasHoy(true);
+        }
+      });
+    }
 
     // Sellado en lote: helper para procesar 1 mes o 3 meses
     const inputBulk = modal.querySelector("#capsula-bulk-fecha");
@@ -794,6 +899,7 @@
       article.classList.remove("polaroid-capsula-locked", "polaroid-capsula-ready");
 
       if (esCapsulaActiva) {
+        article.setAttribute("data-capsula-activa", "true");
         const img = article.querySelector("img");
         const imgSrc = img?.src || "img/mascota-girasol.png";
         if (puedeAbrirse) {
@@ -803,6 +909,7 @@
         }
       } else {
         // Asegurar que fotos normales estén visibles
+        article.removeAttribute("data-capsula-activa");
         article.style.display = "";
       }
     });
@@ -884,17 +991,46 @@
           <div class="polaroid-capsula-overlay-icon" style="border-color:rgba(180,130,255,0.7);">${SVG_LOCK}</div>
           <div class="polaroid-capsula-overlay-title">Cápsula del Tiempo</div>
           <div class="polaroid-capsula-overlay-badge">${count} recuerdos sellados</div>
-          <small style="font-size:0.75rem;color:rgba(255,255,255,0.7);margin-top:0.4rem;">
+          <small style="font-size:0.75rem;color:rgba(255,255,255,0.7);margin-top:0.35rem;">
             Abre en ${diasMin} día${diasMin === 1 ? '' : 's'} (${fechaTexto})
           </small>
-          <button type="button" class="polaroid-capsula-overlay-btn" style="background:rgba(255,255,255,0.15);color:#fff;box-shadow:none;">
-            Ver cápsulas
-          </button>
+          <div style="display:flex;gap:0.4rem;margin-top:0.6rem;width:100%;justify-content:center;flex-wrap:wrap;">
+            <button type="button" class="polaroid-capsula-overlay-btn btn-abrir-stack-hoy" style="margin-top:0;background:linear-gradient(135deg,#ffd93d,#ff6f91);color:#2b2118;font-weight:800;padding:0.4rem 0.8rem;box-shadow:0 3px 12px rgba(255,217,61,0.4);">
+              ✨ Abrir hoy
+            </button>
+            <button type="button" class="polaroid-capsula-overlay-btn btn-ver-stack-lista" style="margin-top:0;background:rgba(255,255,255,0.15);color:#fff;box-shadow:none;padding:0.4rem 0.75rem;">
+              Ver lista
+            </button>
+          </div>
         </div>
         <div class="polaroid-nota">
           <p style="text-align:center;font-weight:700;color:#cba6f7;">⏳ Cofre del Tiempo (${count})</p>
         </div>
       `;
+
+      const btnAbrirHoy = stackBloqueado.querySelector(".btn-abrir-stack-hoy");
+      const btnVerLista = stackBloqueado.querySelector(".btn-ver-stack-lista");
+
+      btnAbrirHoy?.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const ok = window.SunModal?.confirm
+          ? await window.SunModal.confirm({
+              title: `Abrir Cápsula Hoy <span style="width:20px;height:20px;display:inline-block;vertical-align:-3px;margin-left:4px;">${SVG_GIFT}</span>`,
+              message: `¿Deseas abrir tus ${count} recuerdos sellados hoy mismo y revivirlos en tu álbum?`,
+              icon: SVG_GIFT,
+              confirmText: "¡Sí, abrir ahora!",
+              cancelText: "Mantener sellados"
+            })
+          : confirm(`¿Deseas abrir tus ${count} recuerdos sellados hoy?`);
+        if (ok) {
+          await abrirTodasLasCapsulasHoy(true);
+        }
+      });
+
+      btnVerLista?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        abrirModalListadoCapsulas();
+      });
 
       stackBloqueado.addEventListener("click", () => {
         abrirModalListadoCapsulas();
@@ -908,6 +1044,7 @@
     } else if (capsulasBloqueadas.length === 1) {
       // Una sola cápsula sellada individual
       const { foto, capsula, article } = capsulasBloqueadas[0];
+      article.removeAttribute("data-capsula-activa");
       article.style.display = "";
       article.classList.add("polaroid-capsula-locked");
 
@@ -955,10 +1092,12 @@
         });
       });
       if (hayCambios) {
+        aplicarCapsulasAlGrid();
+        actualizarBotonHeader();
         setTimeout(() => {
           aplicarCapsulasAlGrid();
           actualizarBotonHeader();
-        }, 80);
+        }, 60);
       }
     });
 
@@ -999,15 +1138,30 @@
     verificarCapsulasPendientesHoy();
   }
 
+  // Reaccionar cuando el usuario esté listo o las fotos se recarguen
+  window.addEventListener("sunad:user-ready", () => {
+    actualizarBotonHeader();
+    aplicarCapsulasAlGrid();
+  });
+  window.addEventListener("sunad:fotos-recargar", () => {
+    setTimeout(() => {
+      actualizarBotonHeader();
+      aplicarCapsulasAlGrid();
+    }, 100);
+  });
+
   // Exportar API para uso global
-  window.SunCapsulaTiempo = {
+  window.SunCapsulaTiempo = Object.assign(window.SunCapsulaTiempo || {}, {
     abrirModalConfig: abrirModalConfigCapsula,
     abrirModalListado: abrirModalListadoCapsulas,
+    abrirTodasHoy: abrirTodasLasCapsulasHoy,
+    cargarCapsulas: cargarCapsulas,
+    esFotoCapsulaActiva: esFotoCapsulaActiva,
     actualizar: () => {
       actualizarBotonHeader();
       aplicarCapsulasAlGrid();
     }
-  };
+  });
 
   console.log("✅ capsula-tiempo.js cargado correctamente");
 })();

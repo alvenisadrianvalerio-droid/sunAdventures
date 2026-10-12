@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const ICONO = window.ICONO || {};
   const SVG = {
     heart: ICONO.corazon || "", sun: ICONO.sol || "", moon: ICONO.luna || "",
+    download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;display:inline-block;vertical-align:-3px;margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
     android: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 9v8a1 1 0 0 0 1 1h1v3a1 1 0 0 0 2 0v-3h4v3a1 1 0 0 0 2 0v-3h1a1 1 0 0 0 1-1V9H6zM4 9a1 1 0 0 0-1 1v5a1 1 0 0 0 2 0v-5a1 1 0 0 0-1-1zm16 0a1 1 0 0 0-1 1v5a1 1 0 0 0 2 0v-5a1 1 0 0 0-1-1zM8.5 5.5l-1-1.7a.3.3 0 0 1 .5-.3l1 1.7a5 5 0 0 1 6 0l1-1.7a.3.3 0 0 1 .5.3l-1 1.7A5 5 0 0 1 18 9H6a5 5 0 0 1 2.5-3.5z"/></svg>',
     apple: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12.5c0-2.5 2-3.7 2.1-3.8-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9s-1.9-.9-3.2-.8c-1.6 0-3.2.9-4 2.4-1.7 3-.4 7.4 1.2 9.9.8 1.2 1.8 2.5 3.1 2.5 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.8 1.3-2.8s-2.5-1-2.7-3.9zM14.5 5.2c.7-.8 1.1-2 1-3.2-1 .1-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.3z"/></svg>',
     windows: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5l7.5-1v7H3v-6zm0 13l7.5 1v-7H3v6zm8.5 1.2L21 21V12.5h-9.5v7.2zm0-15.4v7.2H21V3l-9.5 1.3z"/></svg>',
@@ -26,16 +27,119 @@ document.addEventListener("DOMContentLoaded", () => {
     const g = qs(".girasol-wrapper"), pop = $("pop"), b = qs(".burbuja");
     if (g && pop) {
       pop.volume = 0.4;
-      const fr = ["Mi lugar favorito", "Contigo hasta el infinito", "Cada día te elijo", "Eres mi casualidad más bonita", "Mi persona favorita en el mundo", "Gracias por existir", "Siempre tú, siempre yo, siempre nosotros", "Te pensé, y apareciste"];
-      g.addEventListener("mouseenter", () => { pop.currentTime = 0; pop.play().catch(() => {}); if (b) b.textContent = randomDe(fr); });
-      g.addEventListener("click", e => {
-        for (let i = 0; i < 5; i++) {
-          const h = document.createElement("div");
-          h.innerHTML = SVG.heart;
-          h.style.cssText = `position:absolute;pointer-events:none;width:1.5rem;height:1.5rem;color:#a684f0;animation:heartFloat 1.5s ease-out forwards;animation-delay:${i * 0.05}s;left:${e.offsetX + (Math.random() - .5) * 40}px;top:${e.offsetY + (Math.random() - .5) * 40}px;--dx:${(Math.random() - .5) * 80}px`;
-          g.appendChild(h);
-          setTimeout(() => h.remove(), 1800);
+      const fr = [
+        "Mi lugar favorito",
+        "Contigo hasta el infinito",
+        "Cada día te elijo",
+        "Eres mi casualidad más bonita",
+        "Mi persona favorita en el mundo",
+        "Gracias por existir",
+        "Siempre tú, siempre yo, siempre nosotros",
+        "Te pensé, y apareciste",
+        "Tú haces que todo sea más bonito",
+        "Mi hogar eres tú",
+        "El amor de mi vida entero",
+        "Mi corazón late por ti",
+        "Juntos somos invencibles",
+        "Tu sonrisa ilumina mis días",
+        "Te amo más que ayer y menos que mañana"
+      ];
+      let ultFrase = b?.textContent || "";
+      let timerBurbuja = null;
+
+      const cambiarFrase = () => {
+        let nueva = randomDe(fr);
+        let intentos = 0;
+        while (nueva === ultFrase && intentos < 8) {
+          nueva = randomDe(fr);
+          intentos++;
         }
+        ultFrase = nueva;
+        if (b) {
+          b.textContent = nueva;
+          b.classList.add("visible");
+          if (timerBurbuja) clearTimeout(timerBurbuja);
+          timerBurbuja = setTimeout(() => {
+            b.classList.remove("visible");
+          }, 3500);
+        }
+      };
+
+      const lanzarCorazones = (origX, origY) => {
+        const paleta = ["#ff3366", "#ff6b8b", "#ff4081", "#ff1744", "#f50057", "#e91e63", "#ff79a8"];
+        const rect = g.getBoundingClientRect();
+        const baseLeft = (typeof origX === "number" && !isNaN(origX)) ? origX : (rect.width / 2);
+        const baseTop = (typeof origY === "number" && !isNaN(origY)) ? origY : (rect.height / 2);
+
+        const svgCorazon = SVG.heart || '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+
+        for (let i = 0; i < 7; i++) {
+          const h = document.createElement("div");
+          h.innerHTML = svgCorazon;
+          const tam = 1.6 + Math.random() * 0.8; // 1.6rem a 2.4rem
+          const color = paleta[Math.floor(Math.random() * paleta.length)];
+          const dx = (Math.random() - 0.5) * 110;
+          const rot = (Math.random() - 0.5) * 50;
+          const posX = baseLeft + (Math.random() - 0.5) * 36;
+          const posY = baseTop + (Math.random() - 0.5) * 36;
+
+          h.style.cssText = `position:absolute;pointer-events:none;width:${tam}rem;height:${tam}rem;color:${color};filter:drop-shadow(0 2px 8px rgba(255,51,102,0.65));animation:heartFloat 1.4s cubic-bezier(0.2,0.8,0.3,1) forwards;animation-delay:${i * 0.04}s;left:${posX}px;top:${posY}px;--dx:${dx}px;--rot:${rot}deg;z-index:99;display:flex;align-items:center;justify-content:center;`;
+          const svgInside = h.querySelector("svg");
+          if (svgInside) {
+            svgInside.style.width = "100%";
+            svgInside.style.height = "100%";
+            svgInside.style.filter = "drop-shadow(0 0 4px rgba(255,255,255,0.7))";
+          }
+          g.appendChild(h);
+          setTimeout(() => h.remove(), 1600);
+        }
+      };
+
+      const accionarGirasol = e => {
+        pop.currentTime = 0;
+        pop.play().catch(() => {});
+        cambiarFrase();
+
+        let x = null, y = null;
+        if (e) {
+          if (e.touches && e.touches[0]) {
+            const r = g.getBoundingClientRect();
+            x = e.touches[0].clientX - r.left;
+            y = e.touches[0].clientY - r.top;
+          } else if (e.changedTouches && e.changedTouches[0]) {
+            const r = g.getBoundingClientRect();
+            x = e.changedTouches[0].clientX - r.left;
+            y = e.changedTouches[0].clientY - r.top;
+          } else if (typeof e.offsetX === "number") {
+            x = e.offsetX;
+            y = e.offsetY;
+          }
+        }
+        lanzarCorazones(x, y);
+
+        // Efecto rebote en el girasol
+        g.classList.add("activo");
+        setTimeout(() => g.classList.remove("activo"), 600);
+      };
+
+      g.addEventListener("mouseenter", () => {
+        pop.currentTime = 0;
+        pop.play().catch(() => {});
+        cambiarFrase();
+      });
+
+      let touchHandled = false;
+      g.addEventListener("touchstart", e => {
+        touchHandled = true;
+        accionarGirasol(e);
+      }, { passive: true });
+
+      g.addEventListener("click", e => {
+        if (touchHandled) {
+          touchHandled = false;
+          return;
+        }
+        accionarGirasol(e);
       });
     }
   } catch {}
@@ -1423,16 +1527,6 @@ sprite.style.opacity = "0.25";
               <span class="download-option-title">Android</span>
               <span class="download-option-hint">Descargar APK directa</span>
             </a>
-            <button class="download-option" data-platform="ios" type="button">
-              <span class="download-option-icon">${SVG.apple || "🍎"}</span>
-              <span class="download-option-title">iOS (iPhone)</span>
-              <span class="download-option-hint">Añadir a inicio</span>
-            </button>
-            <button class="download-option" data-platform="pwa" type="button">
-              <span class="download-option-icon">✨</span>
-              <span class="download-option-title">App Web (PWA)</span>
-              <span class="download-option-hint">Instalar en teléfono</span>
-            </button>
             <button class="download-option" data-platform="windows" type="button">
               <span class="download-option-icon">${SVG.windows || "💻"}</span>
               <span class="download-option-title">Windows</span>
@@ -1440,8 +1534,8 @@ sprite.style.opacity = "0.25";
             </button>
           </div>
           <div style="margin-top:1.2rem;text-align:center">
-            <a href="./app/sunad.apk" download="SunAd-1.5.apk" style="display:inline-block;padding:.6rem 1.2rem;background:rgba(255,217,61,.2);color:#ffd93d;border:1px solid rgba(255,217,61,.4);border-radius:12px;font-size:.85rem;font-weight:bold;text-decoration:none">
-              📥 Descarga directa inmediata (APK)
+            <a href="./app/sunad.apk" id="btn-descarga-inmediata-apk" download="SunAd-1.5.apk" style="display:inline-flex;align-items:center;justify-content:center;padding:.65rem 1.3rem;background:rgba(255,217,61,.2);color:#ffd93d;border:1px solid rgba(255,217,61,.45);border-radius:12px;font-size:.85rem;font-weight:bold;text-decoration:none;transition:all .2s ease;">
+              ${SVG.download} Descarga directa inmediata (APK)
             </a>
           </div>
           <div class="modal-actions" style="margin-top:1.2rem">
@@ -1454,20 +1548,20 @@ sprite.style.opacity = "0.25";
       qsa("[data-close]", m).forEach(el => el.addEventListener("click", c));
       
       const apkBtn = m.querySelector("#btn-descargar-apk");
-      if (apkBtn) {
-        apkBtn.addEventListener("click", (ev) => {
-          // Asegurar inicio de descarga
-          setTimeout(() => {
-            if (window.SunModal) {
-              window.SunModal.toast?.("Descargando APK de SunAd...", "success");
-            }
-          }, 300);
-        });
-      }
+      const apkBtnInmediato = m.querySelector("#btn-descarga-inmediata-apk");
+      [apkBtn, apkBtnInmediato].forEach(btn => {
+        if (btn) {
+          btn.addEventListener("click", () => {
+            setTimeout(() => {
+              if (window.SunModal) {
+                window.SunModal.toast?.("Descargando APK de SunAd...", "success");
+              }
+            }, 300);
+          });
+        }
+      });
 
       const a = {
-        ios: "En iPhone/iPad: Abre esta página en Safari → toca el botón Compartir (cuadrado con flecha) → 'Añadir a pantalla de inicio'.",
-        pwa: "En Android o PC: Puedes instalarla tocando los 3 puntos del navegador → 'Instalar aplicación' o 'Agregar a la pantalla principal'.",
         windows: "En Windows: Abre Chrome o Edge → clic en el icono de instalar en la barra de direcciones o menú → 'Instalar SunAd'.",
         linux: "Próximamente"
       };

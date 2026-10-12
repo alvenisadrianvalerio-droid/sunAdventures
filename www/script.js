@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const ICONO = window.ICONO || {};
   const SVG = {
     heart: ICONO.corazon || "", sun: ICONO.sol || "", moon: ICONO.luna || "",
+    download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;display:inline-block;vertical-align:-3px;margin-right:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
     android: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 9v8a1 1 0 0 0 1 1h1v3a1 1 0 0 0 2 0v-3h4v3a1 1 0 0 0 2 0v-3h1a1 1 0 0 0 1-1V9H6zM4 9a1 1 0 0 0-1 1v5a1 1 0 0 0 2 0v-5a1 1 0 0 0-1-1zm16 0a1 1 0 0 0-1 1v5a1 1 0 0 0 2 0v-5a1 1 0 0 0-1-1zM8.5 5.5l-1-1.7a.3.3 0 0 1 .5-.3l1 1.7a5 5 0 0 1 6 0l1-1.7a.3.3 0 0 1 .5.3l-1 1.7A5 5 0 0 1 18 9H6a5 5 0 0 1 2.5-3.5z"/></svg>',
     apple: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12.5c0-2.5 2-3.7 2.1-3.8-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9s-1.9-.9-3.2-.8c-1.6 0-3.2.9-4 2.4-1.7 3-.4 7.4 1.2 9.9.8 1.2 1.8 2.5 3.1 2.5 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.8 1.3-2.8s-2.5-1-2.7-3.9zM14.5 5.2c.7-.8 1.1-2 1-3.2-1 .1-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.3z"/></svg>',
     windows: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5l7.5-1v7H3v-6zm0 13l7.5 1v-7H3v6zm8.5 1.2L21 21V12.5h-9.5v7.2zm0-15.4v7.2H21V3l-9.5 1.3z"/></svg>',
@@ -1326,16 +1327,6 @@ window._setMascotaImg = setMascotaImg;
               <span class="download-option-title">Android</span>
               <span class="download-option-hint">Descargar APK directa</span>
             </a>
-            <button class="download-option" data-platform="ios" type="button">
-              <span class="download-option-icon">${SVG.apple || "🍎"}</span>
-              <span class="download-option-title">iOS (iPhone)</span>
-              <span class="download-option-hint">Añadir a inicio</span>
-            </button>
-            <button class="download-option" data-platform="pwa" type="button">
-              <span class="download-option-icon">✨</span>
-              <span class="download-option-title">App Web (PWA)</span>
-              <span class="download-option-hint">Instalar en teléfono</span>
-            </button>
             <button class="download-option" data-platform="windows" type="button">
               <span class="download-option-icon">${SVG.windows || "💻"}</span>
               <span class="download-option-title">Windows</span>
@@ -1343,8 +1334,8 @@ window._setMascotaImg = setMascotaImg;
             </button>
           </div>
           <div style="margin-top:1.2rem;text-align:center">
-            <a href="./app/sunad.apk" download="SunAd-1.5.apk" style="display:inline-block;padding:.6rem 1.2rem;background:rgba(255,217,61,.2);color:#ffd93d;border:1px solid rgba(255,217,61,.4);border-radius:12px;font-size:.85rem;font-weight:bold;text-decoration:none">
-              📥 Descarga directa inmediata (APK)
+            <a href="./app/sunad.apk" id="btn-descarga-inmediata-apk" download="SunAd-1.5.apk" style="display:inline-flex;align-items:center;justify-content:center;padding:.65rem 1.3rem;background:rgba(255,217,61,.2);color:#ffd93d;border:1px solid rgba(255,217,61,.45);border-radius:12px;font-size:.85rem;font-weight:bold;text-decoration:none;transition:all .2s ease;">
+              ${SVG.download} Descarga directa inmediata (APK)
             </a>
           </div>
           <div class="modal-actions" style="margin-top:1.2rem">
@@ -1355,9 +1346,22 @@ window._setMascotaImg = setMascotaImg;
       document.body.style.overflow = "hidden";
       const c = () => { m.remove(); document.body.style.overflow = ""; };
       qsa("[data-close]", m).forEach(el => el.addEventListener("click", c));
+
+      const apkBtn = m.querySelector("#btn-descargar-apk");
+      const apkBtnInmediato = m.querySelector("#btn-descarga-inmediata-apk");
+      [apkBtn, apkBtnInmediato].forEach(btn => {
+        if (btn) {
+          btn.addEventListener("click", () => {
+            setTimeout(() => {
+              if (window.SunModal) {
+                window.SunModal.toast?.("Descargando APK de SunAd...", "success");
+              }
+            }, 300);
+          });
+        }
+      });
+
       const a = {
-        ios: "En iPhone/iPad: Abre esta página en Safari → toca el botón Compartir → 'Añadir a pantalla de inicio'.",
-        pwa: "En Android o PC: Puedes instalarla tocando los 3 puntos del navegador → 'Instalar aplicación'.",
         windows: "En Windows: Abre Chrome o Edge → clic en el icono de instalar en la barra de direcciones → 'Instalar SunAd'.",
         linux: "Próximamente"
       };

@@ -144,20 +144,20 @@
             <a href="#musica-local" class="user-dropdown-item" data-view-link="musica-local"><span
                 class="user-dropdown-icon" data-icono="musica"></span><span>Playlists</span></a>
             <div class="user-dropdown-divider"></div>
-            <button class="user-dropdown-item" data-action="perfil"><span class="user-dropdown-icon"
+            <button type="button" class="user-dropdown-item" data-action="perfil"><span class="user-dropdown-icon"
                 data-icono="persona"></span><span>Mi perfil</span></button>
-            <button class="user-dropdown-item" data-action="pareja" style="color:#ff6ba8;"><span
+            <button type="button" class="user-dropdown-item" data-action="pareja" style="color:#ff6ba8;"><span
                 class="user-dropdown-icon" data-icono="corazon"></span><span>Mi Pareja</span></button>
-            <button class="user-dropdown-item" data-action="amigos"><span class="user-dropdown-icon"
+            <button type="button" class="user-dropdown-item" data-action="amigos"><span class="user-dropdown-icon"
                 data-icono="amigos"></span><span>Mi Grupo de Aventuras 👥</span></button>
-            <button class="user-dropdown-item" data-action="ajustes"><span class="user-dropdown-icon"
+            <button type="button" class="user-dropdown-item" data-action="ajustes"><span class="user-dropdown-icon"
                 data-icono="ajustes"></span><span>Ajustes</span></button>
-            <button class="user-dropdown-item" data-action="offline"><span class="user-dropdown-icon"
+            <button type="button" class="user-dropdown-item" data-action="offline"><span class="user-dropdown-icon"
                 data-icono="descargar"></span><span>Descargar todo</span></button>
-            <button class="user-dropdown-item" data-action="descargar"><span class="user-dropdown-icon"
+            <button type="button" class="user-dropdown-item" data-action="descargar"><span class="user-dropdown-icon"
                 data-icono="descargar"></span><span>Descargar App (APK) 📱</span></button>
             <div class="user-dropdown-divider"></div>
-            <button id="logout-btn" class="user-dropdown-item user-dropdown-item-danger" data-action="logout"><span
+            <button type="button" id="logout-btn" class="user-dropdown-item user-dropdown-item-danger" data-action="logout"><span
                 class="user-dropdown-icon" data-icono="salir"></span><span>Salir</span></button>
           </div>
         </div>
@@ -1160,13 +1160,15 @@ Artista - Canción
         if (!v) return;
         e.preventDefault();
         toggleNavMenu(false);
+        document.getElementById("user-dropdown")?.classList.remove("open");
+        document.getElementById("user-info")?.classList.remove("open");
         if (location.hash === "#" + v) window.dispatchEvent(new Event("hashchange"));
         else location.hash = v;
         requestAnimationFrame(function () {
           var s = document.querySelector('[data-view="' + v + '"]');
           if (s && !s.classList.contains("active")) activarVista(v);
         });
-      }, true);
+      });
       function init() { var h = (location.hash || "").replace(/^#/, "").trim(); if (!h) return; if (document.querySelector('[data-view="' + h + '"]')) activarVista(h); }
       if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
       else setTimeout(init, 50);

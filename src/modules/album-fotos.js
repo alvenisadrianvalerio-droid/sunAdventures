@@ -228,6 +228,34 @@
       article.className = "polaroid";
       article.dataset.fotoId = foto.id;
 
+      // Si la foto está sellada en una cápsula del tiempo no abierta, ocultarla de inmediato para no mostrarla fuera del mazo
+      let esCapsula = false;
+      try {
+        if (window.SunCapsulaTiempo?.esFotoCapsulaActiva) {
+          esCapsula = window.SunCapsulaTiempo.esFotoCapsulaActiva(foto.id);
+        } else {
+          // Búsqueda de respaldo en localStorage
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && k.startsWith("sunad_capsulas_")) {
+              const val = localStorage.getItem(k);
+              if (val && val.includes(`"${foto.id}"`)) {
+                const parsed = JSON.parse(val);
+                if (parsed[foto.id] && !parsed[foto.id].abierta) {
+                  esCapsula = true;
+                  break;
+                }
+              }
+            }
+          }
+        }
+      } catch (_) {}
+
+      if (esCapsula) {
+        article.setAttribute("data-capsula-activa", "true");
+        article.style.display = "none";
+      }
+
       if (modoSeleccionFotos) {
         article.classList.add("modo-seleccion");
         const estaSel = fotosSeleccionadasIds.has(foto.id);

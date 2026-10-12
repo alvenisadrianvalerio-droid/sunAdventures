@@ -266,29 +266,52 @@
     userDropdown.classList.remove("open"); userDropdown.setAttribute("aria-hidden", "true");
     userMenuToggle.setAttribute("aria-expanded", "false"); userInfo?.classList.remove("open");
   };
-  userMenuToggle?.addEventListener("click", e => { e.stopPropagation(); userDropdown?.classList.contains("open") ? cerrarMenuPerfil() : abrirMenuPerfil(); });
+  const toggleMenu = e => {
+    if (e.cancelable && e.type !== "click") e.preventDefault();
+    e.stopPropagation();
+    userDropdown?.classList.contains("open") ? cerrarMenuPerfil() : abrirMenuPerfil();
+  };
+  userMenuToggle?.addEventListener("click", toggleMenu);
+  userMenuToggle?.addEventListener("touchend", toggleMenu);
+
   document.addEventListener("click", e => {
+    if (!userDropdown?.classList.contains("open")) return;
+    if (userInfo && !userInfo.contains(e.target)) cerrarMenuPerfil();
+  });
+  document.addEventListener("touchend", e => {
     if (!userDropdown?.classList.contains("open")) return;
     if (userInfo && !userInfo.contains(e.target)) cerrarMenuPerfil();
   });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && userDropdown?.classList.contains("open")) cerrarMenuPerfil(); });
 
+  const ejecutarAccionDropdown = async (item, e) => {
+    if (e) e.stopPropagation();
+    const a = item.dataset.action;
+    if (a === "perfil") window.abrirPerfilModal?.();
+    else if (a === "pareja") window.ParejaSistema?.abrirModal?.();
+    else if (a === "ajustes") window.AlbumApp.modules.grupo?.abrirAjustes();
+    else if (a === "amigos") window.AlbumApp.modules.grupo?.abrirAmigosModal();
+    else if (a === "descargar") {
+      const btnDesc = document.querySelector('.lobby-btn[data-action="descargar"]');
+      if (btnDesc) btnDesc.click();
+      else window.abrirDescarga?.();
+    }
+    else if (a === "offline") {
+      const uso = await window.SunOffline.estadoUso();
+      const msg = (uso.imagenes || uso.canciones)
+        ? `Ya tienes descargado:<br>📸 ${uso.imagenes} imágenes<br>🎵 ${uso.canciones} canciones<br>💾 ${uso.tamanoMB} MB<br><br>¿Descargar de nuevo todo lo nuevo?`
+        : "¿Descargar todas las imágenes y canciones para uso sin conexión?";
+      const ok = await window.AlbumApp.confirmar({ title: "Descargar contenido", message: msg, variant: "success", icon: "📥", confirmText: "Descargar", cancelText: "Cancelar" });
+      if (ok) await window.SunOffline.descargarTodo();
+    }
+    cerrarMenuPerfil();
+  };
+
   userDropdown?.querySelectorAll("[data-action]").forEach(item => {
-    item.addEventListener("click", async () => {
-      const a = item.dataset.action;
-      if (a === "perfil") window.abrirPerfilModal?.();
-      else if (a === "pareja") window.ParejaSistema?.abrirModal?.();
-      else if (a === "ajustes") window.AlbumApp.modules.grupo?.abrirAjustes();
-      else if (a === "amigos") window.AlbumApp.modules.grupo?.abrirAmigosModal();
-      else if (a === "offline") {
-        const uso = await window.SunOffline.estadoUso();
-        const msg = (uso.imagenes || uso.canciones)
-          ? `Ya tienes descargado:<br>📸 ${uso.imagenes} imágenes<br>🎵 ${uso.canciones} canciones<br>💾 ${uso.tamanoMB} MB<br><br>¿Descargar de nuevo todo lo nuevo?`
-          : "¿Descargar todas las imágenes y canciones para uso sin conexión?";
-        const ok = await window.AlbumApp.confirmar({ title: "Descargar contenido", message: msg, variant: "success", icon: "📥", confirmText: "Descargar", cancelText: "Cancelar" });
-        if (ok) await window.SunOffline.descargarTodo();
-      }
-      cerrarMenuPerfil();
+    item.addEventListener("click", e => ejecutarAccionDropdown(item, e));
+    item.addEventListener("touchend", e => {
+      e.preventDefault();
+      ejecutarAccionDropdown(item, e);
     });
   });
 

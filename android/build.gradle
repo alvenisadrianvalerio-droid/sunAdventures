@@ -14,7 +14,13 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
-
+configurations.all {
+    resolutionStrategy {
+        force "org.jetbrains.kotlin:kotlin-stdlib:1.8.22"
+        force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22"
+        force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22"
+    }
+}
 apply from: "variables.gradle"
 
 allprojects {
@@ -22,8 +28,16 @@ allprojects {
         google()
         mavenCentral()
     }
+    
+    // FIX: Resolver conflicto de Kotlin stdlib duplicado
+    configurations.all {
+        resolutionStrategy {
+            force "org.jetbrains.kotlin:kotlin-stdlib:1.9.24"
+        }
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+    }
 }
-
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
