@@ -345,11 +345,13 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     c.innerHTML = `
       <div class="rpg-tabs" role="tablist">
         <button type="button" class="rpg-tab ${tab === "zonas" ? "active" : ""}" data-rpg-tab="zonas"><span class="rpg-tab-icon" aria-hidden="true"><img src="img/items%20de%20aventura/pocion.png" alt=""></span><span class="rpg-tab-text">Zonas</span></button>
+        <button type="button" class="rpg-tab ${tab === "mapa" ? "active" : ""}" data-rpg-tab="mapa"><span class="rpg-tab-icon" aria-hidden="true"><img src="img/items%20de%20aventura/mapa.png" alt=""></span><span class="rpg-tab-text">Mapa</span></button>
         <button type="button" class="rpg-tab ${tab === "objetos" ? "active" : ""}" data-rpg-tab="objetos"><span class="rpg-tab-icon" aria-hidden="true"><img src="img/items%20de%20aventura/hamburguesa.png" alt=""></span><span class="rpg-tab-text">Objetos</span></button>
         <button type="button" class="rpg-tab ${tab === "cofres" ? "active" : ""}" data-rpg-tab="cofres"><span class="rpg-tab-icon" aria-hidden="true"><img src="img/rpg/items/cofre-madera.png?v=2" alt=""></span><span class="rpg-tab-text">Cofres</span></button>
         <button type="button" class="rpg-tab" data-rpg-tab="roguelike"><span class="rpg-tab-icon" aria-hidden="true"><img src="img/items%20de%20aventura/dado.png" alt=""></span><span class="rpg-tab-text">Roguelike</span></button>
       </div>
       <div class="rpg-panel ${tab === "zonas" ? "active" : ""}" data-rpg-panel="zonas">${htmlMapa()}</div>
+      <div class="rpg-panel ${tab === "mapa" ? "active" : ""}" data-rpg-panel="mapa" id="rpg-panel-mapa"></div>
       <div class="rpg-panel ${tab === "objetos" ? "active" : ""}" data-rpg-panel="objetos"></div>
       <div class="rpg-panel ${tab === "cofres" ? "active" : ""}" data-rpg-panel="cofres"></div>`;
 

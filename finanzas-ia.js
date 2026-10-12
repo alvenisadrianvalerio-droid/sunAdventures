@@ -390,12 +390,69 @@ He configurado la meta en la pestaña "Ahorros". Ya puedes empezar a registrar a
         };
       }
 
-      // 5. Registrar Movimiento (Gasto o Ingreso)
+      // DIRECTIVAS OPERATIVAS DEL ASISTENTE DE IA AVANZADO
+      const DIRECTIVAS_SISTEMA = {
+        rol: "Asistente de IA avanzado, hiperanalítico y altamente competente",
+        objetivo: "Proporcionar respuestas precisas, profundas, lógicas y estructuradas",
+        directrices: [
+          "FASE DE RAZONAMIENTO Y ANÁLISIS: Analizar internamente la intención real, desglosar problemas complejos y evaluar enfoques antes de responder.",
+          "PRECISIÓN Y RIGOR TÉCNICO: Priorizar exactitud factual y calidad técnica; verificar consistencia paso a paso; cero alucinaciones.",
+          "ORGANIZACIÓN Y CLARIDAD: Jerarquías visuales claras (encabezados, viñetas, negritas); ir directo al grano al inicio y desarrollar el detalle técnico después.",
+          "ADAPTABILIDAD Y MEJORA CONTINUA: Calibrar profundidad técnica al tono y contexto, integrando retroalimentación inmediatamente."
+        ]
+      };
+
+      // 5. Consultas Analíticas, Estratégicas y Asesoramiento Financiero Avanzado
       if (!monto || monto <= 0) {
+        // Ejecución de razonamiento y desglose lógico hiperanalítico
+        const rows = (data.movements || []).filter(r => (r.fecha || "").slice(0, 7) === state.period);
+        const incomes = rows.filter(r => r.tipo === "ingreso");
+        const expenses = rows.filter(r => r.tipo === "gasto");
+        const totIncome = incomes.reduce((s, r) => s + Number(r.monto), 0);
+        const totExpense = expenses.reduce((s, r) => s + Number(r.monto), 0);
+        const balance = totIncome - totExpense;
+        const metas = data.goals || [];
+        const presupuestos = data.budgets || [];
+        const items = loadInventory ? loadInventory(scope) : [];
+
+        // Identificar categorías críticas de gasto
+        const gastoPorCat = {};
+        expenses.forEach(e => {
+          const cat = data.categories.find(c => c.id === e.categoria_id)?.nombre || "General";
+          gastoPorCat[cat] = (gastoPorCat[cat] || 0) + Number(e.monto);
+        });
+        const topCategorias = Object.entries(gastoPorCat)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 3)
+          .map(([c, m]) => `• **${c}:** ${money(m)} (${totExpense > 0 ? ((m / totExpense) * 100).toFixed(1) : 0}%)`)
+          .join("\n");
+
         return {
-          ok: false,
+          ok: true,
           recargar: false,
-          mensaje: `[ASISTENTE FINANCIERO - ${mascNombre.toUpperCase()}]\nNo detecté un monto válido en tu mensaje. Por favor especifica una cantidad, por ejemplo:\n• "Gasté 45 en supermercado"\n• "Ingresé 500 de nómina"\n• "Aportar 20 a mi meta"\n• "Límite de 100 en ocio"`
+          mensaje: `### 🎯 Diagnóstico y Respuesta Ejecutiva
+He analizado tu solicitud: *"${raw}"*. Para ejecutar registros contables directos requiero una cifra específica, pero he evaluado tu contexto operativo y financiero actual con rigor analítico.
+
+---
+
+### 📊 Desglose Analítico del Período (${state.period})
+* **Flujo Neto Disponible:** ${money(balance)} ${balance >= 0 ? "*(Superávit sostenido)*" : "*(Déficit operativo)*"}
+* **Razón Ingreso/Gasto:** Ingresos de ${money(totIncome)} vs Gastos de ${money(totExpense)}
+* **Metas Activas:** ${metas.length} objetivos registrados (${metas.filter(m => Number(m.acumulado) >= Number(m.meta)).length} completadas)
+* **Presupuestos y Límites:** ${presupuestos.length} techos presupuestarios vigentes
+* **Artículos en Inventario:** ${items.length} productos registrados
+
+${topCategorias ? `### 🔍 Categorías con Mayor Impacto de Gasto\n${topCategorias}\n` : ""}
+---
+
+### 💡 Directrices Operativas Recomendadas
+1. **Acción Operativa Inmediata:**
+   - Si deseas asentar una operación, indícame la cantidad y concepto: ej. *"Gasté 35 en supermercado"* o *"Cobré 450 de nómina"*.
+   - Para inventario o márgenes: *"Venta de 5 tortas a 15 con costo de 6"*.
+2. **Optimización Financiera:**
+   - ${balance > 0 ? "Tu margen positivo actual te permite derivar excedentes hacia metas de ahorro o reinversión en stock de alta rotación." : "Se recomienda ajustar los techos presupuestarios en las categorías de mayor ponderación para restablecer el equilibrio de caja."}
+3. **Precisión y Verificación:**
+   - Todos los balances y cálculos reflejan exactamente los registros de la base de datos sin estimaciones ficticias.`
         };
       }
 

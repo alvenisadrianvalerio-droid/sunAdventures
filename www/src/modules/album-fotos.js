@@ -148,7 +148,48 @@
     });
   }
 
-  /* Render progresivo ultrarrápido (muestra las fotos instantáneamente) */
+  // IntersectionObserver para cargar las fotos dinámicamente según el usuario hace scroll
+  let observerLazyFotos = null;
+
+  function obtenerObserverLazy() {
+    if (observerLazyFotos) return observerLazyFotos;
+    if ("IntersectionObserver" in window) {
+      observerLazyFotos = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            obs.unobserve(el);
+            cargarFotoVisible(el);
+          }
+        });
+      }, {
+        root: null,
+        rootMargin: "350px 0px", // Precargar con antelación antes de que entre al viewport
+        threshold: 0.01
+      });
+    }
+    return observerLazyFotos;
+  }
+
+  async function cargarFotoVisible(el) {
+    if (!el || el.dataset.fotoCargada === "true") return;
+    el.dataset.fotoCargada = "true";
+    const path = el.dataset.fotoPath;
+    if (!path) return;
+    const img = el.querySelector(".polaroid-visual img");
+    if (!img) return;
+
+    try {
+      const url = await obtenerUrlFirmada(path);
+      if (url) {
+        asignarUrlImagen(img, path, url);
+      }
+    } catch (err) {
+      console.warn("cargarFotoVisible error:", err);
+    }
+  }
+
+  /* Render progresivo con Lazy Loading en scroll para máxima optimización */
   async function render() {
     if (!grid) return;
     if (renderEnCurso) { renderPendiente = true; return; }
@@ -158,37 +199,25 @@
       empty?.classList.add("hidden");
       
       grid.innerHTML = "";
-      const polaroidsMap = new Map();
+      const obs = obtenerObserverLazy();
+      if (obs) obs.disconnect();
+
       const fragInicial = document.createDocumentFragment();
 
-      // Creamos los elementos de forma inmediata con placeholder elegante
+      // Creamos los elementos de forma inmediata con placeholders ligeros
       fotos.forEach(f => {
         const el = crearPolaroid(f, null);
         if (el) {
-          polaroidsMap.set(f.id, el);
           fragInicial.appendChild(el);
+          if (obs) {
+            obs.observe(el);
+          } else {
+            // Fallback si no hay soporte para IntersectionObserver
+            cargarFotoVisible(el);
+          }
         }
       });
       grid.appendChild(fragInicial);
-
-      // Cargar URLs en paralelo con concurrencia aumentada (12 concurrentes) e inyectar a medida que llegan
-      const cola = fotos.slice();
-      const CONCURRENCIA = 12;
-      await Promise.all(Array.from({ length: CONCURRENCIA }, async () => {
-        while (cola.length) {
-          const f = cola.shift();
-          const url = await obtenerUrlFirmada(f.path);
-          if (url) {
-            const el = polaroidsMap.get(f.id);
-            if (el) {
-              const img = el.querySelector(".polaroid-visual img");
-              if (img) {
-                asignarUrlImagen(img, f.path, url);
-              }
-            }
-          }
-        }
-      }));
 
       if (document.querySelector("[data-view].active")?.dataset.view === "mapa") renderMapa();
     } catch (err) { console.warn("render:", err); }
@@ -227,6 +256,7 @@
       const article = document.createElement("article");
       article.className = "polaroid";
       article.dataset.fotoId = foto.id;
+      article.dataset.fotoPath = foto.path || "";
 
       // Si la foto está sellada en una cápsula del tiempo no abierta, ocultarla de inmediato para no mostrarla fuera del mazo
       let esCapsula = false;

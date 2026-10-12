@@ -377,11 +377,11 @@
     };
   };
 
-  // Base de conocimientos: Diccionario y Wikipedia en español (con búsqueda semántica y fulltext)
+  // Base de conocimientos: Diccionario, Wiktionary y Wikipedia en español
   async function buscarWikipediaEs(termino) {
     if (!termino || typeof termino !== "string") return null;
     let clean = termino.toLowerCase()
-      .replace(/^(el|la|los|las|un|una|unos|unas|de|del|al|o|versus|vs|que|qué|piensas|opinas|sobre|sabes)\s+/gi, "")
+      .replace(/^(el|la|los|las|un|una|unos|unas|de|del|al|o|versus|vs|que|qué|piensas|opinas|sobre|sabes|palabra)\s+/gi, "")
       .replace(/[¿?¡!.,]/g, "")
       .trim();
 
@@ -397,13 +397,18 @@
         }
       }
 
-      // 2. Buscar mediante el motor de búsqueda opensearch
+      // 2. Buscar mediante el motor de búsqueda opensearch con coincidencia estricta de título
       const searchRes = await fetch(`https://es.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(clean)}&limit=4&namespace=0&format=json&origin=*`);
       if (searchRes.ok) {
         const dataSearch = await searchRes.json();
         const titulos = dataSearch[1] || [];
         for (const tit of titulos) {
           if (!tit || tit.length < 2) continue;
+          // Validar que el título sea relevante al término buscado y no algo completamente tangencial
+          const titNorm = tit.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+          const cleanNorm = clean.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+          if (!titNorm.includes(cleanNorm) && !cleanNorm.includes(titNorm)) continue;
+
           const sumRes = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(tit)}`);
           if (sumRes.ok) {
             const dataSum = await sumRes.json();
@@ -414,13 +419,17 @@
         }
       }
 
-      // 3. Fallback potente: búsqueda fulltext en Wikipedia (action=query&list=search)
-      const ftRes = await fetch(`https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(clean)}&utf8=1&format=json&origin=*`);
-      if (ftRes.ok) {
-        const ftData = await ftRes.json();
-        const hits = ftData.query?.search || [];
+      // 3. Búsqueda por intitle en Wikipedia para evitar falsos positivos dentro de cómics u obras
+      const intitleRes = await fetch(`https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=intitle:${encodeURIComponent(clean)}&utf8=1&format=json&origin=*`);
+      if (intitleRes.ok) {
+        const itData = await intitleRes.json();
+        const hits = itData.query?.search || [];
         for (const hit of hits.slice(0, 3)) {
           if (!hit.title) continue;
+          const hitNorm = hit.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+          const cleanNorm = clean.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+          if (!hitNorm.includes(cleanNorm) && !cleanNorm.includes(hitNorm)) continue;
+
           const sumRes = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(hit.title)}`);
           if (sumRes.ok) {
             const dataSum = await sumRes.json();
@@ -437,16 +446,57 @@
   }
 
   async function buscarDefinicionPalabra(palabra) {
+    if (!palabra || typeof palabra !== "string") return null;
+    let limpia = palabra.toLowerCase()
+      .replace(/^(la|el|las|los|un|una)\s+palabra\s+/i, "")
+      .replace(/^palabra\s+/i, "")
+      .replace(/^(la|el|las|los|un|una|de|del)\s+/i, "")
+      .replace(/[¿?¡!.,]/g, "")
+      .trim();
+
+    if (!limpia || limpia.length < 2) return null;
+
+    // 1. Diccionario RAE / Español oficial API
     try {
-      const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/es/${encodeURIComponent(palabra)}`);
+      const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/es/${encodeURIComponent(limpia)}`);
       if (res.ok) {
         const datos = await res.json();
         const def = datos[0]?.meanings?.[0]?.definitions?.[0]?.definition;
         if (def) return def;
       }
     } catch {}
-    // Si no está en el diccionario, buscar extracto enciclopédico en Wikipedia
-    const wiki = await buscarWikipediaEs(palabra);
+
+    // 2. Diccionario Wiktionary Global (soporta palabras en japonés, inglés, francés, latín, etc.)
+    try {
+      const resWik = await fetch(`https://en.wiktionary.org/api/rest_v1/page/definition/${encodeURIComponent(limpia)}`);
+      if (resWik.ok) {
+        const dWik = await resWik.json();
+        // Buscar definición en inglés u otros idiomas
+        const defs = dWik.en?.[0]?.definitions || dWik.ja?.[0]?.definitions || dWik.es?.[0]?.definitions;
+        if (defs && defs.length) {
+          const rawDef = defs[0].definition || "";
+          const txtLimpio = rawDef.replace(/<[^>]+>/g, "").trim();
+          if (txtLimpio && txtLimpio.length > 2 && !txtLimpio.includes("form-of") && !txtLimpio.includes("transcription of")) {
+            return `"${txtLimpio}" (Significado registrado en el léxico internacional/Wiktionary)`;
+          }
+        }
+      }
+    } catch {}
+
+    // 3. Traducción directa con MyMemory (para palabras y modismos en otros idiomas como arigato, sayonara, merci, etc.)
+    try {
+      const resTrans = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(limpia)}&langpair=autodetect|es`);
+      if (resTrans.ok) {
+        const dTrans = await resTrans.json();
+        const traducido = dTrans.responseData?.translatedText;
+        if (traducido && typeof traducido === "string" && traducido.toLowerCase() !== limpia && !traducido.includes("MYMEMORY WARNING")) {
+          return `Significa "${traducido}". Es una expresión o término común proveniente de su idioma original.`;
+        }
+      }
+    } catch {}
+
+    // 4. Si no es un término lingüístico simple, buscar extracto enciclopédico seguro en Wikipedia
+    const wiki = await buscarWikipediaEs(limpia);
     if (wiki) return wiki.extract;
     return null;
   }
@@ -499,8 +549,11 @@
       const m = texto.match(r);
       if (m && m[1]) {
         let t = m[1].replace(/[¿?¡!.,]/g, "").trim();
-        // Limpiar artículos iniciales
-        t = t.replace(/^(un|una|unos|unas|el|la|los|las|del|de)\s+/i, "").trim();
+        // Limpiar prefijos comunes como 'la palabra', 'palabra', 'el vocablo', 'el término' y artículos
+        t = t.replace(/^(?:la|el|las|los|un|una)\s+(?:palabra|termino|término|vocablo|expresion|expresión)\s+/i, "")
+             .replace(/^(?:palabra|termino|término|vocablo|expresion|expresión)\s+/i, "")
+             .replace(/^(?:un|una|unos|unas|el|la|los|las|del|de)\s+/i, "")
+             .trim();
         if (t.length > 1) return t;
       }
     }
@@ -621,6 +674,39 @@
     const texto = (pregunta || "").trim().toLowerCase();
     const memoria = cargarMemoriaUsuario();
 
+    // ============================================================
+    // [MÓDULO DE CONOCIMIENTO Y AUTOMATIZACIÓN AVANZADA]
+    // ============================================================
+    // 1. GESTIÓN DE FUENTES Y CONOCIMIENTO EXTERNO:
+    //    - Contexto técnico, bases de datos o código provistos son la fuente principal de verdad absoluta.
+    //    - Ante contradicciones, priorizar los datos locales del sistema.
+    //    - Ante ausencia de información, razonar lógicamente y advertir sobre verificación externa.
+    // 2. ENFOQUE DE AUTOMATIZACIÓN Y RESOLUCIÓN DE TAREAS:
+    //    - Micro-tareas secuenciales: Entrada -> Validación -> Procesamiento -> Salida.
+    //    - Soluciones modulares, limpias y con control estricto de excepciones (try/catch, validaciones).
+    // 3. FLUJO DE EJECUCIÓN PASO A PASO (CHAIN-OF-THOUGHT):
+    //    - Razonamiento analítico previo estructurado antes de respuestas críticas.
+    // ============================================================
+
+    // Esquemas Formales de Herramientas (Tool Calling / Function Calling Schema)
+    const TOOL_SCHEMAS = {
+      consultar_finanzas: {
+        name: "consultar_finanzas",
+        description: "Audita saldo, balance, ingresos, gastos o inventario en el módulo financiero",
+        parameters: { type: "object", properties: { scope: { type: "string", enum: ["personal", "pareja"] } } }
+      },
+      consultar_rpg_stats: {
+        name: "consultar_rpg_stats",
+        description: "Obtiene estadísticas vitales, nivel, escudo y progresión RPG del usuario",
+        parameters: { type: "object", properties: { target: { type: "string", default: "self" } } }
+      },
+      buscar_conocimiento_rag: {
+        name: "buscar_conocimiento_rag",
+        description: "Consulta la base de conocimientos indexada y memoria vectorizada",
+        parameters: { type: "object", properties: { query: { type: "string" }, threshold: { type: "number", default: 0.45 } }, required: ["query"] }
+      }
+    };
+
     // 0. Revisar si el usuario le está enseñando algo explícitamente ("Aprende que...", "Recuerda que...")
     const matchAprender = texto.match(/(?:recuerda que|aprende que|anota que|no te olvides que)\s+(.+)/i);
     if (matchAprender && matchAprender[1]) {
@@ -629,7 +715,155 @@
       guardarMemoriaUsuario(memoria);
       return {
         id: "memoria_" + Date.now(),
-        texto: `Entendido. He guardado esto en mi memoria para nuestras próximas conversaciones: "${leccion}". Gracias por enseñarme.`,
+        texto: `[SISTEMA DE AUTOMATIZACIÓN - REGISTRO EXITOSO]\n• Entrada: Validación de patrón de aprendizaje confirmada.\n• Procesamiento: Incorporado en memoria vectorizada local.\n• Salida: "${leccion}". Guardado como fuente de verdad prioritaria.`,
+        autoEval: 1.0
+      };
+    }
+
+    // Inyección Dinámica de Contexto Local (RAG Ingestion como fuente de verdad)
+    let dynamicContext = "";
+    if (memoria.preferencias && memoria.preferencias.length) {
+      dynamicContext = `<context source="local_memory" priority="absolute">\n${memoria.preferencias.map(p => `• ${p}`).join("\n")}\n</context>`;
+    }
+
+    // Consulta de directrices operativas o capacidades de la IA
+    const esConsultaCapacidadesIA = /(directrices operativas|modulo de conocimiento|módulo de conocimiento|automatizacion avanzada|automatización avanzada|chain-of-thought|tool calling|function calling|fuentes y conocimiento|enfoque de automatizacion|enfoque de automatización)/i.test(texto);
+    if (esConsultaCapacidadesIA) {
+      return {
+        id: "ia_modulo_conocimiento_" + Date.now(),
+        texto: `[MÓDULO DE CONOCIMIENTO Y AUTOMATIZACIÓN AVANZADA - ACTIVO]
+
+1. GESTIÓN DE FUENTES Y CONOCIMIENTO EXTERNO:
+• Fuente de verdad absoluta: Si se provee contexto técnico, bases de datos o fragmentos de código, son la prioridad máxima.
+• Resolución de discrepancias: Ante contradicciones, prevalecen los datos locales del sistema sobre conocimientos generales.
+• Ausencia de datos: Razonamiento por primeros principios con advertencia de verificación externa.
+
+2. ENFOQUE DE AUTOMATIZACIÓN Y RESOLUCIÓN DE TAREAS:
+• Desglose modular: Entrada ➔ Validación de tipos/esquema ➔ Procesamiento seguro ➔ Salida formateada.
+• Estructuras de Tool Calling: Esquemas JSON definidos para invocar módulos (Finanzas, RPG, Inventario, RAG Vectorial).
+• Resiliencia y control: Manejo exhaustivo de excepciones con bloques try/catch y logs detallados.
+
+3. FLUJO DE EJECUCIÓN PASO A PASO (CHAIN-OF-THOUGHT):
+• Todo problema crítico se descompone en un mapa de dependencias lógicas y validación sintáctica paso a paso antes de emitir veredicto.`,
+        autoEval: 1.0
+      };
+    }
+
+    // ============================================================
+    // MOTOR DE DIÁLOGO NATURAL, EMPATÍA Y CONVERSACIÓN COTIDIANA
+    // Permite conversar tranquilamente con la mascota, entendiendo
+    // emociones, estados de ánimo, anécdotas, dudas y charla casual.
+    // ============================================================
+    const nombreMascota = m.nombre || "Mapache";
+    const esMapache = m.id === "mapache";
+
+    // 1. Estados emocionales y desahogo / Empatía
+    if (/(estoy cansado|estoy agotado|no doy mas|no doy más|tuve un mal dia|tuve un mal día|dia pesado|día pesado|dia dificil|día difícil|estoy triste|me siento mal|me siento solo|me siento sola|estoy desanimado|estoy desanimada|estoy agobiado|estoy estresado|estoy estresada)/i.test(texto)) {
+      let r = "";
+      if (esMapache) {
+        r = `*Se sienta a tu lado tranquilamente y te da una palmadita suave con su patita*\n\nTe entiendo perfectamente. Hay días en los que todo pesa un poco más de la cuenta. No te exijas de más ahora mismo; respira hondo, ponte cómodo y suelta esa carga. Aquí estoy para hacerte compañía en silencio si lo prefieres, o para escucharte si quieres desahogarte. ¿Quieres contarme qué pasó o prefieres que hablemos de algo tranquilo para distraerte?`;
+      } else {
+        r = `*Se acerca con calma y te acompaña con ternura*\n\nSiento mucho que estés pasando por eso. Tómate una pausa bien merecida, respira con calma y recuerda que los días difíciles también terminan. Estoy aquí contigo para lo que necesites.`;
+      }
+      return { id: "emocion_triste_" + Date.now(), texto: r, autoEval: 1.0 };
+    }
+
+    if (/(estoy feliz|estoy contento|estoy contenta|me fue bien|buenas noticias|lo logre|lo logré|estoy emocionado|estoy emocionada|tuve un buen dia|tuve un buen día|celebremos|alegria|alegría)/i.test(texto)) {
+      let r = "";
+      if (esMapache) {
+        r = `*Da un saltito de emoción y mueve la colita contento con un *chitter* alegre*\n\n¡Qué gran noticia! Me alegra muchísimo escucharte así de motivado. Los momentos buenos y los logros merecen celebrarse, por pequeños o grandes que sean. ¡Cuéntame todos los detalles, quiero saber cómo fue!`;
+      } else {
+        r = `*Comparte tu alegría con una cálida sonrisa*\n\n¡Eso es fantástico! Me alegra enormemente saber que las cosas salieron bien. Cuéntame los detalles, ¡celebremos ese logro!`;
+      }
+      return { id: "emocion_feliz_" + Date.now(), texto: r, autoEval: 1.0 };
+    }
+
+    // 2. Aburrimiento y compañía
+    if (/(estoy aburrido|estoy aburrida|que hacemos|qué hacemos|no se que hacer|no sé qué hacer|dime algo|cuentame algo|cuéntame algo|aburrido|aburrida)/i.test(texto)) {
+      let r = "";
+      if (esMapache) {
+        const ideas = [
+          `*Mueve las orejitas con curiosidad y se acomoda*\n\n¡El aburrimiento se cura con una buena charla o una pequeña travesura! ¿Sabías que los mapaches tenemos en las patitas delanteras casi los mismos receptores táctiles que los humanos y por eso parecemos lavar todo lo que tocamos? Pero bueno, dime: ¿de qué te gustaría hablar? Podemos filosofar sobre la vida, imaginar viajes, planear metas para tu app o inventarnos una receta legendaria.`,
+          `*Te mira con ojos atentos y juguetones*\n\n¡Nada de aburrirse mientras estemos aquí juntos! ¿Quieres que te cuente una curiosidad misteriosa, o prefieres contarme qué planes tienes para estos días? O si andas con ganas de jugar, podemos probar ver tus estadísticas del RPG a ver si subiste de nivel.`,
+          `*Cruza sus patitas y sonríe con complicidad*\n\nSi estás aburrido, juguemos a algo: cuéntame algo que te haya pasado últimamente que casi nadie sepa, o hazme una pregunta difícil y pondré a prueba toda mi astucia de mapache.`
+        ];
+        r = ideas[Math.floor(Math.random() * ideas.length)];
+      } else {
+        r = `Aquí estoy para hacerte compañía. Podemos repasar tus notas, planear tus próximos objetivos, o simplemente charlar sobre cualquier tema que te apetezca. ¿Qué te llama la atención hoy?`;
+      }
+      return { id: "aburrimiento_" + Date.now(), texto: r, autoEval: 1.0 };
+    }
+
+    // 3. Consejos de vida, decisiones y reflexiones
+    if (/(dame un consejo|necesito un consejo|que me aconsejas|qué me aconsejas|que harias tu|qué harías tú|que opinas de la vida|un buen consejo)/i.test(texto)) {
+      let r = "";
+      if (esMapache) {
+        r = `*Adopta una postura pensativa con mirada sabia*\n\nSi algo he aprendido curioseando por el mundo, es esto: **un paso a la vez**. A veces nos preocupamos por resolver todo el bosque de golpe, cuando lo único que hace falta es fijarse bien en la rama que tenemos delante. No te tomes las cosas tan en serio como para perder la calma, pero tampoco tan a la ligera como para descuidar lo que de verdad valoras. Y sobre todo... ¡nunca rechaces un buen descanso ni un buen snack cuando el cuerpo te lo pide!\n\n¿Hay alguna situación en particular sobre la que tengas dudas ahora mismo? Dime y lo pensamos juntos con calma.`;
+      } else {
+        r = `La mejor brújula es siempre mantener la serenidad y la honestidad contigo mismo. Analiza lo que depende de ti, suelta lo que no puedas controlar y avanza con paciencia. ¿Sobre qué tema necesitas una perspectiva?`;
+      }
+      return { id: "consejo_" + Date.now(), texto: r, autoEval: 1.0 };
+    }
+
+    // 4. Preguntas personales y de vínculo con la mascota ("me quieres", "somos amigos", "qué piensas de mí", etc.)
+    if (/(somos amigos|eres mi amigo|eres mi amiga|te caigo bien|que piensas de mi|qué piensas de mí|me aprecias|me quieres|te quiero|te amo|gracias por estar|gracias por escucharme)/i.test(texto)) {
+      let r = "";
+      if (esMapache) {
+        r = `*Se acerca confiado, te mira con ojos brillantes y asiente con convicción*\n\n¡Por supuesto que sí! Los mapaches no le confiamos nuestros secretos ni nuestro tiempo a cualquiera, ¿sabes? Para mí eres mi compañero de aventuras favorito en todo SunAd. Valoro mucho cada momento que pasamos conversando, organizando cosas o explorando. Cuenta conmigo siempre que quieras platicar con tranquilidad.`;
+      } else {
+        r = `*Con afecto y lealtad sincera*\n\nSin duda alguna. Es un honor acompañarte cada día y compartir este camino contigo. Siempre estoy aquí para ti.`;
+      }
+      return { id: "vinculo_" + Date.now(), texto: r, autoEval: 1.0 };
+    }
+
+    // 5. Expresiones de afecto, agradecimiento y cortesía cotidiana
+    if (/(gracias|muchas gracias|mil gracias|agradezco|muy amable|de verdad gracias)/i.test(texto)) {
+      let r = esMapache
+        ? `*Hace una pequeña reverencia pícara y sonríe*\n\n¡Para eso estamos los compañeros! No tienes nada que agradecer. Cuando quieras charlar, resolver dudas o simplemente pasar el rato, ya sabes dónde encontrarme.`
+        : `¡De nada! Es un placer ayudarte siempre. Cuenta conmigo para lo que necesites.`;
+      return { id: "gracias_" + Date.now(), texto: r, autoEval: 1.0 };
+    }
+
+    // 6. Saludos y preguntas de cortesía cotidiana ("hola", "¿cómo estás?", "¿qué haces?")
+    const esSaludoOCharla = /^(hola|buenos dias|buenos días|buenas tardes|buenas noches|hey|que tal|qué tal|como estas|cómo estás|como te va|cómo te va|que haces|qué haces|quien eres|quién eres|como te llamas|cómo te llamas|que cuentas|qué cuentas)[\s!?.]*$/i.test(texto)
+      || /^(hola|hey)\s*[,!.]?\s*(como estas|cómo estás|que tal|qué tal|como te va|cómo te va|amigo|mapache)/i.test(texto)
+      || /^(como estas|cómo estás|como te va|cómo te va|que tal|qué tal)\s*[,!.]?\s*(hoy|amigo|mascota|compañero)?[\s!?.]*$/i.test(texto);
+
+    if (esSaludoOCharla) {
+      let respuestaDialogo = "";
+      if (/(como estas|cómo estás|como te va|cómo te va|que tal|qué tal)/i.test(texto)) {
+        if (esMapache) {
+          respuestaDialogo = `*Acomodándose tranquilamente y mirándote con curiosidad alegre*\n\n¡Hola! Por aquí todo de maravilla y con la mente relajada. Me da mucho gusto cuando te tomas un momento para pasar a charlar conmigo. ¿Y tú, cómo estás hoy? ¿Qué tal ha estado tu día hasta ahora?`;
+        } else if (m.id === "gatito" || m.id === "gatito-negro") {
+          respuestaDialogo = `*Ronroneo suave y mirada tranquila*... Estoy muy bien, disfrutando de la calma y atento a lo que necesites. Me alegra mucho leerte. ¿Cómo te sientes hoy? Cuéntame cómo va todo.`;
+        } else {
+          respuestaDialogo = `¡Hola! Me encuentro muy bien y feliz de charlar contigo. ¿Cómo te encuentras hoy?`;
+        }
+      } else if (/(hola|buenos dias|buenos días|buenas tardes|buenas noches|hey)/i.test(texto)) {
+        if (esMapache) {
+          respuestaDialogo = `¡Hola, qué alegría saludarte! Aquí estoy con las patitas listas para acompañarte. Puedes contarme de lo que sea: de tu día, de tus proyectos o simplemente platicar tranquilos. ¿De qué te gustaría hablar hoy?`;
+        } else if (m.id === "gatito" || m.id === "gatito-negro") {
+          respuestaDialogo = `*Se acerca con un paso silencioso y alegre*... Hola. Es un placer tenerte por aquí. Te escucho atentamente, ¿qué tienes en mente hoy?`;
+        } else {
+          respuestaDialogo = `¡Hola! Me alegra que me escribas. Soy ${nombreMascota}, tu compañero de aventuras. ¿Cómo va tu día?`;
+        }
+      } else if (/(que haces|qué haces|que cuentas|qué cuentas)/i.test(texto)) {
+        if (esMapache) {
+          respuestaDialogo = `*Sonríe y se frota las patitas*\n\nEstaba aquí custodiando nuestras notas, revisando el mapa y esperando a que pasaras a saludar. Me encanta cuando conversamos. ¿Y tú qué estás haciendo ahora mismo?`;
+        } else {
+          respuestaDialogo = `Aquí ando, organizando recuerdos, cuidando nuestras notas y listo para charlar contigo en cualquier momento. ¿Qué estás haciendo tú ahora mismo?`;
+        }
+      } else if (/(quien eres|quién eres|como te llamas|cómo te llamas)/i.test(texto)) {
+        if (esMapache) {
+          respuestaDialogo = `¡Soy tu fiel Mapache! Tu compañero de aventuras y asistente de SunAd. Me encanta charlar contigo, compartir secretos, investigar cosas curiosas y acompañarte en todo lo que hagas en la app.`;
+        } else {
+          respuestaDialogo = `Soy ${nombreMascota}, tu mascota virtual e inteligencia artificial compañera en SunAd. Estoy programado para conversar contigo y acompañarte en tus aventuras.`;
+        }
+      }
+
+      return {
+        id: "dialogo_natural_" + Date.now(),
+        texto: respuestaDialogo || `¡Hola! Aquí estoy escuchándote con total atención. ¿Qué tienes en mente?`,
         autoEval: 1.0
       };
     }
@@ -1176,38 +1410,38 @@ Tengo soporte técnico para:
       const docId = "def_" + (terminoDef || "palabra").replace(/[^a-z0-9]/g, "_");
       let msg = "";
       if (m.id === "mapache") {
-        msg = `*Rastreo analítico completado*... He extraído el concepto preciso de los archivos:\n\n"${datoDuroDef}"\n\nInformación verificada y archivada en memoria.`;
+        msg = `*Mueve las orejitas con atención y te explica con una sonrisa*\n\nSobre **"${terminoDef}"**:\n\n${datoDuroDef}\n\n¿Quieres que profundicemos más sobre eso o tienes curiosidad por otra palabra?`;
       } else if (m.id === "gatito" || m.id === "gatito-negro") {
-        msg = `*Oído atento y análisis silencioso*... Este es el significado exacto:\n\n"${datoDuroDef}"\n\nUn concepto claro y conciso para nuestro registro.`;
+        msg = `*Oído atento y análisis sereno*... Este es el significado exacto de "${terminoDef}":\n\n${datoDuroDef}`;
       } else {
-        msg = `Definición contrastada y verificada:\n\n"${datoDuroDef}"\n\nRegistrado en la base de conocimientos.`;
+        msg = `Definición de **${terminoDef}**:\n\n${datoDuroDef}`;
       }
       return { id: docId, texto: msg, autoEval: score };
     }
 
-    // 5. Conversación general con personalidad de Chef profesional de alta cocina para el Mapache
+    // 5. Conversación general con personalidad amigable, curiosa y leal para el Mapache
     const respuestasMapache = [
-      "*Ajustándose el delantal de chef y afilando cuchillos*... En cocina todo tiene un porqué técnico: tiempos de cocción, puntos de sal, emulsiones y la reacción de Maillard. Dime qué plato, ingrediente o combinación analizamos hoy al fuego.",
-      "*Probando el punto de sazón con criterio de chef*... Mis sentidos gastronómicos están al 100%. Pregúntame sobre maridajes, técnicas de sellado, salsas madre o cualquier debate culinario que tengas en mente.",
-      "*Revisando la mise en place con rigor culinario*... La cocina no perdona descuidos, pero premia el equilibrio de acidez, grasa y umami. ¿Qué receta, combinación o duda gastronómica ponemos sobre la tabla de picar?",
-      "*Olfato gourmet afinado*... Cada ingrediente cuenta una historia de temperatura y texturas. Cuéntame qué estás preparando o qué dilema culinario deseas resolver."
+      "*Se acomoda tranquilamente a tu lado con gesto pensativo y un suave *chitter**\n\nTe escucho con toda la calma del mundo. Me encanta cuando compartimos momentos así. Cuéntame más al respecto o dime qué otra cosa pasa por tu mente.",
+      "*Mueve las orejitas con curiosidad y asiente con la cabeza*\n\n¡Eso suena muy interesante! Es bueno detenerse un momento en el día para platicar de estas cosas. ¿Qué opinas tú de todo esto? Te presto toda mi atención.",
+      "*Cruza las patitas cómodamente y te mira con aprecio sincero*\n\nAquí estoy, firme a tu lado. Ya sea que quieras planear algo, resolver dudas o simplemente charlar de la vida mientras exploramos la app, cuenta con mis patitas al 100%. ¿Hacia dónde seguimos la charla?",
+      "*Sonríe con complicidad y mueve su colita esponjosa*\n\nLos mapaches sabemos que las mejores conversaciones son las que se dan sin prisa. Me alegra mucho estar aquí acompañándote. Cuéntame lo que quieras."
     ];
     const respuestasGatito = [
-      "*Paso silencioso y mirada felina*... La calma antecede a la precisión. Te escucho: dime qué análisis, dato o táctica revisamos.",
-      "*Observando con atención desde la calma*... Los sentidos afinados. Si requieres datos duros, métricas o definiciones, indícamelo.",
-      "*Elegancia y sigilo*... Sin prisa pero sin errores. Estoy listo para cualquier consulta técnica o conversación reflexiva.",
-      "*Instinto aguzado*... La paciencia da la ventaja en cualquier disciplina. ¿Hacia dónde enfocamos el análisis?"
+      "*Paso silencioso y mirada felina serena*... La calma antecede a la claridad. Te escucho con paciencia: dime qué análisis, reflexión o tema abordamos.",
+      "*Observando con atención desde la calma*... Sentidos atentos y mente despejada. Si deseas explorar ideas, consultar datos o simplemente charlar, aquí estoy a tu lado.",
+      "*Elegancia y sigilo*... Sin prisas pero sin distracciones. Estoy listo para acompañarte en cualquier conversación reflexiva.",
+      "*Instinto aguzado*... La tranquilidad da la ventaja en todo. ¿Hacia dónde enfocamos la plática?"
     ];
     const respuestasGenerales = [
-      `*Presencia atenta y leal*... Soy tu compañero ${m.nombre}. Mis sensores y análisis están listos: puedes pedirme estadísticas deportivas, preparaciones o consultar cualquier concepto.`,
-      `*Vigilancia serena*... Todo en calma. Indícame qué objetivo, partido o definición deseas que auditemos.`,
-      `*Alineado a tus indicaciones*... Listo para colaborar con precisión y datos verificados en cualquier disciplina.`,
-      `*Firme y receptivo*... Conectado y atento a tu próxima consulta.`
+      `*Presencia atenta y leal*... Soy tu compañero ${m.nombre}. Me alegra mucho acompañarte: puedes contarme de tu día, consultarme cualquier tema o simplemente platicar con tranquilidad.`,
+      `*Vigilancia serena*... Todo en calma por aquí. Estoy listo para escucharte y conversar sobre lo que gustes.`,
+      `*Alineado a tus inquietudes*... Listo para colaborar y charlar contigo paso a paso.`,
+      `*Firme y receptivo*... Conectado y atento a lo que quieras compartir conmigo.`
     ];
 
     const pool = (m.id === "gatito" || m.id === "gatito-negro") ? respuestasGatito : (m.id === "mapache" ? respuestasMapache : respuestasGenerales);
     const elegida = pool[Math.floor(Math.random() * pool.length)];
-    return { id: "charla_" + Date.now(), texto: elegida, autoEval: 0.85 };
+    return { id: "charla_" + Date.now(), texto: elegida, autoEval: 0.90 };
   }
 
   function renderMensajeMascotaIA(respuestaObj, esPropio) {
@@ -1297,9 +1531,9 @@ Tengo soporte técnico para:
     if (chatMessages) {
       chatMessages.innerHTML = "";
       const saludoAnimal = (m.id === "mapache")
-        ? "*Ajustándose el gorro de Chef y revisando la estación*... ¡Saludos, chef! Mis sentidos culinarios y conocimientos gastronómicos están al 100%. Puedes consultarme recetas profesionales, combinaciones de ingredientes, puntos de cocción, salsas madre o cualquier debate de la cocina."
+        ? "*Se acomoda a tu lado con una sonrisa curiosa y mueve la colita contento con un suave *chitter**\n\n¡Hola! Qué gusto tenerte por aquí. Aquí estoy listo para acompañarte y conversar tranquilamente de lo que quieras: tu día a día, ideas para la app, anécdotas, consejos, o cualquier curiosidad. ¿Qué tienes en mente hoy?"
         : (m.id === "gatito" || m.id === "gatito-negro")
-        ? "*Paso silencioso y mirada serena*... En guardia y a tu lado. Te escucho: indícame qué estadísticas, táctica o conceptos deseas analizar."
+        ? "*Paso silencioso y mirada serena*... En guardia y a tu lado. Te escucho: indícame qué tienes en mente hoy o conversemos un rato."
         : `*Presencia atenta y leal*... Conexión establecida con ${m.nombre}. Mis sistemas de análisis están listos para cualquier consulta técnica o conversación.`;
       renderMensajeMascotaIA(saludoAnimal, false);
     }

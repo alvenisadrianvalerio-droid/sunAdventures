@@ -49,15 +49,22 @@
     wrap.querySelector(".rpg-shield-bar > span").style.width = Math.min(100, (v/100)*100) + "%";
     wrap.querySelector(".rpg-shield-val").textContent = v;
   }
-  new MutationObserver((muts) => muts.forEach(m => m.addedNodes.forEach(n => {
-    if (n.nodeType !== 1) return;
-    const t = n.textContent || "";
-    if (/escudo|blinda|🛡️/i.test(t)) {
-      const match = t.match(/(\d+)/);
-      if (match) setEsc(parseInt(match[1], 10));
+  let _escTimer = null;
+  new MutationObserver((muts) => {
+    let touched = false;
+    for (const m of muts) {
+      for (const n of m.addedNodes) {
+        if (n.nodeType === 1 && /escudo|blinda|🛡️/i.test(n.textContent || "")) {
+          const match = (n.textContent || "").match(/(\d+)/);
+          if (match) { setEsc(parseInt(match[1], 10)); touched = true; }
+        }
+      }
     }
-  }))).observe(document.body, { childList: true, subtree: true });
-  setInterval(pintarEsc, 800);
+    if (touched) {
+      if (!_escTimer) _escTimer = setTimeout(() => { _escTimer = null; pintarEsc(); }, 100);
+    }
+  }).observe(document.body, { childList: true, subtree: true });
+  window.addEventListener("rpg:stats-cambiados", pintarEsc, { passive: true });
 
   /* ============================================================
      3) 👆 LONG PRESS → tooltip habilidades
@@ -84,19 +91,31 @@
     _lpEl.style.left = l + "px"; _lpEl.style.top = t + "px";
     try { navigator.vibrate?.(15); } catch {}
   }
-  function bindLP(btn) {
-    if (btn._lp) return; btn._lp = true;
-    const start = () => { clearTimeout(_lpTimer); _lpTimer = setTimeout(() => mostrarTip(btn), 450); };
-    const end = () => { clearTimeout(_lpTimer); cerrarTip(); };
-    btn.addEventListener("mousedown", start);
-    btn.addEventListener("mouseup", end);
-    btn.addEventListener("mouseleave", end);
-    btn.addEventListener("touchstart", start, { passive: true });
-    btn.addEventListener("touchend", end);
-    btn.addEventListener("touchcancel", end);
-    btn.addEventListener("click", (e) => { if (_lpEl) { e.stopPropagation(); e.preventDefault(); cerrarTip(); } }, true);
-  }
-  setInterval(() => qsa(".rpg-hab").forEach(bindLP), 700);
+  document.addEventListener("mousedown", (e) => {
+    const btn = e.target.closest(".rpg-hab");
+    if (!btn) return;
+    clearTimeout(_lpTimer);
+    _lpTimer = setTimeout(() => mostrarTip(btn), 450);
+  }, { passive: true });
+  document.addEventListener("touchstart", (e) => {
+    const btn = e.target.closest(".rpg-hab");
+    if (!btn) return;
+    clearTimeout(_lpTimer);
+    _lpTimer = setTimeout(() => mostrarTip(btn), 450);
+  }, { passive: true });
+  ["mouseup", "mouseleave", "touchend", "touchcancel"].forEach(ev => {
+    document.addEventListener(ev, () => {
+      clearTimeout(_lpTimer);
+      cerrarTip();
+    }, { passive: true });
+  });
+  document.addEventListener("click", (e) => {
+    if (_lpEl && e.target.closest(".rpg-hab")) {
+      e.stopPropagation();
+      e.preventDefault();
+      cerrarTip();
+    }
+  }, true);
 
   /* ============================================================
      4) 🐾 MASCOTA oculta en RPG
@@ -120,9 +139,10 @@
       }
     }
   }
-  window.addEventListener("hashchange", checkMascota);
-  window.addEventListener("sunad:rpg-tab", checkMascota);
-  setInterval(checkMascota, 400);
+  window.addEventListener("hashchange", checkMascota, { passive: true });
+  window.addEventListener("sunad:rpg-tab", checkMascota, { passive: true });
+  window.addEventListener("sunad:view-change", checkMascota, { passive: true });
+  setTimeout(checkMascota, 500);
 
   /* ============================================================
      5) 🎨 TEMA CLARO comprable (500 🪙)
@@ -227,7 +247,13 @@
     alertar({ title:"¡Descansado!", message:"Vida restaurada.", variant:"success", icon:"💚" });
     window.dispatchEvent(new Event("rpg:stats-cambiados"));
   }, true);
-  setInterval(() => { inyectarRest(); const c = $("rpg-rest-cost"); if (c) c.textContent = `${costeRest()} 🪙`; }, 1200);
+  window.addEventListener("sunad:rpg-tab", (e) => {
+    if (e.detail?.tab === "zonas") inyectarRest();
+  }, { passive: true });
+  window.addEventListener("rpg:stats-cambiados", () => {
+    const c = $("rpg-rest-cost");
+    if (c) c.textContent = `${costeRest()} 🪙`;
+  }, { passive: true });
 
   /* ============================================================
      10) 🎁 RECOMPENSA DIARIA RPG
@@ -273,7 +299,11 @@
     // Eliminar "Poción mágica" completamente
     bs.forEach(b => { if (/poción mágica/i.test(b.textContent)) b.remove(); });
   }
-  setInterval(quitarDup, 1500);
+  // Ejecutar al inicio y solo ante cambios de vista/hash en vez de bucle infinito cada 1500ms
+  quitarDup();
+  window.addEventListener("hashchange", () => setTimeout(quitarDup, 250), { passive: true });
+  window.addEventListener("sunad:view-change", () => setTimeout(quitarDup, 250), { passive: true });
+  window.addEventListener("sunad:minijuegos-open", quitarDup, { passive: true });
 
   /* ============================================================
      12) 🐍 SNAKE — Minijuego
@@ -521,8 +551,10 @@
     b.addEventListener("click", juegoSnake);
     menu.appendChild(b);
   }
-  window.addEventListener("hashchange", () => setTimeout(inyectarBotonSnake, 400));
-  setInterval(inyectarBotonSnake, 1200);
+  window.addEventListener("hashchange", () => setTimeout(inyectarBotonSnake, 200), { passive: true });
+  window.addEventListener("sunad:view-change", () => setTimeout(inyectarBotonSnake, 200), { passive: true });
+  window.addEventListener("sunad:minijuegos-open", inyectarBotonSnake, { passive: true });
+  setTimeout(inyectarBotonSnake, 500);
   /* ============================================================
    🛡️ ANTI-FOUC — Evita que se vean botones duplicados al recargar
    Se ejecuta ANTES de que juegos.js inyecte nada.

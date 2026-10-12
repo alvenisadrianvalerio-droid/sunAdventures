@@ -161,29 +161,158 @@
       const usdtTrend = trend(q.usdt.localPerUsdt, prev?.usdt);
       rows.push(`<article class="finanzas-quote-value"><span>${copy.usdtLabel}</span><strong>${quoteText(copy.usdtPerLocal, { rate: quoteNumber(q.usdt.localPerUsdt, 2) })}</strong><small>${quoteText(copy.vesPerUsdt, { rate: quoteNumber(q.usdt.value, 6) })} · ${escapeHtml(q.usdt.source)} · ${copy.buy} ${quoteNumber(q.usdt.buyLocalPerUsdt, 2)} / ${copy.sell} ${quoteNumber(q.usdt.sellLocalPerUsdt, 2)}${usdtTrend ? ` · ${usdtTrend}` : ""}</small></article>`);
     }
-    ui.quoteValues.innerHTML = rows.join("");
-    ui.quoteChart.innerHTML = sparkline(history, code) || `<span class="finanzas-quote-chart-empty">El gráfico se formará con las próximas cotizaciones.</span>`;
+    const chartSvg = sparkline(history, code);
+    if (chartSvg) {
+      ui.quoteChart.innerHTML = chartSvg;
+      ui.quoteChart.hidden = false;
+      ui.quoteChart.style.display = "";
+    } else {
+      ui.quoteChart.innerHTML = "";
+      ui.quoteChart.hidden = true;
+      ui.quoteChart.style.display = "none";
+    }
     const time = new Intl.DateTimeFormat(undefined, { hour:"2-digit", minute:"2-digit" }).format(new Date(q.fetchedAt));
     ui.quoteUpdated.textContent = quoteText(copy.checked, { time });
     ui.quoteStatus.textContent = code === "VES"
       ? quoteText(copy.vesStatus, { date: q.usd.asOf })
       : quoteText(copy.referenceStatus, { date: q.usd.asOf });
   }
-  async function refreshCurrencyQuote() {
-    if (!state.userId || !state.currency || !window._supabase) return;
-    const req = ++state.quoteRequest, currency = state.currency;
-    if (!state.quote || state.quote.currency !== currency) ui.quoteUpdated.textContent = "Consultando cotización…";
+  async function fetchRealtimeVesFallback() {
+    let bcvRate = null, bcvDate = null;
+    let usdtRate = null, usdtBuy = null, usdtSell = null;
+
+    // 1. Intentar obtener tasa oficial BCV y Paralelo de DolarApi
     try {
-      const { data, error } = await window._supabase.functions.invoke("currency-quotes", { body: { currency } });
-      if (error) throw error;
-      if (req !== state.quoteRequest || currency !== state.currency) return;
-      if (!data?.usd || !Number.isFinite(Number(data.usd.value))) throw new Error(quoteCopy().incomplete);
+      const res = await fetch("https://ve.dolarapi.com/v1/dolares", { cache: "no-store" });
+      if (res.ok) {
+        const arr = await res.json();
+        const oficial = arr.find(x => x.fuente === "oficial" || x.nombre?.toLowerCase().includes("oficial"));
+        if (oficial && Number(oficial.promedio || oficial.venta) > 0) {
+          bcvRate = Number(oficial.promedio || oficial.venta);
+          bcvDate = oficial.fechaActualizacion ? String(oficial.fechaActualizacion).slice(0, 10) : today();
+        }
+      }
+    } catch (e) {
+      console.warn("Fallo DolarApi BCV:", e);
+    }
+
+    // 2. Fallback de respaldo para BCV si DolarApi falló: DolarVZLA CDN
+    if (!bcvRate) {
+      try {
+        const res = await fetch("https://rates.dolarvzla.com/bcv/current.json", { cache: "no-store" });
+        if (res.ok) {
+          const d = await res.json();
+          if (Number(d.usd?.price || d.usd) > 0) {
+            bcvRate = Number(d.usd?.price || d.usd);
+            bcvDate = d.date || today();
+          }
+        }
+      } catch (e) {
+        console.warn("Fallo DolarVZLA:", e);
+      }
+    }
+
+    // 3. Obtener USDT en tiempo real (Binance P2P) a través de CriptoYa
+    try {
+      const res = await fetch("https://criptoya.com/api/binancep2p/USDT/VES/100", { cache: "no-store" });
+      if (res.ok) {
+        const c = await res.json();
+        const ask = Number(c.ask), bid = Number(c.bid);
+        if (ask > 0 || bid > 0) {
+          usdtBuy = ask || bid;
+          usdtSell = bid || ask;
+          usdtRate = (usdtBuy && usdtSell) ? (usdtBuy + usdtSell) / 2 : (usdtBuy || usdtSell);
+        }
+      }
+    } catch (e) {
+      console.warn("Fallo CriptoYa Binance P2P:", e);
+    }
+
+    // Si al menos obtuvimos el dólar oficial o USDT
+    if (bcvRate || usdtRate) {
+      const usdVal = bcvRate || (usdtRate ? usdtRate * 0.95 : 1);
+      const usdtVal = usdtRate || (bcvRate ? bcvRate * 1.15 : 1);
+      return {
+        currency: "VES",
+        fetchedAt: new Date().toISOString(),
+        usd: {
+          value: 1 / usdVal,
+          localPerUsd: usdVal,
+          source: "BCV (En tiempo real)",
+          asOf: bcvDate || today()
+        },
+        usdt: {
+          value: 1 / usdtVal,
+          localPerUsdt: usdtVal,
+          buyLocalPerUsdt: usdtBuy || usdtVal,
+          sellLocalPerUsdt: usdtSell || usdtVal,
+          source: "Binance P2P (En tiempo real)",
+          asOf: new Date().toISOString()
+        }
+      };
+    }
+    return null;
+  }
+
+  async function refreshCurrencyQuote() {
+    if (!state.currency) return;
+    const req = ++state.quoteRequest, currency = state.currency;
+    if (!state.quote || state.quote.currency !== currency) ui.quoteUpdated.textContent = "Actualizando tasas en tiempo real…";
+
+    // Intentar primero a través de Supabase functions si hay sesión
+    let data = null;
+    if (state.userId && window._supabase) {
+      try {
+        const res = await window._supabase.functions.invoke("currency-quotes", { body: { currency } });
+        if (!res.error && res.data?.usd && Number.isFinite(Number(res.data.usd.value))) {
+          data = res.data;
+        }
+      } catch (err) {
+        console.warn("currency-quotes edge function falló o no desplegada, recurriendo a APIs directas:", err);
+      }
+    }
+
+    // Si es VES (Bolívares) o falló la edge function, consultar APIs públicas en tiempo real
+    if (!data && currency === "VES") {
+      try {
+        data = await fetchRealtimeVesFallback();
+      } catch (e) {
+        console.warn("Error en fallback VES:", e);
+      }
+    }
+
+    // Fallback general para monedas internacionales si edge function no responde
+    if (!data) {
+      try {
+        const res = await fetch(`https://open.er-api.com/v6/latest/USD`, { cache: "no-store" });
+        if (res.ok) {
+          const fx = await res.json();
+          const rate = fx.rates?.[currency];
+          if (rate && Number(rate) > 0) {
+            data = {
+              currency,
+              fetchedAt: new Date().toISOString(),
+              usd: {
+                value: 1 / rate,
+                localPerUsd: rate,
+                source: "ExchangeRate-API (En tiempo real)",
+                asOf: fx.time_last_update_utc?.slice(0, 10) || today()
+              }
+            };
+          }
+        }
+      } catch (e) {
+        console.warn("Error en fallback internacional:", e);
+      }
+    }
+
+    if (req !== state.quoteRequest || currency !== state.currency) return;
+
+    if (data && data.usd && Number.isFinite(Number(data.usd.value))) {
       const sample = saveQuoteSample(data);
       state.quote = data; state.quoteHistory = sample.history;
       renderQuote(data, sample.history, sample.previous);
-    } catch (err) {
-      if (req !== state.quoteRequest) return;
-      console.error("Cotización:", err);
+    } else {
       ui.quoteUpdated.textContent = "Cotización no disponible";
       ui.quoteStatus.textContent = quoteCopy().unavailable;
     }
@@ -392,7 +521,7 @@
       ui.app.hidden = false;
       render();
       if (state.quoteTimer) clearInterval(state.quoteTimer);
-      state.quoteTimer = setInterval(refreshCurrencyQuote, 60000);
+      state.quoteTimer = setInterval(refreshCurrencyQuote, 30000);
     } catch (err) {
       if (gen !== authGeneration) return;
       console.error("Finanzas:", err);
@@ -832,27 +961,8 @@
       </div>
     </div>`;
 
-    const recentMovementsPreview = `<section class="finanzas-card">
-      <div class="finanzas-card-heading">
-        <div>
-          <span class="finanzas-eyebrow">ÚLTIMOS REGISTROS</span>
-          <h2>Movimientos de este mes</h2>
-        </div>
-        <button type="button" class="finanzas-text-button" data-nav-to="movimientos">Ver todos (${rows.length}) →</button>
-      </div>
-      ${movementsList(scope, rows.slice(0, 5))}
-    </section>`;
-
-    const helpGuideCard = `<div class="finanzas-help-tip">
-      <span class="finanzas-help-tip-icon">${svgLightbulb}</span>
-      <div>
-        <strong>Consejo fácil:</strong>
-        Puedes usar la pestaña <strong>Límites</strong> para ponerte un tope de gasto en comida o salidas, y <strong>Ahorros</strong> para planear vacaciones o regalos juntos.
-      </div>
-    </div>`;
-
     const sections = {
-      resumen: `${mascotaCard}${heroQuick}${metrics}${isCouple ? settlementCards(rows) : ""}${recentMovementsPreview}${helpGuideCard}`,
+      resumen: `${mascotaCard}${heroQuick}${metrics}${isCouple ? settlementCards(rows) : ""}`,
       movimientos: `${mascotaCard}${movementForm(scope, editing)}<section class="finanzas-card"><div class="finanzas-card-heading"><div><span class="finanzas-eyebrow">ACTIVIDAD DEL PERÍODO</span><h2>Movimientos</h2></div><span class="finanzas-detail-count">${rows.length}</span></div>${movementsList(scope, rows)}</section>`,
       presupuestos: `${mascotaCard}${budgetPanel(scope)}`,
       metas: `${mascotaCard}${goalsPanel(scope)}`,

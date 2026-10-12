@@ -438,7 +438,11 @@
       });
     }
     reemplazar();
-    setInterval(reemplazar, 800);
+    window.addEventListener("sunad:api-ready", reemplazar, { passive: true });
+    window.addEventListener("sunad:tienda-compra", reemplazar, { passive: true });
+    window.addEventListener("rpg:stats-cambiados", reemplazar, { passive: true });
+    window.addEventListener("hashchange", reemplazar, { passive: true });
+    window.addEventListener("sunad:rpg-tab", reemplazar, { passive: true });
   })();
 
   console.log("✅ parches-v3.js cargado — dropdown, tienda, victoria, push, buffs");

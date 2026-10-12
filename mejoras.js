@@ -218,11 +218,17 @@
     </button>`;
     panel.appendChild(wrap);
   }
-  setInterval(() => {
+  // Inyección y actualización reactiva
+  inyectarBotonDescanso();
+  window.addEventListener("sunad:rpg-tab", () => {
     inyectarBotonDescanso();
     const c = $("rpg-rest-cost");
     if (c) c.textContent = `${costeDescanso()} 🪙`;
-  }, 1500);
+  }, { passive: true });
+  window.addEventListener("rpg:stats-cambiados", () => {
+    const c = $("rpg-rest-cost");
+    if (c) c.textContent = `${costeDescanso()} 🪙`;
+  }, { passive: true });
 
   /* ============================================================
      6) 🛡️ ESCUDOS RPG con barra morada
@@ -287,7 +293,10 @@
       setEscudoHeroe(getEscudoHeroe() + 25);
     }
   });
-  setInterval(refrescarBarraEscudo, 800);
+  // Refresco reactivo sin polling cada 800ms
+  refrescarBarraEscudo();
+  window.addEventListener("rpg:stats-cambiados", refrescarBarraEscudo, { passive: true });
+  window.addEventListener("sunad:rpg-tab", refrescarBarraEscudo, { passive: true });
 
   /* ============================================================
      7) 🐾 OCULTAR MASCOTA FLOTANTE EN RPG / ROGUELIKE
@@ -335,9 +344,9 @@
       }
     }
   }
-  window.addEventListener("hashchange", actualizarVisibilidadMascota);
-  window.addEventListener("sunad:rpg-tab", actualizarVisibilidadMascota);
-  setInterval(actualizarVisibilidadMascota, 300);
+  window.addEventListener("hashchange", actualizarVisibilidadMascota, { passive: true });
+  window.addEventListener("sunad:rpg-tab", actualizarVisibilidadMascota, { passive: true });
+  window.addEventListener("sunad:view-change", actualizarVisibilidadMascota, { passive: true });
   actualizarVisibilidadMascota();
 
   /* ============================================================

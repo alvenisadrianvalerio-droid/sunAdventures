@@ -7932,10 +7932,52 @@ body.light .perfil-stat {
   }
 
   .notas-grid,
-  .playlists-grid,
-  .logros-grid {
+  .playlists-grid {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
     gap: 1rem;
+  }
+
+  .logros-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+    gap: .55rem;
+  }
+
+  .logro-card {
+    min-height: auto;
+    padding: .65rem .75rem;
+    gap: .6rem;
+    border-radius: 10px;
+  }
+
+  .logro-contenido h3 {
+    margin: 0 0 .15rem;
+    font-size: .84rem;
+    line-height: 1.2;
+  }
+
+  .logro-contenido p {
+    margin: 0 0 .25rem;
+    font-size: .72rem;
+    line-height: 1.25;
+    opacity: .75;
+  }
+
+  .logro-contenido small {
+    font-size: .7rem;
+  }
+
+  .logro-icono-wrapper {
+    width: 2.3rem;
+    height: 2.3rem;
+    flex-shrink: 0;
+  }
+
+  .logro-icono-svg-badge {
+    width: 1.15rem;
+    height: 1.15rem;
+    font-size: .65rem;
+    bottom: -2px;
+    right: -2px;
   }
 
   .mascotas-grid {
