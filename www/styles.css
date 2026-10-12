@@ -1959,12 +1959,7 @@ body.light .download-option:hover {
 
 @media (max-width:560px) {
   .nav-links {
-    gap: .3rem
-  }
-
-  .nav-link {
-    width: 36px;
-    height: 36px
+    gap: .3rem;
   }
 }
 
@@ -4172,20 +4167,6 @@ canvas {
   .nav-container {
     padding: max(.45rem, env(safe-area-inset-top, 0px)) clamp(.35rem, 2vw, .75rem) .45rem;
     gap: .25rem;
-    overflow-x: clip;
-  }
-
-  .nav-links {
-    min-width: 0;
-    gap: .15rem;
-    flex-shrink: 1;
-  }
-
-  .nav-link {
-    flex: 0 0 34px;
-    width: 34px;
-    height: 34px;
-    padding: .35rem;
   }
 
   .nav-actions {
@@ -4240,17 +4221,6 @@ canvas {
 @media (max-width: 360px) {
   .nav-container {
     padding-inline: .4rem;
-  }
-
-  .nav-links {
-    gap: .05rem;
-  }
-
-  .nav-link {
-    flex-basis: 32px;
-    width: 32px;
-    height: 32px;
-    padding: .35rem;
   }
 
   .btn-auth {

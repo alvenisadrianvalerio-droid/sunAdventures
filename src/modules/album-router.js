@@ -21,6 +21,9 @@
       if (userDropdown?.classList.contains("open")) {
         window.AlbumApp.modules.auth?.cerrarMenuPerfil();
       }
+      if (typeof window.toggleNavMenu === "function") {
+        window.toggleNavMenu(false);
+      }
 
       const grupoActivo = window.AlbumApp.modules.grupo?.getGrupoActivo();
       if (nombre === "chat") {

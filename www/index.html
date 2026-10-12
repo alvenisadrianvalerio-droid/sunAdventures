@@ -1124,29 +1124,34 @@ Artista - Canción
           btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
         }
       }
+      window.toggleNavMenu = toggleNavMenu;
 
       var hamburgerBtn = document.getElementById("nav-hamburger");
       if (hamburgerBtn) {
-        var onToggle = function (e) {
+        hamburgerBtn.addEventListener("click", function (e) {
           e.preventDefault();
           e.stopPropagation();
           toggleNavMenu();
-        };
-        hamburgerBtn.addEventListener("click", onToggle);
+        });
       }
 
       function activarVista(v) {
-        document.querySelectorAll("[data-view]").forEach(function (el) {
-          el.classList.toggle("active", el.dataset.view === v);
-        });
-        document.querySelectorAll("[data-view-link]").forEach(function (el) {
-          el.classList.toggle("active", el.dataset.viewLink === v);
-        });
-        document.getElementById("user-dropdown")?.classList.remove("open");
-        document.getElementById("user-info")?.classList.remove("open");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        window.dispatchEvent(new CustomEvent("sunad:view-change", { detail: { view: v } }));
+        if (window.AlbumApp?.modules?.router?.mostrarVista) {
+          window.AlbumApp.modules.router.mostrarVista(v);
+        } else {
+          document.querySelectorAll("[data-view]").forEach(function (el) {
+            el.classList.toggle("active", el.dataset.view === v);
+          });
+          document.querySelectorAll("[data-view-link]").forEach(function (el) {
+            el.classList.toggle("active", el.dataset.viewLink === v);
+          });
+          document.getElementById("user-dropdown")?.classList.remove("open");
+          document.getElementById("user-info")?.classList.remove("open");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          window.dispatchEvent(new CustomEvent("sunad:view-change", { detail: { view: v } }));
+        }
       }
+      window.activarVista = activarVista;
 
       function navegarHacia(v) {
         if (!v) return;
@@ -1156,15 +1161,15 @@ Artista - Canción
         } else {
           window.dispatchEvent(new Event("hashchange"));
         }
-        // Cerrar menú con un leve respiro para no abortar la navegación táctil
         setTimeout(function () {
           toggleNavMenu(false);
           document.getElementById("user-dropdown")?.classList.remove("open");
           document.getElementById("user-info")?.classList.remove("open");
-        }, 120);
+        }, 80);
       }
+      window.navegarHacia = navegarHacia;
 
-      // Cerrar al hacer clic fuera del menú (SOLO click, NO pointerdown)
+      // Cerrar al hacer clic fuera del menú
       var cerrarNavSiTocaFuera = function (e) {
         var nav = document.getElementById("main-nav-links");
         var btn = document.getElementById("nav-hamburger");
