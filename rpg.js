@@ -361,6 +361,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         window.RpgRoguelike?.abrir?.();
         return;
       }
+      window.RpgRoguelike?.cerrar?.();
       c.dataset.tabActiva = target;
       qsa(".rpg-tab", c).forEach(x => x.classList.toggle("active", x === t));
       qsa(".rpg-panel", c).forEach(p => p.classList.toggle("active", p.dataset.rpgPanel === target));

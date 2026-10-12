@@ -233,8 +233,9 @@
       const equippedCount = ZONAS.filter(z => eq[z.id] && T[z.id]?.[eq[z.id]]).length;
 
       let totalBonus = 0;
+      const svgMochila = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;display:inline-block;vertical-align:-3px;margin-right:6px;color:var(--accent)"><path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M8 21v-5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v5"/><path d="M8 10h8"/><path d="M12 10v4"/></svg>`;
       let html = `<div class="rpg-equipo-header">
-      <span class="rpg-equipo-titulo">🎒 Equipo activo</span>
+      <span class="rpg-equipo-titulo">${svgMochila}Equipo activo</span>
       <span class="rpg-equipo-count">${equippedCount} / 5 slots</span>
     </div>
     <div class="rpg-equipo-grid">`;
@@ -299,6 +300,9 @@
       if (!t) return;
       const content = document.getElementById("rpg-content");
       if (!content) return;
+      window.RpgRoguelike?.cerrar?.();
+      const rlPanel = document.getElementById("rpg-roguelike-panel");
+      if (rlPanel) rlPanel.style.display = "none";
       content.querySelectorAll(".rpg-tab").forEach(x => x.classList.toggle("active", x === t));
       content.querySelectorAll(".rpg-panel").forEach(p => p.classList.toggle("active", p.dataset.rpgPanel === "equipo"));
       render();
