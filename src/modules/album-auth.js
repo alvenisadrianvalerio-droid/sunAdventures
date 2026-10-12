@@ -272,21 +272,24 @@
     userDropdown?.classList.contains("open") ? cerrarMenuPerfil() : abrirMenuPerfil();
   };
   userMenuToggle?.addEventListener("click", toggleMenu);
-  userMenuToggle?.addEventListener("touchend", toggleMenu);
 
-  document.addEventListener("click", e => {
+  // Cerrar menú al tocar fuera
+  const cerrarSiTocaFuera = e => {
     if (!userDropdown?.classList.contains("open")) return;
-    if (userInfo && !userInfo.contains(e.target)) cerrarMenuPerfil();
-  });
-  document.addEventListener("touchend", e => {
-    if (!userDropdown?.classList.contains("open")) return;
-    if (userInfo && !userInfo.contains(e.target)) cerrarMenuPerfil();
-  });
+    if (userDropdown.contains(e.target) || userMenuToggle?.contains(e.target)) return;
+    cerrarMenuPerfil();
+  };
+  document.addEventListener("click", cerrarSiTocaFuera);
+  document.addEventListener("touchend", cerrarSiTocaFuera);
   document.addEventListener("keydown", e => { if (e.key === "Escape" && userDropdown?.classList.contains("open")) cerrarMenuPerfil(); });
 
   const ejecutarAccionDropdown = async (item, e) => {
-    if (e) e.stopPropagation();
+    if (e) {
+      e.stopPropagation();
+    }
     const a = item.dataset.action;
+    cerrarMenuPerfil();
+
     if (a === "perfil") window.abrirPerfilModal?.();
     else if (a === "pareja") window.ParejaSistema?.abrirModal?.();
     else if (a === "ajustes") window.AlbumApp.modules.grupo?.abrirAjustes();
@@ -294,7 +297,7 @@
     else if (a === "descargar") {
       const btnDesc = document.querySelector('.lobby-btn[data-action="descargar"]');
       if (btnDesc) btnDesc.click();
-      else window.abrirDescarga?.();
+      else if (typeof window.abrirDescarga === "function") window.abrirDescarga();
     }
     else if (a === "offline") {
       const uso = await window.SunOffline.estadoUso();
@@ -304,14 +307,19 @@
       const ok = await window.AlbumApp.confirmar({ title: "Descargar contenido", message: msg, variant: "success", icon: "📥", confirmText: "Descargar", cancelText: "Cancelar" });
       if (ok) await window.SunOffline.descargarTodo();
     }
-    cerrarMenuPerfil();
   };
 
   userDropdown?.querySelectorAll("[data-action]").forEach(item => {
-    item.addEventListener("click", e => ejecutarAccionDropdown(item, e));
-    item.addEventListener("touchend", e => {
+    item.addEventListener("click", e => {
       e.preventDefault();
       ejecutarAccionDropdown(item, e);
+    });
+  });
+
+  // Cerrar menú al hacer click o tap en enlaces de vistas (Mapa, Logros, Notitas, Playlists)
+  userDropdown?.querySelectorAll("a.user-dropdown-item").forEach(link => {
+    link.addEventListener("click", () => {
+      cerrarMenuPerfil();
     });
   });
 

@@ -1507,6 +1507,7 @@ sprite.style.opacity = "0.25";
       window.open("./app/sunad.apk", "_blank");
     }
   }
+  window.descargarApkDirecta = descargarApkDirecta;
 
   function abrirDescarga() {
     try {
@@ -1578,6 +1579,7 @@ sprite.style.opacity = "0.25";
       descargarApkDirecta();
     }
   }
+  window.abrirDescarga = abrirDescarga;
 
   /* ---------- PWA ---------- */
   try {
