@@ -224,15 +224,39 @@
     card.className = "logro-card"; card.dataset.logroId = logro.id;
     const contenido = document.createElement("div");
     contenido.className = "logro-contenido";
-    contenido.innerHTML = `<h3>${logro.nombre}</h3><p>${logro.descripcion}</p><small>0 / ${logro.meta}</small>`;
+    contenido.innerHTML = `
+      <div class="logro-header-row">
+        <h3>${logro.nombre}</h3>
+        <span class="logro-badge-status">🔒</span>
+      </div>
+      <p>${logro.descripcion}</p>
+      <div class="logro-progreso-track">
+        <span class="logro-progreso-fill" style="width: 0%"></span>
+      </div>
+      <div class="logro-meta-info">
+        <small class="logro-meta-text">0 / ${logro.meta}</small>
+        <span class="logro-meta-porcentaje">0%</span>
+      </div>`;
     card.append(crearIconoLogro(logro), contenido);
-    return { card, small: contenido.querySelector("small") };
+    return {
+      card,
+      small: contenido.querySelector(".logro-meta-text"),
+      porcentaje: contenido.querySelector(".logro-meta-porcentaje"),
+      fill: contenido.querySelector(".logro-progreso-fill"),
+      badge: contenido.querySelector(".logro-badge-status")
+    };
   }
 
   function _actualizarCard(entry, logro, desbloqueado, progreso, notificar) {
-    const { card, small } = entry;
-    const nuevoTexto = desbloqueado ? "Desbloqueado" : `${progreso} / ${logro.meta}`;
-    if (small.textContent !== nuevoTexto) small.textContent = nuevoTexto;
+    const { card, small, porcentaje, fill, badge } = entry;
+    const meta = Math.max(1, logro.meta || 1);
+    const pct = Math.min(100, Math.max(0, Math.round((progreso / meta) * 100)));
+    const nuevoTexto = desbloqueado ? "¡Completado!" : `${progreso} / ${logro.meta}`;
+    if (small && small.textContent !== nuevoTexto) small.textContent = nuevoTexto;
+    if (porcentaje) porcentaje.textContent = desbloqueado ? "100%" : `${pct}%`;
+    if (fill) fill.style.width = desbloqueado ? "100%" : `${pct}%`;
+    if (badge) badge.textContent = desbloqueado ? "✨" : "🔒";
+
     const tenia = card.classList.contains("desbloqueado");
     if (desbloqueado && !tenia) { card.classList.add("desbloqueado"); if (notificar) notificarLogro(logro); }
     else if (!desbloqueado && tenia) card.classList.remove("desbloqueado");
