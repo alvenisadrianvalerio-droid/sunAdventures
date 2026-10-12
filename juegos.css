@@ -300,3 +300,111 @@ body.light .desafio-diario-juegos { color: var(--text-muted, #715d3d); }
 @media (min-width: 701px) {
   .desafio-diario-premio-icon { image-rendering: auto; }
 }
+
+/* ============================================================
+   MEJORAS ARTÍSTICAS PREMIUM Y JUGO DE MINIJUEGOS (VIBRANCY & POLISH)
+   ============================================================ */
+.minijuego-overlay {
+  transition: opacity .3s cubic-bezier(.16, 1, .3, 1), backdrop-filter .3s ease;
+  backdrop-filter: blur(14px) saturate(160%) !important;
+  background: radial-gradient(circle at 50% 30%, rgba(20, 26, 40, .88), rgba(8, 10, 16, .96)) !important;
+}
+
+body.light .minijuego-overlay {
+  background: radial-gradient(circle at 50% 30%, rgba(255, 250, 235, .92), rgba(245, 236, 215, .97)) !important;
+  backdrop-filter: blur(14px) saturate(140%) !important;
+}
+
+.minijuego-panel {
+  background: linear-gradient(165deg, rgba(26, 32, 48, .92), rgba(14, 18, 28, .96)) !important;
+  border: 1px solid rgba(255, 217, 61, .3) !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .65), 0 0 40px rgba(255, 217, 61, .1), inset 0 1px 0 rgba(255, 255, 255, .15) !important;
+  animation: modalArtisticAppear .35s cubic-bezier(.34, 1.56, .64, 1) both;
+}
+
+body.light .minijuego-panel {
+  background: linear-gradient(165deg, rgba(255, 255, 255, .95), rgba(252, 246, 232, .92)) !important;
+  border: 1px solid rgba(212, 148, 30, .35) !important;
+  box-shadow: 0 20px 60px rgba(139, 90, 20, .18), 0 0 30px rgba(255, 217, 61, .2), inset 0 1px 0 rgba(255, 255, 255, .9) !important;
+}
+
+@keyframes modalArtisticAppear {
+  from {
+    opacity: 0;
+    transform: scale(.88) translateY(20px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+.minijuego-titulo {
+  background: linear-gradient(135deg, #fff 20%, #ffd93d 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(255, 217, 61, .4));
+  letter-spacing: .02em;
+}
+
+body.light .minijuego-titulo {
+  background: linear-gradient(135deg, #7c4a03 20%, #d48b16 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(212, 139, 22, .25));
+}
+
+.jm-hud-card {
+  transition: transform .2s cubic-bezier(.34, 1.56, .64, 1), box-shadow .2s ease;
+  backdrop-filter: blur(6px);
+}
+.jm-hud-card:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 18px rgba(255, 217, 61, .25);
+}
+
+.minijuego-pop {
+  position: absolute;
+  font-weight: 900;
+  font-size: 1.25rem;
+  pointer-events: none;
+  animation: popPuntosFloat .85s cubic-bezier(.16, 1, .3, 1) forwards;
+  text-shadow: 0 2px 6px rgba(0,0,0,.6), 0 0 10px currentColor;
+  z-index: 100;
+}
+
+@keyframes popPuntosFloat {
+  0% { opacity: 0; transform: translateY(0) scale(.5); }
+  20% { opacity: 1; transform: translateY(-12px) scale(1.3); }
+  100% { opacity: 0; transform: translateY(-45px) scale(1); }
+}
+
+.jg-final-emoji {
+  font-size: 3.5rem;
+  filter: drop-shadow(0 4px 18px rgba(255, 217, 61, .6));
+  animation: trophyCelebrate .6s cubic-bezier(.34, 1.56, .64, 1) both;
+}
+
+@keyframes trophyCelebrate {
+  0% { transform: scale(0) rotate(-25deg); opacity: 0; }
+  60% { transform: scale(1.25) rotate(8deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* Efectos visuales de tarjetas de minijuegos con iluminación dinámica */
+.btn-minijuego {
+  box-shadow: 0 10px 25px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.btn-minijuego:hover {
+  filter: saturate(1.2) contrast(1.05);
+}
+.btn-minijuego:hover .btn-minijuego-text {
+  color: #ffd93d;
+  text-shadow: 0 0 12px rgba(255, 217, 61, .75);
+}
+body.light .btn-minijuego:hover .btn-minijuego-text {
+  color: #a86200;
+  text-shadow: 0 0 8px rgba(255, 217, 61, .5);
+}
