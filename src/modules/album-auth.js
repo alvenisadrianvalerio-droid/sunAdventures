@@ -276,48 +276,76 @@
   // Cerrar menú al tocar fuera
   const cerrarSiTocaFuera = e => {
     if (!userDropdown?.classList.contains("open")) return;
-    if (userDropdown.contains(e.target) || userMenuToggle?.contains(e.target)) return;
+    const target = e.target;
+    if (userDropdown.contains(target) || userMenuToggle?.contains(target)) return;
     cerrarMenuPerfil();
   };
   document.addEventListener("click", cerrarSiTocaFuera);
-  document.addEventListener("touchend", cerrarSiTocaFuera);
   document.addEventListener("keydown", e => { if (e.key === "Escape" && userDropdown?.classList.contains("open")) cerrarMenuPerfil(); });
 
   const ejecutarAccionDropdown = async (item, e) => {
     if (e) {
       e.stopPropagation();
+      if (e.cancelable && e.type !== "click") e.preventDefault();
     }
     const a = item.dataset.action;
     cerrarMenuPerfil();
 
-    if (a === "perfil") window.abrirPerfilModal?.();
-    else if (a === "pareja") window.ParejaSistema?.abrirModal?.();
-    else if (a === "ajustes") window.AlbumApp.modules.grupo?.abrirAjustes();
-    else if (a === "amigos") window.AlbumApp.modules.grupo?.abrirAmigosModal();
+    if (a === "perfil") {
+      if (typeof window.abrirPerfilModal === "function") window.abrirPerfilModal();
+    }
+    else if (a === "pareja") {
+      if (typeof window.ParejaSistema?.abrirModal === "function") window.ParejaSistema.abrirModal();
+    }
+    else if (a === "ajustes") {
+      window.AlbumApp.modules.grupo?.abrirAjustes?.();
+    }
+    else if (a === "amigos") {
+      window.AlbumApp.modules.grupo?.abrirAmigosModal?.();
+    }
     else if (a === "descargar") {
-      const btnDesc = document.querySelector('.lobby-btn[data-action="descargar"]');
-      if (btnDesc) btnDesc.click();
-      else if (typeof window.abrirDescarga === "function") window.abrirDescarga();
+      if (typeof window.abrirDescarga === "function") window.abrirDescarga();
+      else if (typeof window.descargarApkDirecta === "function") window.descargarApkDirecta();
+      else {
+        const btnDesc = document.querySelector('.lobby-btn[data-action="descargar"]');
+        if (btnDesc) btnDesc.click();
+      }
     }
     else if (a === "offline") {
-      const uso = await window.SunOffline.estadoUso();
-      const msg = (uso.imagenes || uso.canciones)
-        ? `Ya tienes descargado:<br>📸 ${uso.imagenes} imágenes<br>🎵 ${uso.canciones} canciones<br>💾 ${uso.tamanoMB} MB<br><br>¿Descargar de nuevo todo lo nuevo?`
-        : "¿Descargar todas las imágenes y canciones para uso sin conexión?";
-      const ok = await window.AlbumApp.confirmar({ title: "Descargar contenido", message: msg, variant: "success", icon: "📥", confirmText: "Descargar", cancelText: "Cancelar" });
-      if (ok) await window.SunOffline.descargarTodo();
+      if (window.SunOffline?.estadoUso) {
+        const uso = await window.SunOffline.estadoUso();
+        const msg = (uso.imagenes || uso.canciones)
+          ? `Ya tienes descargado:<br>📸 ${uso.imagenes} imágenes<br>🎵 ${uso.canciones} canciones<br>💾 ${uso.tamanoMB} MB<br><br>¿Descargar de nuevo todo lo nuevo?`
+          : "¿Descargar todas las imágenes y canciones para uso sin conexión?";
+        const ok = await window.AlbumApp.confirmar({ title: "Descargar contenido", message: msg, variant: "success", icon: "📥", confirmText: "Descargar", cancelText: "Cancelar" });
+        if (ok) await window.SunOffline.descargarTodo();
+      }
     }
   };
 
   userDropdown?.querySelectorAll("[data-action]").forEach(item => {
-    item.addEventListener("click", e => {
+    let touched = false;
+    item.addEventListener("touchend", e => {
+      touched = true;
+      e.stopPropagation();
       e.preventDefault();
+      ejecutarAccionDropdown(item, e);
+      setTimeout(() => { touched = false; }, 400);
+    }, { passive: false });
+
+    item.addEventListener("click", e => {
+      if (touched) return;
+      e.preventDefault();
+      e.stopPropagation();
       ejecutarAccionDropdown(item, e);
     });
   });
 
-  // Cerrar menú al hacer click o tap en enlaces de vistas (Mapa, Logros, Notitas, Playlists)
+  // Enlaces de vistas (Mapa, Logros, Notitas, Playlists)
   userDropdown?.querySelectorAll("a.user-dropdown-item").forEach(link => {
+    link.addEventListener("touchend", e => {
+      e.stopPropagation();
+    }, { passive: true });
     link.addEventListener("click", () => {
       cerrarMenuPerfil();
     });

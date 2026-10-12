@@ -1133,16 +1133,6 @@ Artista - Canción
         });
       }
 
-      document.addEventListener("click", function (e) {
-        var nav = document.getElementById("main-nav-links");
-        var btn = document.getElementById("nav-hamburger");
-        if (nav && nav.classList.contains("mobile-open")) {
-          if (!nav.contains(e.target) && (!btn || !btn.contains(e.target))) {
-            toggleNavMenu(false);
-          }
-        }
-      });
-
       function activarVista(v) {
         document.querySelectorAll("[data-view]").forEach(el => el.classList.toggle("active", el.dataset.view === v));
         document.querySelectorAll("[data-view-link]").forEach(el => el.classList.toggle("active", el.dataset.viewLink === v));
@@ -1152,6 +1142,19 @@ Artista - Canción
         window.scrollTo({ top: 0, behavior: "smooth" });
         window.dispatchEvent(new CustomEvent("sunad:view-change", { detail: { view: v } }));
       }
+
+      var cerrarNavSiTocaFuera = function (e) {
+        var nav = document.getElementById("main-nav-links");
+        var btn = document.getElementById("nav-hamburger");
+        if (nav && nav.classList.contains("mobile-open")) {
+          if (!nav.contains(e.target) && (!btn || !btn.contains(e.target))) {
+            toggleNavMenu(false);
+          }
+        }
+      };
+      document.addEventListener("click", cerrarNavSiTocaFuera);
+      document.addEventListener("pointerdown", cerrarNavSiTocaFuera);
+
       document.addEventListener("click", function (e) {
         var link = e.target.closest("[data-view-link]");
         if (!link) return;
