@@ -1593,7 +1593,15 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     ataqueNormalEnemigo();
   }
 
+  function animarAtaqueEnemigo() {
+    const s = $("sprite-enemigo");
+    if (!s) return;
+    s.classList.add("atacando");
+    setTimeout(() => s.classList.remove("atacando"), 400);
+  }
+
   function ataqueNormalEnemigo() {
+    animarAtaqueEnemigo();
     const atkEnemigo = Math.max(1, enemigo.atk + buffsEnemigo.filter(b => b.tipo === "atk").reduce((s, b) => s + b.val, 0));
     const defHeroe = defTotal() + buffVal("def");
     const dmg = Math.max(1, atkEnemigo - defHeroe + rnd(-3, 3));
@@ -1602,8 +1610,16 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     log(enemigo.nombre + " te ataca por " + dmg + ".", "daño");
     floatDmg("#sprite-heroe", "-" + dmg, "daño");
     FX({ tipo: "attack", target: "hero", valor: dmg, fxKey: "bolt" });
-    qs("#sprite-heroe")?.classList.add("golpeado");
-    setTimeout(() => qs("#sprite-heroe")?.classList.remove("golpeado"), 350);
+    const heroeSpr = qs("#sprite-heroe");
+    if (heroeSpr) {
+      heroeSpr.classList.add("golpeado");
+      setTimeout(() => heroeSpr.classList.remove("golpeado"), 380);
+    }
+    const batallaBox = $("rpg-batalla");
+    if (batallaBox) {
+      batallaBox.classList.add("rpg-shake");
+      setTimeout(() => batallaBox.classList.remove("rpg-shake"), 320);
+    }
 
     const ls = lifestealTotal();
     if (ls > 0) {
