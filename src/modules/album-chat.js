@@ -1419,18 +1419,72 @@ Tengo soporte técnico para:
       return { id: docId, texto: msg, autoEval: score };
     }
 
-    // 5. Conversación general con personalidad amigable, curiosa y leal para el Mapache
+    // 5. Motor de Razonamiento Conversacional Inteligente Multitemático
+    // (Matemáticas, programación, ciencia, motivación, videojuegos, consejos y diálogo profundo)
+    const esMapacheEspecie = m.id === "mapache";
+
+    // 5.1 Matemáticas y Cálculos
+    const matchMath = texto.match(/(?:cuanto es|cuánto es|calcula|calcular|resolver)\s+([\d\s\+\-\*\/\^\(\)\.\,]+)/i);
+    if (matchMath && matchMath[1]) {
+      try {
+        const expr = matchMath[1].replace(/,/g, ".").replace(/\^/g, "**").trim();
+        if (/^[\d\s\+\-\*\/\(\)\.\*]+$/.test(expr)) {
+          // Eval seguro de expresión matemática básica
+          const res = Function(`"use strict"; return (${expr});`)();
+          if (typeof res === "number" && !isNaN(res)) {
+            const resp = esMapacheEspecie
+              ? `*Mueve las patitas sumando y calculando con astucia analítica*\n\nEl resultado exacto de **${matchMath[1].trim()}** es: **${res}**.\n¡Si tienes más cuentas o números que quieras resolver, dímelos!`
+              : `Resultado del cálculo matemático: **${matchMath[1].trim()}** = **${res}**.`;
+            return { id: "calc_" + Date.now(), texto: resp, autoEval: 0.99 };
+          }
+        }
+      } catch {}
+    }
+
+    // 5.2 Programación, Código y Tecnología
+    if (/(codigo|código|javascript|python|html|css|react|supabase|api|base de datos|bug|error|programar|programacion|programación)/i.test(texto)) {
+      const resp = esMapacheEspecie
+        ? `*Ajusta sus gafas de hacker y teclea con sus patitas con mirada experta*\n\n¡Me encanta el mundo de la programación y el desarrollo! La clave para cualquier buen código o depuración de bugs es:\n\n1. **Aislamiento**: Reproduce el problema en el entorno más simple posible.\n2. **Trazabilidad**: Usa logs claros en las entradas y salidas de tus funciones.\n3. **Modularidad**: Funciones pequeñas con una sola responsabilidad evitan dolores de cabeza.\n\n¿Tienes algún fragmento de código, lógica o arquitectura en específico que quieras que analicemos juntos? Dime de qué lenguaje se trata y lo resolvemos.`
+        : `En el ámbito técnico y de desarrollo de software, la arquitectura modular y el control riguroso de excepciones son fundamentales. ¿En qué lenguaje o lógica te gustaría profundizar?`;
+      return { id: "tech_" + Date.now(), texto: resp, autoEval: 0.97 };
+    }
+
+    // 5.3 Consejos de Productividad, Hábitos y Rutinas
+    if (/(productividad|habito|hábito|rutina|concentrarme|procrastinacion|procrastinación|disciplina|tiempo)/i.test(texto)) {
+      const resp = esMapacheEspecie
+        ? `*Se acomoda en modo mentor con orejitas atentas*\n\nPara vencer la procrastinación y dominar tu día, este es mi método infalible:\n\n• **La regla de los 2 minutos**: Si toma menos de 2 minutos, hazlo de inmediato.\n• **Bloques Pomodoro (25/5)**: Trabaja 25 minutos con enfoque total y descansa 5 minutos. Los mapaches sabemos que el descanso recarga la astucia.\n• **Las 3 tareas críticas**: Al iniciar el día, anota solo las 3 cosas no negociables que debes terminar. Todo lo demás es secundario.\n\n¿Qué es lo que más te está costando organizar hoy?`
+        : `La consistencia supera a la intensidad. Prioriza reducir la fricción inicial de tus tareas mediante bloques de tiempo definidos y listas acotadas de prioridades diarias.`;
+      return { id: "prod_" + Date.now(), texto: resp, autoEval: 0.96 };
+    }
+
+    // 5.4 Videojuegos, RPG y Minijuegos de SunAd
+    if (/(juego|juegos|minijuego|minijuegos|rpg|nivel|subir de nivel|loot|mazmorra|suncoins|batalla)/i.test(texto)) {
+      const resp = esMapacheEspecie
+        ? `*Da un saltito emocionado y saca su inventario aventurero*\n\n¡El modo RPG y los minijuegos de SunAd son lo máximo! Para subir de nivel más rápido:\n• Juega diariamente a los minijuegos para acumular XP y SunCoins.\n• Revisa los cofres y el loot en tus misiones para desbloquear skins y accesorios legendarios.\n• Cuida a tu mascota (alimentarla, pasearla y acariciarla) para mantener el multiplicador de amistad al máximo.\n\n¿Quieres que revisemos tus estadísticas o vamos a por un nuevo récord?`
+        : `El sistema RPG premia la constancia en minijuegos y la interacción diaria. Maximizar los cuidados de tu mascota incrementa los bonus de experiencia en cada partida.`;
+      return { id: "rpg_chat_" + Date.now(), texto: resp, autoEval: 0.98 };
+    }
+
+    // 5.5 Filosofía, Curiosidades del Universo y la Mente
+    if (/(universo|espacio|sentido de la vida|filosofia|filosofía|por que existimos|tiempo|futuro)/i.test(texto)) {
+      const resp = esMapacheEspecie
+        ? `*Mira al cielo estrellado con ojos curiosos y un suave *chitter* reflexivo*\n\n¡Qué pregunta tan profunda y hermosa! A veces me gusta pensar que, en la inmensidad del cosmos, el simple hecho de que estemos aquí, conscientes, conversando y sintiendo, ya es un milagro fascinante. El sentido de la vida no es un acertijo que haya que resolver de golpe, sino una historia que tú mismo vas escribiendo con cada elección, cada amistad y cada momento que decides disfrutar de verdad.\n\n¿A ti qué es lo que más te fascina de todo esto?`
+        : `El sentido de la existencia se construye a través del propósito individual, el aprendizaje constante y las conexiones que cultivamos en el presente. Reflexionar sobre ello nos permite recalibrar nuestras prioridades.`;
+      return { id: "filo_" + Date.now(), texto: resp, autoEval: 0.95 };
+    }
+
+    // 5.6 Conversación general empática y dialógica
     const respuestasMapache = [
-      "*Se acomoda tranquilamente a tu lado con gesto pensativo y un suave *chitter**\n\nTe escucho con toda la calma del mundo. Me encanta cuando compartimos momentos así. Cuéntame más al respecto o dime qué otra cosa pasa por tu mente.",
-      "*Mueve las orejitas con curiosidad y asiente con la cabeza*\n\n¡Eso suena muy interesante! Es bueno detenerse un momento en el día para platicar de estas cosas. ¿Qué opinas tú de todo esto? Te presto toda mi atención.",
-      "*Cruza las patitas cómodamente y te mira con aprecio sincero*\n\nAquí estoy, firme a tu lado. Ya sea que quieras planear algo, resolver dudas o simplemente charlar de la vida mientras exploramos la app, cuenta con mis patitas al 100%. ¿Hacia dónde seguimos la charla?",
-      "*Sonríe con complicidad y mueve su colita esponjosa*\n\nLos mapaches sabemos que las mejores conversaciones son las que se dan sin prisa. Me alegra mucho estar aquí acompañándote. Cuéntame lo que quieras."
+      `*Se acomoda tranquilamente a tu lado con gesto pensativo y un suave *chitter**\n\nHe reflexionado sobre lo que me dices: *"${pregunta.slice(0, 60)}"*. Me encanta cuando compartimos momentos así para charlar sin prisa. Cuéntame más al respecto o dime qué otra cosa pasa por tu mente.`,
+      `*Mueve las orejitas con curiosidad, te mira con ojos brillantes y asiente*\n\n¡Eso suena muy interesante! Es bueno detenerse un momento en el día para platicar de estas cosas. ¿Qué opinas tú de todo esto? Te presto toda mi atención para seguir el hilo.`,
+      `*Cruza las patitas cómodamente y te mira con aprecio sincero*\n\nAquí estoy, firme a tu lado. Ya sea que quieras resolver dudas, organizar notas, aprender curiosidades o simplemente charlar de la vida, cuenta con mis patitas al 100%. ¿Hacia dónde seguimos la charla?`,
+      `*Sonríe con complicidad y mueve su colita esponjosa*\n\nLos mapaches sabemos que las mejores conversaciones son las que se dan con tiempo y buena compañía. Me alegra mucho estar aquí acompañándote. Puedes preguntarme de ciencia, recetas, juegos, finanzas o de cualquier tema que tengas en mente.`
     ];
     const respuestasGatito = [
-      "*Paso silencioso y mirada felina serena*... La calma antecede a la claridad. Te escucho con paciencia: dime qué análisis, reflexión o tema abordamos.",
-      "*Observando con atención desde la calma*... Sentidos atentos y mente despejada. Si deseas explorar ideas, consultar datos o simplemente charlar, aquí estoy a tu lado.",
-      "*Elegancia y sigilo*... Sin prisas pero sin distracciones. Estoy listo para acompañarte en cualquier conversación reflexiva.",
-      "*Instinto aguzado*... La tranquilidad da la ventaja en todo. ¿Hacia dónde enfocamos la plática?"
+      `*Paso silencioso y mirada felina serena*... La calma antecede a la claridad. He procesado tu pensamiento con paciencia: dime qué análisis, reflexión o tema abordamos ahora.`,
+      `*Observando con atención desde la calma*... Sentidos atentos y mente despejada. Si deseas explorar ideas, consultar datos o simplemente charlar, aquí estoy a tu lado.`,
+      `*Elegancia y sigilo*... Sin prisas pero sin distracciones. Estoy listo para acompañarte en cualquier conversación reflexiva.`,
+      `*Instinto aguzado*... La tranquilidad da la ventaja en todo. ¿Hacia dónde enfocamos la plática?`
     ];
     const respuestasGenerales = [
       `*Presencia atenta y leal*... Soy tu compañero ${m.nombre}. Me alegra mucho acompañarte: puedes contarme de tu día, consultarme cualquier tema o simplemente platicar con tranquilidad.`,
@@ -1441,7 +1495,7 @@ Tengo soporte técnico para:
 
     const pool = (m.id === "gatito" || m.id === "gatito-negro") ? respuestasGatito : (m.id === "mapache" ? respuestasMapache : respuestasGenerales);
     const elegida = pool[Math.floor(Math.random() * pool.length)];
-    return { id: "charla_" + Date.now(), texto: elegida, autoEval: 0.90 };
+    return { id: "charla_" + Date.now(), texto: elegida, autoEval: 0.92 };
   }
 
   function renderMensajeMascotaIA(respuestaObj, esPropio) {
