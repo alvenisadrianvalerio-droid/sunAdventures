@@ -1233,6 +1233,8 @@
         aiFeedback.className = "finanzas-mascota-feedback";
         aiFeedback.textContent = "Analizando tu instrucción financiera...";
       }
+      // Permitir que la UI pinte el estado de carga antes de ejecutar cálculos
+      await new Promise(resolve => setTimeout(resolve, 16));
       try {
         const respuesta = await procesarInstruccionFinancieraIA(prompt, scope);
         if (aiFeedback) {

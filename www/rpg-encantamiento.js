@@ -59,15 +59,46 @@
     };
 
     // ---------- Obtener encantamientos guardados ----------
+    const resolveUid = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || localStorage.getItem("sunadventures_uid") || "local";
+    const getUserCandidates = () => {
+        const list = [];
+        const uid = resolveUid();
+        if (uid && uid !== "local") list.push(uid);
+        const legacyUid = localStorage.getItem("sunadventures_uid");
+        if (legacyUid && !list.includes(legacyUid)) list.push(legacyUid);
+        const username = localStorage.getItem("sunad_username") || localStorage.getItem("sunadventures_username");
+        if (username && !list.includes(username)) list.push(username);
+        const email = window._sunUserEmail || "";
+        if (email) {
+            const ep = email.split("@")[0];
+            if (ep && !list.includes(ep)) list.push(ep);
+        }
+        if (!list.includes("local")) list.push("local");
+        return list;
+    };
+
     function cargarEncantamientos() {
-        const u = window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local";
+        const u = resolveUid();
+        const k = `sa_rpg_encantamientos_${u}`;
         try {
-            return JSON.parse(localStorage.getItem(`sa_rpg_encantamientos_${u}`) || "{}");
+            let raw = localStorage.getItem(k);
+            if (!raw && u !== "local") {
+                const candidates = getUserCandidates();
+                for (const c of candidates) {
+                    const fb = localStorage.getItem(`sa_rpg_encantamientos_${c}`);
+                    if (fb) {
+                        raw = fb;
+                        localStorage.setItem(k, raw);
+                        break;
+                    }
+                }
+            }
+            return JSON.parse(raw || "{}");
         } catch { return {}; }
     }
 
     function guardarEncantamientos(data) {
-        const u = window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local";
+        const u = resolveUid();
         localStorage.setItem(`sa_rpg_encantamientos_${u}`, JSON.stringify(data));
     }
 

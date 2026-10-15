@@ -87,14 +87,19 @@
   }
 
   let comprobandoDiario = false;
+  let diarioReclamadoHoy = false;
   function comprobarDiario() {
-    if (comprobandoDiario) return;
+    if (comprobandoDiario || diarioReclamadoHoy) return;
     const uid = window._sunUserId || localStorage.getItem("sunad_uid");
     if (!uid) return;
     const d = cargarDiario();
-    if (d.ultimo === hoyISO()) return;
+    if (d.ultimo === hoyISO()) {
+      diarioReclamadoHoy = true;
+      return;
+    }
 
     comprobandoDiario = true;
+    diarioReclamadoHoy = true;
     const ayer = new Date(); ayer.setDate(ayer.getDate() - 1);
     const ayerISO = ayer.toISOString().slice(0,10);
     let nuevaRacha = d.ultimo === ayerISO ? (d.racha + 1) : 1;

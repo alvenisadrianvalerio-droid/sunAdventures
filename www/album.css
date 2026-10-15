@@ -463,10 +463,15 @@ body.light .album-seleccion-bar {
   box-shadow: 0 4px 6px rgba(0, 0, 0, .08), 0 12px 30px rgba(0, 0, 0, .15);
   width: 100%;
   max-width: 200px;
-  transform: rotate(-2deg);
-  transition: transform .4s, box-shadow .4s;
+  transform: rotate(-2deg) translateZ(0);
+  -webkit-transform: rotate(-2deg) translateZ(0);
+  transition: transform .25s ease-out, box-shadow .25s ease-out;
   position: relative;
-  cursor: pointer
+  cursor: pointer;
+  content-visibility: auto;
+  contain-intrinsic-size: 200px 240px;
+  contain: layout style paint;
+  touch-action: manipulation;
 }
 
 .polaroid:nth-child(2n) {
@@ -577,7 +582,8 @@ body.light .album-seleccion-bar {
   transform: scale(1.15)
 }
 
-.polaroid:fullscreen {
+.polaroid:fullscreen,
+.polaroid:-webkit-full-screen {
   background: rgba(15, 16, 22, .98);
   max-width: 100%;
   width: 100%;
@@ -586,7 +592,9 @@ body.light .album-seleccion-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-sizing: border-box
+  box-sizing: border-box;
+  content-visibility: visible;
+  contain: none;
 }
 
 .polaroid:fullscreen::before,
@@ -9046,3 +9054,133 @@ body:has(.modal.active) .shop-bubble {
     display: block !important;
   }
 }
+
+/* ============================================================
+   📸 NAVEGACIÓN Y GESTOS SWIPE EN PANTALLA COMPLETA
+   ============================================================ */
+.polaroid:fullscreen .polaroid-nav-arrow,
+.polaroid:-webkit-full-screen .polaroid-nav-arrow {
+  position: fixed !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  color: #fff !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  z-index: 1000 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+  transition: all 0.22s ease !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  touch-action: manipulation;
+}
+
+.polaroid:fullscreen .polaroid-nav-arrow:hover,
+.polaroid:-webkit-full-screen .polaroid-nav-arrow:hover {
+  transform: translateY(-50%) scale(1.12) !important;
+  background: rgba(255, 217, 61, 0.35) !important;
+  border-color: rgba(255, 217, 61, 0.8) !important;
+  box-shadow: 0 10px 28px rgba(255, 217, 61, 0.35), 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.polaroid:fullscreen .polaroid-nav-arrow:active,
+.polaroid:-webkit-full-screen .polaroid-nav-arrow:active {
+  transform: translateY(-50%) scale(0.95) !important;
+}
+
+.polaroid:fullscreen .polaroid-nav-arrow.nav-prev,
+.polaroid:-webkit-full-screen .polaroid-nav-arrow.nav-prev {
+  left: 1.5rem !important;
+}
+
+.polaroid:fullscreen .polaroid-nav-arrow.nav-next,
+.polaroid:-webkit-full-screen .polaroid-nav-arrow.nav-next {
+  right: 1.5rem !important;
+}
+
+.polaroid:fullscreen .polaroid-nav-arrow svg,
+.polaroid:-webkit-full-screen .polaroid-nav-arrow svg {
+  width: 24px !important;
+  height: 24px !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+@media (max-width: 700px) {
+  .polaroid:fullscreen .polaroid-nav-arrow,
+  .polaroid:-webkit-full-screen .polaroid-nav-arrow {
+    width: 42px !important;
+    height: 42px !important;
+    background: rgba(0, 0, 0, 0.35) !important;
+  }
+  .polaroid:fullscreen .polaroid-nav-arrow.nav-prev,
+  .polaroid:-webkit-full-screen .polaroid-nav-arrow.nav-prev {
+    left: 0.75rem !important;
+  }
+  .polaroid:fullscreen .polaroid-nav-arrow.nav-next,
+  .polaroid:-webkit-full-screen .polaroid-nav-arrow.nav-next {
+    right: 0.75rem !important;
+  }
+}
+
+/* Indicador de posición y ayuda en pantalla completa */
+.polaroid:fullscreen .polaroid-counter-badge,
+.polaroid:-webkit-full-screen .polaroid-counter-badge {
+  position: fixed !important;
+  bottom: 1.25rem !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: rgba(0, 0, 0, 0.55) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  padding: 0.35rem 0.9rem !important;
+  border-radius: 999px !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  z-index: 1000 !important;
+  pointer-events: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+}
+
+/* Animaciones suaves al cambiar de foto en fullscreen */
+.polaroid.fs-slide-left-out {
+  animation: fsSlideLeftOut 0.22s ease-in forwards !important;
+}
+.polaroid.fs-slide-right-out {
+  animation: fsSlideRightOut 0.22s ease-in forwards !important;
+}
+.polaroid.fs-slide-left-in {
+  animation: fsSlideLeftIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+.polaroid.fs-slide-right-in {
+  animation: fsSlideRightIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes fsSlideLeftOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-40px); }
+}
+@keyframes fsSlideRightOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(40px); }
+}
+@keyframes fsSlideLeftIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes fsSlideRightIn {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}

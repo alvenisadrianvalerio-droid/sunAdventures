@@ -202,26 +202,50 @@
       const obs = obtenerObserverLazy();
       if (obs) obs.disconnect();
 
-      const fragInicial = document.createDocumentFragment();
+      // Renderizado por lotes (chunked) para evitar picos de CPU y caídas de FPS con cientos de fotos
+      const BATCH_SIZE = 36;
+      let indiceActual = 0;
 
-      // Creamos los elementos de forma inmediata con placeholders ligeros
-      fotos.forEach(f => {
-        const el = crearPolaroid(f, null);
-        if (el) {
-          fragInicial.appendChild(el);
-          if (obs) {
-            obs.observe(el);
-          } else {
-            // Fallback si no hay soporte para IntersectionObserver
-            cargarFotoVisible(el);
+      function renderSiguienteLote() {
+        if (!grid || !renderEnCurso) return;
+        const fin = Math.min(indiceActual + BATCH_SIZE, fotos.length);
+        const frag = document.createDocumentFragment();
+
+        for (let i = indiceActual; i < fin; i++) {
+          const el = crearPolaroid(fotos[i], null);
+          if (el) {
+            frag.appendChild(el);
+            if (obs) {
+              obs.observe(el);
+            } else {
+              cargarFotoVisible(el);
+            }
           }
         }
-      });
-      grid.appendChild(fragInicial);
+
+        grid.appendChild(frag);
+        indiceActual = fin;
+
+        if (indiceActual < fotos.length) {
+          requestAnimationFrame(renderSiguienteLote);
+        } else {
+          renderEnCurso = false;
+          if (renderPendiente) {
+            renderPendiente = false;
+            render();
+          }
+        }
+      }
+
+      renderSiguienteLote();
 
       if (document.querySelector("[data-view].active")?.dataset.view === "mapa") renderMapa();
-    } catch (err) { console.warn("render:", err); }
-    finally { renderEnCurso = false; if (renderPendiente) { renderPendiente = false; render(); } }
+      return; // El ciclo de render continuará de forma asíncrona no bloqueante
+    } catch (err) {
+      console.warn("render:", err);
+      renderEnCurso = false;
+      if (renderPendiente) { renderPendiente = false; render(); }
+    }
   }
 
   function asignarUrlImagen(img, path, url) {
@@ -304,6 +328,7 @@
       }
 
       const img = document.createElement("img");
+      img.decoding = "async";
       if (url) {
         asignarUrlImagen(img, foto.path, url);
       } else {

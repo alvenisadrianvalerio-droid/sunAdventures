@@ -435,6 +435,22 @@ function sustituirEmojis(root) {
      ESTADO
      ============================================================ */
   const resolveUid = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || localStorage.getItem("sunadventures_uid") || (typeof getUserId === "function" ? getUserId() : "local");
+  const getUserCandidates = () => {
+    const list = [];
+    const uid = resolveUid();
+    if (uid && uid !== "local") list.push(uid);
+    const legacyUid = localStorage.getItem("sunadventures_uid");
+    if (legacyUid && !list.includes(legacyUid)) list.push(legacyUid);
+    const username = localStorage.getItem("sunad_username") || localStorage.getItem("sunadventures_username");
+    if (username && !list.includes(username)) list.push(username);
+    const email = window._sunUserEmail || "";
+    if (email) {
+      const ep = email.split("@")[0];
+      if (ep && !list.includes(ep)) list.push(ep);
+    }
+    if (!list.includes("local")) list.push("local");
+    return list;
+  };
   const KEY_META = () => `sa_rl_meta_${resolveUid()}`;
   const KEY_RUN  = () => `sa_rl_run_${resolveUid()}`;
 
@@ -448,13 +464,11 @@ function sustituirEmojis(root) {
       if (raw) {
         try { parsed = JSON.parse(raw); } catch {}
       }
-      // Si el usuario actual no tiene runs o está vacío y está logueado, chequear fallback local o legacy
+      // Si el usuario actual no tiene runs o está vacío y está logueado, chequear fallback de sus claves candidatas
       if ((!parsed || (!parsed.runs && !parsed.victorias)) && u !== "local") {
-        const fallbackKeys = ["sa_rl_meta_local"];
-        const leg = localStorage.getItem("sunadventures_uid");
-        if (leg && leg !== u) fallbackKeys.push(`sa_rl_meta_${leg}`);
-        for (const fk of fallbackKeys) {
-          const fRaw = localStorage.getItem(fk);
+        const candidates = getUserCandidates();
+        for (const c of candidates) {
+          const fRaw = localStorage.getItem(`sa_rl_meta_${c}`);
           if (fRaw) {
             try {
               const fp = JSON.parse(fRaw);

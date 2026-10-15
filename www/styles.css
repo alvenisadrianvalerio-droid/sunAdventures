@@ -32,6 +32,8 @@ html {
   text-rendering: optimizeSpeed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: none;
+  touch-action: pan-y pinch-zoom;
 }
 
 body {
@@ -39,6 +41,8 @@ body {
   color: var(--text);
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
+  -webkit-overflow-scrolling: touch;
+  touch-action: manipulation;
 }
 
 ::selection {

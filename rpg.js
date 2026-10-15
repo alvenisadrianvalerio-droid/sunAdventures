@@ -21,6 +21,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const SVG_POTION = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;display:inline-block;vertical-align:-3px;margin-right:5px;"><path d="M9 2h6M10 2v3.5a2 2 0 0 1-.5 1.4L5.2 12.3A5 5 0 0 0 4 15.6V18a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4v-2.4a5 5 0 0 0-1.2-3.3l-4.3-5.4a2 2 0 0 1-.5-1.4V2"/><path d="M6 14h12" opacity="0.6"/></svg>';
   const SVG_SPARKLES = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;display:inline-block;vertical-align:-3px;margin-right:5px;"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z"/><path d="M19 2l1.2 3.3L23.5 6.5l-3.3 1.2L19 11l-1.2-3.3L14.5 6.5l3.3-1.2L19 2z" opacity="0.75"/></svg>';
   const SVG_RUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;display:inline-block;vertical-align:-3px;margin-right:5px;"><circle cx="14" cy="4" r="2"/><path d="m9 20 3-6-3-3 4-2 3 3h4"/><path d="m6 16 3-3"/><path d="M14 14l2 6"/></svg>';
+  const SVG_SWORD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rpg-stat-svg" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px;color:#ff9a3d;"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>';
+  const SVG_SHIELD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rpg-stat-svg" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px;color:#6cb8ff;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
 
   const D = window.RpgData || {};
   const DIR_48 = D.DIR_48 || 'img/48x48/';
@@ -135,12 +137,12 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       for (let i = 1; i <= 10; i++) {
         const idx = ri * 10 + i, esJefe = i === 10, esMini = i === 5, esElite = i >= 6 && i <= 9;
         // Dificultad afinada: enemigos normales y jefes más desafiantes
-        const hpBase = Math.round(90 + idx * 26);
-        const atkBase = Math.round(14 + idx * 3.4);
-        const hpJefe = esJefe ? Math.round(idx * 50 + 130) : 0;
-        const atkJefe = esJefe ? Math.round(idx * 2.2 + 9) : 0;
-        const hpMini = esMini ? Math.round(idx * 26 + 60) : 0;
-        const atkMini = esMini ? Math.round(idx * 1.4 + 6) : 0;
+        const hpBase = Math.round(115 + idx * 30);
+        const atkBase = Math.round(17 + idx * 3.8);
+        const hpJefe = esJefe ? Math.round(idx * 55 + 150) : 0;
+        const atkJefe = esJefe ? Math.round(idx * 2.5 + 12) : 0;
+        const hpMini = esMini ? Math.round(idx * 30 + 75) : 0;
+        const atkMini = esMini ? Math.round(idx * 1.6 + 8) : 0;
         z.push({
           id: `${reg.id}-${i}`,
           nombre: esJefe ? reg.jefeNombre : `${reg.nombre} · ${i}`,
@@ -149,8 +151,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
           enemigos: esJefe ? [reg.jefe] : esMini ? [...reg.elite.slice(0, 2), reg.base[0]] : esElite ? reg.elite : reg.base,
           hp: Math.round(hpBase + hpJefe + hpMini),
           atk: Math.round(atkBase + atkJefe + atkMini),
-          xp: Math.round(22 + idx * 16 + (esJefe ? idx * 32 : esMini ? idx * 15 : 0)),
-          monedas: Math.round(10 + idx * 3.0 + (esJefe ? 55 : esMini ? 22 : 0)),
+          xp: Math.round(25 + idx * 18 + (esJefe ? idx * 36 : esMini ? idx * 18 : 0)),
+          monedas: Math.round(20 + idx * 7.5 + (esJefe ? 140 + idx * 4 : esMini ? 55 + idx * 2 : 0)),
           jefe: esJefe, miniJefe: esMini, region: reg.id, regionNombre: reg.nombre, orden: idx
         });
       }
@@ -169,17 +171,41 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const KEY = () => `sa_rpg_${resolveUid()}`;
   const def = () => ({ nivel: 1, xp: 0, hp: 120, enemigosDerrotados: 0, jefesDerrotados: [], zonasConquistadas: [], zonaActual: null, statsBase: { atk: 14, def: 5 } });
 
+  const getUserCandidates = () => {
+    const list = [];
+    const uid = window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || (typeof getUserId === "function" ? getUserId() : null);
+    if (uid && uid !== "local") list.push(uid);
+
+    const legacyUid = localStorage.getItem("sunadventures_uid");
+    if (legacyUid && !list.includes(legacyUid)) list.push(legacyUid);
+
+    const username = localStorage.getItem("sunad_username") || localStorage.getItem("sunadventures_username");
+    if (username && !list.includes(username)) list.push(username);
+
+    const email = window._sunUserEmail || "";
+    if (email) {
+      const emailPrefix = email.split("@")[0];
+      if (emailPrefix && !list.includes(emailPrefix)) list.push(emailPrefix);
+    }
+
+    // Candidato local (siempre al final para no sobrescribir antes de tiempo)
+    if (!list.includes("local")) list.push("local");
+    return list;
+  };
+
   // Recupera datos existentes buscando en la clave actual y haciendo fallback si está vacío
   const cargar = () => {
     try {
       const u = resolveUid();
       const kPrincipal = `sa_rpg_${u}`;
+      const userCand = getUserCandidates();
       const candidatas = [kPrincipal];
-      if (u !== "local") candidatas.push("sa_rpg_local");
-      const legacyUid = localStorage.getItem("sunadventures_uid");
-      if (legacyUid && legacyUid !== u) candidatas.push(`sa_rpg_${legacyUid}`);
+      userCand.forEach(c => {
+        const k = `sa_rpg_${c}`;
+        if (!candidatas.includes(k)) candidatas.push(k);
+      });
 
-      // Buscar si alguna de las claves candidatas tiene datos reales
+      // Buscar si alguna de las claves candidatas legítimas tiene datos reales
       let encontrado = null;
       let claveGanadora = null;
 
@@ -202,30 +228,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
                 claveGanadora = k;
               }
             }
-          } catch {}
+          } catch { }
         }
-      }
-
-      // Si no encontró en candidatas conocidas, buscar en cualquier sa_rpg_* que tenga progreso
-      if (!encontrado || ((encontrado.nivel || 1) === 1 && !(encontrado.zonasConquistadas?.length))) {
-        try {
-          let mejorProgreso = null;
-          let mejorNivel = 1;
-          for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith("sa_rpg_") && !key.startsWith("sa_rpg_stats_") && !key.startsWith("sa_rpg_loot_") && !key.startsWith("sa_rpg_cofres_") && !key.startsWith("sa_rpg_jefes_") && !key.startsWith("sa_rpg_loadout_") && !key.startsWith("sa_rpg_items_") && !key.startsWith("sa_rpg_habs_") && !key.startsWith("sa_rpg_encantamientos_") && !key.startsWith("sa_rpg_sets_") && !key.startsWith("sa_rpg_diario_") && !key.startsWith("sa_rpg_tamano_")) {
-              try {
-                const p = JSON.parse(localStorage.getItem(key));
-                if (p && ((p.nivel || 1) > mejorNivel || (p.zonasConquistadas?.length || 0) > 0)) {
-                  mejorNivel = p.nivel || 1;
-                  mejorProgreso = p;
-                  claveGanadora = key;
-                }
-              } catch {}
-            }
-          }
-          if (mejorProgreso) encontrado = mejorProgreso;
-        } catch {}
       }
 
       if (encontrado) {
@@ -233,7 +237,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         if (!merged.statsBase) merged.statsBase = { atk: 14, def: 5 };
         // Migrar a la clave del usuario autenticado si provenía de un fallback
         if (claveGanadora && claveGanadora !== kPrincipal && u !== "local") {
-          try { localStorage.setItem(kPrincipal, JSON.stringify(merged)); } catch {}
+          try { localStorage.setItem(kPrincipal, JSON.stringify(merged)); } catch { }
         }
         return merged;
       }
@@ -256,8 +260,15 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       const k = `sa_rpg_stats_${u}`;
       let r = localStorage.getItem(k);
       if (!r && u !== "local") {
-        r = localStorage.getItem("sa_rpg_stats_local");
-        if (r) { try { localStorage.setItem(k, r); } catch {} }
+        const userCand = getUserCandidates();
+        for (const c of userCand) {
+          const candVal = localStorage.getItem(`sa_rpg_stats_${c}`);
+          if (candVal) {
+            r = candVal;
+            try { localStorage.setItem(k, r); } catch { }
+            break;
+          }
+        }
       }
       return r ? { ...STATS_DEF, ...JSON.parse(r) } : { ...STATS_DEF };
     } catch {
@@ -307,6 +318,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const xpParaSubir = () => state.nivel >= NIVEL_MAX ? Infinity : Math.round(state.nivel * 160 + Math.pow(state.nivel, 1.8) * 35);
 
   let enemigo = null, turnoJugador = true, overlayObjetos = false;
+  let mobHordaObjetivoIdx = null;
   let buffsHeroe = [], buffsEnemigo = [];
 
   function inyectarSeccion() {
@@ -394,8 +406,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
             <span>${m.nombre}</span>
             <span class="rpg-hero-lvl">${esNivelMax ? `Nv ${NIVEL_MAX} (MÁX)` : `Nv ${state.nivel}`}</span>
             <div class="rpg-hero-stats-badges">
-              <span class="rpg-stat-badge" title="Ataque">⚔️ ${totalAtk}</span>
-              <span class="rpg-stat-badge" title="Defensa">🛡️ ${totalDef}</span>
+              <span class="rpg-stat-badge" title="Ataque">${SVG_SWORD}${totalAtk}</span>
+              <span class="rpg-stat-badge" title="Defensa">${SVG_SHIELD}${totalDef}</span>
               ${critPct > 15 ? `<span class="rpg-stat-badge" title="Crítico">⚡ ${critPct}%</span>` : ""}
               ${esqPct > 0 ? `<span class="rpg-stat-badge" title="Esquiva">💨 ${esqPct}%</span>` : ""}
             </div>
@@ -481,15 +493,15 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
             </button>
             <button type="button" class="rpg-btn-horda-opt ${currentHorda === 4 ? 'active' : ''}" data-mobs="4">
               <span class="rpg-horda-opt-num">4</span>
-              <span class="rpg-horda-opt-info"><strong>Patrulla</strong><small>+20% XP/Oro</small></span>
+              <span class="rpg-horda-opt-info"><strong>Patrulla</strong><small>+35% Oro / +25% XP</small></span>
             </button>
             <button type="button" class="rpg-btn-horda-opt ${currentHorda === 8 ? 'active' : ''}" data-mobs="8">
               <span class="rpg-horda-opt-num">8</span>
-              <span class="rpg-horda-opt-info"><strong>Horda</strong><small>+50% XP/Oro</small></span>
+              <span class="rpg-horda-opt-info"><strong>Horda</strong><small>+90% Oro / +60% XP</small></span>
             </button>
             <button type="button" class="rpg-btn-horda-opt ${currentHorda === 12 ? 'active' : ''}" data-mobs="12">
               <span class="rpg-horda-opt-num">12</span>
-              <span class="rpg-horda-opt-info"><strong>Enjambre</strong><small>+90% XP/Oro</small></span>
+              <span class="rpg-horda-opt-info"><strong>Enjambre</strong><small>+160% Oro / +110% XP</small></span>
             </button>
           </div>
         </div>
@@ -587,13 +599,19 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     let eContent = "";
     if (enemigo.esHorda && Array.isArray(enemigo.horda)) {
       const totMobs = enemigo.horda.length;
+      // Validar objetivo actual
+      if (mobHordaObjetivoIdx === null || !enemigo.horda[mobHordaObjetivoIdx] || enemigo.horda[mobHordaObjetivoIdx].hp <= 0) {
+        const primerVivo = enemigo.horda.findIndex(m => m.hp > 0);
+        mobHordaObjetivoIdx = primerVivo >= 0 ? primerVivo : 0;
+      }
       const mobsHtml = enemigo.horda.map((mob, i) => {
         const vivo = mob.hp > 0;
         let mSprKey = mob.sprite || relPath;
         if (mSprKey && mSprKey.startsWith("img/48x48/")) mSprKey = mSprKey.replace("img/48x48/", "");
         const mobSize = mob.esLider ? (totMobs >= 12 ? 42 : 48) : (totMobs >= 12 ? 34 : totMobs >= 8 ? 38 : 42);
         const mobSpr = renderMobAnimado(mSprKey, mobSize, `rpg-horda-anim ${vivo ? "" : "muerto"} ${mob.esLider ? "lider" : ""}`);
-        return `<div class="rpg-horda-item ${vivo ? "" : "caido"} ${mob.esLider ? "horda-lider" : ""}" data-horda-idx="${i}" title="${mob.nombre || enemigo.nombre} (${mob.hp}/${mob.hpMax} HP)">
+        const esSeleccionado = vivo && i === mobHordaObjetivoIdx;
+        return `<div class="rpg-horda-item ${vivo ? "" : "caido"} ${mob.esLider ? "horda-lider" : ""} ${esSeleccionado ? "objetivo-seleccionado" : ""}" data-horda-idx="${i}" title="${mob.nombre || enemigo.nombre} (${mob.hp}/${mob.hpMax} HP) - Clic para fijar objetivo">
           ${mob.esLider ? `<span class="rpg-horda-corona">👑</span>` : ""}
           ${mobSpr}
           <div class="rpg-horda-item-hp"><span style="width:${Math.max(0, (mob.hp / mob.hpMax) * 100)}%"></span></div>
@@ -601,7 +619,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       }).join("");
       eContent = `<div class="rpg-horda-container">
         <div class="rpg-horda-grid mobs-${totMobs}">${mobsHtml}</div>
-        <div class="rpg-horda-contador">Horda: ${enemigo.horda.filter(x => x.hp > 0).length}/${totMobs} vivos</div>
+        <div class="rpg-horda-contador">Horda: ${enemigo.horda.filter(x => x.hp > 0).length}/${totMobs} vivos <small style="display:block;font-size:0.75rem;opacity:.8;margin-top:2px;">(Toca un mob para atacarlo directamente)</small></div>
       </div>`;
     } else {
       const eSpriteEl = relPath ? renderMobAnimado(relPath, 92, "rpg-enemy-sprite-anim") : "";
@@ -621,8 +639,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
             <span>${m.nombre}</span>
             <span class="rpg-hero-lvl">${state.nivel >= NIVEL_MAX ? `Nv ${NIVEL_MAX} (MÁX)` : `Nv ${state.nivel}`}</span>
             <div class="rpg-hero-stats-badges">
-              <span class="rpg-stat-badge" title="Ataque">⚔️ ${totalAtkCombat}</span>
-              <span class="rpg-stat-badge" title="Defensa">🛡️ ${totalDefCombat}</span>
+              <span class="rpg-stat-badge" title="Ataque">${SVG_SWORD}${totalAtkCombat}</span>
+              <span class="rpg-stat-badge" title="Defensa">${SVG_SHIELD}${totalDefCombat}</span>
             </div>
           </div>
           <div class="rpg-barra-label"><span>HP</span><span>${Math.round(state.hp)} / ${totalHpMaxCombat}</span></div>
@@ -672,6 +690,18 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     window.hidratarIconos?.(c);
 
     qsa(".rpg-hab", c).forEach(b => b.addEventListener("click", () => usarHabilidad(b.dataset.hab)));
+    qsa(".rpg-horda-item", c).forEach(item => {
+      item.addEventListener("click", () => {
+        const idx = Number(item.dataset.hordaIdx);
+        if (enemigo && enemigo.horda && enemigo.horda[idx] && enemigo.horda[idx].hp > 0) {
+          mobHordaObjetivoIdx = idx;
+          qsa(".rpg-horda-item", c).forEach(it => it.classList.remove("objetivo-seleccionado"));
+          item.classList.add("objetivo-seleccionado");
+          log(`🎯 Objetivo fijado: ${enemigo.horda[idx].nombre} (${enemigo.horda[idx].hp}/${enemigo.horda[idx].hpMax} HP)`, "info");
+          SND("blip");
+        }
+      });
+    });
     $("#btn-objeto")?.addEventListener("click", toggleObjetos);
     $("#btn-arma-habs")?.addEventListener("click", toggleHabilidadesArma);
     $("#btn-huir")?.addEventListener("click", huir);
@@ -710,6 +740,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     state._oneshotUsado = false;
     state._segundaOportunidadUsada = false;
     state._inmuneUsado = false;
+    mobHordaObjetivoIdx = null;
     guardar(state);
 
     const eId = z.enemigos[rnd(0, z.enemigos.length - 1)];
@@ -724,14 +755,15 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const nHorda = getTamanoHorda();
     const esHorda = nHorda > 1;
 
-    // Dificultad escalada: a mayor número de mobs, combate más desafiante y mejores recompensas
-    // 1 mob: 1.0x HP, 1.0x ATK, 1.0x XP/monedas
-    // 4 mobs: 1.15x HP total, 1.20x ATK, +20% XP/monedas
-    // 8 mobs: 1.40x HP total, 1.45x ATK, +50% XP/monedas
-    // 12 mobs: 1.75x HP total, 1.75x ATK, +90% XP/monedas
+    // Dificultad escalada: a mayor número de mobs, combate más desafiante y sustancialmente más recompensas
+    // 1 mob: 1.0x HP, 1.0x ATK, 1.0x XP, 1.0x Oro
+    // 4 mobs: 1.15x HP total, 1.20x ATK, +25% XP, +35% Oro
+    // 8 mobs: 1.40x HP total, 1.45x ATK, +60% XP, +90% Oro
+    // 12 mobs: 1.75x HP total, 1.75x ATK, +110% XP, +160% Oro
     const multHP = esHorda ? (nHorda === 4 ? 1.15 : nHorda === 8 ? 1.40 : 1.75) : 1.0;
     const multATK = esHorda ? (nHorda === 4 ? 1.20 : nHorda === 8 ? 1.45 : 1.75) : 1.0;
-    const multPremio = esHorda ? (nHorda === 4 ? 1.20 : nHorda === 8 ? 1.50 : 1.90) : 1.0;
+    const multXP = esHorda ? (nHorda === 4 ? 1.25 : nHorda === 8 ? 1.60 : 2.10) : 1.0;
+    const multPremio = esHorda ? (nHorda === 4 ? 1.35 : nHorda === 8 ? 1.90 : 2.60) : 1.0;
 
     const hpFinal = Math.max(30, Math.round(hp * multHP));
     let hordaArr = null;
@@ -743,7 +775,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         const poolEscoltas = (regInfo && regInfo.elite && regInfo.elite.length) ? regInfo.elite : (z.enemigos || [eId]);
         const hpJefeParte = Math.max(20, Math.round(hpFinal * 0.40));
         const hpPorEscolta = Math.max(6, Math.round((hpFinal - hpJefeParte) / (nHorda - 1)));
-        
+
         hordaArr = Array.from({ length: nHorda }, (_, idx) => {
           if (idx === 0) {
             return {
@@ -785,7 +817,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       hpMax: esHorda ? (hordaArr.reduce((s, x) => s + x.hpMax, 0)) : hpFinal,
       hp: esHorda ? (hordaArr.reduce((s, x) => s + x.hp, 0)) : hpFinal,
       atk: Math.round(z.atk * (1 + v) * multATK),
-      xp: Math.round(z.xp * multPremio),
+      xp: Math.round(z.xp * multXP),
       monedas: Math.round(z.monedas * multPremio),
       jefe: !!z.jefe, miniJefe: !!z.miniJefe, esHorda, horda: hordaArr,
       tamanoHorda: nHorda,
@@ -856,7 +888,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const b = qs(".rpg-barra.hp > span"); if (b) b.style.width = clamp(state.hp / hpMax() * 100) + "%";
   }
 
-  function aplicarDmgEnemigo(dmg) {
+  function aplicarDmgEnemigo(dmg, esAoE = false) {
     if (!enemigo) return;
     if (enemigo.shield > 0) {
       const abs = Math.min(dmg, enemigo.shield);
@@ -866,21 +898,54 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if (enemigo.esHorda && Array.isArray(enemigo.horda)) {
       const vivos = enemigo.horda.filter(m => m.hp > 0);
       if (vivos.length > 0) {
-        // El daño de un ataque se divide entre la cantidad de enemigos vivos en el combate
-        const dmgPorMob = Math.max(1, Math.floor(dmg / vivos.length));
-        vivos.forEach(m => {
-          m.hp = Math.max(0, m.hp - dmgPorMob);
-          const el = qs(`.rpg-horda-item[data-horda-idx="${m.id}"]`);
-          if (el) {
-            const bar = el.querySelector(".rpg-horda-item-hp > span");
-            if (bar) bar.style.width = `${Math.max(0, (m.hp / m.hpMax) * 100)}%`;
-            if (m.hp <= 0) {
-              el.classList.add("caido");
-              el.querySelector(".rpg-horda-anim")?.classList.add("muerto");
+        if (esAoE) {
+          // Ataque en área: impacta de lleno a cada enemigo vivo
+          vivos.forEach(m => {
+            m.hp = Math.max(0, m.hp - dmg);
+            const el = qs(`.rpg-horda-item[data-horda-idx="${m.id}"]`);
+            if (el) {
+              const bar = el.querySelector(".rpg-horda-item-hp > span");
+              if (bar) bar.style.width = `${Math.max(0, (m.hp / m.hpMax) * 100)}%`;
+              if (m.hp <= 0) {
+                el.classList.add("caido");
+                el.classList.remove("objetivo-seleccionado");
+                el.querySelector(".rpg-horda-anim")?.classList.add("muerto");
+              }
+            }
+          });
+        } else {
+          // Ataque a un solo objetivo: golpea directamente al mob seleccionado o primer vivo
+          let target = enemigo.horda[mobHordaObjetivoIdx];
+          if (!target || target.hp <= 0) {
+            target = vivos[0];
+            mobHordaObjetivoIdx = target ? target.id : 0;
+          }
+          if (target) {
+            target.hp = Math.max(0, target.hp - dmg);
+            const el = qs(`.rpg-horda-item[data-horda-idx="${target.id}"]`);
+            if (el) {
+              const bar = el.querySelector(".rpg-horda-item-hp > span");
+              if (bar) bar.style.width = `${Math.max(0, (target.hp / target.hpMax) * 100)}%`;
+              if (target.hp <= 0) {
+                el.classList.add("caido");
+                el.classList.remove("objetivo-seleccionado");
+                el.querySelector(".rpg-horda-anim")?.classList.add("muerto");
+                log(`💀 ¡${target.nombre} ha caído!`, "critico");
+              }
             }
           }
-        });
+        }
         enemigo.hp = enemigo.horda.reduce((s, m) => s + m.hp, 0);
+
+        // Si el objetivo fijado murió, seleccionar automáticamente el siguiente vivo
+        if (mobHordaObjetivoIdx === null || !enemigo.horda[mobHordaObjetivoIdx] || enemigo.horda[mobHordaObjetivoIdx].hp <= 0) {
+          const prox = enemigo.horda.find(m => m.hp > 0);
+          if (prox) {
+            mobHordaObjetivoIdx = prox.id;
+            qsa(".rpg-horda-item").forEach(it => it.classList.remove("objetivo-seleccionado"));
+            qs(`.rpg-horda-item[data-horda-idx="${prox.id}"]`)?.classList.add("objetivo-seleccionado");
+          }
+        }
       } else {
         enemigo.hp = 0;
       }
@@ -1096,6 +1161,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     }
 
     if (hab.tipo === "daño_indirecto") {
+      const esAoE = hab.alcance === "todos";
       enemigo.dot = Math.round(enemigo.hpMax * (hab.dmgInd || 0.1));
       enemigo.dotDur = hab.dur || 3;
       if (hab.debuff) {
@@ -1106,7 +1172,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       }
       log(`☠️ ${hab.nombre}: ${enemigo.dot} dmg por ${enemigo.dotDur} turnos.`, "critico");
       const dmg0 = Math.max(1, Math.round(atkTotal() * 0.5));
-      aplicarDmgEnemigo(dmg0);
+      aplicarDmgEnemigo(dmg0, esAoE);
       floatDmg("#sprite-enemigo", "-" + dmg0, "daño");
       FX({ tipo: "attack", target: "enemy", valor: dmg0, fxKey: fxKey });
       actualizarHPs();
@@ -1116,6 +1182,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     }
 
     const hits = hab.hits || 1;
+    const esAoE = hab.alcance === "todos";
     let totalDmg = 0;
     const critBase = critTotal() + (bonusTipo("crit_pct") / 100) + (buffVal("crit") / 100);
     const atkBuffed = atkTotal() + buffVal("atk");
@@ -1127,9 +1194,9 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       if (crit) dmg = Math.round(dmg * 1.8);
       if (enemigo.jefe && tieneBonus("crit_jefe")) dmg = Math.round(dmg * (1 + bonusTipo("crit_jefe") / 100));
       dmg = Math.max(1, dmg);
-      aplicarDmgEnemigo(dmg);
+      aplicarDmgEnemigo(dmg, esAoE);
       totalDmg += dmg;
-      log((i === hits - 1 ? (crit ? "¡CRÍTICO! " : "") : "") + `${hab.nombre}${hits > 1 ? ` [${i + 1}/${hits}]` : ""}: ${dmg} daño.`, crit ? "critico" : "daño");
+      log((i === hits - 1 ? (crit ? "¡CRÍTICO! " : "") : "") + `${hab.nombre}${hits > 1 ? ` [${i + 1}/${hits}]` : ""}: ${dmg} daño${esAoE ? " (a toda la horda)" : ""}.`, crit ? "critico" : "daño");
       if (enemigo.hp <= 0) break;
     }
     floatDmg("#sprite-enemigo", "-" + totalDmg, "daño");
@@ -1155,7 +1222,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       log("🐰 ¡Brinco extra! Atacas otra vez.", "critico");
       setTimeout(() => {
         const seg = Math.max(1, Math.round(atkBuffed * 0.7));
-        aplicarDmgEnemigo(seg);
+        aplicarDmgEnemigo(seg, false);
         floatDmg("#sprite-enemigo", "-" + seg, "daño");
         FX({ tipo: "attack", target: "enemy", valor: seg, fxKey: "slash" });
         log(`Brinquito extra: ${seg} daño.`, "daño");
@@ -1600,7 +1667,99 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     setTimeout(() => s.classList.remove("atacando"), 400);
   }
 
+  function ataqueHordaSecuencial() {
+    if (!enemigo || !enemigo.esHorda || !Array.isArray(enemigo.horda)) {
+      return ataqueNormalEnemigo();
+    }
+    const vivos = enemigo.horda.filter(m => m.hp > 0);
+    if (!vivos.length) {
+      actualizarHPs();
+      return setTimeout(victoria, 400);
+    }
+
+    const nTotal = enemigo.horda.length;
+    // Factor de daño equilibrado y peligroso por mob:
+    // Con 4 mobs c/u pega ~40% del daño total, con 8 mobs c/u pega ~25%, con 12 mobs c/u pega ~20%
+    const factorDmgMob = nTotal <= 4 ? 0.40 : nTotal <= 8 ? 0.25 : 0.20;
+    const atkEnemigoBase = Math.max(1, enemigo.atk + buffsEnemigo.filter(b => b.tipo === "atk").reduce((s, b) => s + b.val, 0));
+    const defHeroe = defTotal() + buffVal("def");
+
+    let step = 0;
+    function siguienteMobAtaca() {
+      if (!enemigo || state.hp <= 0) return;
+      if (step >= vivos.length) {
+        actualizarHPs();
+        tickBuffs();
+        if (state.hp <= 0) {
+          if (comprobarPasivas("recibir-muerte", { hpAntes: 0 })) {
+            guardar(state);
+            actualizarHPs();
+            turnoJugador = true;
+            deshab(false);
+            return;
+          }
+          return setTimeout(derrota, 500);
+        }
+        turnoJugador = true;
+        deshab(false);
+        return;
+      }
+
+      const mob = vivos[step];
+      step++;
+
+      // Animación en el elemento específico del mob
+      const mobEl = qs(`.rpg-horda-item[data-horda-idx="${mob.id}"]`);
+      if (mobEl) {
+        mobEl.classList.add("mob-atacando");
+        setTimeout(() => mobEl.classList.remove("mob-atacando"), 320);
+      }
+
+      // Cálculo de daño individual del mob
+      const multLider = mob.esLider ? 1.4 : 1.0;
+      const atkJunto = Math.max(1, Math.round(atkEnemigoBase * factorDmgMob * multLider));
+      // La defensa del héroe amortigua proporcionalmente cada golpe
+      const defMitigada = Math.max(0, Math.round(defHeroe * factorDmgMob * 0.9));
+      const dmg = Math.max(1, atkJunto - defMitigada + rnd(-1, 2));
+
+      state.hp = Math.max(0, state.hp - dmg);
+      guardar(state);
+      SND("derrota");
+      log(`⚔️ ${mob.nombre}${mob.esLider ? " (Líder)" : ""}: te golpea por ${dmg} daño.`, "daño");
+      floatDmg("#sprite-heroe", `-${dmg}`, "daño");
+      FX({ tipo: "attack", target: "hero", valor: dmg, fxKey: mob.esLider ? "hammer" : "slash" });
+
+      const heroeSpr = qs("#sprite-heroe");
+      if (heroeSpr) {
+        heroeSpr.classList.add("golpeado");
+        setTimeout(() => heroeSpr.classList.remove("golpeado"), 250);
+      }
+
+      comprobarPasivas("recibir-dano", { dano: dmg, mob });
+      actualizarHPs();
+
+      if (state.hp <= 0) {
+        if (comprobarPasivas("recibir-muerte", { hpAntes: 0 })) {
+          guardar(state);
+          actualizarHPs();
+          turnoJugador = true;
+          deshab(false);
+          return;
+        }
+        return setTimeout(derrota, 500);
+      }
+
+      // Intervalo dinámico y fluido entre ataques individuales
+      setTimeout(siguienteMobAtaca, 360);
+    }
+
+    siguienteMobAtaca();
+  }
+
   function ataqueNormalEnemigo() {
+    if (enemigo.esHorda) {
+      return ataqueHordaSecuencial();
+    }
     animarAtaqueEnemigo();
     const atkEnemigo = Math.max(1, enemigo.atk + buffsEnemigo.filter(b => b.tipo === "atk").reduce((s, b) => s + b.val, 0));
     const defHeroe = defTotal() + buffVal("def");
@@ -1845,7 +2004,9 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
           <div class="rpg-fin-recompensas">
             <span class="rpg-fin-badge xp">+${datos.xp} XP</span>
             <span class="rpg-fin-badge oro">+${datos.mon} 🪙</span>
+            ${datos.cofre ? `<span class="rpg-fin-badge cofre">${datos.cofre.emoji} ${datos.cofre.nombre}</span>` : ""}
           </div>
+          ${datos.cofre ? `<div class="rpg-fin-extra" style="color:#ffd84d;">🎁 ¡El enemigo soltó un ${datos.cofre.nombre}! Ve a la pestaña 'Cofres' para abrirlo.</div>` : ""}
           ${datos.primeraVictoria ? `<div class="rpg-fin-extra">🌟 ¡Zona conquistada! Recompensa extra incluida.</div>` : ""}
           ${datos.sub > 0 ? `<div class="rpg-fin-subio"><img src="img/sprites%20complementarios/estrella.png" alt="" style="width:18px;height:18px;object-fit:contain;vertical-align:-3px;margin-right:4px;">¡Subiste a Nivel ${state.nivel}!</div>` : ""}
         ` : `
@@ -1963,15 +2124,49 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       const xpGanado = Math.max(2, Math.round(xp * 0.25));
       localStorage.setItem(kXp, String(actualXp + xpGanado));
       window.dispatchEvent(new Event("sunad:progress"));
-    } catch {}
+    } catch { }
     try { notifMascota?.("¡Victoria!", "+" + mon + " monedas · +" + xp + " XP"); } catch { }
     guardar(state);
     $("rpg-batalla")?.classList.add("ganada");
     log("¡" + nE + " derrotado! +" + xp + " XP, +" + mon + " monedas.", "info");
-    if (primeraVictoriaZona) log(`✨ ¡Zona conquistada por primera vez! +${xpPrimeraVictoria} XP y +${monedasPrimeraVictoria} monedas extra.`, "critico");
-    if (sub > 0) log("¡Subiste a nivel " + state.nivel + "!", "critico");
+    // Sistema de drop de cofres según dificultad, tier de enemigo y tamaño de horda
+    let cofreGanado = null;
+    try {
+      const RL = window.RpgLoot;
+      if (RL && RL.COFRES) {
+        const nHorda = enemigo.tamanoHorda || 1;
+        // Probabilidad base de drop de cofre:
+        // Normal: 15%, Mini-jefe: 45%, Jefe: 100%
+        // Bonus por horda: +5% (Patrulla), +12% (Horda), +25% (Enjambre)
+        let probCofre = eraJefe ? 1.0 : enemigo.miniJefe ? 0.45 : 0.15;
+        if (nHorda >= 12) probCofre += 0.25;
+        else if (nHorda >= 8) probCofre += 0.12;
+        else if (nHorda >= 4) probCofre += 0.05;
 
-    mostrarFinCombate("victoria", { nE, xp, mon, primeraVictoria: primeraVictoriaZona, sub });
+        if (Math.random() <= probCofre) {
+          // Determinar qué cofre otorgar según orden de la zona y tier
+          const zOrd = ZONAS.find(x => x.id === state.zonaActual)?.orden || 1;
+          let tipoCofre = "madera";
+          if (zOrd >= 100 || (eraJefe && zOrd >= 80)) {
+            tipoCofre = Math.random() < 0.35 ? "celestial" : "alba";
+          } else if (zOrd >= 60 || (eraJefe && zOrd >= 40)) {
+            tipoCofre = Math.random() < 0.45 ? "alba" : "dorado";
+          } else if (zOrd >= 30 || (eraJefe && zOrd >= 20) || enemigo.miniJefe) {
+            tipoCofre = Math.random() < 0.50 ? "dorado" : "hierro";
+          } else if (zOrd >= 10 || eraJefe) {
+            tipoCofre = Math.random() < 0.60 ? "hierro" : "madera";
+          }
+
+          if (RL.COFRES[tipoCofre]) {
+            RL.agregarCofreInventario?.(tipoCofre, 1);
+            cofreGanado = { tipo: tipoCofre, ...RL.COFRES[tipoCofre] };
+            log(`🎁 ¡Obtuviste un ${cofreGanado.nombre}!`, "critico");
+          }
+        }
+      }
+    } catch { }
+
+    mostrarFinCombate("victoria", { nE, xp, mon, primeraVictoria: primeraVictoriaZona, sub, cofre: cofreGanado });
   }
 
   function derrota() {

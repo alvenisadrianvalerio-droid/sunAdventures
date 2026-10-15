@@ -161,11 +161,40 @@
             // De todos tus items conseguidos, solo los 10 "más fuertes" dan stats.
             // Los demás quedan en inventario pero no aportan stats pasivos.
             const MAX_ITEMS_ACTIVOS = 10;
-            const SLOTS_KEY = () => `sa_rpg_items_activos_${window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local"}`;
+            const resolveUid = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || localStorage.getItem("sunadventures_uid") || "local";
+            const getUserCandidates = () => {
+                const list = [];
+                const uid = resolveUid();
+                if (uid && uid !== "local") list.push(uid);
+                const legacyUid = localStorage.getItem("sunadventures_uid");
+                if (legacyUid && !list.includes(legacyUid)) list.push(legacyUid);
+                const username = localStorage.getItem("sunad_username") || localStorage.getItem("sunadventures_username");
+                if (username && !list.includes(username)) list.push(username);
+                const email = window._sunUserEmail || "";
+                if (email) {
+                    const ep = email.split("@")[0];
+                    if (ep && !list.includes(ep)) list.push(ep);
+                }
+                if (!list.includes("local")) list.push("local");
+                return list;
+            };
+            const SLOTS_KEY = () => `sa_rpg_items_activos_${resolveUid()}`;
 
             function getItemsActivos() {
                 try {
-                    const raw = localStorage.getItem(SLOTS_KEY());
+                    const k = SLOTS_KEY();
+                    let raw = localStorage.getItem(k);
+                    if (!raw && resolveUid() !== "local") {
+                        const candidates = getUserCandidates();
+                        for (const c of candidates) {
+                            const fb = localStorage.getItem(`sa_rpg_items_activos_${c}`);
+                            if (fb) {
+                                raw = fb;
+                                localStorage.setItem(k, raw);
+                                break;
+                            }
+                        }
+                    }
                     return raw ? JSON.parse(raw) : null;
                 } catch { return null; }
             }
@@ -250,15 +279,23 @@
             window.addEventListener("rpg:item-obtenido", () => setTimeout(() => RL.aplicarBonus(), 200));
 
             // ─── Guardar habilidades de items ───
-            const STORAGE_HABS = () => `sa_rpg_habs_items_${window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local"}`;
+            const STORAGE_HABS = () => `sa_rpg_habs_items_${resolveUid()}`;
 
             function guardarHabs(item) {
                 if (!item || !item.habilidades?.length) return;
                 try {
-                    const raw = localStorage.getItem(STORAGE_HABS());
+                    const k = STORAGE_HABS();
+                    let raw = localStorage.getItem(k);
+                    if (!raw && resolveUid() !== "local") {
+                        const candidates = getUserCandidates();
+                        for (const c of candidates) {
+                            const fb = localStorage.getItem(`sa_rpg_habs_items_${c}`);
+                            if (fb) { raw = fb; break; }
+                        }
+                    }
                     const data = raw ? JSON.parse(raw) : {};
                     data[item.id] = item.habilidades;
-                    localStorage.setItem(STORAGE_HABS(), JSON.stringify(data));
+                    localStorage.setItem(k, JSON.stringify(data));
                 } catch (e) { console.warn(e); }
             }
 

@@ -377,6 +377,24 @@
     };
   };
 
+  // Cache en memoria para respuestas de la IA (Wikipedia, Wiktionary, Diccionario)
+  const cacheWiki = new Map();
+  const cacheDef = new Map();
+
+  // Helper de fetch no bloqueante con timeout estricto para evitar congelamientos si la red es lenta
+  async function fetchConTimeout(url, ms = 2500, opciones = {}) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms);
+    try {
+      const res = await fetch(url, { ...opciones, signal: controller.signal });
+      clearTimeout(timer);
+      return res;
+    } catch (e) {
+      clearTimeout(timer);
+      return null;
+    }
+  }
+
   // Base de conocimientos: Diccionario, Wiktionary y Wikipedia en español
   async function buscarWikipediaEs(termino) {
     if (!termino || typeof termino !== "string") return null;
@@ -387,54 +405,40 @@
 
     if (!clean || clean.length < 2) return null;
 
+    if (cacheWiki.has(clean)) {
+      return cacheWiki.get(clean);
+    }
+
     try {
-      // 1. Intentar primero búsqueda directa en la API REST de sumarios
-      const directRes = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(clean)}`);
-      if (directRes.ok) {
+      // 1. Intentar primero búsqueda directa en la API REST de sumarios con timeout
+      const directRes = await fetchConTimeout(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(clean)}`, 2200);
+      if (directRes && directRes.ok) {
         const dataDirect = await directRes.json();
         if (dataDirect.extract && dataDirect.extract.length > 25 && dataDirect.type !== "disambiguation") {
-          return { titulo: dataDirect.title, extract: dataDirect.extract };
+          const resultado = { titulo: dataDirect.title, extract: dataDirect.extract };
+          cacheWiki.set(clean, resultado);
+          return resultado;
         }
       }
 
       // 2. Buscar mediante el motor de búsqueda opensearch con coincidencia estricta de título
-      const searchRes = await fetch(`https://es.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(clean)}&limit=4&namespace=0&format=json&origin=*`);
-      if (searchRes.ok) {
+      const searchRes = await fetchConTimeout(`https://es.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(clean)}&limit=3&namespace=0&format=json&origin=*`, 2500);
+      if (searchRes && searchRes.ok) {
         const dataSearch = await searchRes.json();
         const titulos = dataSearch[1] || [];
-        for (const tit of titulos) {
+        for (const tit of titulos.slice(0, 2)) {
           if (!tit || tit.length < 2) continue;
-          // Validar que el título sea relevante al término buscado y no algo completamente tangencial
           const titNorm = tit.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
           const cleanNorm = clean.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
           if (!titNorm.includes(cleanNorm) && !cleanNorm.includes(titNorm)) continue;
 
-          const sumRes = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(tit)}`);
-          if (sumRes.ok) {
+          const sumRes = await fetchConTimeout(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(tit)}`, 2000);
+          if (sumRes && sumRes.ok) {
             const dataSum = await sumRes.json();
             if (dataSum.extract && dataSum.extract.length > 25 && dataSum.type !== "disambiguation") {
-              return { titulo: dataSum.title, extract: dataSum.extract };
-            }
-          }
-        }
-      }
-
-      // 3. Búsqueda por intitle en Wikipedia para evitar falsos positivos dentro de cómics u obras
-      const intitleRes = await fetch(`https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=intitle:${encodeURIComponent(clean)}&utf8=1&format=json&origin=*`);
-      if (intitleRes.ok) {
-        const itData = await intitleRes.json();
-        const hits = itData.query?.search || [];
-        for (const hit of hits.slice(0, 3)) {
-          if (!hit.title) continue;
-          const hitNorm = hit.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-          const cleanNorm = clean.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
-          if (!hitNorm.includes(cleanNorm) && !cleanNorm.includes(hitNorm)) continue;
-
-          const sumRes = await fetch(`https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(hit.title)}`);
-          if (sumRes.ok) {
-            const dataSum = await sumRes.json();
-            if (dataSum.extract && dataSum.extract.length > 25 && dataSum.type !== "disambiguation") {
-              return { titulo: dataSum.title, extract: dataSum.extract };
+              const resultado = { titulo: dataSum.title, extract: dataSum.extract };
+              cacheWiki.set(clean, resultado);
+              return resultado;
             }
           }
         }
@@ -442,6 +446,7 @@
     } catch (e) {
       console.warn("Error en Wikipedia ES:", e);
     }
+    cacheWiki.set(clean, null);
     return null;
   }
 
@@ -456,48 +461,62 @@
 
     if (!limpia || limpia.length < 2) return null;
 
-    // 1. Diccionario RAE / Español oficial API
+    if (cacheDef.has(limpia)) {
+      return cacheDef.get(limpia);
+    }
+
+    // 1. Diccionario RAE / Español oficial API con timeout estricto
     try {
-      const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/es/${encodeURIComponent(limpia)}`);
-      if (res.ok) {
+      const res = await fetchConTimeout(`https://api.dictionaryapi.dev/api/v2/entries/es/${encodeURIComponent(limpia)}`, 2000);
+      if (res && res.ok) {
         const datos = await res.json();
         const def = datos[0]?.meanings?.[0]?.definitions?.[0]?.definition;
-        if (def) return def;
+        if (def) {
+          cacheDef.set(limpia, def);
+          return def;
+        }
       }
     } catch {}
 
-    // 2. Diccionario Wiktionary Global (soporta palabras en japonés, inglés, francés, latín, etc.)
+    // 2. Diccionario Wiktionary Global
     try {
-      const resWik = await fetch(`https://en.wiktionary.org/api/rest_v1/page/definition/${encodeURIComponent(limpia)}`);
-      if (resWik.ok) {
+      const resWik = await fetchConTimeout(`https://en.wiktionary.org/api/rest_v1/page/definition/${encodeURIComponent(limpia)}`, 2000);
+      if (resWik && resWik.ok) {
         const dWik = await resWik.json();
-        // Buscar definición en inglés u otros idiomas
         const defs = dWik.en?.[0]?.definitions || dWik.ja?.[0]?.definitions || dWik.es?.[0]?.definitions;
         if (defs && defs.length) {
           const rawDef = defs[0].definition || "";
           const txtLimpio = rawDef.replace(/<[^>]+>/g, "").trim();
           if (txtLimpio && txtLimpio.length > 2 && !txtLimpio.includes("form-of") && !txtLimpio.includes("transcription of")) {
-            return `"${txtLimpio}" (Significado registrado en el léxico internacional/Wiktionary)`;
+            const resDef = `"${txtLimpio}" (Significado registrado en el léxico internacional/Wiktionary)`;
+            cacheDef.set(limpia, resDef);
+            return resDef;
           }
         }
       }
     } catch {}
 
-    // 3. Traducción directa con MyMemory (para palabras y modismos en otros idiomas como arigato, sayonara, merci, etc.)
+    // 3. Traducción directa con MyMemory
     try {
-      const resTrans = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(limpia)}&langpair=autodetect|es`);
-      if (resTrans.ok) {
+      const resTrans = await fetchConTimeout(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(limpia)}&langpair=autodetect|es`, 2000);
+      if (resTrans && resTrans.ok) {
         const dTrans = await resTrans.json();
         const traducido = dTrans.responseData?.translatedText;
         if (traducido && typeof traducido === "string" && traducido.toLowerCase() !== limpia && !traducido.includes("MYMEMORY WARNING")) {
-          return `Significa "${traducido}". Es una expresión o término común proveniente de su idioma original.`;
+          const resTra = `Significa "${traducido}". Es una expresión o término común proveniente de su idioma original.`;
+          cacheDef.set(limpia, resTra);
+          return resTra;
         }
       }
     } catch {}
 
-    // 4. Si no es un término lingüístico simple, buscar extracto enciclopédico seguro en Wikipedia
+    // 4. Fallback a Wikipedia en español
     const wiki = await buscarWikipediaEs(limpia);
-    if (wiki) return wiki.extract;
+    if (wiki) {
+      cacheDef.set(limpia, wiki.extract);
+      return wiki.extract;
+    }
+    cacheDef.set(limpia, null);
     return null;
   }
 
@@ -1756,12 +1775,32 @@ Tengo soporte técnico para:
         }
         renderMensajeMascotaIA(original, true);
         
-        // Simular pensamiento/escritura y generar respuesta con IA + Base de conocimiento
+        // Indicador visual no bloqueante de "pensando..."
+        const indicadorEscribiendo = document.createElement("article");
+        indicadorEscribiendo.className = "chat-message chat-message-typing";
+        const m = getMascotaEquipada();
+        indicadorEscribiendo.innerHTML = `
+          <div class="chat-message-header">
+            <div class="chat-message-avatar"><img src="${m.imagen}" alt="${m.nombre}"></div>
+            <span class="chat-message-nombre">${m.nombre}</span>
+          </div>
+          <p style="opacity:.6;font-style:italic;">${m.nombre} está pensando...</p>
+        `;
+        chatMessages?.appendChild(indicadorEscribiendo);
+        if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Procesar de forma asíncrona sin congelar la UI
         setTimeout(async () => {
-          const resp = await generarRespuestaMascotaIA(original);
-          renderMensajeMascotaIA(resp, false);
-          try { window._snd?.("pop"); } catch {}
-        }, 350);
+          try {
+            const resp = await generarRespuestaMascotaIA(original);
+            indicadorEscribiendo.remove();
+            renderMensajeMascotaIA(resp, false);
+            try { window._snd?.("pop"); } catch {}
+          } catch (err) {
+            indicadorEscribiendo.remove();
+            renderMensajeMascotaIA({ id: "err_" + Date.now(), texto: "Disculpa, tuve un tropiezo procesando tu mensaje. ¿Puedes preguntarme de nuevo?", autoEval: 0.5 }, false);
+          }
+        }, 50);
         return;
       }
 

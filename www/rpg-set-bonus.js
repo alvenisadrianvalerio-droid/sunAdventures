@@ -92,9 +92,10 @@
     };
 
     // ---------- Aplicar/actualizar sets en localStorage ----------
+    const resolveUid = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || localStorage.getItem("sunadventures_uid") || "local";
     function aplicarSets() {
         const sets = setsActivos();
-        const u = window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local";
+        const u = resolveUid();
         const key = `sa_rpg_sets_${u}`;
 
         // Guardar sets activos

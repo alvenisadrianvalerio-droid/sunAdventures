@@ -24,12 +24,42 @@
     function ejecutar() {
 
     const MAX_HABS = 4;
-    const SLOT_KEY = () => `sa_rpg_loadout_${window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local"}`;
+    const resolveUid = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || localStorage.getItem("sunadventures_uid") || "local";
+    const getUserCandidates = () => {
+        const list = [];
+        const uid = resolveUid();
+        if (uid && uid !== "local") list.push(uid);
+        const legacyUid = localStorage.getItem("sunadventures_uid");
+        if (legacyUid && !list.includes(legacyUid)) list.push(legacyUid);
+        const username = localStorage.getItem("sunad_username") || localStorage.getItem("sunadventures_username");
+        if (username && !list.includes(username)) list.push(username);
+        const email = window._sunUserEmail || "";
+        if (email) {
+            const ep = email.split("@")[0];
+            if (ep && !list.includes(ep)) list.push(ep);
+        }
+        if (!list.includes("local")) list.push("local");
+        return list;
+    };
+    const SLOT_KEY = () => `sa_rpg_loadout_${resolveUid()}`;
 
     // ─── Obtener loadout guardado ───
     function getLoadout() {
         try {
-            return JSON.parse(localStorage.getItem(SLOT_KEY()) || "[]").slice(0, MAX_HABS);
+            const k = SLOT_KEY();
+            let raw = localStorage.getItem(k);
+            if (!raw && resolveUid() !== "local") {
+                const candidates = getUserCandidates();
+                for (const c of candidates) {
+                    const fb = localStorage.getItem(`sa_rpg_loadout_${c}`);
+                    if (fb) {
+                        raw = fb;
+                        localStorage.setItem(k, raw);
+                        break;
+                    }
+                }
+            }
+            return JSON.parse(raw || "[]").slice(0, MAX_HABS);
         } catch { return []; }
     }
 

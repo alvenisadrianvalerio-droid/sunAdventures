@@ -38,24 +38,80 @@
 
   /* ---------- Persistencia ---------- */
   const resolveUid = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || localStorage.getItem("sunadventures_uid") || (typeof getUserId === "function" ? getUserId() : "local");
+  const getUserCandidates = () => {
+    const list = [];
+    const uid = window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || (typeof getUserId === "function" ? getUserId() : null);
+    if (uid && uid !== "local") list.push(uid);
+
+    const legacyUid = localStorage.getItem("sunadventures_uid");
+    if (legacyUid && !list.includes(legacyUid)) list.push(legacyUid);
+
+    const username = localStorage.getItem("sunad_username") || localStorage.getItem("sunadventures_username");
+    if (username && !list.includes(username)) list.push(username);
+
+    const email = window._sunUserEmail || "";
+    if (email) {
+      const emailPrefix = email.split("@")[0];
+      if (emailPrefix && !list.includes(emailPrefix)) list.push(emailPrefix);
+    }
+
+    if (!list.includes("local")) list.push("local");
+    return list;
+  };
+
   const K = {
     loot:   () => "sa_rpg_loot_"   + resolveUid(),
     stats:  () => "sa_rpg_stats_"  + resolveUid(),
     rpg:    () => "sa_rpg_"        + resolveUid(),
-    cofres: () => "sa_rpg_cofres_" + resolveUid()
+    cofres:    () => "sa_rpg_cofres_"     + resolveUid(),
+    invCofres: () => "sa_rpg_inv_cofres_" + resolveUid()
   };
   const load  = (k, def) => { try { return JSON.parse(localStorage.getItem(k) || def); } catch { return JSON.parse(def); } };
   const save  = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+
+  const cargarInvCofres = () => {
+    const u = resolveUid();
+    const k = K.invCofres();
+    let inv = load(k, null);
+    if ((!inv || Object.values(inv).every(v => !v)) && u !== "local") {
+      const candidates = getUserCandidates();
+      for (const cand of candidates) {
+        const fb = load(`sa_rpg_inv_cofres_${cand}`, null);
+        if (fb && Object.values(fb).some(v => v > 0)) {
+          inv = fb;
+          save(k, inv);
+          break;
+        }
+      }
+    }
+    return inv || { madera: 0, hierro: 0, dorado: 0, alba: 0, celestial: 0 };
+  };
+  const guardarInvCofres = o => save(K.invCofres(), o);
+
+  function agregarCofreInventario(tipo, cant = 1) {
+    if (!COFRES[tipo]) return;
+    const inv = cargarInvCofres();
+    inv[tipo] = Math.max(0, (inv[tipo] || 0) + cant);
+    guardarInvCofres(inv);
+    try {
+      renderCofres();
+    } catch {}
+    return inv[tipo];
+  }
 
   const cargarLoot = () => {
     const u = resolveUid();
     const kPrincipal = K.loot();
     let l = load(kPrincipal, null);
     if ((!l || Object.keys(l).length === 0) && u !== "local") {
-      const fallbackLocal = load("sa_rpg_loot_local", null);
-      if (fallbackLocal && Object.keys(fallbackLocal).length > 0) {
-        l = fallbackLocal;
-        save(kPrincipal, l);
+      const candidates = getUserCandidates();
+      for (const cand of candidates) {
+        const fb = load(`sa_rpg_loot_${cand}`, null);
+        if (fb && Object.keys(fb).length > 0) {
+          l = fb;
+          save(kPrincipal, l);
+          break;
+        }
       }
     }
     return l || {};
@@ -67,10 +123,14 @@
     const kPrincipal = K.stats();
     let s = load(kPrincipal, null);
     if ((!s || (!s.atkBonus && !s.defBonus && !s.hpBonus)) && u !== "local") {
-      const fallbackLocal = load("sa_rpg_stats_local", null);
-      if (fallbackLocal && (fallbackLocal.atkBonus || fallbackLocal.defBonus || fallbackLocal.hpBonus)) {
-        s = fallbackLocal;
-        save(kPrincipal, s);
+      const candidates = getUserCandidates();
+      for (const cand of candidates) {
+        const fb = load(`sa_rpg_stats_${cand}`, null);
+        if (fb && (fb.atkBonus || fb.defBonus || fb.hpBonus)) {
+          s = fb;
+          save(kPrincipal, s);
+          break;
+        }
       }
     }
     return s || { atkBonus: 0, defBonus: 0, hpBonus: 0 };
@@ -104,41 +164,41 @@
 
   /* ---------- Cofres (con sprites) ---------- */
   const COFRES = {
-    // Orden visual correcto: madera (marrón), hierro (verdoso), dorado (dorado)
+    // Orden visual correcto: madera (marrón), hierro (verdoso), dorado (dorado), alba (rosa), celestial (dorado estelar)
     madera: {
-      nombre:"Cofre de Madera", precio:500,
-      rarBoosts:{comun:.70,raro:.22,epico:.065,legendario:.013,mitico:.002},
-      calBoosts:{normal:.78,reforzado:.18,impecable:.035,ancestral:.005},
+      nombre:"Cofre de Madera", precio:180,
+      rarBoosts:{comun:.68,raro:.24,epico:.065,legendario:.013,mitico:.002},
+      calBoosts:{normal:.75,reforzado:.20,impecable:.045,ancestral:.005},
       emoji:"📦", imagen:"img/rpg/items/cofre-madera.png?v=2", color:"#a0522d",
-      cantMin:1, cantMax:2
+      cantMin:1, cantMax:3, oroMin:25, oroMax:75
     },
     hierro: {
-      nombre:"Cofre de Hierro", precio:3000,
-      rarBoosts:{comun:.55,raro:.30,epico:.115,legendario:.03,mitico:.005},
-      calBoosts:{normal:.62,reforzado:.26,impecable:.10,ancestral:.02},
+      nombre:"Cofre de Hierro", precio:850,
+      rarBoosts:{comun:.48,raro:.34,epico:.14,legendario:.035,mitico:.005},
+      calBoosts:{normal:.58,reforzado:.28,impecable:.11,ancestral:.03},
       emoji:"🗃️", imagen:"img/rpg/items/cofre-hierro.png?v=2", color:"#718093",
-      cantMin:2, cantMax:3
+      cantMin:2, cantMax:4, oroMin:100, oroMax:280
     },
     dorado: {
-      nombre:"Cofre Dorado", precio:15000,
-      rarBoosts:{comun:.35,raro:.35,epico:.20,legendario:.085,mitico:.015},
-      calBoosts:{normal:.42,reforzado:.33,impecable:.20,ancestral:.05},
+      nombre:"Cofre Dorado", precio:3800,
+      rarBoosts:{comun:.25,raro:.38,epico:.24,legendario:.11,mitico:.02},
+      calBoosts:{normal:.35,reforzado:.35,impecable:.23,ancestral:.07},
       emoji:"🏆", imagen:"img/rpg/items/cofre-dorado.png?v=2", color:"#ffd93d",
-      cantMin:3, cantMax:5
+      cantMin:3, cantMax:6, oroMin:450, oroMax:1200
     },
     alba: {
-      nombre:"Cofre del Alba", precio:75000,
-      rarBoosts:{comun:.15,raro:.30,epico:.33,legendario:.18,mitico:.04},
-      calBoosts:{normal:.15,reforzado:.30,impecable:.38,ancestral:.17},
+      nombre:"Cofre del Alba", precio:18000,
+      rarBoosts:{comun:.08,raro:.26,epico:.38,legendario:.22,mitico:.06},
+      calBoosts:{normal:.10,reforzado:.28,impecable:.42,ancestral:.20},
       emoji:"🌟", imagen:"img/rpg/items/cofre-alba.png?v=6", color:"#ff6b9d",
-      cantMin:5, cantMax:7
+      cantMin:5, cantMax:8, oroMin:2200, oroMax:5500
     },
     celestial: {
-      nombre:"Cofre Celestial", precio:400000,
-      rarBoosts:{comun:.03,raro:.15,epico:.35,legendario:.37,mitico:.10},
-      calBoosts:{normal:.05,reforzado:.15,impecable:.42,ancestral:.38},
+      nombre:"Cofre Celestial", precio:95000,
+      rarBoosts:{comun:.01,raro:.10,epico:.34,legendario:.40,mitico:.15},
+      calBoosts:{normal:.03,reforzado:.12,impecable:.43,ancestral:.42},
       emoji:"☀️", imagen:"img/rpg/items/cofre-celestial.png?v=6", color:"#fff5b8",
-      cantMin:7, cantMax:10
+      cantMin:7, cantMax:12, oroMin:12000, oroMax:30000
     }
   };
 
@@ -736,11 +796,20 @@
     return false;
   }
 
-  function abrirCofre(tipo, cant, conLlave = false) {
+  function abrirCofre(tipo, cant, conLlave = false, desdeInventario = false) {
     cant = cant || 1;
     const def = COFRES[tipo]; if (!def) return;
 
-    if (conLlave) {
+    if (desdeInventario) {
+      const inv = cargarInvCofres();
+      if ((inv[tipo] || 0) < cant) {
+        SND("error");
+        notifMascota?.("Sin cofres", `No tienes suficientes cofres de ${def.nombre}`);
+        return;
+      }
+      inv[tipo] -= cant;
+      guardarInvCofres(inv);
+    } else if (conLlave) {
       const exito = consumirLlaveParaCofre(tipo);
       if (!exito) {
         SND("error");
@@ -759,19 +828,27 @@
     const loot = cargarLoot();
     items.forEach(it => { loot[it.id] = (loot[it.id] || 0) + 1; if (!it.consumible) aplicarBonus(it); });
     guardarLoot(loot);
+
+    // Recompensa de oro económica por cofre
+    let oroGanado = 0;
+    if (def.oroMin && def.oroMax) {
+      for (let i = 0; i < cant; i++) oroGanado += rnd(def.oroMin, def.oroMax);
+      if (oroGanado > 0) setMonedas(getMonedas() + oroGanado);
+    }
+
     try {
       localStorage.setItem(K.cofres(), String(Number(localStorage.getItem(K.cofres()) || 0) + cant));
       window.dispatchEvent(new Event("sunad:progress"));
     } catch {}
-    mostrarModalCofre(def, items);
+    mostrarModalCofre(def, items, oroGanado);
     renderColeccion();
     renderCofres();
     const top = items.some(it => it.rar === "legendario" || it.rar === "mitico");
     SND(top ? "victoria" : "sparkle");
-    notifMascota?.("¡Cofre Abierto!", `+${items.length} items del ${def.nombre}`);
+    notifMascota?.("¡Cofre Abierto!", `+${items.length} items y +${oroGanado} 🪙 del ${def.nombre}`);
   }
 
-  function mostrarModalCofre(def, items) {
+  function mostrarModalCofre(def, items, oroGanado = 0) {
     let m = $("loot-cofre-modal");
     if (!m) { m = document.createElement("div"); m.id = "loot-cofre-modal"; m.className = "loot-cofre-modal"; document.body.appendChild(m); }
     const visualCab = def.imagen
@@ -783,7 +860,14 @@
       const v = it.valFinal || it.val;
       html += `<div class="loot-cofre-item rar-${it.rar}"><div class="loot-cofre-item-sprite">${renderIcono(it, "48px")}</div><span class="loot-cofre-item-name">${it.nombre}</span><span class="loot-cofre-item-rar">${RAREZAS[it.rar].label}</span><span class="loot-cal-badge cal-${it.calidad || "normal"}">${cal.icon} ${cal.label}</span><span class="loot-cofre-item-val">+${v} ${it.tipo.toUpperCase()}</span></div>`;
     });
-    m.innerHTML = `<div class="loot-cofre-panel"><div class="loot-cofre-header">${visualCab}<h3 class="loot-cofre-titulo">${def.nombre} Abierto</h3><button class="rpg-loot-modal-close">×</button></div><p class="loot-cofre-sub">¡Obtuviste <strong>${items.length}</strong> items!</p><div class="loot-cofre-items">${html}</div><button class="rpg-loot-usar" style="margin-top:1rem" id="btn-cerrar-cofre">¡Genial!</button></div>`;
+    m.innerHTML = `
+      <div class="loot-cofre-panel">
+        <div class="loot-cofre-header">${visualCab}<h3 class="loot-cofre-titulo">${def.nombre} Abierto</h3><button class="rpg-loot-modal-close">×</button></div>
+        <p class="loot-cofre-sub">¡Obtuviste <strong>${items.length}</strong> items!</p>
+        ${oroGanado > 0 ? `<div style="text-align:center;margin:0.4rem 0 0.8rem;background:linear-gradient(135deg,rgba(255,217,61,0.15),rgba(255,160,0,0.22));border:1px solid rgba(255,217,61,0.4);border-radius:10px;padding:0.45rem 0.8rem;color:#ffd84d;font-weight:900;font-size:1.05rem;box-shadow:0 3px 12px rgba(255,217,61,0.18);display:inline-flex;align-items:center;gap:6px;justify-content:center;width:100%;box-sizing:border-box;"><span data-icono="moneda"></span> +${oroGanado} Monedas de Oro</div>` : ""}
+        <div class="loot-cofre-items">${html}</div>
+        <button class="rpg-loot-usar" style="margin-top:1rem" id="btn-cerrar-cofre">¡Genial!</button>
+      </div>`;
     m.classList.add("active");
     if (window.hidratarIconos) window.hidratarIconos(m);
     m.onclick = e => { if (e.target === m || e.target.classList.contains("rpg-loot-modal-close") || e.target.id === "btn-cerrar-cofre") m.classList.remove("active"); };
@@ -884,6 +968,9 @@
     const c = document.querySelector('[data-rpg-panel="cofres"]');
     if (!c) return;
     const llaves = getLlavesDisponibles();
+    const invCofres = cargarInvCofres();
+    const totalEnInventario = Object.values(invCofres).reduce((a, b) => a + (b || 0), 0);
+
     const grid = Object.entries(COFRES).map(([tipo, def]) => {
       const visual = def.imagen
         ? `<img class="rpg-cofre-img" src="${def.imagen}" alt="${def.nombre}" loading="lazy">`
@@ -907,32 +994,54 @@
         </button>`;
       }
 
+      const cantInv = invCofres[tipo] || 0;
+      let botonInvHtml = "";
+      if (cantInv > 0) {
+        botonInvHtml = `<button class="rpg-cofre-btn rpg-cofre-inv-btn" data-tipo="${tipo}" style="background:linear-gradient(135deg,#4dd48e,#26aa68);color:#0e2a1b;font-weight:900;border:none;box-shadow:0 3px 12px rgba(77,212,142,0.35);">
+          🎁 Abrir Gratis (${cantInv} en botín)
+        </button>`;
+      }
+
       return `<div class="rpg-cofre-card" data-tipo="${tipo}" style="--cofre-color:${def.color}">
+        ${cantInv > 0 ? `<div style="position:absolute;top:8px;right:8px;background:rgba(77,212,142,0.9);color:#0a2014;font-size:0.7rem;font-weight:900;padding:2px 7px;border-radius:12px;box-shadow:0 2px 6px rgba(0,0,0,0.3);letter-spacing:0.3px;">×${cantInv} DISPONIBLE${cantInv > 1 ? 'S' : ''}</div>` : ""}
         ${visual}
         <span class="rpg-cofre-nombre">${def.nombre}</span>
         <span class="rpg-cofre-precio"><span data-icono="moneda"></span> ${def.precio}</span>
+        <div style="font-size:0.73rem;color:rgba(255,255,255,0.7);margin-top:-2px;margin-bottom:6px;">Otorga: ${def.cantMin}-${def.cantMax} ítems + 🪙 ${def.oroMin}-${def.oroMax}</div>
         <div class="rpg-cofre-acciones">
-          <button class="rpg-cofre-btn" data-tipo="${tipo}">Abrir (🪙)</button>
+          ${botonInvHtml}
+          <button class="rpg-cofre-btn" data-tipo="${tipo}">Comprar y Abrir (🪙)</button>
           ${botonLlaveHtml}
         </div>
       </div>`;
     }).join("");
     const svgCofreRegalo = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;display:inline-block;vertical-align:-3px;margin-right:6px;color:var(--accent,#ffd93d);"><path d="M20 12v10H4V12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>`;
-    c.innerHTML = `<div class="rpg-coleccion-header"><span class="rpg-coleccion-titulo">${svgCofreRegalo}Cofres</span><span class="rpg-coleccion-count">Ábrelos para conseguir botín</span></div><div class="rpg-barra-cofres-grid">${grid}</div>`;
+    c.innerHTML = `<div class="rpg-coleccion-header">
+      <span class="rpg-coleccion-titulo">${svgCofreRegalo}Cofres</span>
+      <span class="rpg-coleccion-count">${totalEnInventario > 0 ? `🎁 ${totalEnInventario} cofre${totalEnInventario > 1 ? 's' : ''} en botín` : 'Ábrelos para conseguir botín y oro'}</span>
+    </div>
+    <div class="rpg-barra-cofres-grid">${grid}</div>`;
     if (window.hidratarIconos) window.hidratarIconos(c);
 
-    qsa(".rpg-cofre-btn:not(.rpg-cofre-llave-btn)", c).forEach(b => b.addEventListener("click", () => {
+    qsa(".rpg-cofre-inv-btn", c).forEach(b => b.addEventListener("click", () => {
       const t = b.dataset.tipo;
       b.classList.add("shake");
       setTimeout(() => b.classList.remove("shake"), 600);
-      setTimeout(() => abrirCofre(t, 1, false), 300);
+      setTimeout(() => abrirCofre(t, 1, false, true), 300);
+    }));
+
+    qsa(".rpg-cofre-btn:not(.rpg-cofre-llave-btn):not(.rpg-cofre-inv-btn)", c).forEach(b => b.addEventListener("click", () => {
+      const t = b.dataset.tipo;
+      b.classList.add("shake");
+      setTimeout(() => b.classList.remove("shake"), 600);
+      setTimeout(() => abrirCofre(t, 1, false, false), 300);
     }));
 
     qsa(".rpg-cofre-llave-btn", c).forEach(b => b.addEventListener("click", () => {
       const t = b.dataset.tipo;
       b.classList.add("shake");
       setTimeout(() => b.classList.remove("shake"), 600);
-      setTimeout(() => abrirCofre(t, 1, true), 300);
+      setTimeout(() => abrirCofre(t, 1, true, false), 300);
     }));
   }
 
@@ -971,6 +1080,7 @@
     POOL, SHEETS, RAREZAS, CALIDADES, COFRES, COSTO_REROLL,
     ORDEN_RAREZAS, PROB_REROLL_RAREZA,
     cargarLoot, guardarLoot, cargarStats, guardarStats,
+    cargarInvCofres, guardarInvCofres, agregarCofreInventario,
     usarConsumible, getConsumibles,
     mostrarDetalleItem, mostrarPopup, renderIcono,
     renderColeccion, renderCofres, abrirCofre,
