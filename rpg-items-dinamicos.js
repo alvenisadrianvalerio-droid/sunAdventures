@@ -63,7 +63,6 @@
                 rayo: 0.90,
                 veneno: 0.90,
                 vel: 0.65,
-                mana: 0.65,
                 suerte: 0.45
             };
 
@@ -203,55 +202,74 @@
             }
 
             // ─── Calcular stats totales de items conseguidos ───
+            // Todos los items obtenidos en el botín aportan sus estadísticas pasivas.
             function calcularStatsDeItems() {
                 const loot = RL.cargarLoot();
                 const ids = Object.keys(loot);
 
-                // Ordenar por "score" para coger los más fuertes
                 const items = ids
-                    .map(id => RL.POOL.find(p => p.id === id))
+                    .map(id => {
+                        const base = RL.POOL.find(p => p.id === id);
+                        if (!base) return null;
+                        const cant = Math.max(1, Number(loot[id]) || 1);
+                        return { ...base, cantidad: cant };
+                    })
                     .filter(Boolean)
                     .filter(it => !it.consumible);
 
-                // Score = rareza + suma de stats
-                const score = it => {
-                    const rarScore = { comun: 1, raro: 2, epico: 3, legendario: 4, mitico: 5, tornasol: 6 }[it.rar] || 1;
-                    const statScore = Object.values(it.stats || {}).reduce((s, v) => s + Math.abs(v), 0) / 20;
-                    return rarScore * 100 + statScore;
-                };
-
-                items.sort((a, b) => score(b) - score(a));
-                const activos = items.slice(0, MAX_ITEMS_ACTIVOS);
-
-                // Sumar stats
+                // Sumar stats de todos los items acumulados por cantidad
                 const total = {
                     atkBonus: 0, defBonus: 0, hpBonus: 0, critBonus: 0, esqBonus: 0,
-                    velBonus: 0, manaBonus: 0, lifestealBonus: 0, thornsBonus: 0,
+                    velBonus: 0, lifestealBonus: 0, thornsBonus: 0,
                     regenBonus: 0, xpBonus: 0, oroBonus: 0, suerteBonus: 0,
                     fuegoBonus: 0, hieloBonus: 0, rayoBonus: 0, venenoBonus: 0
                 };
 
                 const STATS_MAP = {
                     atk: "atkBonus", def: "defBonus", hp: "hpBonus",
-                    crit: "critBonus", esq: "esqBonus", vel: "velBonus", mana: "manaBonus",
+                    crit: "critBonus", esq: "esqBonus", vel: "velBonus",
                     lifesteal: "lifestealBonus", thorns: "thornsBonus", regen: "regenBonus",
                     xp: "xpBonus", oro: "oroBonus", suerte: "suerteBonus",
                     fuego: "fuegoBonus", hielo: "hieloBonus", rayo: "rayoBonus", veneno: "venenoBonus"
                 };
 
-                activos.forEach(item => {
-                    Object.entries(item.stats || {}).forEach(([key, val]) => {
-                        const campo = STATS_MAP[key];
-                        if (!campo) return;
-                        total[campo] += val;
-                    });
+                items.forEach(item => {
+                    const cant = item.cantidad || 1;
+                    if (item.stats && Object.keys(item.stats).length > 0) {
+                        Object.entries(item.stats).forEach(([key, val]) => {
+                            const campo = STATS_MAP[key];
+                            if (!campo) return;
+                            total[campo] += (Number(val) || 0) * cant;
+                        });
+                    } else if (item.tipo && STATS_MAP[item.tipo]) {
+                        const campo = STATS_MAP[item.tipo];
+                        const val = item.valFinal || item.val || 0;
+                        total[campo] += (Number(val) || 0) * cant;
+                    }
                 });
 
-                return { total, activos, totalItems: items.length };
+                // Incluir encantamientos si existen
+                try {
+                    const encData = window.RpgEncantamiento?.cargarEncantamientos?.() || {};
+                    Object.values(encData).forEach(lista => {
+                        if (Array.isArray(lista)) {
+                            lista.forEach(enc => {
+                                const campo = STATS_MAP[enc.id];
+                                if (campo && enc.valor) {
+                                    total[campo] += Number(enc.valor) || 0;
+                                }
+                            });
+                        }
+                    });
+                } catch (e) {
+                    console.warn("Error leyendo encantamientos:", e);
+                }
+
+                return { total, activos: items, totalItems: items.length };
             }
 
             // ─── Sobrescribir aplicarBonus / quitarBonus ───
-            // Ya no se aplica/resta item por item. Se recalcula todo de cero.
+            // Recalcula los stats en base a todos los objetos coleccionados
             RL.aplicarBonus = function () {
                 const { total } = calcularStatsDeItems();
                 RL.guardarStats(total);

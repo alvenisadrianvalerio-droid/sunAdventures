@@ -584,17 +584,22 @@ body.light .album-seleccion-bar {
 
 .polaroid:fullscreen,
 .polaroid:-webkit-full-screen {
-  background: rgba(15, 16, 22, .98);
-  max-width: 100%;
-  width: 100%;
-  height: 100%;
-  padding: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  content-visibility: visible;
-  contain: none;
+  background: radial-gradient(circle at center, rgba(28, 30, 42, 0.98) 0%, rgba(10, 11, 16, 0.99) 100%) !important;
+  max-width: 100vw !important;
+  width: 100vw !important;
+  max-height: 100vh !important;
+  height: 100vh !important;
+  padding: 1.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  content-visibility: visible !important;
+  contain: none !important;
+  overflow: hidden !important;
+  transform: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
 .polaroid:fullscreen::before,
@@ -630,10 +635,10 @@ body.light .album-seleccion-bar {
 .polaroid:fullscreen .polaroid-edit,
 .polaroid:-webkit-full-screen .polaroid-edit {
   position: fixed !important;
-  top: 1.5rem !important;
-  left: 1.5rem !important;
-  width: 48px !important;
-  height: 48px !important;
+  top: max(1.2rem, env(safe-area-inset-top, 1.2rem)) !important;
+  left: max(1.2rem, env(safe-area-inset-left, 1.2rem)) !important;
+  width: 46px !important;
+  height: 46px !important;
   border-radius: 50% !important;
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.85), rgba(37, 99, 235, 0.95)) !important;
   backdrop-filter: blur(16px) !important;
@@ -672,10 +677,10 @@ body.light .album-seleccion-bar {
 .polaroid:fullscreen .polaroid-close,
 .polaroid:-webkit-full-screen .polaroid-close {
   position: fixed !important;
-  top: 1.5rem !important;
-  right: 1.5rem !important;
-  width: 48px !important;
-  height: 48px !important;
+  top: max(1.2rem, env(safe-area-inset-top, 1.2rem)) !important;
+  right: max(1.2rem, env(safe-area-inset-right, 1.2rem)) !important;
+  width: 46px !important;
+  height: 46px !important;
   border-radius: 50% !important;
   background: rgba(255, 255, 255, 0.15) !important;
   backdrop-filter: blur(16px) !important;
@@ -711,37 +716,56 @@ body.light .album-seleccion-bar {
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
-.polaroid:fullscreen .polaroid-visual {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 1100px
+.polaroid:fullscreen .polaroid-visual,
+.polaroid:-webkit-full-screen .polaroid-visual {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2rem !important;
+  width: 100% !important;
+  max-width: 1200px !important;
+  max-height: 90vh !important;
+  box-sizing: border-box !important;
 }
 
-.polaroid:fullscreen img {
-  max-width: min(68vw, 860px);
-  max-height: 72vh;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  display: block;
-  border-radius: 10px
+.polaroid:fullscreen img,
+.polaroid:-webkit-full-screen img {
+  max-width: min(68vw, 860px) !important;
+  max-height: 80vh !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+  border-radius: 14px !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+  background: transparent !important;
 }
 
 .polaroid:fullscreen .polaroid-nota,
 .polaroid:fullscreen .polaroid-fecha,
-.polaroid:fullscreen .polaroid-nota p {
-  color: #fff
+.polaroid:fullscreen .polaroid-nota p,
+.polaroid:-webkit-full-screen .polaroid-nota,
+.polaroid:-webkit-full-screen .polaroid-fecha,
+.polaroid:-webkit-full-screen .polaroid-nota p {
+  color: #fff !important;
 }
 
-.polaroid:fullscreen .polaroid-nota {
-  max-width: 260px;
-  text-align: left;
-  padding: 1rem 1.1rem;
-  background: rgba(255, 255, 255, .04);
-  border-radius: 12px
+.polaroid:fullscreen .polaroid-nota,
+.polaroid:-webkit-full-screen .polaroid-nota {
+  max-width: 320px !important;
+  width: 100% !important;
+  text-align: left !important;
+  padding: 1.25rem 1.4rem !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
+  box-sizing: border-box !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
 }
 
 .polaroid-nota {
@@ -9049,9 +9073,61 @@ body:has(.modal.active) .shop-bubble {
     transition: transform 0.12s ease;
   }
 
-  /* Si está en fullscreen nativo, mostrar todo normal */
-  .album-grid .polaroid:fullscreen .polaroid-nota p {
+  /* Si está en fullscreen nativo o móvil, desplegar nota y visual perfectamente */
+  .album-grid .polaroid:fullscreen .polaroid-nota p,
+  .album-grid .polaroid:-webkit-full-screen .polaroid-nota p {
     display: block !important;
+  }
+
+  .polaroid:fullscreen,
+  .polaroid:-webkit-full-screen {
+    padding: 0.75rem !important;
+  }
+
+  .polaroid:fullscreen .polaroid-visual,
+  .polaroid:-webkit-full-screen .polaroid-visual {
+    flex-direction: column !important;
+    gap: 1rem !important;
+    max-height: 86vh !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .polaroid:fullscreen img,
+  .polaroid:-webkit-full-screen img {
+    max-width: 90vw !important;
+    max-height: 58vh !important;
+    object-fit: contain !important;
+    border-radius: 12px !important;
+  }
+
+  .polaroid:fullscreen .polaroid-nota,
+  .polaroid:-webkit-full-screen .polaroid-nota {
+    max-width: 92vw !important;
+    width: 92vw !important;
+    max-height: 24vh !important;
+    padding: 0.85rem 1rem !important;
+    border-radius: 14px !important;
+    background: rgba(20, 22, 32, 0.75) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    text-align: center !important;
+  }
+
+  .polaroid:fullscreen .polaroid-fecha,
+  .polaroid:-webkit-full-screen .polaroid-fecha {
+    font-size: 0.75rem !important;
+    margin-bottom: 0.3rem !important;
+    color: #ffd93d !important;
+  }
+
+  .polaroid:fullscreen .polaroid-nota p,
+  .polaroid:-webkit-full-screen .polaroid-nota p {
+    font-size: 0.85rem !important;
+    line-height: 1.4 !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    margin: 0 !important;
   }
 }
 
@@ -9063,21 +9139,21 @@ body:has(.modal.active) .shop-bubble {
   position: fixed !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
-  width: 48px !important;
-  height: 48px !important;
+  width: 52px !important;
+  height: 52px !important;
   border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.12) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08)) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
   color: #fff !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
   z-index: 1000 !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
-  transition: all 0.22s ease !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.5) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
   user-select: none !important;
   -webkit-user-select: none !important;
   touch-action: manipulation;
@@ -9085,48 +9161,69 @@ body:has(.modal.active) .shop-bubble {
 
 .polaroid:fullscreen .polaroid-nav-arrow:hover,
 .polaroid:-webkit-full-screen .polaroid-nav-arrow:hover {
-  transform: translateY(-50%) scale(1.12) !important;
-  background: rgba(255, 217, 61, 0.35) !important;
-  border-color: rgba(255, 217, 61, 0.8) !important;
-  box-shadow: 0 10px 28px rgba(255, 217, 61, 0.35), 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+  transform: translateY(-50%) scale(1.15) !important;
+  background: linear-gradient(135deg, rgba(255, 217, 61, 0.9), rgba(245, 158, 11, 0.95)) !important;
+  color: #1a1500 !important;
+  border-color: rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 12px 32px rgba(255, 217, 61, 0.5), 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
 }
 
 .polaroid:fullscreen .polaroid-nav-arrow:active,
 .polaroid:-webkit-full-screen .polaroid-nav-arrow:active {
-  transform: translateY(-50%) scale(0.95) !important;
+  transform: translateY(-50%) scale(0.92) !important;
 }
 
 .polaroid:fullscreen .polaroid-nav-arrow.nav-prev,
 .polaroid:-webkit-full-screen .polaroid-nav-arrow.nav-prev {
-  left: 1.5rem !important;
+  left: max(1.2rem, env(safe-area-inset-left, 1.2rem)) !important;
 }
 
 .polaroid:fullscreen .polaroid-nav-arrow.nav-next,
 .polaroid:-webkit-full-screen .polaroid-nav-arrow.nav-next {
-  right: 1.5rem !important;
+  right: max(1.2rem, env(safe-area-inset-right, 1.2rem)) !important;
 }
 
 .polaroid:fullscreen .polaroid-nav-arrow svg,
 .polaroid:-webkit-full-screen .polaroid-nav-arrow svg {
-  width: 24px !important;
-  height: 24px !important;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+  width: 26px !important;
+  height: 26px !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  transition: transform 0.2s ease;
+}
+
+.polaroid:fullscreen .polaroid-nav-arrow.nav-prev:hover svg,
+.polaroid:-webkit-full-screen .polaroid-nav-arrow.nav-prev:hover svg {
+  transform: translateX(-2px);
+}
+
+.polaroid:fullscreen .polaroid-nav-arrow.nav-next:hover svg,
+.polaroid:-webkit-full-screen .polaroid-nav-arrow.nav-next:hover svg {
+  transform: translateX(2px);
 }
 
 @media (max-width: 700px) {
   .polaroid:fullscreen .polaroid-nav-arrow,
   .polaroid:-webkit-full-screen .polaroid-nav-arrow {
-    width: 42px !important;
-    height: 42px !important;
-    background: rgba(0, 0, 0, 0.35) !important;
+    width: 44px !important;
+    height: 44px !important;
+    background: rgba(15, 18, 28, 0.65) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5) !important;
   }
   .polaroid:fullscreen .polaroid-nav-arrow.nav-prev,
   .polaroid:-webkit-full-screen .polaroid-nav-arrow.nav-prev {
-    left: 0.75rem !important;
+    left: 0.65rem !important;
   }
   .polaroid:fullscreen .polaroid-nav-arrow.nav-next,
   .polaroid:-webkit-full-screen .polaroid-nav-arrow.nav-next {
-    right: 0.75rem !important;
+    right: 0.65rem !important;
+  }
+  .polaroid:fullscreen .polaroid-nav-arrow svg,
+  .polaroid:-webkit-full-screen .polaroid-nav-arrow svg {
+    width: 22px !important;
+    height: 22px !important;
   }
 }
 
@@ -9134,19 +9231,20 @@ body:has(.modal.active) .shop-bubble {
 .polaroid:fullscreen .polaroid-counter-badge,
 .polaroid:-webkit-full-screen .polaroid-counter-badge {
   position: fixed !important;
-  bottom: 1.25rem !important;
+  bottom: max(1rem, env(safe-area-inset-bottom, 1rem)) !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
-  background: rgba(0, 0, 0, 0.55) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  color: rgba(255, 255, 255, 0.9) !important;
-  padding: 0.35rem 0.9rem !important;
+  background: rgba(15, 18, 28, 0.75) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  padding: 0.4rem 1rem !important;
   border-radius: 999px !important;
   font-size: 0.8rem !important;
   font-weight: 600 !important;
   letter-spacing: 0.05em !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
   z-index: 1000 !important;
   pointer-events: none !important;
   display: flex !important;

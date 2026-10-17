@@ -364,7 +364,9 @@ shieldBurst:  { sheet:'loot2', col:2, row:4, w:70, h:70, tint:'#a684f0', pulse:t
           setTimeout(() => fxLayer.burst('hit', hero.x, hero.y, 8), 350);
         }
         // Curación
-        if (cls.includes('curar') && txt.match(/\+|cura/i)) {
+        if (cls.includes('curar-enemigo') || (txt.includes('se cura') && !txt.includes('Te curas') && !txt.includes('te curas'))) {
+          fxLayer.aura('heal', enemy.x, enemy.y, { dur: 1.2 });
+        } else if (cls.includes('curar') && txt.match(/\+|cura/i)) {
           fxLayer.aura('heal', hero.x, hero.y, { dur: 1.2 });
         }
         // Buff

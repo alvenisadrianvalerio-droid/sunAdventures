@@ -1485,9 +1485,13 @@ sprite.style.opacity = "0.25";
 
   /* ---------- Modal descarga app ---------- */
   document.addEventListener("click", e => {
-    const btn = e.target.closest('[data-action="descargar"]');
+    const btn = e.target.closest('[data-action="descargar"], [data-action="descargar-directo"]');
     if (btn) {
       e.preventDefault();
+      if (document.documentElement.classList.contains("en-apk")) return;
+      if (typeof window.toggleNavMenu === "function") window.toggleNavMenu(false);
+      document.getElementById("user-dropdown")?.classList.remove("open");
+      document.getElementById("user-info")?.classList.remove("open");
       abrirDescarga();
     }
   });
@@ -1719,12 +1723,17 @@ sprite.style.opacity = "0.25";
     "tema-fondo-noche","tema-fondo-arcoiris","tema-fondo-fuego",
     "tema-fondo-bosque","tema-fondo-oceano","tema-fondo-desierto",
     "tema-fondo-aurora","tema-fondo-sakura","tema-fondo-cyberpunk",
-    "tema-fondo-tormenta", "tema-fondo-galaxia","tema-fondo-cueva","tema-fondo-volcan",
-    "tema-fondo-espacial","tema-fondo-campo","tema-fondo-ciudad","tema-fondo-montana" 
+    "tema-fondo-tormenta","tema-fondo-galaxia","tema-fondo-cueva","tema-fondo-volcan",
+    "tema-fondo-espacial","tema-fondo-campo","tema-fondo-ciudad","tema-fondo-montana",
+    "tema-fondo-neon"
   ];
   window._aplicarTemaFondo = function () {
     try {
+      // Remover todas las clases de temas de fondo conocidas y cualquier clase que empiece por tema-fondo-
       document.body.classList.remove(...TEMAS_FONDO);
+      [...document.body.classList].forEach(cls => {
+        if (cls.startsWith("tema-fondo-")) document.body.classList.remove(cls);
+      });
       const userId = getUserId();
       const mascota = localStorage.getItem("mascota_actual") || "mapache";
       const eq = JSON.parse(localStorage.getItem(`mascota_skins_eq_${userId}_${mascota}`) || "{}");
@@ -1765,6 +1774,152 @@ sprite.style.opacity = "0.25";
   window.addEventListener("sunad:perfil-actualizado", () => {
     try { window._aplicarTemaFondo?.(); } catch {}
   });
+
+  /* ============================================================
+     POP-UP DE ELECCIÓN DE PRIMERA MASCOTA (INICIO DE SESIÓN)
+     ============================================================ */
+  function comprobarStarterPetModal() {
+    try {
+      const u = getUserId();
+      if (!u || u === "anonimo" || u === "local") return;
+      const kElegida = `sa_starter_pet_chosen_${u}`;
+      if (localStorage.getItem(kElegida) === "true") return;
+
+      if ($("starter-pet-modal")) {
+        $("starter-pet-modal").classList.add("active");
+        $("starter-pet-modal").setAttribute("aria-hidden", "false");
+        return;
+      }
+
+      const modal = document.createElement("div");
+      modal.id = "starter-pet-modal";
+      modal.className = "modal starter-pet-modal active";
+      modal.setAttribute("aria-hidden", "false");
+
+      const opcionesStarter = [
+        {
+          id: "mapache",
+          nombre: "Mapache",
+          tipo: "Ágil y Curioso",
+          desc: "Tu compañero leal desde el primer día. ¡Ama la comida y explorar!",
+          img: "img/mapache.png",
+          color: "linear-gradient(135deg, rgba(80, 120, 200, 0.25), rgba(40, 60, 100, 0.45))",
+          borde: "rgba(100, 160, 255, 0.4)"
+        },
+        {
+          id: "girasol",
+          nombre: "Girasol",
+          tipo: "Radiante y Cálido",
+          desc: "Siempre mira hacia la luz del sol. ¡Aporta alegría y pura energía!",
+          img: "img/mascota-girasol.png",
+          color: "linear-gradient(135deg, rgba(255, 190, 40, 0.25), rgba(180, 120, 20, 0.45))",
+          borde: "rgba(255, 215, 0, 0.5)"
+        },
+        {
+          id: "oveja",
+          nombre: "Oveja",
+          tipo: "Suave y Relajante",
+          desc: "De lana esponjosa y corazón tierno. ¡Te acompañará en cada dulce sueño!",
+          img: "img/oveja.png",
+          color: "linear-gradient(135deg, rgba(160, 130, 220, 0.25), rgba(90, 70, 140, 0.45))",
+          borde: "rgba(190, 160, 255, 0.4)"
+        }
+      ];
+
+      modal.innerHTML = `
+        <div class="modal-backdrop" style="background:rgba(10,12,24,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);"></div>
+        <div class="modal-content starter-pet-content" style="max-width:680px;width:92%;background:var(--card-bg, #1e2238);border:1px solid rgba(255,255,255,0.14);border-radius:24px;padding:2rem 1.5rem;box-shadow:0 20px 60px rgba(0,0,0,0.6);text-align:center;position:relative;z-index:10;animation:popIn .3s cubic-bezier(0.175,0.885,0.32,1.275);">
+          <div style="display:inline-flex;align-items:center;justify-content:center;gap:.5rem;background:rgba(255,215,0,0.15);border:1px solid rgba(255,215,0,0.3);color:#ffd700;padding:.35rem 1rem;border-radius:999px;font-size:.85rem;font-weight:700;margin-bottom:1rem;text-transform:uppercase;letter-spacing:1px;">
+            ✨ ¡Bienvenido Aventurero!
+          </div>
+          <h2 style="font-size:1.75rem;margin:0 0 .5rem 0;color:var(--text, #fff);font-weight:800;letter-spacing:-0.5px;">Elige tu Primera Mascota</h2>
+          <p style="font-size:.95rem;color:var(--text-muted, #94a3b8);margin:0 auto 1.75rem auto;max-width:480px;line-height:1.5;">
+            Para comenzar tu viaje en SunAdventures, elige cuál de estas tres criaturas será tu compañera inicial:
+          </p>
+
+          <div class="starter-cards-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));gap:1rem;margin-bottom:1.75rem;">
+            ${opcionesStarter.map(o => `
+              <div class="starter-card" data-pet-id="${o.id}" style="background:${o.color};border:2px solid ${o.borde};border-radius:18px;padding:1.25rem 1rem;cursor:pointer;transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;display:flex;flex-direction:column;align-items:center;position:relative;">
+                <div style="width:84px;height:84px;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;background:rgba(0,0,0,0.2);border-radius:50%;padding:8px;">
+                  <img src="${o.img}" alt="${o.nombre}" style="max-width:100%;max-height:100%;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.4));">
+                </div>
+                <h3 style="margin:0 0 .2rem 0;font-size:1.15rem;font-weight:700;color:var(--text, #fff);">${o.nombre}</h3>
+                <span style="font-size:.75rem;color:#facc15;font-weight:600;margin-bottom:.5rem;">${o.tipo}</span>
+                <p style="font-size:.8rem;color:var(--text-muted, #cbd5e1);margin:0;line-height:1.35;flex-grow:1;">${o.desc}</p>
+                <div class="starter-card-radio" style="margin-top:.85rem;width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.25);">
+                  <div class="starter-radio-dot" style="width:10px;height:10px;border-radius:50%;background:#ffd700;display:none;"></div>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+
+          <button id="btn-confirmar-starter" type="button" class="btn-primary" style="padding:.9rem 2.5rem;font-size:1.05rem;font-weight:700;border-radius:999px;box-shadow:0 6px 20px rgba(255,180,0,0.35);cursor:pointer;border:none;background:linear-gradient(135deg, #f59e0b, #eab308);color:#0f172a;transition:transform .15s ease, filter .15s ease;" disabled>
+            ¡Elegir Mascota!
+          </button>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      let seleccionada = null;
+      const cards = modal.querySelectorAll(".starter-card");
+      const btnConfirmar = modal.querySelector("#btn-confirmar-starter");
+
+      cards.forEach(card => {
+        card.addEventListener("click", () => {
+          seleccionada = card.dataset.petId;
+          cards.forEach(c => {
+            const isThis = c.dataset.petId === seleccionada;
+            c.style.transform = isThis ? "translateY(-4px)" : "none";
+            c.style.boxShadow = isThis ? "0 10px 25px rgba(255,215,0,0.3)" : "none";
+            c.style.borderColor = isThis ? "#ffd700" : (opcionesStarter.find(x => x.id === c.dataset.petId)?.borde || "rgba(255,255,255,0.2)");
+            const dot = c.querySelector(".starter-radio-dot");
+            if (dot) dot.style.display = isThis ? "block" : "none";
+          });
+          btnConfirmar.disabled = false;
+          btnConfirmar.style.filter = "none";
+          btnConfirmar.textContent = `¡Comenzar con ${MASCOTAS[seleccionada]?.nombre || seleccionada}!`;
+        });
+      });
+
+      btnConfirmar.addEventListener("click", () => {
+        if (!seleccionada) return;
+        try {
+          // Desbloquear en las compradas si es girasol u oveja para que no esté bloqueada en tienda
+          const compradas = getMascotasCompradas();
+          if (!compradas.includes(seleccionada)) {
+            compradas.push(seleccionada);
+            setMascotasCompradas(compradas);
+          }
+          // Guardar mascota elegida
+          localStorage.setItem("mascota_actual", seleccionada);
+          localStorage.setItem(kElegida, "true");
+
+          mascotaActual = seleccionada;
+          statsM = cargarStats(mascotaActual);
+          guardarStats(mascotaActual, statsM);
+          visual();
+          try { notifMascota("¡Compañero elegido!", `¡Has elegido a ${MASCOTAS[seleccionada].nombre}!`); } catch {}
+
+          modal.classList.remove("active");
+          modal.setAttribute("aria-hidden", "true");
+          setTimeout(() => modal.remove(), 400);
+
+          window.dispatchEvent(new Event("sunad:mascota-cambiada"));
+          window.dispatchEvent(new Event("sunad:progress"));
+          if (window._renderMascotasGrid) window._renderMascotasGrid();
+        } catch (e) {
+          console.error("Error al confirmar starter pet:", e);
+        }
+      });
+    } catch (err) {
+      console.warn("comprobarStarterPetModal:", err);
+    }
+  }
+
+  window.comprobarStarterPetModal = comprobarStarterPetModal;
+  window.addEventListener("sunad:user-ready", () => setTimeout(comprobarStarterPetModal, 600));
+  setTimeout(comprobarStarterPetModal, 1500);
 
   console.log("✅ script.js v5 cargado (getNivel hoisteada)");
 });

@@ -2528,7 +2528,7 @@ body.tema-fondo-fuego .nav-container {
 .fx-particle {
   position: fixed;
   pointer-events: none;
-  z-index: 550;
+  z-index: 99999;
   will-change: transform, opacity;
 }
 

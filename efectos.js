@@ -20,35 +20,55 @@
     return s;
   }
 
-    function efectoChispas() {
-    const handler = (e) => {
-      const m = document.getElementById("mascota");
-      if (!m) return;
-      // Solo si el clic fue sobre la mascota o su imagen
-      const target = e.target;
-      if (target !== m && !m.contains(target)) return;
+  function efectoChispas() {
+    let ultimoDisparo = 0;
+    const generarChispas = (cx, cy) => {
+      const ahora = Date.now();
+      if (ahora - ultimoDisparo < 120) return;
+      ultimoDisparo = ahora;
 
-      const r = m.getBoundingClientRect();
-      const cx = e.clientX || (r.left + r.width / 2);
-      const cy = e.clientY || (r.top + r.height / 2);
-
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < 16; i++) {
         const p = document.createElement("span");
         p.className = "fx-particle fx-chispa";
         p.style.left = cx + "px";
         p.style.top = cy + "px";
         const a = Math.random() * Math.PI * 2;
-        const d = 50 + Math.random() * 90;
+        const d = 40 + Math.random() * 85;
         p.style.setProperty("--dx", (Math.cos(a) * d) + "px");
         p.style.setProperty("--dy", (Math.sin(a) * d) + "px");
-        p.style.animationDelay = (i * 12) + "ms";
+        p.style.animationDelay = (i * 10) + "ms";
         document.body.appendChild(p);
         setTimeout(() => p.remove(), 1100);
       }
     };
-    // ⚡ capture: true → se ejecuta ANTES que cualquier stopPropagation()
-    document.addEventListener("click", handler, true);
-    limpiarClick = () => document.removeEventListener("click", handler, true);
+
+    const handler = (e) => {
+      const m = document.getElementById("mascota");
+      if (!m) return;
+      const target = e.target;
+      if (target !== m && !m.contains(target)) return;
+
+      const r = m.getBoundingClientRect();
+      const cx = (typeof e.clientX === "number" && e.clientX > 0)
+        ? e.clientX
+        : (e.touches && e.touches[0] ? e.touches[0].clientX : (r.left + r.width / 2));
+      const cy = (typeof e.clientY === "number" && e.clientY > 0)
+        ? e.clientY
+        : (e.touches && e.touches[0] ? e.touches[0].clientY : (r.top + r.height / 2));
+
+      generarChispas(cx, cy);
+    };
+
+    // Escuchar pointerdown, click y touchstart con capture para responder al instante en móvil y desktop
+    ["pointerdown", "click", "touchstart"].forEach(evtName => {
+      document.addEventListener(evtName, handler, { capture: true, passive: true });
+    });
+
+    limpiarClick = () => {
+      ["pointerdown", "click", "touchstart"].forEach(evtName => {
+        document.removeEventListener(evtName, handler, { capture: true });
+      });
+    };
   }
   function efectoCorazones() {
     intervalo = setInterval(() => {

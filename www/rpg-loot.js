@@ -146,12 +146,12 @@
 
   /* ---------- Rarezas / calidades ---------- */
   const RAREZAS = {
-    comun:      { prob:0.62,  label:"Común",      color:"#c9c9c9", glow:"rgba(201,201,201,.3)" },
-    raro:       { prob:0.24,  label:"Raro",       color:"#6cb8ff", glow:"rgba(108,184,255,.5)" },
-    epico:      { prob:0.095, label:"Épico",      color:"#a684f0", glow:"rgba(166,132,240,.6)" },
-    legendario: { prob:0.040, label:"Legendario", color:"#ffd93d", glow:"rgba(255,217,61,.7)" },
-    mitico:     { prob:0.005, label:"Mítico",     color:"#ff6b9d", glow:"rgba(255,107,157,.8)" },
-    tornasol:   { prob:0.001, label:"Tornasol",   color:"#b0f5ff", glow:"rgba(176,245,255,.9)" }
+    comun:      { prob:0.65,  label:"Común",      color:"#c9c9c9", glow:"rgba(201,201,201,.3)" },
+    raro:       { prob:0.25,  label:"Raro",       color:"#6cb8ff", glow:"rgba(108,184,255,.5)" },
+    epico:      { prob:0.082, label:"Épico",      color:"#a684f0", glow:"rgba(166,132,240,.6)" },
+    legendario: { prob:0.016, label:"Legendario", color:"#ffd93d", glow:"rgba(255,217,61,.7)" },
+    mitico:     { prob:0.0018, label:"Mítico",    color:"#ff6b9d", glow:"rgba(255,107,157,.8)" },
+    tornasol:   { prob:0.0002, label:"Tornasol",  color:"#b0f5ff", glow:"rgba(176,245,255,.9)" }
   };
   const ORDEN_RAREZAS = ["comun","raro","epico","legendario","mitico","tornasol"];
   const PROB_REROLL_RAREZA = { misma:0.94, sube1:0.05, sube2:0.005, baja1:0.005 };
@@ -167,36 +167,36 @@
     // Orden visual correcto: madera (marrón), hierro (verdoso), dorado (dorado), alba (rosa), celestial (dorado estelar)
     madera: {
       nombre:"Cofre de Madera", precio:180,
-      rarBoosts:{comun:.68,raro:.24,epico:.065,legendario:.013,mitico:.002},
-      calBoosts:{normal:.75,reforzado:.20,impecable:.045,ancestral:.005},
+      rarBoosts:{comun:.72,raro:.23,epico:.046,legendario:.0038,mitico:.0002},
+      calBoosts:{normal:.78,reforzado:.18,impecable:.038,ancestral:.002},
       emoji:"📦", imagen:"img/rpg/items/cofre-madera.png?v=2", color:"#a0522d",
       cantMin:1, cantMax:3, oroMin:25, oroMax:75
     },
     hierro: {
       nombre:"Cofre de Hierro", precio:850,
-      rarBoosts:{comun:.48,raro:.34,epico:.14,legendario:.035,mitico:.005},
-      calBoosts:{normal:.58,reforzado:.28,impecable:.11,ancestral:.03},
+      rarBoosts:{comun:.55,raro:.33,epico:.11,legendario:.009,mitico:.001},
+      calBoosts:{normal:.64,reforzado:.26,impecable:.085,ancestral:.015},
       emoji:"🗃️", imagen:"img/rpg/items/cofre-hierro.png?v=2", color:"#718093",
       cantMin:2, cantMax:4, oroMin:100, oroMax:280
     },
     dorado: {
       nombre:"Cofre Dorado", precio:3800,
-      rarBoosts:{comun:.25,raro:.38,epico:.24,legendario:.11,mitico:.02},
-      calBoosts:{normal:.35,reforzado:.35,impecable:.23,ancestral:.07},
+      rarBoosts:{comun:.34,raro:.42,epico:.205,legendario:.031,mitico:.004},
+      calBoosts:{normal:.44,reforzado:.36,impecable:.165,ancestral:.035},
       emoji:"🏆", imagen:"img/rpg/items/cofre-dorado.png?v=2", color:"#ffd93d",
       cantMin:3, cantMax:6, oroMin:450, oroMax:1200
     },
     alba: {
       nombre:"Cofre del Alba", precio:18000,
-      rarBoosts:{comun:.08,raro:.26,epico:.38,legendario:.22,mitico:.06},
-      calBoosts:{normal:.10,reforzado:.28,impecable:.42,ancestral:.20},
+      rarBoosts:{comun:.15,raro:.37,epico:.40,legendario:.068,mitico:.012},
+      calBoosts:{normal:.18,reforzado:.38,impecable:.33,ancestral:.11},
       emoji:"🌟", imagen:"img/rpg/items/cofre-alba.png?v=6", color:"#ff6b9d",
       cantMin:5, cantMax:8, oroMin:2200, oroMax:5500
     },
     celestial: {
       nombre:"Cofre Celestial", precio:95000,
-      rarBoosts:{comun:.01,raro:.10,epico:.34,legendario:.40,mitico:.15},
-      calBoosts:{normal:.03,reforzado:.12,impecable:.43,ancestral:.42},
+      rarBoosts:{comun:.04,raro:.18,epico:.59,legendario:.15,mitico:.04},
+      calBoosts:{normal:.08,reforzado:.25,impecable:.45,ancestral:.22},
       emoji:"☀️", imagen:"img/rpg/items/cofre-celestial.png?v=6", color:"#fff5b8",
       cantMin:7, cantMax:12, oroMin:12000, oroMax:30000
     }
@@ -385,8 +385,8 @@
   function sortearItemVictoria(jefe) {
     const x = Math.random();
     const r = jefe
-      ? (x < 0.008 ? "mitico" : x < 0.048 ? "legendario" : x < 0.20 ? "epico" : x < 0.55 ? "raro" : "comun")
-      : (x < 0.0015 ? "mitico" : x < 0.02 ? "legendario" : x < 0.12 ? "epico" : x < 0.42 ? "raro" : "comun");
+      ? (x < 0.003 ? "mitico" : x < 0.02 ? "legendario" : x < 0.18 ? "epico" : x < 0.55 ? "raro" : "comun")
+      : (x < 0.0005 ? "mitico" : x < 0.008 ? "legendario" : x < 0.09 ? "epico" : x < 0.40 ? "raro" : "comun");
     return sortearItem(r, sortearCalidad());
   }
 
@@ -499,16 +499,87 @@
         const b = document.createElement("button");
         b.type = "button"; b.className = "rpg-loot-usar"; b.textContent = "🧪 Usar ahora";
         b.addEventListener("click", () => {
-          const s = cargarEstado(); const hm = hpMaxRpg(s);
-          if (item.tipo === "hp" || item.tipo === "def") {
-            const cur = item.tipo === "hp" ? v : v * 3;
-            const a = s.hp; s.hp = Math.min(hm, s.hp + cur);
-            const g = Math.round(s.hp - a);
-            if (g <= 0) { alert("Ya tienes la vida al máximo"); return; }
-            usarConsumible(item.id); guardarEstado(s); SND("comer");
-            m.classList.remove("active");
-            window.dispatchEvent(new Event("rpg:stats-cambiados"));
-          } else alert("Los objetos de ataque solo funcionan en batalla");
+          const s = cargarEstado();
+          const hm = window.Rpg?.hpMax ? window.Rpg.hpMax() : hpMaxRpg(s);
+          const habs = Array.isArray(item.habilidades) ? item.habilidades : [];
+          const desc = (item.desc || "").toLowerCase();
+          const nom = (item.nombre || "").toLowerCase();
+
+          // Comprobar si el item cura toda la vida
+          const curaTodaVida = habs.some(h => (h.nombre + " " + h.desc).toLowerCase().includes("toda la vida")) || desc.includes("toda la vida") || nom.includes("elixir");
+          
+          // Calcular curación
+          let curaBase = 0;
+          if (curaTodaVida) {
+            curaBase = hm;
+          } else {
+            habs.forEach(h => {
+              const hTexto = (h.nombre + " " + (h.desc || "")).toLowerCase();
+              const m = hTexto.match(/cura(?:r)?\s+(\d+)/);
+              if (m) curaBase = Math.max(curaBase, parseInt(m[1]));
+              else if (h.val && h.tipo === "soporte") curaBase = Math.max(curaBase, Number(h.val) || 0);
+            });
+            if (!curaBase) {
+              if (item.stats?.hp) curaBase = Number(item.stats.hp);
+              else if (item.tipo === "hp") curaBase = v;
+              else if (item.tipo === "def") curaBase = v * 3;
+              else curaBase = 50;
+            }
+          }
+
+          // Escudo / buff
+          let escudoVal = 0;
+          habs.forEach(h => {
+            const hTexto = (h.nombre + " " + (h.desc || "")).toLowerCase();
+            if (hTexto.includes("escudo")) {
+              const mPct = hTexto.match(/(\d+)\s*%/);
+              const mVal = hTexto.match(/(?:da|dar|añade|otorga)\s+(\d+)/) || hTexto.match(/escudo.*?(\d+)/);
+              if (mPct) escudoVal = Math.round(hm * (parseInt(mPct[1]) / 100));
+              else if (mVal) escudoVal = parseInt(mVal[1]);
+              else if (h.val) escudoVal = Number(h.val) || 100;
+            }
+          });
+          if (!escudoVal && desc.includes("escudo")) {
+            const mVal = desc.match(/(\d+)\s*(?:de\s+)?escudo/);
+            if (mVal) escudoVal = parseInt(mVal[1]);
+          }
+
+          // ¿Tiene la vida al máximo y ningún otro efecto aplicable?
+          const vidaAntes = s.hp || 0;
+          if (vidaAntes >= hm && !escudoVal && !habs.some(h => h.tipo === "ultimate" || h.tipo === "boost")) {
+            alert("Ya tienes la vida al máximo (" + hm + " HP)");
+            return;
+          }
+
+          // Consumir el item del inventario
+          const itemConsumido = usarConsumible(item.id);
+          if (!itemConsumido) return;
+
+          // Aplicar curación
+          s.hp = Math.min(hm, vidaAntes + curaBase);
+          const curadoReal = Math.round(s.hp - vidaAntes);
+
+          // Si el RPG activo en memoria existe, sincronizar
+          if (window.Rpg?.curarHeroe) {
+            window.Rpg.curarHeroe(curadoReal);
+          } else {
+            guardarEstado(s);
+          }
+
+          // Si otorga escudo y está en combate
+          if (escudoVal > 0 && window.Rpg?.agregarBuffHeroe) {
+            window.Rpg.agregarBuffHeroe("def", Math.round(escudoVal / 2), 3, `🛡️ ${escudoVal}`);
+          }
+
+          SND("comer");
+          m.classList.remove("active");
+          const msgs = [];
+          if (curadoReal > 0) msgs.push(`+${curadoReal} HP`);
+          if (escudoVal > 0) msgs.push(`🛡️ +${escudoVal} Escudo`);
+          notifMascota?.(`¡Usaste ${item.nombre}!`, msgs.join(" · ") || "¡Efecto aplicado con éxito!");
+
+          window.dispatchEvent(new Event("rpg:stats-cambiados"));
+          window.dispatchEvent(new Event("rpg:loot-cambiado"));
         });
         acc.appendChild(b);
       }

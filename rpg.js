@@ -193,6 +193,41 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     return list;
   };
 
+  const getMascotaActualId = () => {
+    try { return localStorage.getItem("mascota_actual") || "mapache"; } catch { return "mapache"; }
+  };
+
+  const sincMascotaState = (s) => {
+    if (!s) return;
+    if (!s.mascotas || typeof s.mascotas !== "object") s.mascotas = {};
+    const mId = getMascotaActualId();
+    // Si la mascota aún no tiene registro, es una mascota nueva: siempre inicia en nivel 1 con 0 XP
+    if (!s.mascotas[mId]) {
+      // Solo el compañero original 'mapache' puede heredar un estado preexistente si venía de una versión anterior
+      if (mId === "mapache" && Object.keys(s.mascotas).length === 0 && (s.nivel || s.xp)) {
+        s.mascotas[mId] = { nivel: s.nivel || 1, xp: s.xp || 0, hp: s.hp || 120 };
+      } else {
+        // Todas las mascotas nuevas (compradas o elegidas) empiezan en nivel 1
+        s.mascotas[mId] = { nivel: 1, xp: 0, hp: 125 };
+      }
+    }
+    const p = s.mascotas[mId];
+    s.nivel = p.nivel || 1;
+    s.xp = p.xp || 0;
+    if (typeof p.hp === "number") s.hp = p.hp;
+  };
+
+  const guardarMascotaState = (s) => {
+    if (!s) return;
+    if (!s.mascotas || typeof s.mascotas !== "object") s.mascotas = {};
+    const mId = getMascotaActualId();
+    s.mascotas[mId] = {
+      nivel: s.nivel || 1,
+      xp: s.xp || 0,
+      hp: s.hp || 120
+    };
+  };
+
   // Recupera datos existentes buscando en la clave actual y haciendo fallback si está vacío
   const cargar = () => {
     try {
@@ -235,25 +270,31 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       if (encontrado) {
         const merged = { ...def(), ...encontrado };
         if (!merged.statsBase) merged.statsBase = { atk: 14, def: 5 };
+        sincMascotaState(merged);
         // Migrar a la clave del usuario autenticado si provenía de un fallback
         if (claveGanadora && claveGanadora !== kPrincipal && u !== "local") {
           try { localStorage.setItem(kPrincipal, JSON.stringify(merged)); } catch { }
         }
         return merged;
       }
-      return def();
+      const d = def();
+      sincMascotaState(d);
+      return d;
     } catch {
-      return def();
+      const d = def();
+      sincMascotaState(d);
+      return d;
     }
   };
 
   const guardar = s => {
     try {
+      guardarMascotaState(s);
       localStorage.setItem(KEY(), JSON.stringify(s));
     } catch { }
   };
 
-  const STATS_DEF = { atkBonus: 0, defBonus: 0, hpBonus: 0, critBonus: 0, esqBonus: 0, velBonus: 0, manaBonus: 0, lifestealBonus: 0, thornsBonus: 0, regenBonus: 0, xpBonus: 0, oroBonus: 0, suerteBonus: 0, fuegoBonus: 0, hieloBonus: 0, rayoBonus: 0, venenoBonus: 0 };
+  const STATS_DEF = { atkBonus: 0, defBonus: 0, hpBonus: 0, critBonus: 0, esqBonus: 0, velBonus: 0, lifestealBonus: 0, thornsBonus: 0, regenBonus: 0, xpBonus: 0, oroBonus: 0, suerteBonus: 0, fuegoBonus: 0, hieloBonus: 0, rayoBonus: 0, venenoBonus: 0 };
   const statsLoot = () => {
     try {
       const u = resolveUid();
@@ -1646,14 +1687,16 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       log(`🩸 Sangrado: -${state.sangrado} HP`, "daño");
       if (state.hp <= 0) return setTimeout(derrota, 500);
     }
+    // Comprobación de esquiva del héroe
     const esq = esqTotal() + bonusTipo("esquivar") / 100 + buffVal("esq") / 100;
-    if (esq > 0 && Math.random() < esq) {
-      log("😎 ¡Esquivaste!", "curar"); floatDmg("#sprite-heroe", "¡ESQUIVA!", "curar");
-      guardar(state); actualizarHPs(); tickBuffs();
-      turnoJugador = true; deshab(false); return;
-    }
+
     enemigo.specialTimer--;
     if (enemigo.specialTimer <= 0) {
+      // Si la habilidad especial es curación pero el enemigo o horda tiene la vida llena (>=95%), no malgastar el turno curándose
+      if (enemigo.special === 'heal' && enemigo.hp >= enemigo.hpMax * 0.95) {
+        enemigo.specialTimer = 1; // Reevaluar el siguiente turno
+        return ataqueNormalEnemigo();
+      }
       enemigo.specialTimer = enemigo.specialCD;
       return setTimeout(ejecutarEspecial, 500);
     }
@@ -1667,14 +1710,17 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     setTimeout(() => s.classList.remove("atacando"), 400);
   }
 
-  function ataqueHordaSecuencial() {
+  function ataqueHordaSecuencial(skipMobIdx = null) {
     if (!enemigo || !enemigo.esHorda || !Array.isArray(enemigo.horda)) {
       return ataqueNormalEnemigo();
     }
-    const vivos = enemigo.horda.filter(m => m.hp > 0);
+    const vivos = enemigo.horda.filter(m => m.hp > 0 && (skipMobIdx === null || m.id !== skipMobIdx));
     if (!vivos.length) {
       actualizarHPs();
-      return setTimeout(victoria, 400);
+      tickBuffs();
+      turnoJugador = true;
+      deshab(false);
+      return;
     }
 
     const nTotal = enemigo.horda.length;
@@ -1683,6 +1729,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const factorDmgMob = nTotal <= 4 ? 0.40 : nTotal <= 8 ? 0.25 : 0.20;
     const atkEnemigoBase = Math.max(1, enemigo.atk + buffsEnemigo.filter(b => b.tipo === "atk").reduce((s, b) => s + b.val, 0));
     const defHeroe = defTotal() + buffVal("def");
+    const esqHeroe = esqTotal() + bonusTipo("esquivar") / 100 + buffVal("esq") / 100;
 
     let step = 0;
     function siguienteMobAtaca() {
@@ -1713,6 +1760,14 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       if (mobEl) {
         mobEl.classList.add("mob-atacando");
         setTimeout(() => mobEl.classList.remove("mob-atacando"), 320);
+      }
+
+      // Comprobación individual de esquiva frente al ataque de este mob
+      if (esqHeroe > 0 && Math.random() < esqHeroe) {
+        log(`😎 ¡Esquivaste el ataque de ${mob.nombre}${mob.esLider ? " (Líder)" : ""}!`, "curar");
+        floatDmg("#sprite-heroe", "¡ESQUIVA!", "curar");
+        actualizarHPs();
+        return setTimeout(siguienteMobAtaca, 340);
       }
 
       // Cálculo de daño individual del mob
@@ -1761,6 +1816,16 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       return ataqueHordaSecuencial();
     }
     animarAtaqueEnemigo();
+    const esqHeroe = esqTotal() + bonusTipo("esquivar") / 100 + buffVal("esq") / 100;
+    if (esqHeroe > 0 && Math.random() < esqHeroe) {
+      log(`😎 ¡Esquivaste el ataque de ${enemigo.nombre}!`, "curar");
+      floatDmg("#sprite-heroe", "¡ESQUIVA!", "curar");
+      actualizarHPs();
+      tickBuffs();
+      turnoJugador = true;
+      deshab(false);
+      return;
+    }
     const atkEnemigo = Math.max(1, enemigo.atk + buffsEnemigo.filter(b => b.tipo === "atk").reduce((s, b) => s + b.val, 0));
     const defHeroe = defTotal() + buffVal("def");
     const dmg = Math.max(1, atkEnemigo - defHeroe + rnd(-3, 3));
@@ -1812,23 +1877,56 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if (!enemigo) return;
     const s = enemigo.special;
     SND('growl');
+
+    // Identificar qué mob de la horda ejecuta la habilidad especial
+    let mobActor = null;
+    if (enemigo.esHorda && Array.isArray(enemigo.horda)) {
+      const vivos = enemigo.horda.filter(m => m.hp > 0);
+      mobActor = vivos.find(m => m.esLider) || vivos[0];
+      if (mobActor) {
+        const mobEl = qs(`.rpg-horda-item[data-horda-idx="${mobActor.id}"]`);
+        if (mobEl) {
+          mobEl.classList.add("mob-atacando");
+          setTimeout(() => mobEl.classList.remove("mob-atacando"), 400);
+        }
+      }
+    }
+
+    const actorNombre = mobActor ? `${mobActor.nombre}${mobActor.esLider ? ' (Líder)' : ''}` : enemigo.nombre;
+
     switch (s) {
       case 'heal': {
         const c = Math.round(enemigo.hpMax * 0.12);
+        const antes = enemigo.hp;
         enemigo.hp = Math.min(enemigo.hpMax, enemigo.hp + c);
-        log(`💚 ${enemigo.nombre} se cura ${c} HP.`, "curar"); break;
+        const curadoReal = Math.round(enemigo.hp - antes);
+        if (enemigo.esHorda && Array.isArray(enemigo.horda)) {
+          const heridos = enemigo.horda.filter(m => m.hp > 0 && m.hp < m.hpMax);
+          if (heridos.length) {
+            const cadaUno = Math.max(1, Math.round(c / heridos.length));
+            heridos.forEach(m => { m.hp = Math.min(m.hpMax, m.hp + cadaUno); });
+            enemigo.hp = enemigo.horda.reduce((s, m) => s + m.hp, 0);
+          }
+        }
+        log(`💚 ${actorNombre} se cura ${curadoReal || c} HP.`, "curar-enemigo");
+        floatDmg(mobActor ? `.rpg-horda-item[data-horda-idx="${mobActor.id}"]` : "#sprite-enemigo", `+${curadoReal || c}`, "curar");
+        FX({ tipo: "heal", target: "enemy", valor: curadoReal || c, fxKey: "heal" });
+        break;
       }
       case 'buff': {
         enemigo.atk = Math.round(enemigo.atk * 1.18);
-        log(`⬆️ ${enemigo.nombre} se potencia (+18% ATK).`, "info"); break;
+        log(`⬆️ ${actorNombre} se potencia (+18% ATK).`, "info"); break;
       }
       case 'debuff': {
         buffsHeroe.push({ tipo: 'atk', val: -4, turnos: 3, label: '-ATK' });
-        log(`⬇️ ¡Tu ATK baja 4!`, "daño"); renderBuffs(); break;
+        log(`⬇️ ¡${actorNombre} reduce tu ATK en 4!`, "daño");
+        floatDmg("#sprite-heroe", "-4 ATK", "daño");
+        FX({ tipo: "attack", target: "hero", valor: 4, fxKey: "darkness" });
+        renderBuffs(); break;
       }
       case 'poison': {
         state.sangrado = (state.sangrado || 0) + 3;
-        log('☠️ ¡Envenenado! +3 daño/turno.', "daño"); break;
+        log(`☠️ ¡${actorNombre} te envenena! +3 daño/turno.`, "daño"); break;
       }
       case 'multihit': {
         let total = 0;
@@ -1837,7 +1935,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
           const d = Math.max(1, Math.floor(enemigo.atk * 0.45) - defHeroe + rnd(-2, 2));
           state.hp = Math.max(0, state.hp - d); total += d;
         }
-        log(`💥💥💥 ¡Triple golpe! ${total} daño.`, "daño");
+        log(`💥💥💥 ¡${actorNombre} desata un triple golpe! ${total} daño.`, "daño");
         floatDmg("#sprite-heroe", "-" + total, "daño");
         FX({ tipo: "attack", target: "hero", valor: total, fxKey: "dagger" }); break;
       }
@@ -1846,23 +1944,26 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         const d = Math.max(1, Math.floor(enemigo.atk * 0.7) - defHeroe + rnd(-2, 2));
         state.hp = Math.max(0, state.hp - d);
         enemigo.hp = Math.min(enemigo.hpMax, enemigo.hp + Math.round(d * 0.7));
-        log(`🩸 ${enemigo.nombre} te drena ${d} HP.`, "daño");
+        log(`🩸 ${actorNombre} te drena ${d} HP.`, "daño");
         floatDmg("#sprite-heroe", "-" + d, "daño"); break;
       }
       case 'shield': {
         enemigo.shield += Math.round(enemigo.hpMax * 0.15);
-        log(`🛡️ ${enemigo.nombre} se blinda (${enemigo.shield}).`, "info"); break;
+        log(`🛡️ ${actorNombre} se blinda (${enemigo.shield}).`, "info"); break;
       }
       case 'curse': {
         buffsHeroe.push({ tipo: 'def', val: -3, turnos: 3, label: '-DEF' });
-        log('💀 ¡Maldición! -3 DEF durante 3 turnos.', "critico"); renderBuffs(); break;
+        log(`💀 ¡${actorNombre} lanza una maldición! -3 DEF durante 3 turnos.`, "critico");
+        floatDmg("#sprite-heroe", "-3 DEF", "critico");
+        FX({ tipo: "attack", target: "hero", valor: 3, fxKey: "darkness" });
+        renderBuffs(); break;
       }
       case 'firebreath': {
         const d = danoEscaladoJefe(1.2);
         state.hp = Math.max(0, state.hp - d);
         enemigo.dot = Math.round(enemigo.hpMax * 0.05);
         enemigo.dotDur = 2;
-        log(`🔥 ¡Aliento de fuego! ${d} daño + quemadura.`, "critico");
+        log(`🔥 ¡${actorNombre} exhala aliento de fuego! ${d} daño + quemadura.`, "critico");
         floatDmg("#sprite-heroe", "-" + d, "daño");
         FX({ tipo: "attack", target: "hero", valor: d, fxKey: "fireball", critico: true }); break;
       }
@@ -1870,27 +1971,41 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         const d = danoEscaladoJefe(0.8);
         state.hp = Math.max(0, state.hp - d);
         enemigo.hp = Math.min(enemigo.hpMax, enemigo.hp + Math.round(enemigo.hpMax * 0.10));
-        log(`💀 ${enemigo.nombre} invoca esqueletos · ${d} daño · se cura.`, "critico"); break;
+        log(`💀 ${actorNombre} invoca esqueletos · ${d} daño · se cura.`, "critico"); break;
       }
       case 'apocalypse': {
         const d = danoEscaladoJefe(1.5);
         state.hp = Math.max(0, state.hp - d);
         enemigo.shield += Math.round(enemigo.hpMax * 0.08);
-        log(`☄️ ¡APOCALIPSIS! ${d} daño + escudo.`, "critico");
+        log(`☄️ ¡${actorNombre}: APOCALIPSIS! ${d} daño + escudo.`, "critico");
         floatDmg("#sprite-heroe", "-" + d, "daño");
         FX({ tipo: "attack", target: "hero", valor: d, fxKey: "fireball", critico: true }); break;
       }
     }
-    actualizarHPs(); tickBuffs();
+    actualizarHPs();
     if (state.hp <= 0) {
       if (comprobarPasivas("recibir-muerte", { hpAntes: 0 })) {
         guardar(state);
         actualizarHPs();
+        tickBuffs();
         turnoJugador = true; deshab(false);
         return;
       }
       return setTimeout(derrota, 500);
     }
+
+    // En hordas: Un miembro de la horda usó su habilidad especial (buff, multihit, heal, etc.).
+    // Los demás miembros de la horda aún deben realizar sus ataques secuenciales en este turno.
+    if (enemigo.esHorda && Array.isArray(enemigo.horda)) {
+      // Si el especial fue de ataque directo (como multihit, drain, apocalypse, etc.),
+      // el mob que lo ejecutó ya consumió su acción ofensiva, por lo que los restantes atacan.
+      // Si fue buff/heal/shield, toda la horda ataca potenciada.
+      const specialsSinAtaqueDirecto = ['buff', 'heal', 'shield', 'debuff', 'poison', 'curse'];
+      const skipId = specialsSinAtaqueDirecto.includes(s) ? null : (mobActor ? mobActor.id : null);
+      return setTimeout(() => ataqueHordaSecuencial(skipId), 450);
+    }
+
+    tickBuffs();
     turnoJugador = true; deshab(false);
   }
 
@@ -2135,13 +2250,13 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       const RL = window.RpgLoot;
       if (RL && RL.COFRES) {
         const nHorda = enemigo.tamanoHorda || 1;
-        // Probabilidad base de drop de cofre:
-        // Normal: 15%, Mini-jefe: 45%, Jefe: 100%
-        // Bonus por horda: +5% (Patrulla), +12% (Horda), +25% (Enjambre)
-        let probCofre = eraJefe ? 1.0 : enemigo.miniJefe ? 0.45 : 0.15;
-        if (nHorda >= 12) probCofre += 0.25;
-        else if (nHorda >= 8) probCofre += 0.12;
-        else if (nHorda >= 4) probCofre += 0.05;
+        // Probabilidad base de drop de cofre (reducida para mayor balance):
+        // Normal: 6% (antes 15%), Mini-jefe: 22% (antes 45%), Jefe: 55% (antes 100%)
+        // Bonus por horda: +3% (Patrulla), +6% (Horda), +12% (Enjambre)
+        let probCofre = eraJefe ? 0.55 : enemigo.miniJefe ? 0.22 : 0.06;
+        if (nHorda >= 12) probCofre += 0.12;
+        else if (nHorda >= 8) probCofre += 0.06;
+        else if (nHorda >= 4) probCofre += 0.03;
 
         if (Math.random() <= probCofre) {
           // Determinar qué cofre otorgar según orden de la zona y tier
@@ -2239,7 +2354,13 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       actualizarBadgeObjetos();
     }
   });
-  window.addEventListener("sunad:mascota-cambiada", () => { if ($("rpg-content") && !enemigo) render(); });
+  window.addEventListener("sunad:mascota-cambiada", () => {
+    if (state) {
+      sincMascotaState(state);
+      guardar(state);
+    }
+    if ($("rpg-content") && !enemigo) render();
+  });
   window.addEventListener("sunad:user-ready", () => {
     state = cargar();
     inyectarNav();
@@ -2280,6 +2401,18 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
   window.Rpg = {
     state: () => state,
+    guardar: () => guardar(state),
+    curarHeroe: (cantidad) => {
+      const a = state.hp;
+      state.hp = clamp(state.hp + cantidad, 0, hpMax());
+      guardar(state);
+      actualizarHPs();
+      return Math.round(state.hp - a);
+    },
+    agregarBuffHeroe: (tipo, val, turnos, label) => {
+      buffsHeroe.push({ tipo, val, turnos, label });
+      renderBuffs();
+    },
     enemigo: () => enemigo,
     hpMax: () => hpMax(),
     atkTotal: () => atkTotal(),

@@ -132,7 +132,106 @@
         scroll-behavior: auto !important;
       }
     }
+
+    /* ============================================================
+       OPTIMIZACIÓN MÓVILES GAMA BAJA / RENDERING LIGERO
+       Desactivar backdrop-filter pesado en pantallas móviles (< 768px)
+       y reemplazarlo por opacidad y color sólido de alta velocidad.
+       ============================================================ */
+    @media (max-width: 768px) {
+      .modal-backdrop,
+      .tienda-overlay,
+      .amistad-overlay,
+      .minijuego-overlay,
+      .rpg-fin-combate-overlay,
+      .nav-container,
+      .player,
+      .ml-player,
+      .ml-modal,
+      .sun-modal-overlay,
+      .polaroid-viewer,
+      body[class*="tema-fondo-"] .modal-backdrop,
+      [style*="backdrop-filter"] {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      .modal-backdrop,
+      .tienda-overlay,
+      .amistad-overlay,
+      .minijuego-overlay,
+      .sun-modal-overlay {
+        background: rgba(8, 10, 18, 0.92) !important;
+      }
+
+      .nav-container {
+        background: rgba(14, 16, 26, 0.96) !important;
+      }
+
+      /* Sombras difusas pesadas simplificadas para evitar repaint en GPU móvil */
+      .polaroid,
+      .rpg-zone-card,
+      .tienda-item,
+      .modal-content,
+      .experiencia-card,
+      .lobby-btn {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+      }
+
+      /* Filtros pesados de brillo/contraste desactivados en scroll */
+      .mascota-img {
+        filter: none !important;
+      }
+    }
+
+    /* Clase forzada para celulares de gama baja detectados automáticamente */
+    html.gama-baja *,
+    html.gama-baja *::before,
+    html.gama-baja *::after {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      text-shadow: none !important;
+    }
+    html.gama-baja .polaroid,
+    html.gama-baja .rpg-zone-card,
+    html.gama-baja .tienda-item,
+    html.gama-baja .modal-content {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+    }
+
+    /* Ocultar botones de descargar app cuando se ejecuta dentro de la APK */
+    html.en-apk [data-action="descargar"],
+    html.en-apk [data-action="descargar-directo"],
+    html.en-apk #descarga-app-modal {
+      display: none !important;
+    }
   </style>
+  <script>
+    /* Detección de APK nativa (Capacitor / WebView / Standalone) */
+    (function () {
+      try {
+        var esCapacitor = !!(window.Capacitor && (window.Capacitor.isNative || (typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform())));
+        var esAndroidAsset = window.location.protocol === 'capacitor:' || window.location.protocol === 'file:' || window.location.hostname === 'localhost' && window.location.port === '' && /Android/i.test(navigator.userAgent);
+        var esStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        var esApkUserAgent = /SunAdventures|wv|Capacitor/i.test(navigator.userAgent);
+        if (esCapacitor || esAndroidAsset || esApkUserAgent || esStandalone) {
+          document.documentElement.classList.add("en-apk");
+        }
+      } catch (e) {}
+    })();
+
+    /* Detección automática de hardware gama baja (<= 4 núcleos o <= 4GB RAM) */
+    (function () {
+      try {
+        var cores = navigator.hardwareConcurrency || 4;
+        var ram = navigator.deviceMemory || 4;
+        var esMovil = /Android|iPhone|iPod|Mobile/i.test(navigator.userAgent);
+        if (esMovil && (cores <= 4 || ram <= 3)) {
+          document.documentElement.classList.add("gama-baja");
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 
 <body>
@@ -157,8 +256,6 @@
             data-icono="huella"></span><span class="nav-link-text">Mascotas</span></a>
         <a href="#finanzas" class="nav-link" data-view-link="finanzas" aria-label="Finanzas"><span
             class="ui-icon nav-link-icon" data-icono="finanzas"></span><span class="nav-link-text">Finanzas</span></a>
-        <a href="./app/sunad.apk" download="SunAd-1.5.apk" class="nav-link" data-action="descargar-directo" aria-label="Descargar App"><span
-            class="ui-icon nav-link-icon" data-icono="descargar"></span><span class="nav-link-text">Descargar App</span></a>
       </nav>
       <div class="nav-actions">
         <button id="btn-open-login" class="btn-auth" aria-label="Entrar"><span class="btn-auth-icon"><img
@@ -1237,7 +1334,7 @@ Artista - Canción
         for (var i = 0; i < els.length; i++) {
           var el = els[i];
           if (!el || !el.closest) continue;
-          var it = el.closest("#main-nav-links [data-view-link], #user-dropdown [data-view-link], #user-dropdown [data-action]");
+          var it = el.closest("#main-nav-links [data-view-link], #main-nav-links [data-action], #user-dropdown [data-view-link], #user-dropdown [data-action]");
           if (it) return it;
         }
         return null;
@@ -1269,6 +1366,12 @@ Artista - Canción
           var v = it.dataset.viewLink;
           navegarHacia(v);
           setTimeout(function () { forzarVista(v); }, 150);
+        } else if (it.dataset.action === "descargar" || it.dataset.action === "descargar-directo") {
+          toggleNavMenu(false);
+          document.getElementById("user-dropdown")?.classList.remove("open");
+          document.getElementById("user-info")?.classList.remove("open");
+          if (typeof window.abrirDescarga === "function") window.abrirDescarga();
+          else if (typeof window.descargarApkDirecta === "function") window.descargarApkDirecta();
         } else {
           it.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
         }
@@ -1390,7 +1493,7 @@ Artista - Canción
         btnPrev.type = "button";
         btnPrev.className = "polaroid-nav-arrow nav-prev";
         btnPrev.setAttribute("aria-label", "Foto anterior");
-        btnPrev.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`;
+        btnPrev.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>`;
         btnPrev.addEventListener("click", e => {
           e.preventDefault(); e.stopPropagation();
           cambiarFotoFullscreen(-1);
@@ -1401,7 +1504,7 @@ Artista - Canción
         btnNext.type = "button";
         btnNext.className = "polaroid-nav-arrow nav-next";
         btnNext.setAttribute("aria-label", "Foto siguiente");
-        btnNext.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>`;
+        btnNext.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>`;
         btnNext.addEventListener("click", e => {
           e.preventDefault(); e.stopPropagation();
           cambiarFotoFullscreen(1);
