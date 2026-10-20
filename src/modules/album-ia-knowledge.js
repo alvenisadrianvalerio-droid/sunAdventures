@@ -254,10 +254,112 @@
     }
   };
 
+  // ============================================================
+  // BASE DE CONOCIMIENTO ESPECIALIZADO: CREACIÓN DE CONTENIDO Y VIRALIDAD (NIVEL TOP CREATOR / MRBEAST LAB)
+  // ============================================================
+  const KNOWLEDGE_CREACION_CONTENIDO = {
+    pilaresFundamentales: {
+      "anatomia del gancho": "Los primeros 3 segundos determinan el 90% del éxito:\n• Hook Visual: Movimiento inmediato, zoom-in dinámico o elemento discordante que corte el scroll.\n• Hook Verbal (Pregunta polarizante o creencia rota): 'Todo lo que creías saber sobre X es una mentira'.\n• Hook Textual: Texto en negrita con contraste alto (amarillo/blanco con sombra negra) en el tercio superior de la pantalla.",
+      "psicologia de retencion": "Cómo mantener a la audiencia hasta el final (Retention Rate > 70%):\n• Micro-bucles narrativos (Open Loops): Plantear una pregunta irresistible y demorar la respuesta hasta el clímax.\n• Cortes de ritmo: Cambios de plano, B-Roll, efectos de sonido (SFX) o zoom cada 2.5 a 4 segundos para reiniciar la atención del cerebro.\n• Payoff proporcional: La recompensa final debe superar la promesa del gancho para evitar el clickbait negativo y ganar seguidores fieles.",
+      "algoritmos sociales": "Cómo leen las plataformas el contenido (YouTube, Instagram, TikTok):\n• Instagram: Prioriza 'Saves' (Guardados) y 'Shares' por DM (Compartidos). Un post guardado indica valor eterno; un post compartido indica identidad.\n• TikTok: Prioriza Completion Rate (visto al 100%) y Re-watch Rate (visto más de una vez). Los loops infinitos multiplican el alcance.\n• YouTube / Shorts: Click-Through-Rate (CTR de la miniatura) + Average Percentage Viewed (APV > 100% en Shorts, > 50% en largos).",
+      "formatos de alto impacto": "Matriz de formatos ganadores:\n• 1. Carrusel 'Saveable': 5 a 8 láminas con densidad de valor (1 consejo aplicable por slide).\n• 2. Storytelling Personal (Viaje del Héroe): Error catastrófico ➔ Epifanía ➔ Lección aprendida ➔ moraleja aplicable.\n• 3. Listas y Curaduría: 'Las 5 herramientas que parecen ilegales de conocer'.\n• 4. Reacción / Crítica constructiva: Tomar una tendencia viral y aportar un punto de vista disruptivo."
+    }
+  };
+
+  // ============================================================
+  // BASE DE CONOCIMIENTO ESPECIALIZADO: MARKETING DIGITAL, ESTRATÉGICO Y GROWTH (NIVEL CMO / EXPERTO MUNDIAL)
+  // ============================================================
+  const KNOWLEDGE_MARKETING = {
+    conceptosClave: {
+      "funnel de ventas": "El embudo de conversión y ciclo de vida del cliente (AIDA / TOFU-MOFU-BOFU / Flywheel):\n• TOFU (Top of Funnel / Conciencia): Tráfico frío captado por contenido de atracción de alta viralidad o intencionalidad (Short-form video, podcasts, SEO técnico pilar, paid ads de awareness). La métrica clave es el CPM, CTR y Hook Rate.\n• MOFU (Middle of Funnel / Consideración y Nutrición): Prospectos tibios que reconocen su problema. Captura con lead magnets hiper-específicos, VSL (Video Sales Letters), secuencias automatizadas de email marketing (Soap Opera Sequences de Russell Brunson) y demostraciones prácticas.\n• BOFU (Bottom of Funnel / Conversión y Cierre): Tráfico caliente. Se elimina toda fricción con 'Grand Slam Offers' (Alex Hormozi), desensamble de objeciones, garantías de inversión de riesgo (Risk Reversal), prueba social irrefutable y urgencia/escasez genuina.\n• Post-Funnel / Retención (Flywheel): Maximización del LTV mediante secuencias de onboarding, Cross-Selling, Up-Selling, programas de lealtad y loops de referidos.",
+      "copywriting": "Psicología persuasiva de conversión escrita y verbal:\n• Los 5 Niveles de Conciencia de Eugene Schwartz: Inconsciente (Unaware), Consciente del Problema (Problem-Aware), Consciente de la Solución (Solution-Aware), Consciente del Producto (Product-Aware) y Totalmente Consciente (Most Aware). Adaptar el gancho y el ángulo según este nivel es el 80% del éxito.\n• Fórmulas de Oro: PAS (Problema, Agitación, Solución), AIDA (Atención, Interés, Deseo, Acción), BAB (Before, After, Bridge), QUEST (Qualify, Understand, Educate, Stimulate, Transition) y Star-Story-Solution.\n• Reglas Maestras de Copywriting: 1) Las características informan, pero los beneficios venden, y las transformaciones de estatus obsesionan. 2) Especificidad genera credibilidad ('47.3% más rápido' supera a 'mucho más rápido'). 3) Matar adjetivos vacíos y reemplazarlos por verbos de acción activa y dolor sensorial.",
+      "posicionamiento de marca": "Ingeniería de percepción estratégica (Ries & Trout / David Aaker):\n• Ley de la Categoría: Si no puedes ser el primero en una categoría, crea una nueva categoría donde seas el primero (Category King / Piratas de Playbook).\n• Arquetipos de Marca (Jung): Gobernante (Mercedes-Benz, Rolex), Sabio (Google, BBC), Héroe (Nike, FedEx), Mago (Apple, Disney), Forajido/Rebelde (Harley, Virgin, Red Bull), Inocente (Dove), Amigo/Everyman (IKEA).\n• Propuesta Única de Venta (USP) y Matriz de Posicionamiento: Diferenciación radical vs. Comoditización por precio. Quien compite por precio, por precio morirá.",
+      "metricas y kpis": "Arquitectura cuantitativa y economía unitaria (Unit Economics):\n• CAC (Customer Acquisition Cost): Gasto comercial y de marketing consolidado / Nuevos clientes adquiridos.\n• LTV / CLV (Customer Lifetime Value): (Ticket promedio × Frecuencia de compra anual) × Vida útil media del cliente en años. En SaaS: ARPU / Churn Rate.\n• Ratio LTV:CAC Saludable: Mínimo 3:1. Un ratio de 5:1 o superior exige acelerar inversión agresiva para no ceder cuota de mercado.\n• CAC Payback Period: Tiempo en meses en que el margen bruto recupera el CAC (ideal < 12 meses en B2B/SaaS, < 3 meses en E-commerce).\n• ROAS vs. MER (Marketing Efficiency Ratio): El ROAS atribuye pauta directa por pixel; el MER (Ingresos Totales / Gasto Total en Pauta) es la métrica de verdad financiera omnicanal que no miente ante restricciones de iOS/cookies.\n• Churn Rate (Logo Churn vs. Revenue Churn): Tasa de atrición. El 'Net Revenue Retention' (NRR) > 110% es el motor de los unicornios tecnológicos.",
+      "seo": "Search Engine Optimization y Search Generative Experience (SGE / IA):\n• Topic Clusters y Pillar Pages: Organizar la arquitectura web en núcleos temáticos densos enlazados internamente para transferir PageRank y construir 'Topical Authority'.\n• Intención de Búsqueda (Search Intent): Informativa, Navegacional, Comercial o Transaccional. Google penaliza páginas que no resuelven la intención de forma inmediata en el primer scroll ('Zero-Click Searches').\n• E-E-A-T de Google: Experiencia, Expertise (Pericia), Autoridad y Confiabilidad (Trust). Vital en nichos YMYL (Your Money Your Life).\n• Core Web Vitals técnicos: LCP < 2.5s, INP < 200ms, CLS < 0.1, Schema Markup estructurado (JSON-LD) y optimización crawl budget.",
+      "growth hacking": "Metodología científica de experimentación de tracción rápida (Sean Ellis / Andrew Chen):\n• Embudo Pirata AARRR: Acquisiton, Activation (el momento 'Aha!'), Retention (el motor central), Referral (Factor K viral > 1.0) y Revenue.\n• Loops de Crecimiento vs. Embudos Lineales: Productos diseñados para que el output de un ciclo sea el input del siguiente (ej. invitaciones de Dropbox, marcas de agua de TikTok/Canva, enlaces virales de Calendly).\n• Proceso de Experimentación Semanal: Backlog de ideas puntuadas por ICE (Impact, Confidence, Ease), ejecución de sprints y análisis post-mortem riguroso.",
+      "oferta irresistible": "Estructura de ofertas de 100 millones de dólares (Alex Hormozi Framework):\n• Ecuación del Valor: (Resultado Soñado × Percepción de Certeza de Logro) / (Demora de Tiempo × Esfuerzo y Sacrificio Percibido). Para maximizar el valor hasta el infinito, debes minimizar el tiempo y el sacrificio a casi cero.\n• Componentes de una Grand Slam Offer: 1) Solución exacta a cada micro-problema del cliente, 2) Bonos irresistibles que valen más que el producto principal, 3) Garantías audaces (incondicional, condicional, basada en resultados o anti-garantía), 4) Escasez y urgencia legítimas.",
+      "publicidad paga": "Paid Media y Ecosistema de Pauta (Meta Ads, Google Ads, TikTok Ads):\n• Creative-Led Growth: En Meta Ads moderno (Advantage+), los creativos son el nuevo targeting. El algoritmo segmenta según la temática del video y los primeros 3 segundos de gancho (Hook Rate).\n• Estructura de Campañas de Escalamiento: Campaña CBO/Advantage+ de testing de creativos dinámicos (DCT) + Campaña de escala probada con presupuestos agresivos (Horizontal y Vertical Scaling).\n• Google Ads: Search de alta intención con palabras clave negativas estrictas + Performance Max (PMax) con señales de audiencia hiper-curadas y feed de productos optimizado."
+    },
+    estrategias: {
+      lanzamiento: "Metodología de Lanzamiento Orquestado (Product Launch Formula - Jeff Walker):\n• 1. Pre-Pre-Lanzamiento (Shotgun): Encuestas secretas, detectar objeciones reales y crear lista VIP con escasez.\n• 2. Pre-Lanzamiento (Los 3 Videos de Valor PLC): Video 1 (Oportunidad y por qué el juego cambió), Video 2 (Transformación y caso de estudio), Video 3 (Experiencia de propiedad y cómo ejecutarlo).\n• 3. Lanzamiento (Apertura de Carrito): Ventana limitada de 4 a 7 días con bono exclusivo de primeras 24 horas y webinar de preguntas y respuestas.\n• 4. Cierre de Carrito: Secuencia de urgencia en las últimas 12 y 2 horas, eliminando objeciones de última hora.",
+      redesSociales: "Estrategia Omnicanal de Autoridad de Contenido (Content Multiplication Engine):\n• Contenido Pilar de Larga Duración: Un video analítico profundo o podcast a la semana.\n• Micro-Contenido Derivado: 5 Reels/Shorts con ganchos viscerales, 3 carruseles de Instagram con frameworks educativos accionables y 4 hilos en X/LinkedIn.\n• Regla 80/20: 80% valor puro sin pedir nada a cambio, 20% llamadas a la acción claras (CTA) hacia el lead magnet o la oferta."
+    }
+  };
+
+  // ============================================================
+  // BASE DE CONOCIMIENTO ESPECIALIZADO: DISEÑO GRÁFICO, UI/UX Y BRANDING
+  // ============================================================
+  const KNOWLEDGE_DISENO_GRAFICO = {
+    principiosDiseno: {
+      "teoria del color": "La ciencia y psicología cromática aplicada:\n• Rueda de color y armonías: Monocromática (elegante y limpia), Análoga (serena y natural), Complementaria (máximo contraste y vibración), Triádica (dinámica y balanceada).\n• Psicología del color: Azul (confianza, seguridad, corporativo), Rojo (urgencia, pasión, apetito), Amarillo (energía, optimismo, alerta), Verde (salud, naturaleza, finanzas), Negro/Dorado (lujo, sofisticación, poder).\n• Regla 60-30-10: 60% color dominante neutro, 30% color secundario/estructural, 10% color de acento/CTA.",
+      "tipografia": "Arquitectura tipográfica y legibilidad:\n• Familias: Serif (tradición, autoridad, elegancia editorial), Sans-Serif (modernidad, limpieza digital, accesibilidad), Monospace (código, precisión técnica), Display/Script (personalidad y acento, nunca para párrafos largos).\n• Jerarquía visual: Escala tipográfica armónica (ej. 1.25 Major Third o 1.333 Perfect Fourth), leading (interlineado a 140-160%), kerning (espaciado entre pares) y tracking (espaciado general).\n• Regla tipográfica: No mezclar más de 2 familias tipográficas en una misma identidad (una para titulares, otra para lectura).",
+      "composicion y layout": "Leyes de percepción visual y composición:\n• Principios Gestalt: Proximidad (elementos cercanos se perciben juntos), Similitud (mismo estilo = misma función), Continuidad, Cierre y Figura-Fondo.\n• Retículas y Grids: Sistema de 8pt/4pt en diseño UI, cuadrícula de 12 columnas en diseño web, regla de los tercios y proporción áurea (Golden Ratio 1.618).\n• Espacio en Blanco (Negative Space): El elemento más sofisticado del diseño; no es espacio vacío, es el aire que otorga jerarquía y estatus a los elementos clave.",
+      "branding e identidad": "Construcción de sistemas de identidad visual consistentes:\n• Manual de Identidad Visual (Brand Guidelines): Logotipo, imagotipo o isotipo, versiones responsivas, zonas de exclusión/respeto, paleta primaria y secundaria (códigos HEX, RGB, CMYK, Pantone) y sistema iconográfico.\n• Coherencia transversal: La marca debe ser reconocible incluso si le quitas el logotipo, a través de sus formas, colores y tono de voz.",
+      "diseno ui ux": "Diseño de interfaces de usuario y experiencia centrada en el humano:\n• Ley de Fitts: Los botones más grandes y cercanos son más fáciles y rápidos de tocar.\n• Ley de Hick: A mayor número de opciones, mayor es el tiempo y la fatiga mental para tomar una decisión.\n• Accesibilidad (WCAG 2.1): Contraste mínimo de 4.5:1 para texto normal (AA) y 7:1 (AAA), tamaños de toque táctil mínimo de 44x44px o 48x48px."
+    },
+    formatosYHerramientas: {
+      vectorialVsRaster: "Raster (píxeles: JPG, PNG, WebP) para fotografía y texturas ricas sujetas a resolución (DPI/PPI); Vectorial (matemático: SVG, AI, EPS) para logotipos, iconos e ilustraciones escalables infinitamente sin pérdida.",
+      colorPrintVsDigital: "RGB (Red, Green, Blue) aditivo con perfil sRGB/Display P3 para pantallas digitales. CMYK (Cyan, Magenta, Yellow, Key/Black) sustractivo para artes de imprenta."
+    }
+  };
+
+  // ============================================================
+  // BASE DE CONOCIMIENTO ESPECIALIZADO: DESARROLLO, PROGRAMACIÓN Y ARQUITECTURA
+  // ============================================================
+  const KNOWLEDGE_DESARROLLO_SOFTWARE = {
+    principiosIngenieria: {
+      cleanCode: "Clean Code & SOLID: Responsabilidad única (SRP), Abierto/Cerrado (OCP), Sustitución de Liskov (LSP), Segregación de Interfaces (ISP), Inversión de Dependencias (DIP). Nombres explícitos, funciones puras con menos de 20 líneas y cero efectos secundarios indeseados.",
+      arquitectura: "Patrones arquitectónicos modernos: Arquitectura Hexagonal / Puertos y Adaptadores, Clean Architecture, Microservicios vs. Monolitos Modulares, Event-Driven Architecture (EDA), CQRS y Event Sourcing.",
+      depuracionYTesting: "Debugging sistemático: 1) Reproducción mínima reproducible (MRE), 2) Hipótesis y aislamiento binario, 3) Inspección de estado y llamadas asíncronas, 4) Testing piramidal (Unitarios > Integración > E2E con Cypress/Playwright)."
+    },
+    ecosistemas: {
+      javascriptYWeb: "JavaScript ES2026+ / TypeScript: Event Loop (Microtasks vs. Macrotasks), Closures, Prototypes, Garbage Collection, Async/Await concurrency, Streams, Web Workers, Canvas 2D/WebGL y Service Workers para PWAs offline.",
+      backendYDatabases: "Node.js / Python / Bases de Datos: Optimización de consultas SQL (PostgreSQL, Supabase RLS, Índices B-Tree, EXPLAIN ANALYZE), NoSQL (MongoDB, Redis caching), RESTful APIs estructuradas, GraphQL y WebSockets en tiempo real.",
+      devopsYCloud: "Docker containerization, CI/CD pipelines (GitHub Actions), despliegues cloud (Vercel, AWS, Cloudflare Workers), seguridad OWASP Top 10 (CSRF, XSS, SQL Injection prevention) y JWT / OAuth2."
+    }
+  };
+
+  // ============================================================
+  // BASE DE CONOCIMIENTO ESPECIALIZADO: AYUDANTE DE TRABAJO, REDACCIÓN Y PRODUCTIVIDAD
+  // ============================================================
+  const KNOWLEDGE_ASISTENTE_TRABAJO = {
+    redaccionYComunicacion: {
+      emailsEjecutivos: "Estructura BLUF (Bottom Line Up Front): La conclusión, petición o decisión requerida en la primera frase. Contexto justificado en viñetas concisas. Llamada a la acción clara con fecha límite y sin ambigüedad.",
+      informesYReportes: "Estructura de Informe de Alto Nivel: Resumen Ejecutivo (Executive Summary), Antecedentes y Metodología, Hallazgos Cuantitativos y Cualitativos, Conclusiones Clave y Hoja de Ruta de Recomendaciones Priorizadas (Matriz Impacto/Esfuerzo).",
+      propuestasComerciales: "Propuesta de Servicios Ganadora: 1) Diagnóstico de la situación actual y costo de la inacción, 2) Solución integral y alcance delimitado (Scope of Work), 3) Cronograma y entregables por fases, 4) Inversión escalonada (3 paquetes: Bueno, Mejor, Óptimo) y 5) Términos, garantías y firma."
+    },
+    gestionProyectosYProductividad: {
+      metodologias: "Scrum & Kanban ágil: Sprints de 2 semanas, Daily Standup, Backlog Grooming, Estimación por Story Points (Fibonacci), WIP limits para evitar cuellos de botella y Retrospectivas accionables.",
+      marcosDecisiones: "Frameworks estratégicos: Matriz de Eisenhower (Urgente vs. Importante), Primeros Principios (Elon Musk / Aristóteles), Navaja de Ockham, Análisis DAFO/FODA cruzado y Objetivos OKRs (Objectives & Key Results)."
+    }
+  };
+
+  // ============================================================
+  // BASE DE CONOCIMIENTO ESPECIALIZADO: INGENIERÍA DE PROMPTS Y GENERACIÓN DE IMÁGENES POR IA
+  // ============================================================
+  const KNOWLEDGE_INGENIERIA_PROMPTS_IA = {
+    anatomiaPrompt: "Sujeto detallado + Acción/Pose + Entorno/Escenario + Iluminación + Composición/Cámara + Estilo artístico + Render/Calidad + Parámetros técnicos.",
+    modelosYParametros: {
+      midjourney: "--ar (aspect ratio: 1:1, 16:9, 9:16, 4:5), --v 6.1/7, --style raw (menos sesgo de opinión MJ), --sref (style reference), --cref (character reference), --cw (character weight 0-100), --stylize (0-1000), --chaos (0-100), --weird (0-3000), --no (negative prompt).",
+      stableDiffusionYFlux: "CFG Scale (3.5 para Flux, 7 para SD1.5/SDXL), Steps (20-35), Sampler (Euler, DPM++ 2M Karras), LoRA weight (<lora:nombre:0.8>), ControlNet (pose, depth, canny), Negative Prompts estrictos (deformities, bad anatomy, watermarks, lowres).",
+      dalleEImagenGemini: "Lenguaje descriptivo en prosa natural en inglés o español, sin flags CLI. Enfoque en relaciones espaciales, texturas, iluminación volumétrica y lentes cinematográficos."
+    },
+    iluminacionYCamara: {
+      iluminacion: "Rembrandt, split lighting, butterfly lighting, golden hour, blue hour, chiaroscuro, volumetric rays, rim light, softbox studio, neon cyberpunk, low-key, high-key.",
+      camaraYOptica: "Hasselblad H6D-100c, Sony A7R V, 85mm f/1.4 lens, 35mm street view, 24mm wide angle, macro 100mm, shallow depth of field, creamy bokeh, cinematic color grading, Kodak Portra 400."
+    }
+  };
+
   // Exportar al ecosistema AlbumApp
   window.AlbumApp.knowledge = {
     RECETAS_POPULARES,
     ANALISIS_DEPORTES_VERIFICADOS,
-    obtenerContextoTemporalDeportivo
+    obtenerContextoTemporalDeportivo,
+    KNOWLEDGE_CREACION_CONTENIDO,
+    KNOWLEDGE_MARKETING,
+    KNOWLEDGE_DISENO_GRAFICO,
+    KNOWLEDGE_DESARROLLO_SOFTWARE,
+    KNOWLEDGE_ASISTENTE_TRABAJO,
+    KNOWLEDGE_INGENIERIA_PROMPTS_IA
   };
 })();

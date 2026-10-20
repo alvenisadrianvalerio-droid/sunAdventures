@@ -624,6 +624,13 @@
           <select name="categoria_id" id="finanzas-select-categoria">${categoryOptions(scope, type, r.categoria_id || "")}</select>
         </label>
 
+        <!-- Chips de selección rápida de categoría -->
+        <div class="finanzas-cat-chips" id="finanzas-quick-cat-chips">
+          ${(state.data[scope]?.categories || []).filter(c => c.tipo === type).slice(0, 6).map(c => 
+            `<button type="button" class="finanzas-cat-chip ${c.id === (r.categoria_id || "") ? "selected" : ""}" data-select-cat="${escapeHtml(c.id)}">${escapeHtml(c.nombre)}</button>`
+          ).join("")}
+        </div>
+
         <label>
           <span>Fecha</span>
           <input name="fecha" type="date" required value="${escapeHtml(r.fecha || today())}">
@@ -633,7 +640,7 @@
 
         <label class="finanzas-form-wide">
           <span>Descripción o nota (opcional)</span>
-          <input name="descripcion" maxlength="120" value="${escapeHtml(r.descripcion || "")}" placeholder="Ej. Almuerzo juntos, súper, gasolina...">
+          <input name="descripcion" maxlength="120" value="${escapeHtml(r.descripcion || "")}" placeholder="Ej. Almuerzo, supermercado, gasolina, sueldo...">
         </label>
 
         <div class="finanzas-form-actions finanzas-form-wide" style="display:flex;gap:.7rem;margin-top:.3rem;">
@@ -825,7 +832,7 @@
           </article>`;
         }).join("") : `<div class="finanzas-empty finanzas-empty-large" style="grid-column:1/-1;">
           <strong>Sin productos en inventario</strong>
-          <span>Añade productos arriba o dile a la mascota: <em>"Agrega 20 pasteles al inventario a 15 de venta y 6 de materia prima"</em> o <em>"Vendí 3 pasteles"</em>.</span>
+          <span>Añade productos arriba con su precio de venta y costo de materia prima para calcular tus márgenes y ganancias netas al instante.</span>
         </div>`}
       </div>
     </section>`;
@@ -911,51 +918,6 @@
     const svgLightbulb = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>`;
     const svgSparkles = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>`;
 
-    // Datos de la mascota activa
-    const mId = localStorage.getItem("mascota_actual") || "mapache";
-    const mascInfo = {
-      mapache: { nombre: "Mapache", img: "img/mapache.png" },
-      gatito: { nombre: "Gatito", img: "img/gatito.png" },
-      "gatito-negro": { nombre: "Gatito Negro", img: "img/gatito-negro.png" },
-      perrito: { nombre: "Perrito", img: "img/perrito.png" },
-      pollito: { nombre: "Pollito", img: "img/pollito.png" },
-      jirafa: { nombre: "Jirafa", img: "img/jirafa.png" },
-      unicornio: { nombre: "Unicornio", img: "img/unicornio.png" },
-      conejo: { nombre: "Conejito", img: "img/conejito.png" },
-      "dragon-bebe": { nombre: "Dragón Bebé", img: "img/dragon-bebe.png" },
-      "dragon-anciano": { nombre: "Dragón Anciano", img: "img/dragon-anciano.png" }
-    }[mId] || { nombre: "Mascota", img: "img/mapache.png" };
-
-    const mascotaCard = `<section class="finanzas-mascota-ai-card">
-      <div class="finanzas-mascota-header">
-        <div class="finanzas-mascota-identity">
-          <div class="finanzas-mascota-avatar-wrap">
-            <img src="${mascInfo.img}" alt="${mascInfo.nombre}">
-          </div>
-          <div class="finanzas-mascota-title">
-            <h3>${mascInfo.nombre} Financiero <span class="finanzas-mascota-tag">IA Activa</span></h3>
-            <p>Escribe en lenguaje natural lo que quieras hacer con tus finanzas y lo gestiono al instante.</p>
-          </div>
-        </div>
-      </div>
-      <form id="finanzas-mascota-ai-form" class="finanzas-mascota-form" data-scope="${scope}">
-        <div class="finanzas-mascota-input-wrap">
-          <input id="finanzas-mascota-input" class="finanzas-mascota-input" type="text" placeholder="Ej: Gasté 35 en supermercado, ingresé 400 de sueldo, ahorrar 50 para viaje..." autocomplete="off">
-        </div>
-        <button type="submit" class="btn-primary finanzas-mascota-submit">
-          ${svgSparkles} Gestionar
-        </button>
-      </form>
-      <div class="finanzas-mascota-shortcuts">
-        <button type="button" class="finanzas-mascota-chip" data-ai-prompt="Diagnóstico 50/30/20">📊 Regla 50/30/20</button>
-        <button type="button" class="finanzas-mascota-chip" data-ai-prompt="¿Cuánto puedo gastar al día?">🗓️ Presupuesto diario</button>
-        <button type="button" class="finanzas-mascota-chip" data-ai-prompt="¿En qué he gastado más?">🔍 Fuga de dinero</button>
-        <button type="button" class="finanzas-mascota-chip" data-ai-prompt="Fondo de emergencia">🛡️ Fondo emergencia</button>
-        <button type="button" class="finanzas-mascota-chip" data-ai-prompt="Consejos para ahorrar">💡 Consejos de ahorro</button>
-      </div>
-      <div id="finanzas-mascota-feedback" class="finanzas-mascota-feedback"></div>
-    </section>`;
-
     const heroQuick = `<div class="finanzas-hero-quick">
       <div class="finanzas-hero-text">
         <h2>${isCouple ? `Finanzas en Pareja ${svgCouple}` : `Tu resumen financiero ${svgCard}`}</h2>
@@ -968,13 +930,24 @@
       </div>
     </div>`;
 
+    const recentMovementsCard = `<section class="finanzas-card">
+      <div class="finanzas-card-heading">
+        <div>
+          <span class="finanzas-eyebrow">MOVIMIENTOS RECIENTES</span>
+          <h2>Últimos registros de ${escapeHtml(state.period)}</h2>
+        </div>
+        <button type="button" class="finanzas-text-button" data-nav-to="movimientos">Ver todos (${rows.length}) →</button>
+      </div>
+      ${movementsList(scope, rows.slice(0, 5))}
+    </section>`;
+
     const sections = {
-      resumen: `${mascotaCard}${heroQuick}${metrics}${isCouple ? settlementCards(rows) : ""}`,
-      movimientos: `${mascotaCard}${movementForm(scope, editing)}<section class="finanzas-card"><div class="finanzas-card-heading"><div><span class="finanzas-eyebrow">ACTIVIDAD DEL PERÍODO</span><h2>Movimientos</h2></div><span class="finanzas-detail-count">${rows.length}</span></div>${movementsList(scope, rows)}</section>`,
-      presupuestos: `${mascotaCard}${budgetPanel(scope)}`,
-      metas: `${mascotaCard}${goalsPanel(scope)}`,
-      categorias: `${mascotaCard}${categoriesPanel(scope)}`,
-      inventario: `${mascotaCard}${inventoryPanel(scope)}`
+      resumen: `${heroQuick}${metrics}${isCouple ? settlementCards(rows) : ""}${recentMovementsCard}`,
+      movimientos: `${movementForm(scope, editing)}<section class="finanzas-card"><div class="finanzas-card-heading"><div><span class="finanzas-eyebrow">ACTIVIDAD DEL PERÍODO</span><h2>Movimientos</h2></div><span class="finanzas-detail-count">${rows.length}</span></div>${movementsList(scope, rows)}</section>`,
+      presupuestos: `${budgetPanel(scope)}`,
+      metas: `${goalsPanel(scope)}`,
+      categorias: `${categoriesPanel(scope)}`,
+      inventario: `${inventoryPanel(scope)}`
     };
     ui.panel.innerHTML = sections[state.section] || sections.resumen;
     bindDashboardEvents(scope);
@@ -1028,8 +1001,28 @@
         $$("[data-set-type]", txForm).forEach(b => b.classList.toggle("active", b === btn));
         const catSel = $('select[name="categoria_id"]', txForm);
         if (catSel) catSel.innerHTML = categoryOptions(scope, type);
+        const quickChips = $("#finanzas-quick-cat-chips", txForm);
+        if (quickChips) {
+          quickChips.innerHTML = (state.data[scope]?.categories || []).filter(c => c.tipo === type).slice(0, 6).map(c => 
+            `<button type="button" class="finanzas-cat-chip" data-select-cat="${escapeHtml(c.id)}">${escapeHtml(c.nombre)}</button>`
+          ).join("");
+          bindCategoryChips();
+        }
       });
     });
+
+    // Selección rápida de categoría con un toque
+    const bindCategoryChips = () => {
+      $$("[data-select-cat]", txForm).forEach(chip => {
+        chip.addEventListener("click", () => {
+          const catId = chip.dataset.selectCat;
+          const catSel = $('select[name="categoria_id"]', txForm);
+          if (catSel) catSel.value = catId;
+          $$("[data-select-cat]", txForm).forEach(c => c.classList.toggle("selected", c === chip));
+        });
+      });
+    };
+    bindCategoryChips();
 
     // Chips de montos rápidos (+5, +10, +20, etc.)
     $$("[data-quick-amount]", txForm || ui.panel).forEach(btn => {
@@ -1047,6 +1040,15 @@
       if (e.target.name === "tipo") {
         const catSel = $('select[name="categoria_id"]', txForm);
         catSel.innerHTML = categoryOptions(scope, e.target.value);
+        const quickChips = $("#finanzas-quick-cat-chips", txForm);
+        if (quickChips) {
+          quickChips.innerHTML = (state.data[scope]?.categories || []).filter(c => c.tipo === e.target.value).slice(0, 6).map(c => 
+            `<button type="button" class="finanzas-cat-chip" data-select-cat="${escapeHtml(c.id)}">${escapeHtml(c.nombre)}</button>`
+          ).join("");
+          bindCategoryChips();
+        }
+      } else if (e.target.name === "categoria_id") {
+        $$("[data-select-cat]", txForm).forEach(c => c.classList.toggle("selected", c.dataset.selectCat === e.target.value));
       }
     });
     txForm?.addEventListener("submit", e => { e.preventDefault(); handleForm(txForm, () => saveMovement(txForm, scope)); });
@@ -1220,52 +1222,6 @@
       });
     }));
 
-    // Manejador del Asistente IA de la Mascota en Finanzas
-    const aiForm = $("#finanzas-mascota-ai-form", ui.panel);
-    const aiInput = $("#finanzas-mascota-input", ui.panel);
-    const aiFeedback = $("#finanzas-mascota-feedback", ui.panel);
-
-    const ejecutarIA = async (textoPrompt) => {
-      const prompt = (textoPrompt || "").trim();
-      if (!prompt) return;
-      if (aiFeedback) {
-        aiFeedback.style.display = "block";
-        aiFeedback.className = "finanzas-mascota-feedback";
-        aiFeedback.textContent = "Analizando tu instrucción financiera...";
-      }
-      // Permitir que la UI pinte el estado de carga antes de ejecutar cálculos
-      await new Promise(resolve => setTimeout(resolve, 16));
-      try {
-        const respuesta = await procesarInstruccionFinancieraIA(prompt, scope);
-        if (aiFeedback) {
-          aiFeedback.className = `finanzas-mascota-feedback ${respuesta.ok ? "success" : "error"}`;
-          aiFeedback.textContent = respuesta.mensaje;
-        }
-        if (respuesta.ok && respuesta.recargar) {
-          await refreshData();
-        }
-      } catch (err) {
-        if (aiFeedback) {
-          aiFeedback.className = "finanzas-mascota-feedback error";
-          aiFeedback.textContent = `No se pudo procesar la instrucción: ${err.message || "Error desconocido"}`;
-        }
-      }
-    };
-
-    aiForm?.addEventListener("submit", (e) => {
-      e.preventDefault();
-      ejecutarIA(aiInput?.value);
-      if (aiInput) aiInput.value = "";
-    });
-
-    $$("[data-ai-prompt]", ui.panel).forEach(chip => {
-      chip.addEventListener("click", () => {
-        const prompt = chip.dataset.aiPrompt;
-        if (aiInput) aiInput.value = prompt;
-        ejecutarIA(prompt);
-      });
-    });
-
     // Navegación rápida desde botones amigables
     $("[data-open-quick-add]", ui.panel)?.addEventListener("click", () => {
       state.section = "movimientos";
@@ -1279,16 +1235,6 @@
         render();
       });
     });
-  }
-
-  /* ---------- Motor de Inteligencia Artificial Financiera de la Mascota ---------- */
-  async function procesarInstruccionFinancieraIA(instruccion, scope) {
-    if (window.FinanzasIA?.procesar) {
-      return await window.FinanzasIA.procesar(instruccion, scope, {
-        state, money, today, loadInventory, saveInventory, checked, rowScope
-      });
-    }
-    throw new Error("Módulo de IA Financiera no disponible.");
   }
 
   /* ---------- Reportes ---------- */

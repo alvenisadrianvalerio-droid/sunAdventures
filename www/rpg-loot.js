@@ -59,28 +59,43 @@
     return list;
   };
 
+  const getMascotaActualId = () => {
+    try { return localStorage.getItem("mascota_actual") || "mapache"; } catch { return "mapache"; }
+  };
+
   const K = {
-    loot:   () => "sa_rpg_loot_"   + resolveUid(),
-    stats:  () => "sa_rpg_stats_"  + resolveUid(),
-    rpg:    () => "sa_rpg_"        + resolveUid(),
-    cofres:    () => "sa_rpg_cofres_"     + resolveUid(),
-    invCofres: () => "sa_rpg_inv_cofres_" + resolveUid()
+    loot:      () => "sa_rpg_loot_"      + resolveUid() + "_" + getMascotaActualId(),
+    stats:     () => "sa_rpg_stats_"     + resolveUid() + "_" + getMascotaActualId(),
+    rpg:       () => "sa_rpg_"           + resolveUid() + "_" + getMascotaActualId(),
+    cofres:    () => "sa_rpg_cofres_"    + resolveUid() + "_" + getMascotaActualId(),
+    invCofres: () => "sa_rpg_inv_cofres_"+ resolveUid() + "_" + getMascotaActualId()
   };
   const load  = (k, def) => { try { return JSON.parse(localStorage.getItem(k) || def); } catch { return JSON.parse(def); } };
   const save  = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 
   const cargarInvCofres = () => {
     const u = resolveUid();
+    const m = getMascotaActualId();
     const k = K.invCofres();
     let inv = load(k, null);
-    if ((!inv || Object.values(inv).every(v => !v)) && u !== "local") {
-      const candidates = getUserCandidates();
-      for (const cand of candidates) {
-        const fb = load(`sa_rpg_inv_cofres_${cand}`, null);
-        if (fb && Object.values(fb).some(v => v > 0)) {
-          inv = fb;
+    if ((!inv || Object.values(inv).every(v => !v))) {
+      // Fallback para mapache si venía de la clave global anterior
+      if (m === "mapache") {
+        const legacy = load(`sa_rpg_inv_cofres_${u}`, null);
+        if (legacy && Object.values(legacy).some(v => v > 0)) {
+          inv = legacy;
           save(k, inv);
-          break;
+        }
+      }
+      if ((!inv || Object.values(inv).every(v => !v)) && u !== "local") {
+        const candidates = getUserCandidates();
+        for (const cand of candidates) {
+          const fb = load(`sa_rpg_inv_cofres_${cand}_${m}`, null) || (m === "mapache" ? load(`sa_rpg_inv_cofres_${cand}`, null) : null);
+          if (fb && Object.values(fb).some(v => v > 0)) {
+            inv = fb;
+            save(k, inv);
+            break;
+          }
         }
       }
     }
@@ -101,16 +116,26 @@
 
   const cargarLoot = () => {
     const u = resolveUid();
+    const m = getMascotaActualId();
     const kPrincipal = K.loot();
     let l = load(kPrincipal, null);
-    if ((!l || Object.keys(l).length === 0) && u !== "local") {
-      const candidates = getUserCandidates();
-      for (const cand of candidates) {
-        const fb = load(`sa_rpg_loot_${cand}`, null);
-        if (fb && Object.keys(fb).length > 0) {
-          l = fb;
+    if (!l || Object.keys(l).length === 0) {
+      if (m === "mapache") {
+        const legacy = load(`sa_rpg_loot_${u}`, null);
+        if (legacy && Object.keys(legacy).length > 0) {
+          l = legacy;
           save(kPrincipal, l);
-          break;
+        }
+      }
+      if ((!l || Object.keys(l).length === 0) && u !== "local") {
+        const candidates = getUserCandidates();
+        for (const cand of candidates) {
+          const fb = load(`sa_rpg_loot_${cand}_${m}`, null) || (m === "mapache" ? load(`sa_rpg_loot_${cand}`, null) : null);
+          if (fb && Object.keys(fb).length > 0) {
+            l = fb;
+            save(kPrincipal, l);
+            break;
+          }
         }
       }
     }
@@ -120,16 +145,26 @@
 
   const cargarStats = () => {
     const u = resolveUid();
+    const m = getMascotaActualId();
     const kPrincipal = K.stats();
     let s = load(kPrincipal, null);
-    if ((!s || (!s.atkBonus && !s.defBonus && !s.hpBonus)) && u !== "local") {
-      const candidates = getUserCandidates();
-      for (const cand of candidates) {
-        const fb = load(`sa_rpg_stats_${cand}`, null);
-        if (fb && (fb.atkBonus || fb.defBonus || fb.hpBonus)) {
-          s = fb;
+    if (!s || (!s.atkBonus && !s.defBonus && !s.hpBonus)) {
+      if (m === "mapache") {
+        const legacy = load(`sa_rpg_stats_${u}`, null);
+        if (legacy && (legacy.atkBonus || legacy.defBonus || legacy.hpBonus)) {
+          s = legacy;
           save(kPrincipal, s);
-          break;
+        }
+      }
+      if ((!s || (!s.atkBonus && !s.defBonus && !s.hpBonus)) && u !== "local") {
+        const candidates = getUserCandidates();
+        for (const cand of candidates) {
+          const fb = load(`sa_rpg_stats_${cand}_${m}`, null) || (m === "mapache" ? load(`sa_rpg_stats_${cand}`, null) : null);
+          if (fb && (fb.atkBonus || fb.defBonus || fb.hpBonus)) {
+            s = fb;
+            save(kPrincipal, s);
+            break;
+          }
         }
       }
     }
@@ -146,12 +181,12 @@
 
   /* ---------- Rarezas / calidades ---------- */
   const RAREZAS = {
-    comun:      { prob:0.65,  label:"Común",      color:"#c9c9c9", glow:"rgba(201,201,201,.3)" },
+    comun:      { prob:0.655, label:"Común",      color:"#c9c9c9", glow:"rgba(201,201,201,.3)" },
     raro:       { prob:0.25,  label:"Raro",       color:"#6cb8ff", glow:"rgba(108,184,255,.5)" },
     epico:      { prob:0.082, label:"Épico",      color:"#a684f0", glow:"rgba(166,132,240,.6)" },
-    legendario: { prob:0.016, label:"Legendario", color:"#ffd93d", glow:"rgba(255,217,61,.7)" },
-    mitico:     { prob:0.0018, label:"Mítico",    color:"#ff6b9d", glow:"rgba(255,107,157,.8)" },
-    tornasol:   { prob:0.0002, label:"Tornasol",  color:"#b0f5ff", glow:"rgba(176,245,255,.9)" }
+    legendario: { prob:0.011, label:"Legendario", color:"#ffd93d", glow:"rgba(255,217,61,.7)" },
+    mitico:     { prob:0.0012, label:"Mítico",    color:"#ff6b9d", glow:"rgba(255,107,157,.8)" },
+    tornasol:   { prob:0.0008, label:"Tornasol",  color:"#b0f5ff", glow:"rgba(176,245,255,.9)" }
   };
   const ORDEN_RAREZAS = ["comun","raro","epico","legendario","mitico","tornasol"];
   const PROB_REROLL_RAREZA = { misma:0.94, sube1:0.05, sube2:0.005, baja1:0.005 };
@@ -167,35 +202,35 @@
     // Orden visual correcto: madera (marrón), hierro (verdoso), dorado (dorado), alba (rosa), celestial (dorado estelar)
     madera: {
       nombre:"Cofre de Madera", precio:180,
-      rarBoosts:{comun:.72,raro:.23,epico:.046,legendario:.0038,mitico:.0002},
+      rarBoosts:{comun:.725,raro:.23,epico:.042,legendario:.0025,mitico:.0001,tornasol:.0004},
       calBoosts:{normal:.78,reforzado:.18,impecable:.038,ancestral:.002},
       emoji:"📦", imagen:"img/rpg/items/cofre-madera.png?v=2", color:"#a0522d",
       cantMin:1, cantMax:3, oroMin:25, oroMax:75
     },
     hierro: {
       nombre:"Cofre de Hierro", precio:850,
-      rarBoosts:{comun:.55,raro:.33,epico:.11,legendario:.009,mitico:.001},
+      rarBoosts:{comun:.555,raro:.33,epico:.107,legendario:.0065,mitico:.0007,tornasol:.0008},
       calBoosts:{normal:.64,reforzado:.26,impecable:.085,ancestral:.015},
       emoji:"🗃️", imagen:"img/rpg/items/cofre-hierro.png?v=2", color:"#718093",
       cantMin:2, cantMax:4, oroMin:100, oroMax:280
     },
     dorado: {
       nombre:"Cofre Dorado", precio:3800,
-      rarBoosts:{comun:.34,raro:.42,epico:.205,legendario:.031,mitico:.004},
+      rarBoosts:{comun:.345,raro:.42,epico:.208,legendario:.022,mitico:.003,tornasol:.002},
       calBoosts:{normal:.44,reforzado:.36,impecable:.165,ancestral:.035},
       emoji:"🏆", imagen:"img/rpg/items/cofre-dorado.png?v=2", color:"#ffd93d",
       cantMin:3, cantMax:6, oroMin:450, oroMax:1200
     },
     alba: {
       nombre:"Cofre del Alba", precio:18000,
-      rarBoosts:{comun:.15,raro:.37,epico:.40,legendario:.068,mitico:.012},
+      rarBoosts:{comun:.155,raro:.37,epico:.415,legendario:.048,mitico:.008,tornasol:.004},
       calBoosts:{normal:.18,reforzado:.38,impecable:.33,ancestral:.11},
       emoji:"🌟", imagen:"img/rpg/items/cofre-alba.png?v=6", color:"#ff6b9d",
       cantMin:5, cantMax:8, oroMin:2200, oroMax:5500
     },
     celestial: {
       nombre:"Cofre Celestial", precio:95000,
-      rarBoosts:{comun:.04,raro:.18,epico:.59,legendario:.15,mitico:.04},
+      rarBoosts:{comun:.045,raro:.19,epico:.62,legendario:.11,mitico:.025,tornasol:.01},
       calBoosts:{normal:.08,reforzado:.25,impecable:.45,ancestral:.22},
       emoji:"☀️", imagen:"img/rpg/items/cofre-celestial.png?v=6", color:"#fff5b8",
       cantMin:7, cantMax:12, oroMin:12000, oroMax:30000
@@ -383,10 +418,14 @@
   }
 
   function sortearItemVictoria(jefe) {
+    const pgBonus = (window.RpgPostGame?.getState?.()?.bendiciones?.ojoTornasol || 0) * 0.0005;
     const x = Math.random();
+    const probTornasolJefe = 0.001 + pgBonus;
+    const probTornasolNormal = 0.0003 + pgBonus;
+
     const r = jefe
-      ? (x < 0.003 ? "mitico" : x < 0.02 ? "legendario" : x < 0.18 ? "epico" : x < 0.55 ? "raro" : "comun")
-      : (x < 0.0005 ? "mitico" : x < 0.008 ? "legendario" : x < 0.09 ? "epico" : x < 0.40 ? "raro" : "comun");
+      ? (x < probTornasolJefe ? "tornasol" : x < 0.0028 + pgBonus ? "mitico" : x < 0.016 ? "legendario" : x < 0.18 ? "epico" : x < 0.55 ? "raro" : "comun")
+      : (x < probTornasolNormal ? "tornasol" : x < 0.0009 + pgBonus ? "mitico" : x < 0.006 ? "legendario" : x < 0.09 ? "epico" : x < 0.40 ? "raro" : "comun");
     return sortearItem(r, sortearCalidad());
   }
 
@@ -487,7 +526,7 @@
           abrirCofre("dorado", 1, true);
         });
         acc.appendChild(b);
-      } else if (item.id === "item-5-8" || item.id === "llave-pequena" || item.nombre?.toLowerCase().includes("llave común") || item.nombre?.toLowerCase().includes("llave comun")) {
+      } else if (item.id === "item-5-8" || item.id === "llave-pequena" || item.nombre?.toLowerCase().includes("llave plateada") || item.nombre?.toLowerCase().includes("llave común") || item.nombre?.toLowerCase().includes("llave comun")) {
         const b = document.createElement("button");
         b.type = "button"; b.className = "rpg-loot-usar"; b.textContent = "🗃️ Abrir Cofre Plateado";
         b.addEventListener("click", () => {
@@ -829,37 +868,19 @@
   function consumirLlaveParaCofre(tipo) {
     const { comunes, doradas, loot } = getLlavesDisponibles();
     if (tipo === "hierro") {
-      // Cofre plateado / de hierro: se abre con 1 Llave común (o 1 dorada como alternativa si no tiene comunes)
+      // Cofre Plateado / de Hierro: se abre exclusivamente con 1 Llave Plateada
       if (comunes > 0) {
         if (loot["llave-pequena"] > 0) loot["llave-pequena"]--;
         else if (loot["item-5-8"] > 0) loot["item-5-8"]--;
         guardarLoot(loot);
         return true;
-      } else if (doradas > 0) {
-        if (loot["llave-hierro"] > 0) loot["llave-hierro"]--;
-        else if (loot["item-4-8"] > 0) loot["item-4-8"]--;
-        else if (loot["llave-dorada"] > 0) loot["llave-dorada"]--;
-        guardarLoot(loot);
-        return true;
       }
     } else if (tipo === "dorado") {
-      // Cofre Dorado: se abre con 1 Llave dorada (o 2 llaves comunes)
+      // Cofre Dorado: se abre exclusivamente con 1 Llave Dorada
       if (doradas > 0) {
         if (loot["llave-hierro"] > 0) loot["llave-hierro"]--;
         else if (loot["item-4-8"] > 0) loot["item-4-8"]--;
         else if (loot["llave-dorada"] > 0) loot["llave-dorada"]--;
-        guardarLoot(loot);
-        return true;
-      } else if (comunes >= 2) {
-        let restantes = 2;
-        if (loot["llave-pequena"] > 0) {
-          const gasto = Math.min(loot["llave-pequena"], restantes);
-          loot["llave-pequena"] -= gasto;
-          restantes -= gasto;
-        }
-        if (restantes > 0 && loot["item-5-8"] > 0) {
-          loot["item-5-8"] -= restantes;
-        }
         guardarLoot(loot);
         return true;
       }
@@ -884,7 +905,7 @@
       const exito = consumirLlaveParaCofre(tipo);
       if (!exito) {
         SND("error");
-        notifMascota?.("Sin llaves", tipo === "dorado" ? "Necesitas 1 Llave Dorada o 2 Llaves Comunes" : "Necesitas 1 Llave");
+        notifMascota?.("Sin llaves", tipo === "dorado" ? "Necesitas 1 Llave Dorada" : tipo === "hierro" ? "Necesitas 1 Llave Plateada" : "Necesitas 1 Llave");
         return;
       }
     } else {
@@ -1052,15 +1073,15 @@
 
       let botonLlaveHtml = "";
       if (tipo === "hierro") {
-        const tieneLlave = llaves.comunes > 0 || llaves.doradas > 0;
-        const infoTxt = llaves.comunes > 0 ? `(${llaves.comunes} ${svgLlave})` : `(${llaves.doradas} ${svgLlaveDorada})`;
-        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${tieneLlave ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${tieneLlave ? `Abre con 1 Llave Común (${llaves.comunes} disp.)` : 'Necesitas 1 Llave Común'}">
-          ${svgLlave} Abrir con Llave Común ${tieneLlave ? infoTxt : '(0)'}
+        const tieneLlave = llaves.comunes > 0;
+        const infoTxt = `(${llaves.comunes} ${svgLlave})`;
+        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${tieneLlave ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${tieneLlave ? `Abre con 1 Llave Plateada (${llaves.comunes} disp.)` : 'Necesitas 1 Llave Plateada'}">
+          ${svgLlave} Abrir con Llave Plateada ${tieneLlave ? infoTxt : '(0)'}
         </button>`;
       } else if (tipo === "dorado") {
-        const puedeAbrirDorado = llaves.doradas > 0 || llaves.comunes >= 2;
-        const infoTxt = llaves.doradas > 0 ? `(${llaves.doradas} ${svgLlaveDorada})` : `(${Math.floor(llaves.comunes / 2)} usos)`;
-        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${puedeAbrirDorado ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${puedeAbrirDorado ? 'Abre con 1 Llave Dorada o 2 Comunes' : 'Necesitas 1 Llave Dorada o 2 Comunes'}">
+        const puedeAbrirDorado = llaves.doradas > 0;
+        const infoTxt = `(${llaves.doradas} ${svgLlaveDorada})`;
+        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${puedeAbrirDorado ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${puedeAbrirDorado ? `Abre con 1 Llave Dorada (${llaves.doradas} disp.)` : 'Necesitas 1 Llave Dorada'}">
           ${svgLlaveDorada} Abrir con Llave Dorada ${puedeAbrirDorado ? infoTxt : '(0)'}
         </button>`;
       }
@@ -1142,6 +1163,14 @@
   window.addEventListener("sunad:user-ready", () => {
     try {
       renderColeccion();
+      window.dispatchEvent(new Event("rpg:stats-cambiados"));
+    } catch {}
+  });
+
+  window.addEventListener("sunad:mascota-cambiada", () => {
+    try {
+      renderColeccion();
+      renderCofres();
       window.dispatchEvent(new Event("rpg:stats-cambiados"));
     } catch {}
   });

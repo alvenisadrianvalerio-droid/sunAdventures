@@ -79,8 +79,8 @@
         "1,8": { nombre: "Queso para dragones.", rar: "mitico", icono: "espada", desc: "Si no eres un dragón ni te acerques.", consumible: true, stats: { hp: 500, atk: 25 }, habilidades: [{ nombre: "Queso divino.", tipo: "ultimate", val: 0, desc: "Cura toda la vida y sube el ataque en 50 si eres un dragón." }] },
         "2,8": { nombre: "Buebito fiito.", rar: "comun", icono: "espada", desc: "Cura un poco.", consumible: true, stats: { hp: 100 }, habilidades: [{ nombre: "Cura Buebito fito.", tipo: "soporte", val: 100, desc: "Cura 100 de vida." }] },
         "3,8": { nombre: "Tarta demorah.", rar: "legendario", icono: "espada", desc: "Un objeto legendario.", consumible: true, stats: { hp: 250, esq: 20 }, habilidades: [{ nombre: "Demorah", tipo: "ultimate", val: 100, desc: "Da 100 de esquivas por 2 turnos y recupera vida." }] },
-        "4,8": { nombre: "Llave dorada.", rar: "epico", icono: "espada", desc: "Sirve para abrir el Cofre Dorado.", consumible: true, stats: { crit: 10 } },
-        "5,8": { nombre: "Llave común.", rar: "raro", icono: "espada", desc: "Sirve para abrir el Cofre Plateado (de hierro).", consumible: true, stats: { oro: 10 } },
+        "4,8": { nombre: "Llave dorada.", rar: "epico", icono: "espada", desc: "Sirve exclusivamente para abrir el Cofre Dorado.", consumible: true, stats: { crit: 10 } },
+        "5,8": { nombre: "Llave plateada.", rar: "raro", icono: "espada", desc: "Sirve exclusivamente para abrir el Cofre Plateado (de hierro).", consumible: true, stats: { oro: 10 } },
         "6,8": { nombre: "Vela de mucha gracia.", rar: "tornasol", icono: "espada", desc: "Si estás cerca de esta vela ningún mal económico te perseguirá.", stats: { oro: 200 } },
         "7,8": { nombre: "Caldo de pollo.", rar: "tornasol", icono: "espada", desc: "Inteligencia absoluta en un solo saldo.", stats: { xp: 200 } }
 

@@ -143,16 +143,20 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         const atkJefe = esJefe ? Math.round(idx * 2.5 + 12) : 0;
         const hpMini = esMini ? Math.round(idx * 30 + 75) : 0;
         const atkMini = esMini ? Math.round(idx * 1.6 + 8) : 0;
+        // Escalado especial para end-game: a partir de nivel 100 los monstruos son mucho más temibles
+        const multEndGame = idx >= 100 ? (1 + (idx - 99) * 0.015) : 1; // +1.5% acumulativo por nivel desde 100 (+15% en 110, +45% en 130, +75% en 150)
+        const multAtkEndGame = idx >= 100 ? (1 + (idx - 99) * 0.018) : 1; // +1.8% acumulativo de ataque
+
         z.push({
           id: `${reg.id}-${i}`,
           nombre: esJefe ? reg.jefeNombre : `${reg.nombre} · ${i}`,
           desc: esJefe ? "⚔️ JEFE DE REGIÓN" : esMini ? "★ Mini-jefe" : reg.nombre,
           icono: esJefe ? reg.jefeIcono : reg.icono, nivel: idx,
           enemigos: esJefe ? [reg.jefe] : esMini ? [...reg.elite.slice(0, 2), reg.base[0]] : esElite ? reg.elite : reg.base,
-          hp: Math.round(hpBase + hpJefe + hpMini),
-          atk: Math.round(atkBase + atkJefe + atkMini),
-          xp: Math.round(25 + idx * 18 + (esJefe ? idx * 36 : esMini ? idx * 18 : 0)),
-          monedas: Math.round(20 + idx * 7.5 + (esJefe ? 140 + idx * 4 : esMini ? 55 + idx * 2 : 0)),
+          hp: Math.round((hpBase + hpJefe + hpMini) * multEndGame),
+          atk: Math.round((atkBase + atkJefe + atkMini) * multAtkEndGame),
+          xp: Math.round((25 + idx * 18 + (esJefe ? idx * 36 : esMini ? idx * 18 : 0)) * (idx >= 100 ? 1.25 : 1)),
+          monedas: Math.round((20 + idx * 7.5 + (esJefe ? 140 + idx * 4 : esMini ? 55 + idx * 2 : 0)) * (idx >= 100 ? 1.25 : 1)),
           jefe: esJefe, miniJefe: esMini, region: reg.id, regionNombre: reg.nombre, orden: idx
         });
       }
@@ -168,7 +172,10 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   }));
 
   const resolveUid = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || localStorage.getItem("sunadventures_uid") || (typeof getUserId === "function" ? getUserId() : "local");
-  const KEY = () => `sa_rpg_${resolveUid()}`;
+  const getMascotaActualId = () => {
+    try { return localStorage.getItem("mascota_actual") || "mapache"; } catch { return "mapache"; }
+  };
+  const KEY = () => `sa_rpg_${resolveUid()}_${getMascotaActualId()}`;
   const def = () => ({ nivel: 1, xp: 0, hp: 120, enemigosDerrotados: 0, jefesDerrotados: [], zonasConquistadas: [], zonaActual: null, statsBase: { atk: 14, def: 5 } });
 
   const getUserCandidates = () => {
@@ -193,52 +200,26 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     return list;
   };
 
-  const getMascotaActualId = () => {
-    try { return localStorage.getItem("mascota_actual") || "mapache"; } catch { return "mapache"; }
-  };
-
-  const sincMascotaState = (s) => {
-    if (!s) return;
-    if (!s.mascotas || typeof s.mascotas !== "object") s.mascotas = {};
-    const mId = getMascotaActualId();
-    // Si la mascota aún no tiene registro, es una mascota nueva: siempre inicia en nivel 1 con 0 XP
-    if (!s.mascotas[mId]) {
-      // Solo el compañero original 'mapache' puede heredar un estado preexistente si venía de una versión anterior
-      if (mId === "mapache" && Object.keys(s.mascotas).length === 0 && (s.nivel || s.xp)) {
-        s.mascotas[mId] = { nivel: s.nivel || 1, xp: s.xp || 0, hp: s.hp || 120 };
-      } else {
-        // Todas las mascotas nuevas (compradas o elegidas) empiezan en nivel 1
-        s.mascotas[mId] = { nivel: 1, xp: 0, hp: 125 };
-      }
-    }
-    const p = s.mascotas[mId];
-    s.nivel = p.nivel || 1;
-    s.xp = p.xp || 0;
-    if (typeof p.hp === "number") s.hp = p.hp;
-  };
-
-  const guardarMascotaState = (s) => {
-    if (!s) return;
-    if (!s.mascotas || typeof s.mascotas !== "object") s.mascotas = {};
-    const mId = getMascotaActualId();
-    s.mascotas[mId] = {
-      nivel: s.nivel || 1,
-      xp: s.xp || 0,
-      hp: s.hp || 120
-    };
-  };
-
-  // Recupera datos existentes buscando en la clave actual y haciendo fallback si está vacío
+  // Recupera datos existentes buscando en la clave de la mascota actual y haciendo fallback si está vacío
   const cargar = () => {
     try {
       const u = resolveUid();
-      const kPrincipal = `sa_rpg_${u}`;
+      const m = getMascotaActualId();
+      const kPrincipal = `sa_rpg_${u}_${m}`;
       const userCand = getUserCandidates();
       const candidatas = [kPrincipal];
       userCand.forEach(c => {
-        const k = `sa_rpg_${c}`;
+        const k = `sa_rpg_${c}_${m}`;
         if (!candidatas.includes(k)) candidatas.push(k);
       });
+      // Fallback para mapache si venía de la clave global histórica
+      if (m === "mapache") {
+        if (!candidatas.includes(`sa_rpg_${u}`)) candidatas.push(`sa_rpg_${u}`);
+        userCand.forEach(c => {
+          const k = `sa_rpg_${c}`;
+          if (!candidatas.includes(k)) candidatas.push(k);
+        });
+      }
 
       // Buscar si alguna de las claves candidatas legítimas tiene datos reales
       let encontrado = null;
@@ -270,26 +251,20 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       if (encontrado) {
         const merged = { ...def(), ...encontrado };
         if (!merged.statsBase) merged.statsBase = { atk: 14, def: 5 };
-        sincMascotaState(merged);
-        // Migrar a la clave del usuario autenticado si provenía de un fallback
+        // Migrar a la clave del usuario autenticado de la mascota actual si provenía de un fallback
         if (claveGanadora && claveGanadora !== kPrincipal && u !== "local") {
           try { localStorage.setItem(kPrincipal, JSON.stringify(merged)); } catch { }
         }
         return merged;
       }
-      const d = def();
-      sincMascotaState(d);
-      return d;
+      return def();
     } catch {
-      const d = def();
-      sincMascotaState(d);
-      return d;
+      return def();
     }
   };
 
   const guardar = s => {
     try {
-      guardarMascotaState(s);
       localStorage.setItem(KEY(), JSON.stringify(s));
     } catch { }
   };
@@ -298,12 +273,16 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const statsLoot = () => {
     try {
       const u = resolveUid();
-      const k = `sa_rpg_stats_${u}`;
+      const m = getMascotaActualId();
+      const k = `sa_rpg_stats_${u}_${m}`;
       let r = localStorage.getItem(k);
+      if (!r && m === "mapache") {
+        r = localStorage.getItem(`sa_rpg_stats_${u}`);
+      }
       if (!r && u !== "local") {
         const userCand = getUserCandidates();
         for (const c of userCand) {
-          const candVal = localStorage.getItem(`sa_rpg_stats_${c}`);
+          const candVal = localStorage.getItem(`sa_rpg_stats_${c}_${m}`) || (m === "mapache" ? localStorage.getItem(`sa_rpg_stats_${c}`) : null);
           if (candVal) {
             r = candVal;
             try { localStorage.setItem(k, r); } catch { }
@@ -346,16 +325,21 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   };
 
   const NIVEL_MAX = 50;
-  const hpMax = () => 100 + Math.min(state.nivel, NIVEL_MAX) * 25 + (statsLoot().hpBonus || 0) + bonusTipo("hp_max");
-  const atkTotal = () => state.statsBase.atk + Math.min(state.nivel, NIVEL_MAX) * 4 + (statsLoot().atkBonus || 0) + bonusTipo("atk_fijo");
-  const defTotal = () => state.statsBase.def + Math.min(state.nivel, NIVEL_MAX) * 2.5 + (statsLoot().defBonus || 0) + bonusTipo("def_fijo");
+  const pgBonusAtk = () => ((window.RpgPostGame?.getState?.()?.bendiciones?.fuerzaAstral || 0) * 0.03);
+  const pgBonusDef = () => ((window.RpgPostGame?.getState?.()?.bendiciones?.armaduraCosmica || 0) * 0.03);
+  const pgBonusHp = () => ((window.RpgPostGame?.getState?.()?.bendiciones?.armaduraCosmica || 0) * 50);
+  const pgBonusOro = () => ((window.RpgPostGame?.getState?.()?.bendiciones?.bendicionMonedas || 0) * 0.10);
+
+  const hpMax = () => Math.round((100 + Math.min(state.nivel, NIVEL_MAX) * 25 + (statsLoot().hpBonus || 0) + bonusTipo("hp_max") + pgBonusHp()));
+  const atkTotal = () => Math.round((state.statsBase.atk + Math.min(state.nivel, NIVEL_MAX) * 4 + (statsLoot().atkBonus || 0) + bonusTipo("atk_fijo")) * (1 + pgBonusAtk()));
+  const defTotal = () => Math.round((state.statsBase.def + Math.min(state.nivel, NIVEL_MAX) * 2.5 + (statsLoot().defBonus || 0) + bonusTipo("def_fijo")) * (1 + pgBonusDef()));
   const critTotal = () => 0.15 + ((statsLoot().critBonus || 0) / 100);
   const esqTotal = () => ((statsLoot().esqBonus || 0) / 100);
   const regenTotal = () => (statsLoot().regenBonus || 0);
   const lifestealTotal = () => ((statsLoot().lifestealBonus || 0) / 100);
   const thornsTotal = () => (statsLoot().thornsBonus || 0);
   const xpTotal = () => 1 + ((statsLoot().xpBonus || 0) / 100);
-  const oroTotal = () => 1 + ((statsLoot().oroBonus || 0) / 100);
+  const oroTotal = () => (1 + ((statsLoot().oroBonus || 0) / 100) + pgBonusOro());
   const xpParaSubir = () => state.nivel >= NIVEL_MAX ? Infinity : Math.round(state.nivel * 160 + Math.pow(state.nivel, 1.8) * 35);
 
   let enemigo = null, turnoJugador = true, overlayObjetos = false;
@@ -441,11 +425,17 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
     return `
       <div class="rpg-hud">
-        <div class="rpg-hero-avatar"><img src="${m.imagen}" alt="${m.nombre}" style="width:58px;height:58px;max-width:58px;max-height:58px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'"></div>
+        <div class="rpg-hero-avatar rpg-hero-avatar-btn" data-rpg-accion="cambiar-mascota" title="Clic para cambiar de mascota" style="cursor:pointer;position:relative;">
+          <img src="${m.imagen}" alt="${m.nombre}" style="width:58px;height:58px;max-width:58px;max-height:58px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'">
+          <span class="rpg-hero-avatar-cambiar-badge" title="Cambiar mascota">🔄</span>
+        </div>
         <div class="rpg-hero-info">
           <div class="rpg-hero-name">
             <span>${m.nombre}</span>
             <span class="rpg-hero-lvl">${esNivelMax ? `Nv ${NIVEL_MAX} (MÁX)` : `Nv ${state.nivel}`}</span>
+            <button type="button" class="rpg-btn-cambiar-mascota" data-rpg-accion="cambiar-mascota" title="Cambiar de Mascota">
+              <span>🔄 Cambiar</span>
+            </button>
             <div class="rpg-hero-stats-badges">
               <span class="rpg-stat-badge" title="Ataque">${SVG_SWORD}${totalAtk}</span>
               <span class="rpg-stat-badge" title="Defensa">${SVG_SHIELD}${totalDef}</span>
@@ -571,7 +561,113 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     requestAnimationFrame(() => m.classList.add("active"));
   }
 
+  function getMascotasDisponibles() {
+    const API = window._TiendaAPI;
+    const ids = Object.keys(MASCOTAS);
+    return ids.filter(id => {
+      if (API?.desbloqueada) return API.desbloqueada(id);
+      if (id === "mapache" || id === "gatito-negro") return true;
+      try {
+        const u = resolveUid();
+        const comp = JSON.parse(localStorage.getItem(`sa_mascotas_compradas_${u}`) || "[]");
+        return comp.includes(id);
+      } catch { return false; }
+    });
+  }
+
+  function abrirPopupMascotas(modo = "aventura") {
+    let p = $("rpg-popup-mascotas"); if (p) p.remove();
+    p = document.createElement("div");
+    p.id = "rpg-popup-mascotas";
+    p.className = "rpg-popup-grupo";
+
+    const disponibles = getMascotasDisponibles();
+    const actualId = getMascotaActualId();
+    const u = resolveUid();
+
+    p.innerHTML = `
+      <div class="rpg-popup-panel rpg-popup-mascotas-panel" style="max-width:520px;">
+        <button class="rpg-popup-close" aria-label="Cerrar">×</button>
+        <header class="rpg-popup-hero" style="min-height:auto;padding:1.2rem;">
+          <div class="rpg-popup-titulo">
+            <small>CAMBIAR COMPAÑERO · ${modo === "roguelike" ? "MODO ROGUELIKE" : "MODO AVENTURA"}</small>
+            <span style="font-size:1.3rem;">Elige tu Mascota</span>
+            <em>Cada mascota tiene su progreso, nivel, mapa y equipamiento independiente.</em>
+          </div>
+        </header>
+        <div class="rpg-popup-mascotas-grid">
+          ${disponibles.map(id => {
+            const data = MASCOTAS[id] || {};
+            const esActiva = id === actualId;
+            let nivelTxt = "Nv 1";
+            if (modo === "aventura") {
+              try {
+                const sRaw = localStorage.getItem(`sa_rpg_${u}_${id}`) || (id === "mapache" ? localStorage.getItem(`sa_rpg_${u}`) : null);
+                if (sRaw) {
+                  const sObj = JSON.parse(sRaw);
+                  if (sObj?.nivel) nivelTxt = `Nv ${sObj.nivel}`;
+                }
+              } catch {}
+            } else {
+              try {
+                const mRaw = localStorage.getItem(`sa_rl_meta_${u}_${id}`) || (id === "mapache" ? localStorage.getItem(`sa_rl_meta_${u}`) : null);
+                if (mRaw) {
+                  const mObj = JSON.parse(mRaw);
+                  nivelTxt = `${mObj?.runs || 0} runs · P.${mObj?.mejorPiso || 0}`;
+                }
+              } catch {}
+            }
+            return `
+              <button type="button" class="rpg-popup-mascota-card ${esActiva ? "activa" : ""}" data-mascota-sel="${id}">
+                <div class="rpg-popup-mascota-img-wrap">
+                  <img src="${data.imagen || 'img/girasol-loading.png'}" alt="${data.nombre}" onerror="this.onerror=null;this.src='img/girasol-loading.png'">
+                  ${esActiva ? `<span class="rpg-popup-mascota-activa-badge">✓</span>` : ""}
+                </div>
+                <div class="rpg-popup-mascota-info">
+                  <strong>${data.nombre || id}</strong>
+                  <span>${nivelTxt}</span>
+                </div>
+              </button>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+    document.body.appendChild(p);
+    requestAnimationFrame(() => p.classList.add("active"));
+  }
+  window._rpgAbrirPopupMascotas = abrirPopupMascotas;
+
   document.addEventListener("click", e => {
+    const btnCambiarMascota = e.target.closest('[data-rpg-accion="cambiar-mascota"]');
+    if (btnCambiarMascota) {
+      e.preventDefault(); e.stopPropagation();
+      abrirPopupMascotas("aventura");
+      return;
+    }
+    const cardMascotaSel = e.target.closest("[data-mascota-sel]");
+    if (cardMascotaSel) {
+      e.preventDefault(); e.stopPropagation();
+      const nuevoId = cardMascotaSel.dataset.mascotaSel;
+      if (nuevoId) {
+        localStorage.setItem("mascota_actual", nuevoId);
+        SND("blip");
+        const popupMascotas = $("rpg-popup-mascotas");
+        if (popupMascotas) {
+          popupMascotas.classList.remove("active");
+          setTimeout(() => popupMascotas.remove(), 200);
+        }
+        window.dispatchEvent(new Event("sunad:mascota-cambiada"));
+      }
+      return;
+    }
+    const popupMascotas = e.target.closest("#rpg-popup-mascotas");
+    if (popupMascotas && (e.target === popupMascotas || e.target.classList.contains("rpg-popup-close"))) {
+      popupMascotas.classList.remove("active");
+      setTimeout(() => popupMascotas.remove(), 250);
+      return;
+    }
+
     const btnDescansar = e.target.closest('[data-rpg-accion="descansar"]');
     if (btnDescansar && !btnDescansar.disabled) {
       e.preventDefault(); e.stopPropagation();
@@ -992,6 +1088,20 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       }
     } else {
       enemigo.hp = Math.max(0, enemigo.hp - dmg);
+    }
+
+    // Afección de Afijo: Espejo del Vacío (Reflejo del Jefe del Caos)
+    if (enemigo && enemigo.afijoCaos && enemigo.afijoCaos.id === "reflejo" && dmg > 0) {
+      const reflejado = Math.max(1, Math.round(dmg * 0.15));
+      state.hp = Math.max(0, state.hp - reflejado);
+      log(`🪞 Espejo del Vacío: ¡${enemigo.nombre} te refleja ${reflejado} de daño!`, "daño");
+      floatDmg("#sprite-heroe", `-${reflejado}`, "daño");
+      FX({ tipo: "attack", target: "hero", valor: reflejado, fxKey: "magic" });
+      if (state.hp <= 0) {
+        if (!comprobarPasivas("recibir-muerte", { hpAntes: 0 })) {
+          setTimeout(derrota, 400);
+        }
+      }
     }
 
     // Animación visual de recibir golpe / herido
@@ -1858,6 +1968,22 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       if (enemigo.hp <= 0) { actualizarHPs(); return setTimeout(victoria, 400); }
     }
 
+    // Afijo Caos: Vampirismo Astral
+    if (enemigo && enemigo.afijoCaos && enemigo.afijoCaos.id === "vampirismo" && dmg > 0) {
+      const curado = Math.min(enemigo.hpMax - enemigo.hp, Math.round(dmg * 0.25));
+      if (curado > 0) {
+        enemigo.hp += curado;
+        log(`🩸 Vampirismo Astral: ¡${enemigo.nombre} drena ${curado} HP de ti!`, "curar-enemigo");
+        floatDmg("#sprite-enemigo", `+${curado}`, "curar");
+      }
+    }
+
+    // Afijo Caos: Miasma Astral
+    if (enemigo && enemigo.afijoCaos && enemigo.afijoCaos.id === "veneno_etereo") {
+      state.sangrado = (state.sangrado || 0) + 5;
+      log(`☠️ Miasma Astral: ¡Te impregnas de energía corrupta! (+5 daño/turno)`, "daño");
+    }
+
     comprobarPasivas("recibir-dano", { dano: dmg });
 
     actualizarHPs(); tickBuffs();
@@ -2250,19 +2376,26 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       const RL = window.RpgLoot;
       if (RL && RL.COFRES) {
         const nHorda = enemigo.tamanoHorda || 1;
-        // Probabilidad base de drop de cofre (reducida para mayor balance):
-        // Normal: 6% (antes 15%), Mini-jefe: 22% (antes 45%), Jefe: 55% (antes 100%)
-        // Bonus por horda: +3% (Patrulla), +6% (Horda), +12% (Enjambre)
-        let probCofre = eraJefe ? 0.55 : enemigo.miniJefe ? 0.22 : 0.06;
-        if (nHorda >= 12) probCofre += 0.12;
-        else if (nHorda >= 8) probCofre += 0.06;
-        else if (nHorda >= 4) probCofre += 0.03;
+        // Probabilidad base de drop de cofre (reducida para mayor dificultad):
+        // Normal: 2% (antes 6%), Mini-jefe: 10% (antes 22%), Jefe: 30% (antes 55%)
+        // Bonus por horda: +1.5% (Patrulla), +3% (Horda), +5% (Enjambre)
+        let probCofre = eraJefe ? 0.30 : enemigo.miniJefe ? 0.10 : 0.02;
+        if (nHorda >= 12) probCofre += 0.05;
+        else if (nHorda >= 8) probCofre += 0.03;
+        else if (nHorda >= 4) probCofre += 0.015;
+
+        // En combate Post-Game (Jefes del Caos o Falla alta): drop garantizado de cofre Celestial o Alba
+        if (enemigo.esPostGame) {
+          probCofre = 1.0;
+        }
 
         if (Math.random() <= probCofre) {
           // Determinar qué cofre otorgar según orden de la zona y tier
           const zOrd = ZONAS.find(x => x.id === state.zonaActual)?.orden || 1;
           let tipoCofre = "madera";
-          if (zOrd >= 100 || (eraJefe && zOrd >= 80)) {
+          if (enemigo.esPostGame) {
+            tipoCofre = enemigo.jefe ? "celestial" : (Math.random() < 0.65 ? "celestial" : "alba");
+          } else if (zOrd >= 100 || (eraJefe && zOrd >= 80)) {
             tipoCofre = Math.random() < 0.35 ? "celestial" : "alba";
           } else if (zOrd >= 60 || (eraJefe && zOrd >= 40)) {
             tipoCofre = Math.random() < 0.45 ? "alba" : "dorado";
@@ -2355,10 +2488,9 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     }
   });
   window.addEventListener("sunad:mascota-cambiada", () => {
-    if (state) {
-      sincMascotaState(state);
-      guardar(state);
-    }
+    state = cargar();
+    if (!Array.isArray(state.zonasConquistadas)) state.zonasConquistadas = [];
+    if (!state.statsBase) state.statsBase = { atk: 14, def: 5 };
     if ($("rpg-content") && !enemigo) render();
   });
   window.addEventListener("sunad:user-ready", () => {
@@ -2399,6 +2531,23 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     }
   }, 300);
 
+  function iniciarCombateDirecto(enemigoObj, zonaNombre = "Falla Astral") {
+    state.zonaActual = enemigoObj.id || "caos-directo";
+    state._oneshotUsado = false;
+    state._segundaOportunidadUsada = false;
+    state._inmuneUsado = false;
+    mobHordaObjetivoIdx = null;
+    guardar(state);
+
+    enemigo = { ...enemigoObj };
+    turnoJugador = true;
+    overlayObjetos = false;
+    buffsHeroe = [];
+    buffsEnemigo = [];
+    SND("blip");
+    render();
+  }
+
   window.Rpg = {
     state: () => state,
     guardar: () => guardar(state),
@@ -2431,7 +2580,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     reset: () => { localStorage.removeItem(KEY()); state = def(); render(); }
   };
   window._rpgEntrarZona = entrarZona;
+  window._rpgIniciarCombateDirecto = iniciarCombateDirecto;
   window._comprobarPasivas = comprobarPasivas;
 
-  console.log("✅ rpg.js v14 · balance + loadout + pasivas");
+  console.log("✅ rpg.js v15 · post-game ready + balance + loadout");
 })();

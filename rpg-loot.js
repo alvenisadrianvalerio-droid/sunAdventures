@@ -487,7 +487,7 @@
           abrirCofre("dorado", 1, true);
         });
         acc.appendChild(b);
-      } else if (item.id === "item-5-8" || item.id === "llave-pequena" || item.nombre?.toLowerCase().includes("llave común") || item.nombre?.toLowerCase().includes("llave comun")) {
+      } else if (item.id === "item-5-8" || item.id === "llave-pequena" || item.nombre?.toLowerCase().includes("llave plateada") || item.nombre?.toLowerCase().includes("llave común") || item.nombre?.toLowerCase().includes("llave comun")) {
         const b = document.createElement("button");
         b.type = "button"; b.className = "rpg-loot-usar"; b.textContent = "🗃️ Abrir Cofre Plateado";
         b.addEventListener("click", () => {
@@ -829,37 +829,19 @@
   function consumirLlaveParaCofre(tipo) {
     const { comunes, doradas, loot } = getLlavesDisponibles();
     if (tipo === "hierro") {
-      // Cofre plateado / de hierro: se abre con 1 Llave común (o 1 dorada como alternativa si no tiene comunes)
+      // Cofre Plateado / de Hierro: se abre exclusivamente con 1 Llave Plateada
       if (comunes > 0) {
         if (loot["llave-pequena"] > 0) loot["llave-pequena"]--;
         else if (loot["item-5-8"] > 0) loot["item-5-8"]--;
         guardarLoot(loot);
         return true;
-      } else if (doradas > 0) {
-        if (loot["llave-hierro"] > 0) loot["llave-hierro"]--;
-        else if (loot["item-4-8"] > 0) loot["item-4-8"]--;
-        else if (loot["llave-dorada"] > 0) loot["llave-dorada"]--;
-        guardarLoot(loot);
-        return true;
       }
     } else if (tipo === "dorado") {
-      // Cofre Dorado: se abre con 1 Llave dorada (o 2 llaves comunes)
+      // Cofre Dorado: se abre exclusivamente con 1 Llave Dorada
       if (doradas > 0) {
         if (loot["llave-hierro"] > 0) loot["llave-hierro"]--;
         else if (loot["item-4-8"] > 0) loot["item-4-8"]--;
         else if (loot["llave-dorada"] > 0) loot["llave-dorada"]--;
-        guardarLoot(loot);
-        return true;
-      } else if (comunes >= 2) {
-        let restantes = 2;
-        if (loot["llave-pequena"] > 0) {
-          const gasto = Math.min(loot["llave-pequena"], restantes);
-          loot["llave-pequena"] -= gasto;
-          restantes -= gasto;
-        }
-        if (restantes > 0 && loot["item-5-8"] > 0) {
-          loot["item-5-8"] -= restantes;
-        }
         guardarLoot(loot);
         return true;
       }
@@ -884,7 +866,7 @@
       const exito = consumirLlaveParaCofre(tipo);
       if (!exito) {
         SND("error");
-        notifMascota?.("Sin llaves", tipo === "dorado" ? "Necesitas 1 Llave Dorada o 2 Llaves Comunes" : "Necesitas 1 Llave");
+        notifMascota?.("Sin llaves", tipo === "dorado" ? "Necesitas 1 Llave Dorada" : tipo === "hierro" ? "Necesitas 1 Llave Plateada" : "Necesitas 1 Llave");
         return;
       }
     } else {
@@ -1052,15 +1034,15 @@
 
       let botonLlaveHtml = "";
       if (tipo === "hierro") {
-        const tieneLlave = llaves.comunes > 0 || llaves.doradas > 0;
-        const infoTxt = llaves.comunes > 0 ? `(${llaves.comunes} ${svgLlave})` : `(${llaves.doradas} ${svgLlaveDorada})`;
-        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${tieneLlave ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${tieneLlave ? `Abre con 1 Llave Común (${llaves.comunes} disp.)` : 'Necesitas 1 Llave Común'}">
-          ${svgLlave} Abrir con Llave Común ${tieneLlave ? infoTxt : '(0)'}
+        const tieneLlave = llaves.comunes > 0;
+        const infoTxt = `(${llaves.comunes} ${svgLlave})`;
+        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${tieneLlave ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${tieneLlave ? `Abre con 1 Llave Plateada (${llaves.comunes} disp.)` : 'Necesitas 1 Llave Plateada'}">
+          ${svgLlave} Abrir con Llave Plateada ${tieneLlave ? infoTxt : '(0)'}
         </button>`;
       } else if (tipo === "dorado") {
-        const puedeAbrirDorado = llaves.doradas > 0 || llaves.comunes >= 2;
-        const infoTxt = llaves.doradas > 0 ? `(${llaves.doradas} ${svgLlaveDorada})` : `(${Math.floor(llaves.comunes / 2)} usos)`;
-        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${puedeAbrirDorado ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${puedeAbrirDorado ? 'Abre con 1 Llave Dorada o 2 Comunes' : 'Necesitas 1 Llave Dorada o 2 Comunes'}">
+        const puedeAbrirDorado = llaves.doradas > 0;
+        const infoTxt = `(${llaves.doradas} ${svgLlaveDorada})`;
+        botonLlaveHtml = `<button class="rpg-cofre-btn rpg-cofre-llave-btn ${puedeAbrirDorado ? 'tiene-llave' : 'sin-llave'}" data-tipo="${tipo}" title="${puedeAbrirDorado ? `Abre con 1 Llave Dorada (${llaves.doradas} disp.)` : 'Necesitas 1 Llave Dorada'}">
           ${svgLlaveDorada} Abrir con Llave Dorada ${puedeAbrirDorado ? infoTxt : '(0)'}
         </button>`;
       }

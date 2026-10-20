@@ -143,16 +143,20 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         const atkJefe = esJefe ? Math.round(idx * 2.5 + 12) : 0;
         const hpMini = esMini ? Math.round(idx * 30 + 75) : 0;
         const atkMini = esMini ? Math.round(idx * 1.6 + 8) : 0;
+        // Escalado especial para end-game: a partir de nivel 100 los monstruos son mucho más temibles
+        const multEndGame = idx >= 100 ? (1 + (idx - 99) * 0.015) : 1; // +1.5% acumulativo por nivel desde 100 (+15% en 110, +45% en 130, +75% en 150)
+        const multAtkEndGame = idx >= 100 ? (1 + (idx - 99) * 0.018) : 1; // +1.8% acumulativo de ataque
+
         z.push({
           id: `${reg.id}-${i}`,
           nombre: esJefe ? reg.jefeNombre : `${reg.nombre} · ${i}`,
           desc: esJefe ? "⚔️ JEFE DE REGIÓN" : esMini ? "★ Mini-jefe" : reg.nombre,
           icono: esJefe ? reg.jefeIcono : reg.icono, nivel: idx,
           enemigos: esJefe ? [reg.jefe] : esMini ? [...reg.elite.slice(0, 2), reg.base[0]] : esElite ? reg.elite : reg.base,
-          hp: Math.round(hpBase + hpJefe + hpMini),
-          atk: Math.round(atkBase + atkJefe + atkMini),
-          xp: Math.round(25 + idx * 18 + (esJefe ? idx * 36 : esMini ? idx * 18 : 0)),
-          monedas: Math.round(20 + idx * 7.5 + (esJefe ? 140 + idx * 4 : esMini ? 55 + idx * 2 : 0)),
+          hp: Math.round((hpBase + hpJefe + hpMini) * multEndGame),
+          atk: Math.round((atkBase + atkJefe + atkMini) * multAtkEndGame),
+          xp: Math.round((25 + idx * 18 + (esJefe ? idx * 36 : esMini ? idx * 18 : 0)) * (idx >= 100 ? 1.25 : 1)),
+          monedas: Math.round((20 + idx * 7.5 + (esJefe ? 140 + idx * 4 : esMini ? 55 + idx * 2 : 0)) * (idx >= 100 ? 1.25 : 1)),
           jefe: esJefe, miniJefe: esMini, region: reg.id, regionNombre: reg.nombre, orden: idx
         });
       }
@@ -2250,13 +2254,13 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       const RL = window.RpgLoot;
       if (RL && RL.COFRES) {
         const nHorda = enemigo.tamanoHorda || 1;
-        // Probabilidad base de drop de cofre (reducida para mayor balance):
-        // Normal: 6% (antes 15%), Mini-jefe: 22% (antes 45%), Jefe: 55% (antes 100%)
-        // Bonus por horda: +3% (Patrulla), +6% (Horda), +12% (Enjambre)
-        let probCofre = eraJefe ? 0.55 : enemigo.miniJefe ? 0.22 : 0.06;
-        if (nHorda >= 12) probCofre += 0.12;
-        else if (nHorda >= 8) probCofre += 0.06;
-        else if (nHorda >= 4) probCofre += 0.03;
+        // Probabilidad base de drop de cofre (reducida para mayor dificultad):
+        // Normal: 2% (antes 6%), Mini-jefe: 10% (antes 22%), Jefe: 30% (antes 55%)
+        // Bonus por horda: +1.5% (Patrulla), +3% (Horda), +5% (Enjambre)
+        let probCofre = eraJefe ? 0.30 : enemigo.miniJefe ? 0.10 : 0.02;
+        if (nHorda >= 12) probCofre += 0.05;
+        else if (nHorda >= 8) probCofre += 0.03;
+        else if (nHorda >= 4) probCofre += 0.015;
 
         if (Math.random() <= probCofre) {
           // Determinar qué cofre otorgar según orden de la zona y tier

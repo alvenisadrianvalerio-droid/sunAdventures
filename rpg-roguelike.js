@@ -491,13 +491,26 @@ function sustituirEmojis(root) {
   function bonosMeta(m) {
     const b = { hp:0, atk:0, def:0, pocion:0, crit:0 };
     const r = m.runs || 0;
-    if (r >= 3)  { b.hp += 10; }
-    if (r >= 5)  { b.pocion += 1; }
-    if (r >= 8)  { b.atk += 2; }
-    if (r >= 12) { b.def += 2; }
-    if (r >= 20) { b.crit += 0.05; }
-    if (m.victorias >= 1) { b.hp += 15; b.atk += 3; }
-    if (m.victorias >= 3) { b.pocion += 1; b.crit += 0.05; }
+    const bosses = m.bossesDerrotados || 0;
+    const vics = m.victorias || 0;
+
+    // Bonos por runs jugadas (progresión continua desde run 1)
+    b.hp += r * 4;
+    b.atk += Math.floor(r / 2);
+    b.def += Math.floor(r / 3);
+    if (r >= 4) b.pocion += 1;
+    if (r >= 10) b.pocion += 1;
+    if (r >= 6) b.crit += Math.min(0.15, Math.floor(r / 6) * 0.02);
+
+    // Bonos por jefes derrotados (gran recompensa por maestría en combate)
+    b.hp += bosses * 8;
+    b.atk += bosses * 2;
+    b.def += bosses * 1;
+    if (bosses >= 2) b.pocion += Math.min(2, Math.floor(bosses / 2));
+    if (bosses >= 3) b.crit += Math.min(0.10, Math.floor(bosses / 3) * 0.02);
+
+    // Bonos por victorias finales
+    if (vics >= 1) { b.hp += 20 * vics; b.atk += 4 * vics; b.def += 2 * vics; b.pocion += 1; b.crit += 0.05; }
     return b;
   }
 
@@ -1141,7 +1154,7 @@ function sustituirEmojis(root) {
   function calcularDmgBase() {
     let dmg = state.atk * (state.atkMult || 1) + rnd(-2, 3);
     if (state.furia && state.hp / state.hpMax < 0.3) dmg *= 1.6;
-    return Math.round(dmg);
+    return Math.max(1, Math.round(dmg));
   }
 
   function recibirDanio(cantidad) {
@@ -1174,16 +1187,19 @@ function sustituirEmojis(root) {
     const crit = Math.random() < state.crit;
     if (crit) dmg = Math.round(dmg * 1.8);
     if (state.enemigo.shield > 0) {
-      const absorbed = Math.min(dmg, state.enemigo.shield);
+      // El escudo absorbe daño, pero los golpes exitosos siempre perforan al menos 1-2 de daño real (chip damage)
+      const maxAbsorcion = Math.max(0, dmg - Math.max(1, Math.floor(dmg * 0.15)));
+      const absorbed = Math.min(maxAbsorcion, state.enemigo.shield);
       state.enemigo.shield -= absorbed;
       dmg -= absorbed;
-      if (absorbed > 0) logBatalla(`🛡️ El escudo absorbe ${absorbed}`);
+      if (absorbed > 0) logBatalla(`🛡️ El escudo enemigo absorbe ${absorbed} de daño`);
     }
-    dmg = Math.max(0, dmg);
+    dmg = Math.max(1, dmg);
     animador.playAttack('slash', dmg, crit);
     SND(crit ? 'victoria' : 'atrapado');
     logBatalla(`⚔️ Atacas por ${dmg}${crit ? ' ¡CRÍTICO!' : ''}`);
     state.enemigo.hp = Math.max(0, state.enemigo.hp - dmg);
+    actualizarBarraHeroe();
 
     if (state.lifesteal > 0) {
       const rob = Math.round(dmg * state.lifesteal);
@@ -1193,7 +1209,15 @@ function sustituirEmojis(root) {
       logBatalla('🪞 ¡Ataque doble!');
       setTimeout(() => {
         let d2 = calcularDmgBase();
+        if (state.enemigo.shield > 0) {
+          const maxAbs = Math.max(0, d2 - 1);
+          const abs = Math.min(maxAbs, state.enemigo.shield);
+          state.enemigo.shield -= abs;
+          d2 -= abs;
+        }
+        d2 = Math.max(1, d2);
         state.enemigo.hp = Math.max(0, state.enemigo.hp - d2);
+        actualizarBarraHeroe();
         animador.playAttack('dagger', d2, false);
         logBatalla(`⚔️ Segundo golpe: ${d2}`);
         setTimeout(() => afterPlayerAction(), 500);
@@ -1276,14 +1300,17 @@ function sustituirEmojis(root) {
     for (let i = 0; i < hits; i++) {
       let d = Math.round(calcularDmgBase() * h.mult);
       if (state.enemigo.shield > 0) {
-        const absorbed = Math.min(d, state.enemigo.shield);
+        const maxAbs = Math.max(0, d - 1);
+        const absorbed = Math.min(maxAbs, state.enemigo.shield);
         state.enemigo.shield -= absorbed;
         d -= absorbed;
       }
+      d = Math.max(1, d);
       total += d;
       state.enemigo.hp = Math.max(0, state.enemigo.hp - d);
       if (state.enemigo.hp <= 0) break;
     }
+    actualizarBarraHeroe();
     animador.playAttack(h.fx, total, true);
     SND('victoria');
     logBatalla(`✨ ${h.nombre}: ${total} daño`);
@@ -1349,6 +1376,25 @@ function sustituirEmojis(root) {
     const ee = qs('.rpg-rl-fighter-info.enemigo .rpg-rl-barra-hp em');
     if (es && state.enemigo) es.style.width = clamp(state.enemigo.hp / state.enemigo.hpMax * 100) + '%';
     if (ee && state.enemigo) ee.textContent = `${Math.round(state.enemigo.hp)} / ${state.enemigo.hpMax}`;
+
+    // Sincronizar etiqueta de escudo del enemigo
+    const infoEnemigo = qs('.rpg-rl-fighter-info.enemigo');
+    if (infoEnemigo && state.enemigo) {
+      let shieldEl = infoEnemigo.querySelector('.rpg-rl-shield');
+      if (state.enemigo.shield > 0) {
+        if (!shieldEl) {
+          shieldEl = document.createElement('small');
+          shieldEl.className = 'rpg-rl-shield';
+          const intencion = infoEnemigo.querySelector('#rl-intencion');
+          if (intencion) infoEnemigo.insertBefore(shieldEl, intencion);
+          else infoEnemigo.appendChild(shieldEl);
+        }
+        shieldEl.innerHTML = `${spriteMarkup('🛡️')} Escudo: ${state.enemigo.shield}`;
+        shieldEl.style.display = 'block';
+      } else if (shieldEl) {
+        shieldEl.style.display = 'none';
+      }
+    }
   }
 
   function turnoEnemigo() {
@@ -1557,14 +1603,17 @@ function sustituirEmojis(root) {
     state.oro += oroGanado;
     state.xp += e.xp;
     let subido = false;
+    let lvlsSubidos = 0;
     while (state.xp >= state.xpSig) {
       state.xp -= state.xpSig;
       state.nivel++;
       state.xpSig = Math.round(state.xpSig * 1.45);
       state.hpMax += 12;
+      state.hp = clamp(state.hp + 12, 0, state.hpMax);
       state.atk += 2;
       state.def += 1;
       subido = true;
+      lvlsSubidos++;
     }
     SND('victoria');
 
@@ -1611,7 +1660,7 @@ function sustituirEmojis(root) {
 const STAR = '<img class="rpg-rl-inline-icon" src="img/items%20de%20aventura/estrella.png" alt="">';
 const lineas = [`+${oroGanado} ${COIN} oro`, `+${e.xp} ${STAR} XP`];
 if (premioRacha) lineas.push(`🔥 Racha x${state.racha}: +20 ${COIN} y una 🧪`);
-if (subido) lineas.push(`⬆️ Nivel ${state.nivel}`);
+if (subido) lineas.push(`⬆️ ¡Subiste a Nivel ${state.nivel}! (+${lvlsSubidos * 12} HP máx, +${lvlsSubidos * 2} ATK, +${lvlsSubidos * 1} DEF)`);
 if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}`);
       mostrarRecompensa('¡Victoria!', lineas, () => completarSala());
     }, 900);
@@ -1635,12 +1684,13 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
     meta.runs++;
     meta.mejorPiso = Math.max(meta.mejorPiso, state.piso);
     guardarMeta(meta);
+    const b = bonosMeta(meta);
     setTimeout(() => {
       mostrarRecompensa('💀 Has caído…', [
-        `Llegaste al piso ${state.piso}`,
-        `Nivel ${state.nivel}`,
-        `${state.reliquias.length} reliquias`,
-        `${state.maldiciones.length} maldiciones`
+        `Llegaste al piso ${state.piso} (Nivel ${state.nivel})`,
+        `${state.reliquias.length} reliquias · ${state.maldiciones.length} maldiciones`,
+        `📈 Estadísticas meta activas para la próxima run:`,
+        `✨ +${b.hp} HP · +${b.atk} ATK · +${b.def} DEF · +${b.pocion} 🧪`
       ], () => { limpiarRun(); state = null; renderPanel(); });
     }, 700);
   }
@@ -1654,6 +1704,7 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
     meta.mejorPiso = PISOS_MAX;
     guardarMeta(meta);
     guardarRun(state);
+    const b = bonosMeta(meta);
     // Gran bonus de XP para el nivel general de la cuenta
     try {
       const uId = resolveUid();
@@ -1669,7 +1720,8 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
         `Nivel final: ${state.nivel}`,
         `${state.reliquias.length} reliquias`,
         `${state.maldiciones.length} maldiciones`,
-        `+500 ${COIN} bonus`
+        `+500 ${COIN} bonus`,
+        `✨ Nuevas estadísticas permanentes: +${b.hp} HP, +${b.atk} ATK, +${b.def} DEF`
       ], () => { limpiarRun(); state = null; renderPanel(); });
     }, 700);
   }
