@@ -620,26 +620,31 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const u = resolveUid();
 
     p.innerHTML = `
-      <div class="rpg-popup-panel rpg-popup-mascotas-panel" style="max-width:520px;">
+      <div class="rpg-popup-panel rpg-popup-mascotas-panel">
         <button class="rpg-popup-close" aria-label="Cerrar">×</button>
-        <header class="rpg-popup-hero" style="min-height:auto;padding:1.2rem;">
-          <div class="rpg-popup-titulo">
-            <small>CAMBIAR COMPAÑERO · ${modo === "roguelike" ? "MODO ROGUELIKE" : "MODO AVENTURA"}</small>
-            <span style="font-size:1.3rem;">Elige tu Mascota</span>
-            <em>Cada mascota tiene su progreso, nivel, mapa y equipamiento independiente.</em>
+        <header class="rpg-popup-mascotas-header">
+          <div class="rpg-popup-mascotas-header-badge">
+            <span class="rpg-header-sparkle">✦</span>
+            <span>${modo === "roguelike" ? "MODO ROGUELIKE" : "MODO AVENTURA"}</span>
           </div>
+          <h2 class="rpg-popup-mascotas-title">Elige tu Mascota</h2>
+          <p class="rpg-popup-mascotas-desc">Cada compañero cuenta con su propio progreso, nivel independiente y estilo único en combate.</p>
         </header>
         <div class="rpg-popup-mascotas-grid">
           ${disponibles.map(id => {
             const data = MASCOTAS[id] || {};
             const esActiva = id === actualId;
             let nivelTxt = "Nv 1";
+            let nivelNum = 1;
             if (modo === "aventura") {
               try {
                 const sRaw = localStorage.getItem(`sa_rpg_${u}_${id}`) || (id === "mapache" ? localStorage.getItem(`sa_rpg_${u}`) : null);
                 if (sRaw) {
                   const sObj = JSON.parse(sRaw);
-                  if (sObj?.nivel) nivelTxt = `Nv ${sObj.nivel}`;
+                  if (sObj?.nivel) {
+                    nivelNum = sObj.nivel;
+                    nivelTxt = `Nv ${sObj.nivel}`;
+                  }
                 }
               } catch {}
             } else {
@@ -647,20 +652,22 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
                 const mRaw = localStorage.getItem(`sa_rl_meta_${u}_${id}`) || (id === "mapache" ? localStorage.getItem(`sa_rl_meta_${u}`) : null);
                 if (mRaw) {
                   const mObj = JSON.parse(mRaw);
-                  nivelTxt = `${mObj?.runs || 0} runs · P.${mObj?.mejorPiso || 0}`;
+                  nivelTxt = `Piso ${mObj?.mejorPiso || 1}`;
                 }
               } catch {}
             }
             return `
               <button type="button" class="rpg-popup-mascota-card ${esActiva ? "activa" : ""}" data-mascota-sel="${id}">
+                ${esActiva ? `<div class="rpg-popup-mascota-activa-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>` : ""}
                 <div class="rpg-popup-mascota-img-wrap">
+                  <div class="rpg-popup-mascota-aura"></div>
                   <img src="${data.imagen || 'img/girasol-loading.png'}" alt="${data.nombre}" onerror="this.onerror=null;this.src='img/girasol-loading.png'">
-                  ${esActiva ? `<span class="rpg-popup-mascota-activa-badge">✓</span>` : ""}
                 </div>
                 <div class="rpg-popup-mascota-info">
-                  <strong>${data.nombre || id}</strong>
-                  <span>${nivelTxt}</span>
+                  <strong class="rpg-popup-mascota-nombre">${data.nombre || id}</strong>
+                  <span class="rpg-popup-mascota-level-pill ${esActiva ? 'pill-activa' : ''}">${nivelTxt}</span>
                 </div>
+                ${esActiva ? `<span class="rpg-popup-mascota-status-tag">En equipo</span>` : `<span class="rpg-popup-mascota-select-hint">Seleccionar</span>`}
               </button>
             `;
           }).join("")}
