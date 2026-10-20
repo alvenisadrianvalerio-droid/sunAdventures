@@ -434,7 +434,10 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
             <span>${m.nombre}</span>
             <span class="rpg-hero-lvl">${esNivelMax ? `Nv ${NIVEL_MAX} (MÁX)` : `Nv ${state.nivel}`}</span>
             <button type="button" class="rpg-btn-cambiar-mascota" data-rpg-accion="cambiar-mascota" title="Cambiar de Mascota">
-              <span>🔄 Cambiar</span>
+              <svg viewBox="0 0 24 24" class="rpg-btn-cambiar-icon" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+              <span>Cambiar</span>
             </button>
             <div class="rpg-hero-stats-badges">
               <span class="rpg-stat-badge" title="Ataque">${SVG_SWORD}${totalAtk}</span>

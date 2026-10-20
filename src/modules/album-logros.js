@@ -138,25 +138,54 @@
     const minijuegosCount = Math.max(0, Number(localStorage.getItem(`sa_minijuegos_jugados_${u}`)) || 0);
     const xpMinijuegos = minijuegosCount * 5; // 5 XP por partida
 
-    // 2. Modo Aventura (RPG clásico): enemigos y zonas
+    const MASCOTAS_LISTA = ["mapache","girasol","gatito","gatito-negro","hamburguesa","oveja","pollito","jirafa","unicornio","conejo","dragon-bebe","dragon-anciano"];
+
+    // 2. Modo Aventura (RPG clásico): enemigos y zonas (agregado de todas las mascotas + legacy)
     let xpAventura = 0;
     try {
-      const rpgData = JSON.parse(localStorage.getItem(`sa_rpg_${u}`) || "{}");
-      const enemigos = Number(rpgData.enemigosDerrotados || 0);
-      const zonas = Array.isArray(rpgData.zonasConquistadas) ? rpgData.zonasConquistadas.length : 0;
-      const jefes = Array.isArray(rpgData.jefesDerrotados) ? rpgData.jefesDerrotados.length : 0;
-      xpAventura = (enemigos * 2) + (zonas * 15) + (jefes * 35);
+      let enemigosTotal = 0;
+      const zonasTodas = new Set();
+      const jefesTodos = new Set();
+
+      const parseRpg = raw => {
+        if (!raw) return;
+        try {
+          const d = typeof raw === "string" ? JSON.parse(raw) : raw;
+          enemigosTotal += Number(d.enemigosDerrotados || 0);
+          (d.zonasConquistadas || []).forEach(z => zonasTodas.add(z));
+          (d.jefesDerrotados || []).forEach(j => jefesTodos.add(j));
+        } catch {}
+      };
+
+      parseRpg(localStorage.getItem(`sa_rpg_${u}`));
+      MASCOTAS_LISTA.forEach(m => parseRpg(localStorage.getItem(`sa_rpg_${u}_${m}`)));
+
+      xpAventura = (enemigosTotal * 2) + (zonasTodas.size * 15) + (jefesTodos.size * 35);
     } catch {}
 
-    // 3. Modo Roguelike: runs, mejor piso, victorias y jefes
+    // 3. Modo Roguelike: runs, mejor piso, victorias y jefes (agregado de todas las mascotas + legacy)
     let xpRoguelike = 0;
     try {
-      const rlData = JSON.parse(localStorage.getItem(`sa_rl_meta_${u}`) || "{}");
-      const runs = Number(rlData.runs || 0);
-      const mejorPiso = Number(rlData.mejorPiso || 0);
-      const victorias = Number(rlData.victorias || 0);
-      const bosses = Number(rlData.bossesDerrotados || 0);
-      xpRoguelike = (runs * 5) + (mejorPiso * 10) + (victorias * 80) + (bosses * 25);
+      let runsTotal = 0;
+      let maxPiso = 0;
+      let vicTotal = 0;
+      let bossesTotal = 0;
+
+      const parseRl = raw => {
+        if (!raw) return;
+        try {
+          const d = typeof raw === "string" ? JSON.parse(raw) : raw;
+          runsTotal += Number(d.runs || 0);
+          if (Number(d.mejorPiso || 0) > maxPiso) maxPiso = Number(d.mejorPiso || 0);
+          vicTotal += Number(d.victorias || 0);
+          bossesTotal += Number(d.bossesDerrotados || 0);
+        } catch {}
+      };
+
+      parseRl(localStorage.getItem(`sa_rl_meta_${u}`));
+      MASCOTAS_LISTA.forEach(m => parseRl(localStorage.getItem(`sa_rl_meta_${u}_${m}`)));
+
+      xpRoguelike = (runsTotal * 5) + (maxPiso * 10) + (vicTotal * 80) + (bossesTotal * 25);
     } catch {}
 
     const extra = Math.max(0, Number(localStorage.getItem(`sa_experiencia_extra_${u}`)) || 0);
@@ -219,9 +248,28 @@
   const _logroState = { personal: { grid: null, cards: new Map(), firma: "" }, grupo: { grid: null, cards: new Map(), firma: "" } };
   const _firmaLogros = lista => lista.map(l => l.id).join("|");
 
+  function _obtenerCategoria(logro) {
+    if (logro.tipo === "grupo") return "grupo";
+    const id = logro.id || "";
+    if (id.startsWith("rl-")) return "roguelike";
+    if (id.startsWith("rpg-") || id.startsWith("maxima-bestia")) return "rpg";
+    if (id.startsWith("mascota-") || id.startsWith("clics-") || id.includes("cuidado") || id.includes("amigo")) return "mascotas";
+    if (id.includes("juego") || id.includes("jugador") || id.includes("ganador") || id.includes("invicto") || id.includes("vicio")) return "minijuegos";
+    return "general";
+  }
+
+  let _categoriaFiltroActiva = "todos";
+
   function _construirCard(logro) {
     const card = document.createElement("article");
-    card.className = "logro-card"; card.dataset.logroId = logro.id;
+    const cat = _obtenerCategoria(logro);
+    card.className = "logro-card";
+    card.dataset.logroId = logro.id;
+    card.dataset.categoria = cat;
+    if (_categoriaFiltroActiva !== "todos" && cat !== _categoriaFiltroActiva) {
+      card.classList.add("logro-oculto");
+    }
+
     const contenido = document.createElement("div");
     contenido.className = "logro-contenido";
     contenido.innerHTML = `
@@ -258,8 +306,13 @@
     if (badge) badge.textContent = desbloqueado ? "✨" : "🔒";
 
     const tenia = card.classList.contains("desbloqueado");
-    if (desbloqueado && !tenia) { card.classList.add("desbloqueado"); if (notificar) notificarLogro(logro); }
-    else if (!desbloqueado && tenia) card.classList.remove("desbloqueado");
+    if (desbloqueado && !tenia) {
+      card.classList.add("desbloqueado");
+      try { window._snd?.("fanfarria") || window._snd?.("pop"); } catch {}
+      if (notificar) notificarLogro(logro);
+    } else if (!desbloqueado && tenia) {
+      card.classList.remove("desbloqueado");
+    }
   }
 
   function renderLogros({ notificar = false } = {}) {
@@ -299,8 +352,24 @@
       const personales = LOGROS.filter(l => l.tipo !== "grupo");
       const grupales = LOGROS.filter(l => l.tipo === "grupo");
       const totalPersonal = pintar(personales, logrosPersonalesGrid, `sunad_logros_${getUserIdSafe()}`, "personal");
-      pintar(grupales, logrosGrupoGrid, `sunad_logros_grupo_${grupoActivo?.id || "local"}`, "grupo");
+      const totalGrupal = pintar(grupales, logrosGrupoGrid, `sunad_logros_grupo_${grupoActivo?.id || "local"}`, "grupo");
+
+      // Actualizar conteos y barra global
+      const totalDesbloqueados = totalPersonal + totalGrupal;
+      const totalMeta = LOGROS.length;
+      const pctGlobal = totalMeta > 0 ? Math.round((totalDesbloqueados / totalMeta) * 100) : 0;
+
       if (logrosDesbloqueados) logrosDesbloqueados.textContent = totalPersonal;
+      const totalCountEl = $("logros-total-count");
+      if (totalCountEl) totalCountEl.textContent = totalMeta;
+      const pctGlobalEl = $("logros-porcentaje-global");
+      if (pctGlobalEl) pctGlobalEl.textContent = `${pctGlobal}%`;
+      const fillGlobalEl = $("logros-global-fill");
+      if (fillGlobalEl) fillGlobalEl.style.width = `${pctGlobal}%`;
+
+      // Aplicar filtro activo a los elementos visibles
+      aplicarFiltroActivo();
+
       renderExperiencia();
       window._logrosDesbloqueados = {
         ...JSON.parse(localStorage.getItem(`sunad_logros_grupo_${grupoActivo?.id || "local"}`) || "{}"),
@@ -308,6 +377,60 @@
       };
       if (typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
     } catch (err) { console.error("renderLogros:", err); }
+  }
+
+  function aplicarFiltroActivo() {
+    const cards = document.querySelectorAll(".logros-grid .logro-card");
+    cards.forEach(card => {
+      const cat = card.dataset.categoria;
+      if (_categoriaFiltroActiva === "todos" || cat === _categoriaFiltroActiva) {
+        card.classList.remove("logro-oculto");
+      } else {
+        card.classList.add("logro-oculto");
+      }
+    });
+
+    // Ocultar o mostrar títulos según filtro
+    const titPersonal = $("logros-cat-titulo-personal");
+    const titGrupo = $("logros-cat-titulo-grupo");
+    const gridGrupo = $("logros-grupo-grid");
+    if (_categoriaFiltroActiva === "grupo") {
+      if (titPersonal) titPersonal.style.display = "none";
+      if (logrosPersonalesGrid) logrosPersonalesGrid.style.display = "none";
+      if (titGrupo) titGrupo.style.display = "";
+      if (gridGrupo) gridGrupo.style.display = "";
+    } else if (_categoriaFiltroActiva !== "todos") {
+      if (titPersonal) titPersonal.style.display = "";
+      if (logrosPersonalesGrid) logrosPersonalesGrid.style.display = "";
+      if (titGrupo) titGrupo.style.display = "none";
+      if (gridGrupo) gridGrupo.style.display = "none";
+    } else {
+      if (titPersonal) titPersonal.style.display = "";
+      if (logrosPersonalesGrid) logrosPersonalesGrid.style.display = "";
+      if (titGrupo) titGrupo.style.display = "";
+      if (gridGrupo) gridGrupo.style.display = "";
+    }
+  }
+
+  // Configurar botones de filtro
+  function inicializarFiltros() {
+    const bar = $("logros-filtros-bar");
+    if (!bar) return;
+    bar.addEventListener("click", e => {
+      const btn = e.target.closest(".logro-filtro-btn");
+      if (!btn) return;
+      bar.querySelectorAll(".logro-filtro-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      _categoriaFiltroActiva = btn.dataset.cat || "todos";
+      aplicarFiltroActivo();
+      try { window._snd?.("pop"); } catch {}
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", inicializarFiltros);
+  } else {
+    inicializarFiltros();
   }
 
   let _progressT = null, _progressPend = false;

@@ -800,7 +800,10 @@ function sustituirEmojis(root) {
           <h2>Modo Roguelike</h2>
           <div style="margin-bottom:0.75rem;">
             <button type="button" class="rpg-btn-cambiar-mascota" data-rl-accion="cambiar-mascota" title="Cambiar mascota para Roguelike">
-              <span>🔄 Mascota: <strong>${m.nombre || mascotaId}</strong></span>
+              <svg viewBox="0 0 24 24" class="rpg-btn-cambiar-icon" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+              <span>Mascota: <strong>${m.nombre || mascotaId}</strong></span>
             </button>
           </div>
           <p>10 pisos · 6 columnas · Maldiciones · Jefes con 2 fases</p>

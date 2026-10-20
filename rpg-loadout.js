@@ -41,17 +41,27 @@
         if (!list.includes("local")) list.push("local");
         return list;
     };
-    const SLOT_KEY = () => `sa_rpg_loadout_${resolveUid()}`;
+    const getMascotaActualId = () => {
+        try { return localStorage.getItem("mascota_actual") || "mapache"; } catch { return "mapache"; }
+    };
+    const SLOT_KEY = () => `sa_rpg_loadout_${resolveUid()}_${getMascotaActualId()}`;
 
     // ─── Obtener loadout guardado ───
     function getLoadout() {
         try {
             const k = SLOT_KEY();
+            const m = getMascotaActualId();
             let raw = localStorage.getItem(k);
+            if (!raw) {
+                if (m === "mapache") {
+                    raw = localStorage.getItem(`sa_rpg_loadout_${resolveUid()}`);
+                    if (raw) localStorage.setItem(k, raw);
+                }
+            }
             if (!raw && resolveUid() !== "local") {
                 const candidates = getUserCandidates();
                 for (const c of candidates) {
-                    const fb = localStorage.getItem(`sa_rpg_loadout_${c}`);
+                    const fb = localStorage.getItem(`sa_rpg_loadout_${c}_${m}`) || (m === "mapache" ? localStorage.getItem(`sa_rpg_loadout_${c}`) : null);
                     if (fb) {
                         raw = fb;
                         localStorage.setItem(k, raw);
@@ -847,6 +857,10 @@
         if (e.detail?.tab === "objetos") {
             setTimeout(inyectarPanelLoadout, 200);
         }
+    });
+
+    window.addEventListener("sunad:mascota-cambiada", () => {
+        setTimeout(inyectarPanelLoadout, 150);
     });
 
     setTimeout(inyectarPanelLoadout, 1800);

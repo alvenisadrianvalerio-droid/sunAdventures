@@ -506,6 +506,9 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const u = getUserId();
       setNumLS(`sa_minijuegos_jugados_${u}`, numLS(`sa_minijuegos_jugados_${u}`) + 1);
+      if (m > 0 || f > 0) {
+        setNumLS(`sa_minijuegos_ganados_${u}`, numLS(`sa_minijuegos_ganados_${u}`) + 1);
+      }
       // Ganar XP de nivel general por cada partida ganada o jugada
       const xpPremio = Math.max(3, Math.round(m * 0.4));
       const kXp = `sa_experiencia_extra_${u}`;
@@ -1434,8 +1437,12 @@ sprite.style.opacity = "0.25";
         }
         else { p.textContent = "Aún no desbloqueada"; b.textContent = "Bloqueada"; b.disabled = true; }
       }
-      else if (id === act) { p.textContent = "Te acompaña"; b.textContent = "En uso"; b.classList.add("activo"); }
-      else { p.textContent = "Disponible"; b.textContent = "Usar"; b.addEventListener("click", () => { localStorage.setItem("mascota_actual", id); window.location.reload(); }); }
+      else {
+        p.textContent = "Mascota adquirida";
+        b.textContent = "✓ Adquirida";
+        b.classList.add("activo");
+        b.disabled = true;
+      }
       c.append(im, h, p, b);
       g.appendChild(c);
     });

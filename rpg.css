@@ -1777,4 +1777,713 @@ html.animations-disabled .rpg-rl-log-line { opacity: 1 !important; }
   object-fit: contain; font-size: 1.6rem; line-height: 40px; text-align: center;
 }
 .rpg-rl-eleccion .rpg-rl-opcion-reliquia strong { font-size: .88rem; }
-.rpg-rl-eleccion .rpg-rl-opcion-reliquia small { font-size: .74rem; opacity: .8; }
+.rpg-rl-eleccion .rpg-rl-opcion-reliquia small { font-size: .74rem; opacity: .8; }
+
+/* ============================================================
+   POST-GAME: LA FALLA ASTRAL & JEFES DEL CAOS
+   ============================================================ */
+.rpg-tab-postgame {
+  background: linear-gradient(135deg, rgba(176, 245, 255, 0.18), rgba(184, 154, 255, 0.22)) !important;
+  border-color: rgba(176, 245, 255, 0.45) !important;
+  color: #b0f5ff !important;
+  position: relative;
+  overflow: hidden;
+}
+.rpg-tab-postgame::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: rotate(30deg);
+  animation: pgTabShine 4s linear infinite;
+}
+@keyframes pgTabShine {
+  0% { transform: translateX(-100%) rotate(30deg); }
+  30%, 100% { transform: translateX(100%) rotate(30deg); }
+}
+.postgame-corona-shimmer {
+  filter: drop-shadow(0 0 6px rgba(176, 245, 255, 0.8));
+  animation: pgGlowPulse 2.2s infinite alternate ease-in-out;
+}
+@keyframes pgGlowPulse {
+  0% { filter: drop-shadow(0 0 4px rgba(176, 245, 255, 0.6)); }
+  100% { filter: drop-shadow(0 0 10px rgba(255, 217, 61, 0.95)); }
+}
+
+/* Banner en el HUB de zonas */
+.rpg-postgame-portal-banner {
+  margin: 0.8rem 0 1.4rem;
+  background: linear-gradient(135deg, rgba(20, 15, 38, 0.95), rgba(12, 28, 48, 0.92));
+  border: 2px solid rgba(176, 245, 255, 0.5);
+  border-radius: 16px;
+  padding: 1rem 1.4rem;
+  box-shadow: 0 8px 32px rgba(108, 92, 231, 0.25), inset 0 0 20px rgba(176, 245, 255, 0.1);
+  position: relative;
+  animation: pgPortalPulse 3s infinite alternate;
+}
+@keyframes pgPortalPulse {
+  0% { border-color: rgba(176, 245, 255, 0.4); box-shadow: 0 4px 20px rgba(108, 92, 231, 0.2); }
+  100% { border-color: rgba(255, 217, 61, 0.7); box-shadow: 0 8px 30px rgba(255, 217, 61, 0.35); }
+}
+.rpg-pg-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+.rpg-pg-banner-icon {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 0 10px #b0f5ff);
+  animation: pgSpinSlow 12s linear infinite;
+}
+@keyframes pgSpinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.rpg-pg-banner-text {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.rpg-pg-banner-text strong {
+  font-size: 1.05rem;
+  color: #b0f5ff;
+  letter-spacing: 0.02em;
+}
+.rpg-pg-banner-text span {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.35;
+}
+.rpg-pg-banner-btn {
+  background: linear-gradient(135deg, #6c5ce7, #0984e3);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.65rem 1.3rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(108, 92, 231, 0.4);
+}
+.rpg-pg-banner-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #a29bfe, #74b9ff);
+  box-shadow: 0 6px 20px rgba(116, 185, 255, 0.6);
+}
+
+/* Panel Post-Game Wrapper */
+.rpg-postgame-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  padding: 0.5rem 0 3rem;
+}
+.rpg-postgame-hero {
+  background: radial-gradient(circle at 50% 10%, rgba(108, 92, 231, 0.25), transparent 70%),
+              linear-gradient(135deg, rgba(16, 20, 36, 0.95), rgba(10, 12, 24, 0.98));
+  border: 2px solid rgba(176, 245, 255, 0.35);
+  border-radius: 20px;
+  padding: 1.6rem;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+.rpg-postgame-badge-top {
+  display: inline-block;
+  background: linear-gradient(90deg, #6c5ce7, #b0f5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+.rpg-postgame-title {
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.6rem;
+  text-shadow: 0 2px 14px rgba(176, 245, 255, 0.35);
+}
+.rpg-postgame-subtitle {
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 720px;
+  margin: 0 auto 1.4rem;
+  line-height: 1.5;
+}
+.rpg-postgame-stats-ribbon {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+.rpg-postgame-stat-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.75rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.rpg-postgame-stat-val {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #ffd84d;
+}
+.rpg-postgame-stat-lbl {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Sub-pestañas */
+.rpg-postgame-subtabs {
+  display: flex;
+  gap: 0.6rem;
+  overflow-x: auto;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.rpg-pg-subtab {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+  padding: 0.65rem 1.1rem;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+.rpg-pg-subtab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.rpg-pg-subtab.active {
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.35), rgba(9, 132, 227, 0.35));
+  border-color: #b0f5ff;
+  color: #b0f5ff;
+  box-shadow: 0 0 14px rgba(176, 245, 255, 0.25);
+}
+
+/* Grid de Jefes del Caos */
+.rpg-pg-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 1.2rem;
+}
+.rpg-boss-caos-card {
+  background: linear-gradient(145deg, rgba(22, 26, 44, 0.95), rgba(15, 17, 30, 0.98));
+  border: 1.5px solid rgba(176, 245, 255, 0.25);
+  border-radius: 16px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.rpg-boss-caos-card:hover:not(.bloqueado) {
+  transform: translateY(-4px);
+  border-color: rgba(176, 245, 255, 0.6);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(176, 245, 255, 0.15);
+}
+.rpg-boss-caos-card.conquistado {
+  border-color: rgba(255, 217, 61, 0.4);
+}
+.rpg-boss-caos-card.bloqueado {
+  opacity: 0.55;
+  filter: grayscale(0.6);
+}
+.rpg-boss-caos-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.rpg-boss-tier-badge {
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffd84d;
+  letter-spacing: 0.05em;
+}
+.rpg-boss-afijo-pill {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 84, 112, 0.18);
+  border: 1px solid rgba(255, 84, 112, 0.4);
+  color: #ff9a9e;
+}
+.rpg-boss-sprite-zone {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90px;
+  background: radial-gradient(circle, rgba(108, 92, 231, 0.2), transparent 70%);
+}
+.rpg-boss-anim-card {
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.7));
+}
+.rpg-boss-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.rpg-boss-name {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #fff;
+  margin: 0;
+  line-height: 1.25;
+}
+.rpg-boss-title {
+  font-size: 0.78rem;
+  color: #b0f5ff;
+  font-style: italic;
+}
+.rpg-boss-stats-row {
+  display: flex;
+  gap: 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0.3rem 0;
+}
+.rpg-boss-afijo-desc {
+  font-size: 0.78rem;
+  color: rgba(255, 200, 200, 0.9);
+  margin: 0;
+  line-height: 1.35;
+}
+.rpg-boss-loot-highlight {
+  font-size: 0.78rem;
+  background: rgba(255, 217, 61, 0.08);
+  border: 1px solid rgba(255, 217, 61, 0.2);
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  color: #ffeaa7;
+  font-weight: 600;
+}
+.rpg-boss-footer {
+  margin-top: auto;
+  padding-top: 0.6rem;
+}
+.rpg-btn-caos {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+.rpg-btn-caos.iniciar {
+  background: linear-gradient(135deg, #d63031, #e17055);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(214, 48, 49, 0.4);
+}
+.rpg-btn-caos.iniciar:hover {
+  background: linear-gradient(135deg, #ff7675, #fab1a0);
+  transform: translateY(-2px);
+}
+.rpg-btn-caos.repetible {
+  background: rgba(255, 217, 61, 0.15);
+  border: 1px solid rgba(255, 217, 61, 0.4);
+  color: #ffd84d;
+}
+.rpg-btn-caos.repetible:hover {
+  background: rgba(255, 217, 61, 0.3);
+  transform: translateY(-2px);
+}
+.rpg-btn-caos.bloqueado {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
+}
+
+/* Panel de Falla Infinita */
+.rpg-falla-panel {
+  background: linear-gradient(135deg, rgba(18, 22, 40, 0.95), rgba(12, 14, 28, 0.98));
+  border: 2px solid rgba(176, 245, 255, 0.3);
+  border-radius: 18px;
+  padding: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+.rpg-falla-header {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+}
+.rpg-falla-orb {
+  font-size: 3.5rem;
+  animation: pgSpinSlow 8s linear infinite;
+}
+.rpg-falla-copy {
+  flex: 1;
+  min-width: 260px;
+}
+.rpg-falla-copy h3 {
+  font-size: 1.35rem;
+  color: #b0f5ff;
+  margin-bottom: 0.4rem;
+}
+.rpg-falla-copy p {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.45;
+  margin-bottom: 0.8rem;
+}
+.rpg-falla-multipliers {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.falla-mult-tag {
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  background: rgba(255, 84, 112, 0.2);
+  color: #ff7675;
+}
+.falla-mult-tag.oro {
+  background: rgba(255, 217, 61, 0.2);
+  color: #ffd84d;
+}
+.falla-mult-tag.tornasol {
+  background: rgba(176, 245, 255, 0.2);
+  color: #b0f5ff;
+  border: 1px solid rgba(176, 245, 255, 0.4);
+}
+.rpg-falla-actions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+.rpg-btn-falla-entrar {
+  background: linear-gradient(135deg, #0984e3, #6c5ce7);
+  color: #fff;
+  border: none;
+  padding: 0.9rem 1.6rem;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(9, 132, 227, 0.4);
+  transition: all 0.25s ease;
+}
+.rpg-btn-falla-entrar:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #74b9ff, #a29bfe);
+  box-shadow: 0 8px 25px rgba(116, 185, 255, 0.6);
+}
+.rpg-btn-falla-reset {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Altar de Bendiciones */
+.rpg-altar-panel {
+  background: linear-gradient(135deg, rgba(16, 18, 34, 0.95), rgba(10, 11, 22, 0.98));
+  border: 2px solid rgba(255, 217, 61, 0.3);
+  border-radius: 18px;
+  padding: 1.6rem;
+}
+.rpg-altar-header {
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto 1.4rem;
+}
+.rpg-altar-header h3 {
+  font-size: 1.3rem;
+  color: #ffd84d;
+  margin-bottom: 0.4rem;
+}
+.rpg-altar-header p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.45;
+  margin-bottom: 0.8rem;
+}
+.rpg-altar-points-badge {
+  display: inline-block;
+  background: rgba(255, 217, 61, 0.15);
+  border: 1px solid rgba(255, 217, 61, 0.4);
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  color: #ffd84d;
+  font-size: 0.9rem;
+}
+.rpg-bendiciones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+.rpg-bendicion-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rpg-bendicion-card.tornasol {
+  border-color: rgba(176, 245, 255, 0.4);
+  background: linear-gradient(135deg, rgba(176, 245, 255, 0.06), rgba(184, 154, 255, 0.06));
+}
+.rpg-bendicion-icon {
+  font-size: 1.8rem;
+}
+.rpg-bendicion-info h4 {
+  font-size: 0.98rem;
+  color: #fff;
+  margin: 0 0 0.2rem;
+}
+.rpg-bendicion-info p {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0 0 0.4rem;
+  line-height: 1.35;
+}
+.rpg-bendicion-status {
+  font-size: 0.75rem;
+  color: #74b9ff;
+  font-weight: 700;
+  display: block;
+}
+.rpg-btn-bendicion {
+  margin-top: auto;
+  background: linear-gradient(135deg, #00b894, #0984e3);
+  color: #fff;
+  border: none;
+  padding: 0.6rem;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.rpg-btn-bendicion:hover:not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 184, 148, 0.4);
+}
+.rpg-btn-bendicion[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================
+   SELECTOR DE MASCOTAS (AVENTURA & ROGUELIKE)
+   ============================================================ */
+.rpg-hero-avatar-btn {
+  position: relative;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.rpg-hero-avatar-btn:hover {
+  transform: scale(1.05);
+  border-color: var(--accent);
+  box-shadow: 0 0 15px rgba(255, 217, 61, 0.35);
+}
+.rpg-hero-avatar-cambiar-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: linear-gradient(135deg, #2a2517, #181510);
+  border: 1.5px solid var(--accent);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  color: #ffd93d;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 10px rgba(255, 217, 61, 0.35);
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.rpg-hero-avatar-btn:hover .rpg-hero-avatar-cambiar-badge {
+  transform: rotate(180deg) scale(1.15);
+}
+
+.rpg-btn-cambiar-mascota {
+  appearance: none;
+  -webkit-appearance: none;
+  background: linear-gradient(135deg, rgba(255, 217, 61, 0.16), rgba(255, 171, 61, 0.08)) !important;
+  border: 1px solid rgba(255, 217, 61, 0.5) !important;
+  color: #ffd93d !important;
+  padding: 0.24rem 0.75rem !important;
+  border-radius: 999px !important;
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
+  cursor: pointer;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  line-height: 1 !important;
+  vertical-align: middle;
+  outline: none;
+  user-select: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.rpg-btn-cambiar-mascota .rpg-btn-cambiar-icon {
+  width: 13px;
+  height: 13px;
+  stroke: #ffd93d;
+  flex-shrink: 0;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.rpg-btn-cambiar-mascota:hover {
+  background: linear-gradient(135deg, rgba(255, 217, 61, 0.28), rgba(255, 171, 61, 0.18)) !important;
+  border-color: #ffd93d !important;
+  color: #fff !important;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 16px rgba(255, 217, 61, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+.rpg-btn-cambiar-mascota:hover .rpg-btn-cambiar-icon {
+  transform: rotate(180deg);
+  stroke: #fff;
+}
+
+.rpg-btn-cambiar-mascota:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.light .rpg-btn-cambiar-mascota {
+  background: linear-gradient(135deg, rgba(255, 245, 210, 0.95), rgba(255, 230, 160, 0.9)) !important;
+  border-color: rgba(212, 148, 30, 0.6) !important;
+  color: #8b5305 !important;
+  box-shadow: 0 2px 6px rgba(139, 90, 20, 0.15) !important;
+}
+
+body.light .rpg-btn-cambiar-mascota .rpg-btn-cambiar-icon {
+  stroke: #8b5305;
+}
+
+body.light .rpg-btn-cambiar-mascota:hover {
+  background: linear-gradient(135deg, #fff3cb, #ffe28a) !important;
+  border-color: #d4941e !important;
+  color: #5c3400 !important;
+}
+.rpg-popup-mascotas-panel {
+  max-width: 540px !important;
+}
+.rpg-popup-mascotas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.75rem;
+  padding: 1.2rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.rpg-popup-mascota-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 0.75rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--text);
+  font: inherit;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.rpg-popup-mascota-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 217, 61, 0.5);
+  background: rgba(255, 217, 61, 0.08);
+}
+.rpg-popup-mascota-card.activa {
+  border-color: var(--accent);
+  background: rgba(255, 217, 61, 0.14);
+  box-shadow: 0 0 14px rgba(255, 217, 61, 0.2);
+}
+.rpg-popup-mascota-img-wrap {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+.rpg-popup-mascota-img-wrap img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.rpg-popup-mascota-activa-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #2ed573;
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  font-size: 0.65rem;
+  font-weight: 900;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+.rpg-popup-mascota-info {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.rpg-popup-mascota-info strong {
+  font-size: 0.82rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+.rpg-popup-mascota-card.activa .rpg-popup-mascota-info strong {
+  color: var(--accent);
+}
+.rpg-popup-mascota-info span {
+  font-size: 0.68rem;
+  opacity: 0.75;
+}
+

@@ -5741,7 +5741,7 @@ body.light .logros-title {
   justify-content: center;
   gap: .75rem;
   padding: .7rem 1.6rem;
-  margin: 0 auto 2.2rem;
+  margin: 0 auto 1.5rem;
   border-radius: 999px;
   background: linear-gradient(135deg, rgba(255, 217, 61, .15), rgba(255, 217, 61, .03));
   border: 1px solid rgba(255, 217, 61, .35);
@@ -5757,6 +5757,135 @@ body.light .logros-title {
   font-weight: 900;
   line-height: 1;
   text-shadow: 0 0 14px rgba(255, 217, 61, .6);
+}
+
+/* Tarjeta de Progreso Global */
+.logros-resumen-card {
+  max-width: 680px;
+  margin: 0 auto 1.8rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(145deg, rgba(26, 32, 48, .9), rgba(16, 20, 32, .95));
+  border: 1px solid rgba(255, 217, 61, .3);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .35), 0 0 24px rgba(255, 217, 61, .1);
+  backdrop-filter: blur(12px);
+}
+
+body.light .logros-resumen-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, .95), rgba(248, 243, 230, .95));
+  border-color: rgba(212, 148, 30, .4);
+  box-shadow: 0 8px 24px rgba(139, 90, 20, .12);
+}
+
+.logros-resumen-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .85rem;
+}
+
+.logros-resumen-dato {
+  display: flex;
+  align-items: baseline;
+  gap: .6rem;
+}
+
+.logros-resumen-dato strong {
+  color: var(--accent, #ffd93d);
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 0 18px rgba(255, 217, 61, .55);
+}
+
+.logros-resumen-dato span {
+  font-size: .92rem;
+  color: var(--text-muted, rgba(255, 255, 255, .7));
+  font-weight: 600;
+}
+
+.logros-resumen-pct {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #4dd48e;
+  text-shadow: 0 0 12px rgba(77, 212, 142, .45);
+}
+
+.logros-global-track {
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, .08);
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, .4);
+}
+
+body.light .logros-global-track {
+  background: rgba(0, 0, 0, .08);
+}
+
+.logros-global-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffd93d, #ff9f1a, #4dd48e);
+  box-shadow: 0 0 12px rgba(255, 217, 61, .7);
+  transition: width .6s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+/* Barra de Filtros de Categoría */
+.logros-filtros-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  max-width: 900px;
+}
+
+.logro-filtro-btn {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, .1);
+  background: rgba(255, 255, 255, .05);
+  color: var(--text-muted, rgba(255, 255, 255, .75));
+  padding: .5rem 1rem;
+  border-radius: 999px;
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .22s cubic-bezier(.34, 1.56, .64, 1);
+  backdrop-filter: blur(8px);
+}
+
+.logro-filtro-btn:hover {
+  background: rgba(255, 255, 255, .12);
+  color: #fff;
+  transform: translateY(-2px);
+  border-color: rgba(255, 217, 61, .35);
+}
+
+.logro-filtro-btn.active {
+  background: linear-gradient(135deg, rgba(255, 217, 61, .25), rgba(255, 171, 61, .15));
+  border-color: rgba(255, 217, 61, .7);
+  color: #ffd93d;
+  box-shadow: 0 4px 14px rgba(255, 217, 61, .25), inset 0 1px 0 rgba(255, 255, 255, .2);
+  transform: translateY(-2px) scale(1.03);
+}
+
+body.light .logro-filtro-btn {
+  background: rgba(0, 0, 0, .04);
+  border-color: rgba(0, 0, 0, .1);
+  color: #555;
+}
+
+body.light .logro-filtro-btn.active {
+  background: linear-gradient(135deg, rgba(255, 217, 61, .4), rgba(255, 230, 150, .3));
+  border-color: #d4941e;
+  color: #8b5305;
+}
+
+/* Ocultar tarjetas filtradas */
+.logro-card.logro-oculto {
+  display: none !important;
 }
 
 .logros-categoria {

@@ -2314,38 +2314,90 @@ html.animations-disabled .rpg-rl-log-line { opacity: 1 !important; }
   position: absolute;
   bottom: -4px;
   right: -4px;
-  background: #232228;
-  border: 1px solid var(--accent);
+  background: linear-gradient(135deg, #2a2517, #181510);
+  border: 1.5px solid var(--accent);
   border-radius: 50%;
   width: 22px;
   height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
-  color: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  font-size: 0.72rem;
+  color: #ffd93d;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 10px rgba(255, 217, 61, 0.35);
   pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+.rpg-hero-avatar-btn:hover .rpg-hero-avatar-cambiar-badge {
+  transform: rotate(180deg) scale(1.15);
+}
+
 .rpg-btn-cambiar-mascota {
-  background: rgba(255, 217, 61, 0.12);
-  border: 1px solid rgba(255, 217, 61, 0.4);
-  color: var(--accent);
-  padding: 0.22rem 0.65rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 800;
+  appearance: none;
+  -webkit-appearance: none;
+  background: linear-gradient(135deg, rgba(255, 217, 61, 0.16), rgba(255, 171, 61, 0.08)) !important;
+  border: 1px solid rgba(255, 217, 61, 0.5) !important;
+  color: #ffd93d !important;
+  padding: 0.24rem 0.75rem !important;
+  border-radius: 999px !important;
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em !important;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  transition: all 0.2s ease;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  line-height: 1 !important;
+  vertical-align: middle;
+  outline: none;
+  user-select: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
+
+.rpg-btn-cambiar-mascota .rpg-btn-cambiar-icon {
+  width: 13px;
+  height: 13px;
+  stroke: #ffd93d;
+  flex-shrink: 0;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
 .rpg-btn-cambiar-mascota:hover {
-  background: rgba(255, 217, 61, 0.24);
-  border-color: var(--accent);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(255, 217, 61, 0.25);
+  background: linear-gradient(135deg, rgba(255, 217, 61, 0.28), rgba(255, 171, 61, 0.18)) !important;
+  border-color: #ffd93d !important;
+  color: #fff !important;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 16px rgba(255, 217, 61, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+.rpg-btn-cambiar-mascota:hover .rpg-btn-cambiar-icon {
+  transform: rotate(180deg);
+  stroke: #fff;
+}
+
+.rpg-btn-cambiar-mascota:active {
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.light .rpg-btn-cambiar-mascota {
+  background: linear-gradient(135deg, rgba(255, 245, 210, 0.95), rgba(255, 230, 160, 0.9)) !important;
+  border-color: rgba(212, 148, 30, 0.6) !important;
+  color: #8b5305 !important;
+  box-shadow: 0 2px 6px rgba(139, 90, 20, 0.15) !important;
+}
+
+body.light .rpg-btn-cambiar-mascota .rpg-btn-cambiar-icon {
+  stroke: #8b5305;
+}
+
+body.light .rpg-btn-cambiar-mascota:hover {
+  background: linear-gradient(135deg, #fff3cb, #ffe28a) !important;
+  border-color: #d4941e !important;
+  color: #5c3400 !important;
 }
 .rpg-popup-mascotas-panel {
   max-width: 540px !important;

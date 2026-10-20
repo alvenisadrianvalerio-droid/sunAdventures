@@ -451,24 +451,41 @@ function sustituirEmojis(root) {
     if (!list.includes("local")) list.push("local");
     return list;
   };
-  const KEY_META = () => `sa_rl_meta_${resolveUid()}`;
-  const KEY_RUN  = () => `sa_rl_run_${resolveUid()}`;
+  const getMascotaActualId = () => {
+    try { return localStorage.getItem("mascota_actual") || "mapache"; } catch { return "mapache"; }
+  };
+  const KEY_META = () => `sa_rl_meta_${resolveUid()}_${getMascotaActualId()}`;
+  const KEY_RUN  = () => `sa_rl_run_${resolveUid()}_${getMascotaActualId()}`;
 
   const metaDef = () => ({ runs:0, mejorPiso:0, victorias:0, desbloqueos:[], maldicionesTotales:0, bossesDerrotados:0 });
   const cargarMeta = () => {
     try {
       const u = resolveUid();
+      const m = getMascotaActualId();
       const kPrincipal = KEY_META();
       let raw = localStorage.getItem(kPrincipal);
       let parsed = null;
       if (raw) {
         try { parsed = JSON.parse(raw); } catch {}
       }
-      // Si el usuario actual no tiene runs o está vacío y está logueado, chequear fallback de sus claves candidatas
+      // Fallback para mapache si venía de la clave global histórica
+      if ((!parsed || (!parsed.runs && !parsed.victorias)) && m === "mapache") {
+        const legacy = localStorage.getItem(`sa_rl_meta_${u}`);
+        if (legacy) {
+          try {
+            const legParsed = JSON.parse(legacy);
+            if (legParsed && ((legParsed.runs && legParsed.runs > 0) || legParsed.victorias > 0)) {
+              parsed = legParsed;
+              localStorage.setItem(kPrincipal, JSON.stringify(parsed));
+            }
+          } catch {}
+        }
+      }
+      // Fallback de candidatos de usuario
       if ((!parsed || (!parsed.runs && !parsed.victorias)) && u !== "local") {
         const candidates = getUserCandidates();
         for (const c of candidates) {
-          const fRaw = localStorage.getItem(`sa_rl_meta_${c}`);
+          const fRaw = localStorage.getItem(`sa_rl_meta_${c}_${m}`) || (m === "mapache" ? localStorage.getItem(`sa_rl_meta_${c}`) : null);
           if (fRaw) {
             try {
               const fp = JSON.parse(fRaw);
@@ -553,9 +570,13 @@ function sustituirEmojis(root) {
   const cargarRun = () => {
     try {
       const u = resolveUid();
+      const m = getMascotaActualId();
       let r = localStorage.getItem(KEY_RUN());
+      if (!r && m === "mapache") {
+        r = localStorage.getItem(`sa_rl_run_${u}`);
+      }
       if (!r && u !== "local") {
-        r = localStorage.getItem("sa_rl_run_local");
+        r = localStorage.getItem(`sa_rl_run_local_${m}`) || (m === "mapache" ? localStorage.getItem("sa_rl_run_local") : null);
         if (r) {
           try { localStorage.setItem(KEY_RUN(), r); } catch {}
         }
@@ -563,10 +584,7 @@ function sustituirEmojis(root) {
       if (!r) return null;
       const saved = JSON.parse(r);
       if (!saved || typeof saved !== "object") return null;
-      /* ✅ Merge: los valores guardados pisan los defaults,
-         pero cualquier propiedad NUEVA (reliquias, maldiciones, mapa, etc.)
-         que falte en el save antiguo se rellena con el default. */
-      const base = nuevoRun(saved.mascota || localStorage.getItem("mascota_actual") || "mapache");
+      const base = nuevoRun(saved.mascota || m);
       return { ...base, ...saved };
     } catch { return null; }
   };
@@ -778,8 +796,16 @@ function sustituirEmojis(root) {
     panel.innerHTML = `
       <div class="rpg-rl-menu">
         <div class="rpg-rl-hero">
-          <div class="rpg-rl-hero-art">${m.imagen ? `<img src="${m.imagen}" alt="">` : spriteMarkup('🐾')}</div>
+          <div class="rpg-rl-hero-art" data-rl-accion="cambiar-mascota" style="cursor:pointer;" title="Clic para cambiar de mascota">${m.imagen ? `<img src="${m.imagen}" alt="">` : spriteMarkup('🐾')}</div>
           <h2>Modo Roguelike</h2>
+          <div style="margin-bottom:0.75rem;">
+            <button type="button" class="rpg-btn-cambiar-mascota" data-rl-accion="cambiar-mascota" title="Cambiar mascota para Roguelike">
+              <svg viewBox="0 0 24 24" class="rpg-btn-cambiar-icon" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+              <span>Mascota: <strong>${m.nombre || mascotaId}</strong></span>
+            </button>
+          </div>
           <p>10 pisos · 6 columnas · Maldiciones · Jefes con 2 fases</p>
           <div class="rpg-rl-stats">
             <div><strong>${meta.runs}</strong><span>Runs</span></div>
@@ -820,6 +846,9 @@ function sustituirEmojis(root) {
           </ul>
         </div>
       </div>`;
+    qsa('[data-rl-accion="cambiar-mascota"]', panel).forEach(btn => btn.addEventListener('click', () => {
+      window._rpgAbrirPopupMascotas?.('roguelike');
+    }));
     qsa('[data-bendicion]', panel).forEach(boton => boton.addEventListener('click', () => {
       bendicionElegida = boton.dataset.bendicion;
       qsa('[data-bendicion]', panel).forEach(opcion => {
@@ -847,9 +876,12 @@ function sustituirEmojis(root) {
     const hpPct = clamp(state.hp / state.hpMax * 100);
     panel.innerHTML = `
       <div class="rpg-rl-hud">
-        <div class="rpg-rl-hud-hero">
+        <div class="rpg-rl-hud-hero" data-rl-accion="cambiar-mascota" style="cursor:pointer;" title="Clic para cambiar de mascota">
           ${m.imagen ? `<img src="${m.imagen}" alt="">` : '🐾'}
-          <div><strong>${m.nombre || 'Héroe'}</strong><small>Nv ${state.nivel} · Piso ${state.piso}</small></div>
+          <div>
+            <strong>${m.nombre || 'Héroe'} <span style="font-size:0.75rem;opacity:0.8;margin-left:4px;">🔄</span></strong>
+            <small>Nv ${state.nivel} · Piso ${state.piso} · Clic para cambiar</small>
+          </div>
         </div>
         <div class="rpg-rl-hud-stats">
           <div class="rpg-rl-barra hp">
@@ -885,6 +917,9 @@ function sustituirEmojis(root) {
         </div>` : ''}
       <button type="button" class="btn-secondary rpg-rl-abandonar" id="rl-abandonar">Abandonar run</button>
     `;
+    qsa('[data-rl-accion="cambiar-mascota"]', panel).forEach(btn => btn.addEventListener('click', () => {
+      window._rpgAbrirPopupMascotas?.('roguelike');
+    }));
     const canvas = $('rl-canvas-mapa');
     if (canvas) {
       const animar = () => {
@@ -2349,6 +2384,15 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
 
   /* Recargar run y meta-progresión al autenticarse el usuario */
   window.addEventListener("sunad:user-ready", () => {
+    state = cargarRun();
+    const p = $("rpg-roguelike-panel");
+    if (p && p.style.display !== "none") {
+      renderPanel();
+    }
+  });
+
+  /* Recargar run y meta-progresión al cambiar de mascota */
+  window.addEventListener("sunad:mascota-cambiada", () => {
     state = cargarRun();
     const p = $("rpg-roguelike-panel");
     if (p && p.style.display !== "none") {

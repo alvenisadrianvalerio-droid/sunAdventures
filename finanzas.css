@@ -208,156 +208,7 @@
 .finanzas-hero-text h2 { margin: 0 0 .15rem; font-size: 1.05rem; color: #f7d27c; }
 .finanzas-hero-text p { margin: 0; opacity: .78; font-size: .8rem; line-height: 1.35; }
 .finanzas-hero-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
-/* Tarjeta de Asistente IA Financiero con la Mascota */
-.finanzas-mascota-ai-card {
-  display: grid;
-  gap: .75rem;
-  padding: .95rem 1.15rem;
-  margin-bottom: .6rem;
-  border: 1px solid rgba(234, 184, 83, 0.35);
-  border-radius: 16px;
-  background: linear-gradient(135deg, rgba(234, 184, 83, 0.15), rgba(255, 255, 255, 0.03));
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
-  position: relative;
-  overflow: hidden;
-}
-.finanzas-mascota-ai-card::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, #ffd93d, #ff9991, #79d6a0);
-}
-.finanzas-mascota-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: .8rem;
-}
-.finanzas-mascota-identity {
-  display: flex;
-  align-items: center;
-  gap: .7rem;
-}
-.finanzas-mascota-avatar-wrap {
-  width: 48px;
-  height: 48px;
-  flex: 0 0 auto;
-  border-radius: 14px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 217, 61, 0.3);
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-.finanzas-mascota-avatar-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.finanzas-mascota-title h3 {
-  margin: 0;
-  font-size: 1.05rem;
-  color: #f7d27c;
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-}
-.finanzas-mascota-title p {
-  margin: .15rem 0 0;
-  font-size: .8rem;
-  opacity: .75;
-}
-.finanzas-mascota-tag {
-  font-size: .65rem;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  background: rgba(255, 217, 61, 0.2);
-  color: #ffd93d;
-  padding: 2px 7px;
-  border-radius: 6px;
-  font-weight: 800;
-}
-.finanzas-mascota-form {
-  display: flex;
-  gap: .6rem;
-  align-items: center;
-}
-.finanzas-mascota-input-wrap {
-  position: relative;
-  flex: 1;
-}
-.finanzas-mascota-input {
-  width: 100%;
-  min-height: 38px;
-  padding: .45rem .85rem;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 10px;
-  color: #fff;
-  font: inherit;
-  font-size: .82rem;
-  outline: none;
-  transition: border-color .2s, box-shadow .2s;
-}
-.finanzas-mascota-input:focus {
-  border-color: #f7d27c;
-  box-shadow: 0 0 0 3px rgba(247, 210, 124, 0.15);
-}
-.finanzas-mascota-submit {
-  display: inline-flex;
-  align-items: center;
-  gap: .35rem;
-  min-height: 38px;
-  padding: 0 1rem;
-  font-size: .8rem;
-  font-weight: 750;
-  border-radius: 10px;
-  white-space: nowrap;
-}
-.finanzas-mascota-shortcuts {
-  display: flex;
-  gap: .45rem;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.finanzas-mascota-chip {
-  padding: .28rem .7rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: .75rem;
-  cursor: pointer;
-  transition: all .2s;
-}
-.finanzas-mascota-chip:hover {
-  background: rgba(247, 210, 124, 0.15);
-  border-color: rgba(247, 210, 124, 0.4);
-  color: #f7d27c;
-}
-.finanzas-mascota-feedback {
-  display: none;
-  padding: .8rem 1rem;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.35);
-  border-left: 4px solid #f7d27c;
-  font-size: .84rem;
-  line-height: 1.5;
-  white-space: pre-line;
-  animation: fadeInFinance 0.3s ease;
-}
-.finanzas-mascota-feedback.success {
-  border-left-color: #79d6a0;
-  background: rgba(121, 214, 160, 0.1);
-}
-.finanzas-mascota-feedback.error {
-  border-left-color: #ff7769;
-  background: rgba(255, 119, 105, 0.1);
-}
-@keyframes fadeInFinance {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+
 
 .finanzas-btn-big-add {
   display: inline-flex;
@@ -489,23 +340,33 @@
   grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
-  gap: .4rem;
+  gap: .45rem;
   margin-top: -.2rem;
+  margin-bottom: .4rem;
 }
 .finanzas-cat-chip {
-  padding: .3rem .75rem;
-  border: 1px solid rgba(255,255,255,.1);
+  display: inline-flex;
+  align-items: center;
+  padding: .35rem .75rem;
+  border: 1px solid rgba(255,255,255,.14);
   border-radius: 10px;
-  background: rgba(0,0,0,.18);
+  background: rgba(255,255,255,.05);
   color: var(--text);
-  font-size: .78rem;
+  font-size: .8rem;
   font-weight: 700;
   cursor: pointer;
+  transition: all .15s ease;
 }
-.finanzas-cat-chip:hover, .finanzas-cat-chip.selected {
-  background: rgba(234,184,83,.25);
+.finanzas-cat-chip:hover {
+  background: rgba(234,184,83,.2);
   border-color: #eab853;
-  color: #fff;
+  color: #f7d27c;
+}
+.finanzas-cat-chip.selected {
+  background: linear-gradient(135deg, rgba(234,184,83,.35), rgba(234,184,83,.15));
+  border-color: #f7d27c;
+  color: #ffd93d;
+  box-shadow: 0 0 0 2px rgba(247,210,124,.2);
 }
 
 /* Guía de ayuda amigable */
@@ -682,19 +543,6 @@ body.light .finanzas-currency select, body.light .finanzas-toolbar input, body.l
   .finanzas-scopes {
     width: 100%;
     margin-bottom: .85rem;
-  }
-  .finanzas-mascota-ai-card {
-    padding: 1.1rem 1.1rem;
-    border-radius: 16px;
-  }
-  .finanzas-mascota-form {
-    flex-direction: column;
-    align-items: stretch;
-    gap: .55rem;
-  }
-  .finanzas-mascota-submit {
-    width: 100%;
-    justify-content: center;
   }
   .finanzas-hero-quick {
     flex-direction: column;

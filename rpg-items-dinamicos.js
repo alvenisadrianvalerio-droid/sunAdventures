@@ -177,16 +177,26 @@
                 if (!list.includes("local")) list.push("local");
                 return list;
             };
-            const SLOTS_KEY = () => `sa_rpg_items_activos_${resolveUid()}`;
+            const getMascotaActualId = () => {
+                try { return localStorage.getItem("mascota_actual") || "mapache"; } catch { return "mapache"; }
+            };
+            const SLOTS_KEY = () => `sa_rpg_items_activos_${resolveUid()}_${getMascotaActualId()}`;
 
             function getItemsActivos() {
                 try {
                     const k = SLOTS_KEY();
+                    const m = getMascotaActualId();
                     let raw = localStorage.getItem(k);
+                    if (!raw) {
+                        if (m === "mapache") {
+                            raw = localStorage.getItem(`sa_rpg_items_activos_${resolveUid()}`);
+                            if (raw) localStorage.setItem(k, raw);
+                        }
+                    }
                     if (!raw && resolveUid() !== "local") {
                         const candidates = getUserCandidates();
                         for (const c of candidates) {
-                            const fb = localStorage.getItem(`sa_rpg_items_activos_${c}`);
+                            const fb = localStorage.getItem(`sa_rpg_items_activos_${c}_${m}`) || (m === "mapache" ? localStorage.getItem(`sa_rpg_items_activos_${c}`) : null);
                             if (fb) {
                                 raw = fb;
                                 localStorage.setItem(k, raw);
