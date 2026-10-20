@@ -1008,6 +1008,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       }
     }
 
+    const probEsquivaHorda = esHorda ? (nHorda <= 4 ? 0.22 : nHorda <= 8 ? 0.28 : 0.35) : 0;
+
     enemigo = {
       id: eId, iconoKey: eId, icono: z.icono, sprite: spriteName, nombre: NOMBRES[eId] || eId,
       hpMax: esHorda ? (hordaArr.reduce((s, x) => s + x.hpMax, 0)) : hpFinal,
@@ -1017,12 +1019,20 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       monedas: Math.round(z.monedas * multPremio),
       jefe: !!z.jefe, miniJefe: !!z.miniJefe, esHorda, horda: hordaArr,
       tamanoHorda: nHorda,
+      probEsquiva: probEsquivaHorda,
       dot: 0, dotDur: 0, sangrado: 0, sangradoDur: 0, shield: Math.round(z.shieldBase || 0), phase: 1, tier,
       special: esp, specialCD: z.jefe ? 2 : z.miniJefe ? 3 : 4, specialTimer: z.jefe ? 2 : z.miniJefe ? 3 : 4
     };
-    turnoJugador = true; overlayObjetos = false;
+    turnoJugador = !esHorda; overlayObjetos = false;
     buffsHeroe = []; buffsEnemigo = [];
     SND("blip"); render();
+
+    if (esHorda) {
+      deshab(true);
+      const tipoGrupo = nHorda <= 4 ? "La patrulla" : "La horda";
+      log(`⚡ ¡${tipoGrupo} es mucho más rápida que tú y toma la iniciativa atacando primero!`, "critico");
+      setTimeout(turnoEnemigo, 700);
+    }
   }
 
   function log(txt, tipo = "info") {
@@ -1032,7 +1042,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     l.appendChild(d); l.scrollTop = l.scrollHeight;
   }
   function floatDmg(sel, txt, tipo = "daño") {
-    const el = qs(sel); if (!el) return;
+    const el = (sel instanceof Element) ? sel : qs(sel); if (!el) return;
     const f = document.createElement("span");
     f.className = "rpg-float " + tipo; f.textContent = txt;
     el.style.position = "relative"; f.style.left = "50%"; f.style.top = "20%";
@@ -1094,11 +1104,17 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if (enemigo.esHorda && Array.isArray(enemigo.horda)) {
       const vivos = enemigo.horda.filter(m => m.hp > 0);
       if (vivos.length > 0) {
+        const probEsq = enemigo.probEsquiva || (enemigo.tamanoHorda <= 4 ? 0.22 : enemigo.tamanoHorda <= 8 ? 0.28 : 0.35);
         if (esAoE) {
-          // Ataque en área: impacta de lleno a cada enemigo vivo
+          // Ataque en área: cada monstruo evalúa individualmente si logra esquivar
           vivos.forEach(m => {
-            m.hp = Math.max(0, m.hp - dmg);
             const el = qs(`.rpg-horda-item[data-horda-idx="${m.id}"]`);
+            if (probEsq > 0 && Math.random() < probEsq) {
+              log(`💨 ¡${m.nombre}${m.esLider ? " (Líder)" : ""} esquivó ágilmente el ataque en área!`, "curar");
+              if (el) floatDmg(el, "¡ESQUIVÓ!", "curar");
+              return;
+            }
+            m.hp = Math.max(0, m.hp - dmg);
             if (el) {
               const bar = el.querySelector(".rpg-horda-item-hp > span");
               if (bar) bar.style.width = `${Math.max(0, (m.hp / m.hpMax) * 100)}%`;
@@ -1110,15 +1126,22 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
             }
           });
         } else {
-          // Ataque a un solo objetivo: golpea directamente al mob seleccionado o primer vivo
+          // Ataque a un solo objetivo: comprobar si el objetivo seleccionado esquiva el golpe
           let target = enemigo.horda[mobHordaObjetivoIdx];
           if (!target || target.hp <= 0) {
             target = vivos[0];
             mobHordaObjetivoIdx = target ? target.id : 0;
           }
           if (target) {
-            target.hp = Math.max(0, target.hp - dmg);
             const el = qs(`.rpg-horda-item[data-horda-idx="${target.id}"]`);
+            if (probEsq > 0 && Math.random() < probEsq) {
+              log(`💨 ¡${target.nombre}${target.esLider ? " (Líder)" : ""} es demasiado rápido y esquivó tu ataque!`, "curar");
+              if (el) floatDmg(el, "¡ESQUIVÓ!", "curar");
+              else floatDmg("#sprite-enemigo", "¡ESQUIVÓ!", "curar");
+              SND("blip");
+              return;
+            }
+            target.hp = Math.max(0, target.hp - dmg);
             if (el) {
               const bar = el.querySelector(".rpg-horda-item-hp > span");
               if (bar) bar.style.width = `${Math.max(0, (target.hp / target.hpMax) * 100)}%`;
@@ -2064,7 +2087,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       const mobEl = qs(`.rpg-horda-item[data-horda-idx="${mob.id}"]`);
       if (mobEl) {
         mobEl.classList.add("mob-atacando");
-        setTimeout(() => mobEl.classList.remove("mob-atacando"), 320);
+        setTimeout(() => mobEl.classList.remove("mob-atacando"), 220);
       }
 
       // Comprobación individual de esquiva frente al ataque de este mob
@@ -2072,7 +2095,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         log(`😎 ¡Esquivaste el ataque de ${mob.nombre}${mob.esLider ? " (Líder)" : ""}!`, "curar");
         floatDmg("#sprite-heroe", "¡ESQUIVA!", "curar");
         actualizarHPs();
-        return setTimeout(siguienteMobAtaca, 340);
+        return setTimeout(siguienteMobAtaca, 200);
       }
 
       // Cálculo de daño individual del mob
@@ -2092,7 +2115,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       const heroeSpr = qs("#sprite-heroe");
       if (heroeSpr) {
         heroeSpr.classList.add("golpeado");
-        setTimeout(() => heroeSpr.classList.remove("golpeado"), 250);
+        setTimeout(() => heroeSpr.classList.remove("golpeado"), 180);
       }
 
       comprobarPasivas("recibir-dano", { dano: dmg, mob });
@@ -2109,8 +2132,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         return setTimeout(derrota, 500);
       }
 
-      // Intervalo dinámico y fluido entre ataques individuales
-      setTimeout(siguienteMobAtaca, 360);
+      // Intervalo rápido y fluido entre ataques individuales (refleja la alta velocidad de la horda)
+      setTimeout(siguienteMobAtaca, 230);
     }
 
     siguienteMobAtaca();
