@@ -1023,16 +1023,18 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       dot: 0, dotDur: 0, sangrado: 0, sangradoDur: 0, shield: Math.round(z.shieldBase || 0), phase: 1, tier,
       special: esp, specialCD: z.jefe ? 2 : z.miniJefe ? 3 : 4, specialTimer: z.jefe ? 2 : z.miniJefe ? 3 : 4
     };
-    turnoJugador = !esHorda; overlayObjetos = false;
+    turnoJugador = false; overlayObjetos = false;
     buffsHeroe = []; buffsEnemigo = [];
     SND("blip"); render();
 
+    deshab(true);
     if (esHorda) {
-      deshab(true);
       const tipoGrupo = nHorda <= 4 ? "La patrulla" : "La horda";
-      log(`⚡ ¡${tipoGrupo} es mucho más rápida que tú y toma la iniciativa atacando primero!`, "critico");
-      setTimeout(turnoEnemigo, 700);
+      log(`⚡ ¡${tipoGrupo} es más rápida que tú y toma la iniciativa atacando primero!`, "critico");
+    } else {
+      log(`⚡ ¡${enemigo.nombre} es más rápido que tú y ataca primero!`, "critico");
     }
+    setTimeout(turnoEnemigo, 700);
   }
 
   function log(txt, tipo = "info") {
@@ -2774,12 +2776,15 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if (objClon.atk) objClon.atk = Math.round(objClon.atk * multPoderItems);
 
     enemigo = objClon;
-    turnoJugador = true;
+    turnoJugador = false;
     overlayObjetos = false;
     buffsHeroe = [];
     buffsEnemigo = [];
     SND("blip");
     render();
+    deshab(true);
+    log(`⚡ ¡${enemigo.nombre} es más rápido que tú y ataca primero!`, "critico");
+    setTimeout(turnoEnemigo, 700);
   }
 
   window.Rpg = {
