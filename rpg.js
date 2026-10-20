@@ -905,6 +905,27 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     jefe: ['firebreath', 'summon', 'apocalypse', 'curse']
   };
 
+  function contarReliquiasPoder() {
+    try {
+      const loot = window.RpgLoot?.cargarLoot?.() || {};
+      const pool = window.RpgLoot?.POOL || [];
+      const mapaPool = new Map(pool.map(p => [p.id, p]));
+      let cant = 0;
+      Object.keys(loot).forEach(id => {
+        const count = Number(loot[id]) || 0;
+        if (count <= 0) return;
+        const it = mapaPool.get(id);
+        const rar = it?.rar || "";
+        if (rar === "legendario" || rar === "mitico") {
+          cant += count;
+        }
+      });
+      return cant;
+    } catch {
+      return 0;
+    }
+  }
+
   function entrarZona(id) {
     const z = ZONAS.find(x => x.id === id); if (!z) return;
     state.zonaActual = z.id;
@@ -926,13 +947,17 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const nHorda = getTamanoHorda();
     const esHorda = nHorda > 1;
 
+    // Escalado de dificultad según reliquias legendarias y míticas (+2% HP y ATK por cada una)
+    const cantReliquiasPoder = contarReliquiasPoder();
+    const multPoderItems = 1 + (cantReliquiasPoder * 0.02);
+
     // Dificultad escalada: a mayor número de mobs, combate más desafiante y sustancialmente más recompensas
     // 1 mob: 1.0x HP, 1.0x ATK, 1.0x XP, 1.0x Oro
     // 4 mobs: 1.15x HP total, 1.20x ATK, +25% XP, +35% Oro
     // 8 mobs: 1.40x HP total, 1.45x ATK, +60% XP, +90% Oro
     // 12 mobs: 1.75x HP total, 1.75x ATK, +110% XP, +160% Oro
-    const multHP = esHorda ? (nHorda === 4 ? 1.15 : nHorda === 8 ? 1.40 : 1.75) : 1.0;
-    const multATK = esHorda ? (nHorda === 4 ? 1.20 : nHorda === 8 ? 1.45 : 1.75) : 1.0;
+    const multHP = (esHorda ? (nHorda === 4 ? 1.15 : nHorda === 8 ? 1.40 : 1.75) : 1.0) * multPoderItems;
+    const multATK = (esHorda ? (nHorda === 4 ? 1.20 : nHorda === 8 ? 1.45 : 1.75) : 1.0) * multPoderItems;
     const multXP = esHorda ? (nHorda === 4 ? 1.25 : nHorda === 8 ? 1.60 : 2.10) : 1.0;
     const multPremio = esHorda ? (nHorda === 4 ? 1.35 : nHorda === 8 ? 1.90 : 2.60) : 1.0;
 
@@ -2564,11 +2589,19 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
           const zOrd = ZONAS.find(x => x.id === state.zonaActual)?.orden || 1;
           let tipoCofre = "madera";
           if (enemigo.esPostGame) {
-            tipoCofre = enemigo.jefe ? "celestial" : (Math.random() < 0.65 ? "celestial" : "alba");
+            // Postgame: más balanceado entre dorado, alba y una prob menor de celestial
+            const x = Math.random();
+            tipoCofre = enemigo.jefe
+              ? (x < 0.25 ? "celestial" : x < 0.65 ? "alba" : "dorado")
+              : (x < 0.12 ? "celestial" : x < 0.45 ? "alba" : "dorado");
           } else if (zOrd >= 100 || (eraJefe && zOrd >= 80)) {
-            tipoCofre = Math.random() < 0.35 ? "celestial" : "alba";
+            // Drop reducido de celestial en campaña: 12% celestial, 28% alba, 60% dorado
+            const x = Math.random();
+            tipoCofre = x < 0.12 ? "celestial" : x < 0.40 ? "alba" : "dorado";
           } else if (zOrd >= 60 || (eraJefe && zOrd >= 40)) {
-            tipoCofre = Math.random() < 0.45 ? "alba" : "dorado";
+            // Drop reducido de alba: 20% alba, 55% dorado, 25% hierro
+            const x = Math.random();
+            tipoCofre = x < 0.20 ? "alba" : x < 0.75 ? "dorado" : "hierro";
           } else if (zOrd >= 30 || (eraJefe && zOrd >= 20) || enemigo.miniJefe) {
             tipoCofre = Math.random() < 0.50 ? "dorado" : "hierro";
           } else if (zOrd >= 10 || eraJefe) {
@@ -2709,7 +2742,15 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     mobHordaObjetivoIdx = null;
     guardar(state);
 
-    enemigo = { ...enemigoObj };
+    const cantReliquiasPoder = contarReliquiasPoder();
+    const multPoderItems = 1 + (cantReliquiasPoder * 0.02);
+
+    const objClon = { ...enemigoObj };
+    if (objClon.hpMax) objClon.hpMax = Math.round(objClon.hpMax * multPoderItems);
+    if (objClon.hp) objClon.hp = Math.round(objClon.hp * multPoderItems);
+    if (objClon.atk) objClon.atk = Math.round(objClon.atk * multPoderItems);
+
+    enemigo = objClon;
     turnoJugador = true;
     overlayObjetos = false;
     buffsHeroe = [];

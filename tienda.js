@@ -56,7 +56,8 @@
       rows: window.SPRITE_SHEET?.rows || 110
     },
     comida: { url: "img/tienda/comida-sheet.png", cols: 5, rows: 5 },
-    tienda: { url: "img/tienda/tienda-sheet.png", cols: 5, rows: 5 }
+    tienda: { url: "img/tienda/tienda-sheet.png", cols: 5, rows: 5 },
+    loot1:  { url: "img/rpg/loot-2.png", cols: 8, rows: 9 }
   };
 
   function construirPreview(item, esComida, id, cat) {
@@ -84,9 +85,28 @@
     return `<div class="tienda-item-preview">${ICONO[item.icono] || ICONO.estrella || ""}</div>`;
   }
 
+  /* ---------- Items Míticos / Reliquias Míticas ---------- */
+  const ITEMS_MITICOS = {
+    "item-6-0": { nombre: "Espada Fauna", precio: 300000, sprite: [6, 0], sheet: "loot1", rar: "mitico", desc: "Drena el alma enemiga. +10 ATK, +10 Lifesteal, +50 HP, +10 Veneno." },
+    "item-7-0": { nombre: "Espada Girasol", precio: 450000, sprite: [7, 0], sheet: "loot1", rar: "mitico", desc: "El poder absoluto sobre todo lo vivo. +20 ATK, +20 DEF, +50 HP, Regen, Lifesteal, Thorns." },
+    "item-7-1": { nombre: "Rebanadora", precio: 280000, sprite: [7, 1], sheet: "loot1", rar: "mitico", desc: "Rebana el viento a gran velocidad. +10 ATK, +10 Esq, +100 Regen, +100 HP." },
+    "item-5-2": { nombre: "Naturaleza", precio: 320000, sprite: [5, 2], sheet: "loot1", rar: "mitico", desc: "Hace temblar el suelo. +10 ATK, +100 Veneno, +100 Thorns, +200 HP." },
+    "item-6-2": { nombre: "Astrología", precio: 350000, sprite: [6, 2], sheet: "loot1", rar: "mitico", desc: "Poder cósmico ancestral. +20 ATK, +20 Crit, +20 Esq, +200 HP." },
+    "item-0-4": { nombre: "Colgante de Escudo", precio: 280000, sprite: [0, 4], sheet: "loot1", rar: "mitico", desc: "Lágrima de girasol encapsulada. +50 DEF y genera 300 escudo por turno." },
+    "item-1-4": { nombre: "Estrella Encapsulada", precio: 340000, sprite: [1, 4], sheet: "loot1", rar: "mitico", desc: "Energía astronómica incontrolable. +20 ATK, +20 XP, +10 Lifesteal." },
+    "item-2-4": { nombre: "Colmillo Ancestral", precio: 320000, sprite: [2, 4], sheet: "loot1", rar: "mitico", desc: "Colmillo de vampiro milenario. +50 Lifesteal y robo de vida masivo." },
+    "item-3-4": { nombre: "Calavera Encapsulada", precio: 300000, sprite: [3, 4], sheet: "loot1", rar: "mitico", desc: "Aura de putrefacción letal. +500 Veneno y reduce ataque del rival." },
+    "item-4-4": { nombre: "Pergamino de Escudo", precio: 330000, sprite: [4, 4], sheet: "loot1", rar: "mitico", desc: "Conocimiento arcano de defensa. +100 DEF, +40 XP y esquiva." },
+    "item-7-5": { nombre: "Oda a la Incertidumbre", precio: 350000, sprite: [7, 5], sheet: "loot1", rar: "mitico", desc: "Compañera de la guerra. +300 HP, +50 DEF, +300 Thorns, +20 Esq." },
+    "item-3-6": { nombre: "Zapatos de Mago", precio: 310000, sprite: [3, 6], sheet: "loot1", rar: "mitico", desc: "Pasos mágicos imperceptibles. +50 Esq, +50 DEF, +100 HP." },
+    "item-2-7": { nombre: "Oda a la Miseria", precio: 360000, sprite: [2, 7], sheet: "loot1", rar: "mitico", desc: "Daño indirecto demoledor. +40 Esq, +200 Thorns, +100 Veneno, +10 Lifesteal." },
+    "item-4-7": { nombre: "Mano de Mono", precio: 290000, sprite: [4, 7], sheet: "loot1", rar: "mitico", desc: "Fortuna y tesoros sin fin. +100% Oro droppeado." },
+    "item-1-8": { nombre: "Queso para Dragones", precio: 250000, sprite: [1, 8], sheet: "loot1", rar: "mitico", desc: "Manjar divino para bestias. +500 HP, +25 ATK." }
+  };
+
   /* ---------- HTML interno ---------- */
   function htmlTienda() {
-    const cats = ["mascotas", ...Object.keys(TIENDA_ITEMS)];
+    const cats = ["mascotas", "miticos", ...Object.keys(TIENDA_ITEMS)];
     return `
       <div class="tienda-header">
         <h2 class="tienda-titulo">Tienda</h2>
@@ -116,6 +136,7 @@
 
   const labelCat = c => ({
     mascotas:"🐾 Mascotas",
+    miticos:"🔮 Míticos",
     comida:"Comida", cabeza:"Cabeza", cuello:"Cuello",
     ojos:"Ojos", fondos:"Fondos", efectos:"Efectos"
   })[c] || (c[0].toUpperCase() + c.slice(1));
@@ -231,6 +252,7 @@
 
     const esMascotas = categoriaActiva === "mascotas";
     const esComida = categoriaActiva === "comida";
+    const esMiticos = categoriaActiva === "miticos";
     let items = {};
     if (esMascotas) {
       Object.keys(MASCOTAS || {}).forEach(id => {
@@ -245,6 +267,8 @@
           desc: `Mascota compañera (${m.favorita ? "le gusta " + m.favorita : "fiel"})`
         };
       });
+    } else if (esMiticos) {
+      items = ITEMS_MITICOS;
     } else {
       items = TIENDA_ITEMS[categoriaActiva] || {};
     }
@@ -255,6 +279,7 @@
     const hist = getHist();
     const histIds = new Set(hist.slice(0, 20).map(h => h.id));
     const compMascotas = getMascotasCompradas?.() || [];
+    const rpgLoot = window.RpgLoot?.cargarLoot?.() || {};
 
     let lista = Object.entries(items);
     if (busqueda) lista = lista.filter(([_, it]) => it.nombre.toLowerCase().includes(busqueda));
@@ -262,6 +287,7 @@
       lista = lista.filter(([id, it]) => {
         if (esMascotas) return it.tipo === "inicial" || compMascotas.includes(id);
         if (esComida) return false;
+        if (esMiticos) return (Number(rpgLoot[id]) || 0) > 0;
         return co.includes(id);
       });
     }
@@ -275,7 +301,7 @@
       v.textContent = "Sin resultados.";
       frag.appendChild(v);
     } else {
-      lista.forEach(([id, item]) => frag.appendChild(crearItem(id, item, esComida, esMascotas, co, eq, favs, compMascotas)));
+      lista.forEach(([id, item]) => frag.appendChild(crearItem(id, item, esComida, esMascotas, co, eq, favs, compMascotas, esMiticos, rpgLoot)));
     }
     g.innerHTML = "";
     g.appendChild(frag);
@@ -285,25 +311,29 @@
     window.hidratarIconos?.(g);
   }
 
-  function crearItem(id, item, esComida, esMascotas, co, eq, favs, compMascotas = []) {
+  function crearItem(id, item, esComida, esMascotas, co, eq, favs, compMascotas = [], esMiticos = false, rpgLoot = {}) {
     const it = document.createElement("article");
     it.className = "tienda-item";
     const mascComprada = esMascotas && (item.tipo === "inicial" || compMascotas.includes(id));
     const mascEnUso    = esMascotas && (getMascota() === id);
-    const comprado     = esMascotas ? mascComprada : (!esComida && co.includes(id));
-    const equipado     = esMascotas ? mascEnUso : (!esComida && eq[categoriaActiva] === id);
+    const cantLoot     = esMiticos ? (Number(rpgLoot[id]) || 0) : 0;
+    const comprado     = esMascotas ? mascComprada : esMiticos ? false : (!esComida && co.includes(id));
+    const equipado     = esMascotas ? mascEnUso : (!esComida && !esMiticos && eq[categoriaActiva] === id);
     const esFav        = favs.includes(id);
-    const precio       = (esComida || esMascotas) ? item.precio : precioConDescuento(item, esComida);
+    const precio       = (esComida || esMascotas || esMiticos) ? item.precio : precioConDescuento(item, esComida);
     const puede        = getMonedas() >= precio;
 
     if (comprado) it.classList.add("comprado");
     if (equipado) it.classList.add("equipado");
+    if (esMiticos) it.classList.add("tienda-item-mitico");
 
     let desc = "";
     if (esMascotas) {
       desc = `<span class="tienda-item-desc">${mascEnUso ? "⭐ En uso actual" : item.desc}</span>`;
     } else if (esComida) {
       desc = `<span class="tienda-item-desc">+${item.efecto?.hambre || 10} <span data-icono="comida"></span> +${item.efecto?.felicidad || 10} <span data-icono="corazon"></span></span>`;
+    } else if (esMiticos) {
+      desc = `<span class="tienda-item-desc" style="color:#ffb3cc;">${item.desc}${cantLoot > 0 ? ` <strong style="color:var(--accent);display:inline-block;margin-top:2px;">(Posees: x${cantLoot})</strong>` : ""}</span>`;
     } else {
       desc = `<span class="tienda-item-desc">${item.desc || "Adorno"}</span>`;
     }
@@ -314,7 +344,9 @@
           : `<span class="tienda-item-precio ${puede ? "" : "no-alcanza"}">${ICONO.moneda || ""} ${item.precio}</span>`)
       : `<span class="tienda-item-precio" style="color:var(--accent);">✓ Desbloqueada</span>`;
 
-    const bonusBadge = (!esComida && !esMascotas && item.bonus?.desc)
+    const bonusBadge = esMiticos
+      ? `<span class="tienda-item-efecto" style="background:rgba(255,107,157,0.15);border:1px solid rgba(255,107,157,0.4);color:#ff6b9d;">✨ Reliquia Mítica</span>`
+      : (!esComida && !esMascotas && item.bonus?.desc)
       ? `<span class="tienda-item-efecto">⚡ ${item.bonus.desc}</span>`
       : "";
 
@@ -364,6 +396,10 @@
           }
         });
       }
+    } else if (esMiticos) {
+      btn.textContent = puede ? "Comprar Mítico" : "No alcanza";
+      if (!puede) { btn.disabled = true; btn.classList.add("no-alcanza"); }
+      btn.addEventListener("click", () => comprarMitico(id, item));
     } else if (esComida) {
       btn.textContent = puede ? "Comprar x1" : "No alcanza";
       if (!puede) { btn.disabled = true; btn.classList.add("no-alcanza"); }
@@ -399,6 +435,33 @@
   }
 
   /* ---------- Acciones ---------- */
+  function comprarMitico(id, item) {
+    if (getMonedas() < item.precio) return;
+    setMonedas(getMonedas() - item.precio);
+
+    if (window.RpgLoot?.cargarLoot && window.RpgLoot?.guardarLoot) {
+      const loot = window.RpgLoot.cargarLoot();
+      loot[id] = (loot[id] || 0) + 1;
+      window.RpgLoot.guardarLoot(loot);
+      try {
+        const pool = window.RpgLoot.POOL || [];
+        const poolItem = pool.find(p => p.id === id);
+        if (poolItem && typeof window.RpgLoot.aplicarBonus === "function") {
+          window.RpgLoot.aplicarBonus(poolItem);
+        }
+      } catch {}
+      window.RpgLoot.renderColeccion?.();
+    }
+
+    window._snd?.("victoria");
+    notifMascota?.("¡Reliquia Mítica Adquirida!", `${item.nombre}`);
+    pushHist({ id, nombre: item.nombre, cat: "miticos" });
+    window.dispatchEvent(new CustomEvent("rpg:item-obtenido", { detail: { id, rar: "mitico" } }));
+    window.dispatchEvent(new Event("sunad:tienda-compra"));
+    window.dispatchEvent(new Event("rpg:stats-cambiados"));
+    render();
+  }
+
   function comprarComida(id, item) {
     if (getMonedas() < item.precio) return;
     setMonedas(getMonedas() - item.precio);
