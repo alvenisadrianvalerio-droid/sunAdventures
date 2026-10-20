@@ -641,6 +641,47 @@
                 min-width: 0;
             }
         }
+
+        /* Marcadores y badges de ítems ya mapeados */
+        .gcell-mapped {
+            position: absolute;
+            pointer-events: none;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 217, 61, 0.4);
+            background: rgba(255, 217, 61, 0.08);
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+            padding: 2px;
+            z-index: 2;
+        }
+
+        .gcell-mapped.rar-comun      { border-color: rgba(200, 200, 200, 0.6); background: rgba(200, 200, 200, 0.08); }
+        .gcell-mapped.rar-raro       { border-color: rgba(108, 184, 255, 0.6); background: rgba(108, 184, 255, 0.08); }
+        .gcell-mapped.rar-epico      { border-color: rgba(166, 132, 240, 0.6); background: rgba(166, 132, 240, 0.08); }
+        .gcell-mapped.rar-legendario { border-color: rgba(255, 217, 61, 0.7);  background: rgba(255, 217, 61, 0.12); }
+        .gcell-mapped.rar-mitico     { border-color: rgba(255, 107, 157, 0.8); background: rgba(255, 107, 157, 0.15); }
+        .gcell-mapped.rar-tornasol   { border-color: rgba(0, 240, 255, 0.8);   background: rgba(0, 240, 255, 0.15); }
+
+        .gcell-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 5px currentColor;
+        }
+
+        .preset-select {
+            background: var(--panel-2);
+            color: var(--accent);
+            border: 1px solid var(--border);
+            padding: .4rem .6rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: .85rem;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -663,13 +704,21 @@
     <div class="layout">
         <!-- ============ COLUMNA IZQUIERDA: SHEET ============ -->
         <div class="sheet-panel">
-            <div class="barra">
-                <label>Ruta <input id="ruta" type="text" value="img/rpg/loot-1.png"></label>
+            <div class="barra" style="flex-wrap:wrap; gap:.5rem;">
+                <label>Preset
+                    <select id="sheet-preset" class="preset-select">
+                        <option value="img/rpg/loot-2.png" data-cols="8" data-rows="9">⚔️ Loot 2 (RPG Pool Activo: 8x9)</option>
+                        <option value="img/rpg/loot-1.png" data-cols="8" data-rows="9">🛡️ Loot 1 (Armería: 8x9)</option>
+                        <option value="img/tienda/admurin-items.png" data-cols="30" data-rows="110">👑 Tienda Admurin (30x110)</option>
+                    </select>
+                </label>
+                <label>Ruta <input id="ruta" type="text" value="img/rpg/loot-2.png" style="min-width:180px;"></label>
                 <button id="cargar">Cargar</button>
-                <label>Columnas <input id="cols" type="number" value="8" min="1" max="60"></label>
-                <label>Filas <input id="rows" type="number" value="9" min="1" max="60"></label>
-                <label>Zoom <input id="zoom" type="number" value="4" min="1" max="8" step="1"></label>
+                <label>Columnas <input id="cols" type="number" value="8" min="1" max="60" style="width:60px;"></label>
+                <label>Filas <input id="rows" type="number" value="9" min="1" max="150" style="width:60px;"></label>
+                <label>Zoom <input id="zoom" type="number" value="4" min="1" max="8" step="1" style="width:60px;"></label>
                 <button id="aplicar" class="sec">Aplicar</button>
+                <button id="btn-recargar-actuales" class="sec" style="background:rgba(108,184,255,0.15);border-color:#6cb8ff;color:#6cb8ff;" title="Carga todos los objetos definidos en sprites-names.js">📥 Cargar Ítems Actuales</button>
             </div>
             <div id="sheet-wrap">
                 <img id="sheet" alt="Sprite sheet">
@@ -771,6 +820,9 @@
         </div>
     </div>
 
+    <!-- Cargar los datos actuales de sprites-names.js -->
+    <script src="sprites-names.js"></script>
+
     <script>
         (() => {
             const $ = id => document.getElementById(id);
@@ -798,6 +850,7 @@
                 { v: "hielo", label: "❄️ Daño de hielo" },
                 { v: "rayo", label: "⚡ Daño de rayo" },
                 { v: "veneno", label: "☠️ Daño de veneno" },
+                { v: "sangrado", label: "🩸 Sangrado (DoT)" },
             ];
 
             const HAB_TIPOS = [
@@ -838,6 +891,8 @@
                 const w = sheet.clientWidth, h = sheet.clientHeight;
                 const cw = w / cols, ch = h / rows;
                 if (cw < 4 || ch < 4) return;
+
+                // Cuadrícula
                 for (let c = 1; c < cols; c++) {
                     const d = document.createElement("div");
                     d.className = "gline";
@@ -850,6 +905,19 @@
                     d.style.cssText = `top:${r * ch}px;left:0;height:1px;width:${w}px;`;
                     overlay.appendChild(d);
                 }
+
+                // Pintar badges/indicadores de celdas que ya tienen item mapeado
+                lista.forEach(item => {
+                    const [c, r] = item.sprite;
+                    if (c >= 0 && c < cols && r >= 0 && r < rows) {
+                        const cellBox = document.createElement("div");
+                        cellBox.className = `gcell-mapped rar-${item.rar || 'comun'}`;
+                        cellBox.style.cssText = `left:${c * cw}px;top:${r * ch}px;width:${cw}px;height:${ch}px;`;
+                        cellBox.title = `${item.nombre} [${c},${r}] (${item.rar})`;
+                        cellBox.innerHTML = `<span class="gcell-dot"></span>`;
+                        overlay.appendChild(cellBox);
+                    }
+                });
             }
 
             function actualizarPreview() {
@@ -868,8 +936,58 @@
                 preview.style.backgroundSize = `${cols * 100}% ${rows * 100}%`;
                 preview.style.backgroundPosition = `${posX}% ${posY}%`;
                 coordsEl.textContent = `${col} , ${row}`;
-                statusEl.textContent = `Celda #${row * cols + col + 1}`;
+
+                const itemExistente = lista.find(i => i.sprite[0] === col && i.sprite[1] === row);
+                if (itemExistente) {
+                    statusEl.textContent = `📍 [Mapeado]: ${itemExistente.nombre} (${itemExistente.rar})`;
+                } else {
+                    statusEl.textContent = `Celda #${row * cols + col + 1} (Sin mapear)`;
+                }
             }
+
+            /* ============================================================
+               CARGAR ÍTEMS DESDE SPRITES-NAMES.JS
+               ============================================================ */
+            function cargarItemsActuales() {
+                const names = window.SPRITE_NAMES || {};
+                const entradas = Object.entries(names);
+                if (!entradas.length) {
+                    $("current-status").textContent = "⚠️ No se detectaron objetos en window.SPRITE_NAMES";
+                    return;
+                }
+
+                lista.length = 0;
+                entradas.forEach(([coord, info]) => {
+                    const [c, r] = coord.split(",").map(Number);
+                    lista.push({
+                        id: info.id || `item-${c}-${r}`,
+                        nombre: info.nombre || `Objeto ${c},${r}`,
+                        rar: info.rar || "comun",
+                        icono: info.icono || "espada",
+                        desc: info.desc || "",
+                        consumible: !!info.consumible,
+                        stats: info.stats ? { ...info.stats } : {},
+                        habilidades: Array.isArray(info.habilidades) ? JSON.parse(JSON.stringify(info.habilidades)) : [],
+                        sprite: [c, r]
+                    });
+                });
+
+                pintarGrid();
+                renderOutput();
+                $("current-status").textContent = `✅ ¡Cargados ${lista.length} objetos actuales desde sprites-names.js!`;
+            }
+
+            // Presets selector
+            $("sheet-preset")?.addEventListener("change", e => {
+                const opt = e.target.selectedOptions[0];
+                if (!opt) return;
+                $("ruta").value = opt.value;
+                $("cols").value = opt.dataset.cols || "8";
+                $("rows").value = opt.dataset.rows || "9";
+                cargar();
+            });
+
+            $("btn-recargar-actuales")?.addEventListener("click", cargarItemsActuales);
 
             /* ============================================================
                STATS DINÁMICOS
@@ -962,19 +1080,42 @@
             }
 
             /* ============================================================
-               CLICK EN EL SHEET — siempre activo
+               CLICK EN EL SHEET
                ============================================================ */
             sheet.addEventListener("load", () => {
                 const w = sheet.naturalWidth, h = sheet.naturalHeight;
                 if (w && h) {
-                    $("cols").value = Math.max(1, Math.round(w / 16));
-                    $("rows").value = Math.max(1, Math.round(h / 16));
+                    if (!$("cols").value) $("cols").value = Math.max(1, Math.round(w / 16));
+                    if (!$("rows").value) $("rows").value = Math.max(1, Math.round(h / 16));
                     setTimeout(aplicar, 60);
                 }
             });
             sheet.addEventListener("error", () => {
                 $("current-status").textContent = "❌ No se pudo cargar la imagen";
             });
+
+            function cargarDatosItemEnFormulario(item) {
+                $("item-nombre").value = item.nombre || "";
+                $("item-id").value = item.id || `item-${item.sprite[0]}-${item.sprite[1]}`;
+                $("item-rar").value = item.rar || "comun";
+                $("item-icono").value = item.icono || "espada";
+                $("item-desc").value = item.desc || "";
+                $("item-consumible").value = item.consumible ? "si" : "no";
+
+                limpiarStats();
+                if (item.stats && Object.keys(item.stats).length) {
+                    Object.entries(item.stats).forEach(([k, v]) => addStatRow(k, v));
+                } else {
+                    addStatRow("atk", 1);
+                }
+
+                limpiarHabilidades();
+                if (Array.isArray(item.habilidades) && item.habilidades.length) {
+                    item.habilidades.forEach(h => addHabRow(h.tipo, h.nombre, h.desc, h.val));
+                } else {
+                    addHabRow();
+                }
+            }
 
             function seleccionarSprite(clientX, clientY) {
                 if (!sheet.clientWidth) return;
@@ -989,14 +1130,17 @@
                     row: Math.max(0, Math.min(rows - 1, Math.floor(y / ch)))
                 };
                 actualizarPreview();
-                if (!$("item-id").value.trim()) {
+
+                // Si ya existe un objeto mapeado en esta coordenada, auto-rellenar el formulario para editarlo
+                const existente = lista.find(i => i.sprite[0] === current.col && i.sprite[1] === current.row);
+                if (existente) {
+                    cargarDatosItemEnFormulario(existente);
+                } else {
                     $("item-id").value = `item-${current.col}-${current.row}`;
                 }
             }
 
-            // click normal
             sheet.addEventListener("click", (e) => seleccionarSprite(e.clientX, e.clientY));
-            // también al arrastrar con el ratón pulsado (por si acaso)
             sheet.addEventListener("mousedown", (e) => {
                 if (e.button === 0) seleccionarSprite(e.clientX, e.clientY);
             });
@@ -1027,20 +1171,9 @@
                 if (idx !== -1) lista[idx] = item;
                 else lista.push(item);
 
+                pintarGrid();
                 renderOutput();
-
-                // Resetear formulario
-                $("item-nombre").value = "";
-                $("item-id").value = "";
-                $("item-desc").value = "";
-                $("item-consumible").value = "no";
-                limpiarStats();
-                limpiarHabilidades();
-                // Dejar una fila de stat y una de habilidad listas por defecto
-                addStatRow("atk", 1);
-                addHabRow();
-
-                $("current-status").textContent = `✅ "${nombre}" añadido en [${current.col}, ${current.row}]`;
+                $("current-status").textContent = `✅ "${nombre}" guardado en [${current.col}, ${current.row}]`;
             });
 
             /* ============================================================
@@ -1070,9 +1203,9 @@
                             partes.push(`habilidades: [${habsStr}]`);
                         }
 
-                        return `  "${i.sprite[0]},${i.sprite[1]}": { ${partes.join(", ")} },`;
+                        return `        "${i.sprite[0]},${i.sprite[1]}": { ${partes.join(", ")} },`;
                     }).join("\n");
-                $("output").value = lines ? `// --- MAPEO GENERADO ---\n${lines}` : "";
+                $("output").value = lines ? `    window.SPRITE_NAMES = {\n\n        // --- MAPEO GENERADO ---\n${lines}\n\n    };` : "";
                 $("output-count").textContent = `${lista.length} sprite${lista.length === 1 ? "" : "s"}`;
             }
 
@@ -1093,6 +1226,7 @@
                 if (!lista.length) return;
                 if (!confirm("¿Vaciar la lista de sprites mapeados?")) return;
                 lista.length = 0;
+                pintarGrid();
                 renderOutput();
                 $("current-status").textContent = "Lista vaciada";
             });
@@ -1104,6 +1238,13 @@
             addHabRow();
 
             cargar();
+
+            // Auto-cargar objetos existentes
+            setTimeout(() => {
+                if (window.SPRITE_NAMES && Object.keys(window.SPRITE_NAMES).length) {
+                    cargarItemsActuales();
+                }
+            }, 300);
         })();
     </script>
 </body>
