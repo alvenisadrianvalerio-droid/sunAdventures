@@ -137,20 +137,32 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       for (let i = 1; i <= 10; i++) {
         const idx = ri * 10 + i, esJefe = i === 10, esMini = i === 5, esElite = i >= 6 && i <= 9;
         // Dificultad afinada: enemigos normales y jefes más desafiantes
-        const hpBase = Math.round(115 + idx * 32);
-        const atkBase = Math.round(17 + idx * 3.8);
-        const hpJefe = esJefe ? Math.round(idx * 75 + 250) : 0;
-        const atkJefe = esJefe ? Math.round(idx * 2.5 + 12) : 0;
-        const hpMini = esMini ? Math.round(idx * 40 + 120) : 0;
-        const atkMini = esMini ? Math.round(idx * 1.6 + 8) : 0;
-        // Escalado especial para últimas zonas: los monstruos de late-game tienen mucha más vida
-        // A partir de zona 80 ya reciben un incremento progresivo, y a partir de 100-150 vida masiva
-        const multEndGame = idx >= 100
-          ? (1.5 + (idx - 99) * 0.035) // +3.5% acumulativo por nivel desde 100 (+150% en 100, +220% en 120, +325% en 150)
-          : idx >= 75
-          ? (1 + (idx - 74) * 0.02)   // Transición firme desde zona 75 (+20% a +50% vida)
-          : 1;
-        const multAtkEndGame = idx >= 100 ? (1 + (idx - 99) * 0.015) : 1; // Ataque controlado
+        const hpBase = Math.round(115 + idx * 34);
+        const atkBase = Math.round(17 + idx * 4.2);
+        const hpJefe = esJefe ? Math.round(idx * 85 + 320) : 0;
+        const atkJefe = esJefe ? Math.round(idx * 3.0 + 16) : 0;
+        const hpMini = esMini ? Math.round(idx * 45 + 150) : 0;
+        const atkMini = esMini ? Math.round(idx * 1.9 + 10) : 0;
+
+        // 🔥 Escalado de stats reforzados a partir de nivel 50:
+        // A partir de idx >= 50 los monstruos obtienen un multiplicador progresivo sustancial en vida y ataque
+        let multHpNivel50 = 1;
+        let multAtkNivel50 = 1;
+        if (idx >= 50) {
+          // Nivel 50 a 74: +25% base + 1.2% por nivel sobre 50
+          // Nivel 75 a 99: +55% base + 2.0% por nivel sobre 75
+          // Nivel 100 a 150 (End-game): vida y ataque masivos para combate épico
+          if (idx >= 100) {
+            multHpNivel50 = 1.9 + (idx - 99) * 0.04;    // +4% por nivel desde 100 (+190% en 100, +270% en 120, +394% en 150)
+            multAtkNivel50 = 1.45 + (idx - 99) * 0.018; // +1.8% ataque por nivel desde 100
+          } else if (idx >= 75) {
+            multHpNivel50 = 1.45 + (idx - 74) * 0.018;  // +45% a +88% vida
+            multAtkNivel50 = 1.25 + (idx - 74) * 0.008; // +25% a +44% ataque
+          } else {
+            multHpNivel50 = 1.20 + (idx - 49) * 0.01;   // +20% a +44% vida
+            multAtkNivel50 = 1.12 + (idx - 49) * 0.005; // +12% a +24% ataque
+          }
+        }
 
         z.push({
           id: `${reg.id}-${i}`,
@@ -158,8 +170,9 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
           desc: esJefe ? "⚔️ JEFE DE REGIÓN" : esMini ? "★ Mini-jefe" : reg.nombre,
           icono: esJefe ? reg.jefeIcono : reg.icono, nivel: idx,
           enemigos: esJefe ? [reg.jefe] : esMini ? [...reg.elite.slice(0, 2), reg.base[0]] : esElite ? reg.elite : reg.base,
-          hp: Math.round((hpBase + hpJefe + hpMini) * multEndGame),
-          atk: Math.round((atkBase + atkJefe + atkMini) * multAtkEndGame),
+          hp: Math.round((hpBase + hpJefe + hpMini) * multHpNivel50),
+          atk: Math.round((atkBase + atkJefe + atkMini) * multAtkNivel50),
+          shieldBase: idx >= 50 ? Math.round((idx - 49) * (esJefe ? 25 : esMini ? 12 : 5)) : 0,
           xp: Math.round((25 + idx * 18 + (esJefe ? idx * 36 : esMini ? idx * 18 : 0)) * (idx >= 100 ? 1.25 : 1)),
           monedas: Math.round((8 + idx * 2.8 + (esJefe ? 45 + idx * 1.5 : esMini ? 18 + idx * 0.8 : 0)) * (idx >= 100 ? 1.15 : 1)),
           jefe: esJefe, miniJefe: esMini, region: reg.id, regionNombre: reg.nombre, orden: idx
@@ -979,7 +992,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       monedas: Math.round(z.monedas * multPremio),
       jefe: !!z.jefe, miniJefe: !!z.miniJefe, esHorda, horda: hordaArr,
       tamanoHorda: nHorda,
-      dot: 0, dotDur: 0, sangrado: 0, sangradoDur: 0, shield: 0, phase: 1, tier,
+      dot: 0, dotDur: 0, sangrado: 0, sangradoDur: 0, shield: Math.round(z.shieldBase || 0), phase: 1, tier,
       special: esp, specialCD: z.jefe ? 2 : z.miniJefe ? 3 : 4, specialTimer: z.jefe ? 2 : z.miniJefe ? 3 : 4
     };
     turnoJugador = true; overlayObjetos = false;
