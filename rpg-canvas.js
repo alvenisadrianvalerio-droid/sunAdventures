@@ -96,6 +96,19 @@ shieldBurst:  { sheet:'loot2', col:2, row:4, w:70, h:70, tint:'#a684f0', pulse:t
     'bola-fuego':'fireball', regen:'heal', 'fuego-ancestral':'fireball',
     rugido:'curse', 'aliento-inf':'burn', 'sabiduria-m':'buffAtk',
     'lluvia-fuego':'fireball', 'cura-arcana':'heal', apocalipsis:'fireball',
+    /* Nuevos ataques de nivel 16, 22 y 30 */
+    emboscada:'dagger', 'bomba-humo':'buffEsq', 'saqueo-maestro':'axe',
+    'llamarada-zen':'fireball', 'polen-sagrado':'heal', 'ira-helios':'auraFuego',
+    'caceria-nocturna':'dagger', 'instinto-salvaje':'buffAtk', 'danza-filos':'slash',
+    'devorador-almas':'auraOscura', 'pesar-abismal':'curse', 'vacio-absoluto':'shadow',
+    'crujido-bacon':'hammer', 'capa-extra':'buffDef', 'aplastamiento-gourmet':'hammer',
+    'pison-ovino':'hammer', 'vello-espinoso':'buffDef', 'estampida-rebaño':'bolt',
+    'aguijon-celeste':'dagger', 'frenesi-plumado':'buffEsq', 'huracan-dorado':'bolt',
+    'impacto-estratosfera':'hammer', 'presencia-alta':'buffAtk', 'cataclismo-savana':'hammer',
+    'rayo-estelar':'magic', 'aura-inmortal':'auraSagrada', 'genesis-cosmico':'magic',
+    'colmillo-liebre':'slash', 'furia-conejil':'buffAtk', 'bestia-apocaliptica':'slash',
+    'garras-ignicion':'fireball', 'resplandor-draconico':'buffAtk', 'inferno-total':'auraFuego',
+    'cometa-abisal':'shadow', 'reino-cenizas':'buffAtk', 'fin-del-mundo':'auraFuego',
     'ataque-basico':'slash'
   };
 

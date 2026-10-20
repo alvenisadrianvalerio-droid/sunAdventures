@@ -137,15 +137,20 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       for (let i = 1; i <= 10; i++) {
         const idx = ri * 10 + i, esJefe = i === 10, esMini = i === 5, esElite = i >= 6 && i <= 9;
         // Dificultad afinada: enemigos normales y jefes más desafiantes
-        const hpBase = Math.round(115 + idx * 30);
+        const hpBase = Math.round(115 + idx * 32);
         const atkBase = Math.round(17 + idx * 3.8);
-        const hpJefe = esJefe ? Math.round(idx * 55 + 150) : 0;
+        const hpJefe = esJefe ? Math.round(idx * 75 + 250) : 0;
         const atkJefe = esJefe ? Math.round(idx * 2.5 + 12) : 0;
-        const hpMini = esMini ? Math.round(idx * 30 + 75) : 0;
+        const hpMini = esMini ? Math.round(idx * 40 + 120) : 0;
         const atkMini = esMini ? Math.round(idx * 1.6 + 8) : 0;
-        // Escalado especial para end-game: a partir de nivel 100 los monstruos son mucho más temibles
-        const multEndGame = idx >= 100 ? (1 + (idx - 99) * 0.015) : 1; // +1.5% acumulativo por nivel desde 100 (+15% en 110, +45% en 130, +75% en 150)
-        const multAtkEndGame = idx >= 100 ? (1 + (idx - 99) * 0.018) : 1; // +1.8% acumulativo de ataque
+        // Escalado especial para últimas zonas: los monstruos de late-game tienen mucha más vida
+        // A partir de zona 80 ya reciben un incremento progresivo, y a partir de 100-150 vida masiva
+        const multEndGame = idx >= 100
+          ? (1.5 + (idx - 99) * 0.035) // +3.5% acumulativo por nivel desde 100 (+150% en 100, +220% en 120, +325% en 150)
+          : idx >= 75
+          ? (1 + (idx - 74) * 0.02)   // Transición firme desde zona 75 (+20% a +50% vida)
+          : 1;
+        const multAtkEndGame = idx >= 100 ? (1 + (idx - 99) * 0.015) : 1; // Ataque controlado
 
         z.push({
           id: `${reg.id}-${i}`,
@@ -330,9 +335,22 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const pgBonusHp = () => ((window.RpgPostGame?.getState?.()?.bendiciones?.armaduraCosmica || 0) * 50);
   const pgBonusOro = () => ((window.RpgPostGame?.getState?.()?.bendiciones?.bendicionMonedas || 0) * 0.10);
 
-  const hpMax = () => Math.round((100 + Math.min(state.nivel, NIVEL_MAX) * 25 + (statsLoot().hpBonus || 0) + bonusTipo("hp_max") + pgBonusHp()));
-  const atkTotal = () => Math.round((state.statsBase.atk + Math.min(state.nivel, NIVEL_MAX) * 4 + (statsLoot().atkBonus || 0) + bonusTipo("atk_fijo")) * (1 + pgBonusAtk()));
-  const defTotal = () => Math.round((state.statsBase.def + Math.min(state.nivel, NIVEL_MAX) * 2.5 + (statsLoot().defBonus || 0) + bonusTipo("def_fijo")) * (1 + pgBonusDef()));
+  const hpMax = () => {
+    const rawLootHp = Number(statsLoot().hpBonus || 0);
+    // Suavizado del escalado desmedido por exceso de ítems (curva balanceada)
+    const lootHpEffective = Math.round(rawLootHp > 300 ? 300 + (rawLootHp - 300) * 0.6 : rawLootHp * 0.85);
+    return Math.round(100 + Math.min(state.nivel, NIVEL_MAX) * 35 + lootHpEffective + bonusTipo("hp_max") + pgBonusHp());
+  };
+  const atkTotal = () => {
+    const rawLootAtk = Number(statsLoot().atkBonus || 0);
+    const lootAtkEffective = Math.round(rawLootAtk > 150 ? 150 + (rawLootAtk - 150) * 0.55 : rawLootAtk * 0.75);
+    return Math.round((state.statsBase.atk + Math.min(state.nivel, NIVEL_MAX) * 5.5 + lootAtkEffective + bonusTipo("atk_fijo")) * (1 + pgBonusAtk()));
+  };
+  const defTotal = () => {
+    const rawLootDef = Number(statsLoot().defBonus || 0);
+    const lootDefEffective = Math.round(rawLootDef > 100 ? 100 + (rawLootDef - 100) * 0.55 : rawLootDef * 0.75);
+    return Math.round((state.statsBase.def + Math.min(state.nivel, NIVEL_MAX) * 3.5 + lootDefEffective + bonusTipo("def_fijo")) * (1 + pgBonusDef()));
+  };
   const critTotal = () => 0.15 + ((statsLoot().critBonus || 0) / 100);
   const esqTotal = () => ((statsLoot().esqBonus || 0) / 100);
   const regenTotal = () => (statsLoot().regenBonus || 0);
@@ -1282,12 +1300,20 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const pasiva = window.RpgHabilidades?.getPasiva(mascotaId) || {};
     const fxKey = FX_KEY(habId);
 
+    // Escalado de habilidad por nivel y estadísticas totales
+    const petLv = Math.min(state.nivel || 1, NIVEL_MAX);
+    const escalaHabilidad = 1 + (petLv - 1) * 0.025; // +2.5% por nivel (hasta +122.5% a nivel 50)
+    const statScaleBonus = Math.round((atkTotal() * 0.08) + (defTotal() * 0.06)); // Sinergia con stats equipados
+
     if (hab.tipo === "boost" && hab.buff) {
       Object.entries(hab.buff).forEach(([k, v]) => {
-        if (["atk", "def", "crit", "esq"].includes(k))
-          buffsHeroe.push({ tipo: k, val: v, turnos: hab.buff.dur || 3, label: k.toUpperCase() });
+        if (["atk", "def", "crit", "esq"].includes(k)) {
+          // Buffs escalan con nivel y estadísticas
+          const vEscalado = Math.round(v * escalaHabilidad + (k === "atk" ? atkTotal() * 0.05 : k === "def" ? defTotal() * 0.05 : 0));
+          buffsHeroe.push({ tipo: k, val: vEscalado, turnos: hab.buff.dur || 3, label: k.toUpperCase() });
+        }
       });
-      log(`✨ ${hab.nombre}: buff aplicado.`, "curar");
+      log(`✨ ${hab.nombre}: buff aplicado (potenciado por stats).`, "curar");
       FX({ tipo: "buff", target: "hero", fxKey: "buffAtk" });
       renderBuffs();
       setTimeout(turnoEnemigo, 800);
@@ -1295,14 +1321,19 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     }
 
     if (hab.tipo === "soporte") {
-      const curado = Math.round(hpMax() * (hab.heal || 0.3));
+      // Curación escala con HP Max y DEF total
+      const healBase = hab.heal || 0.3;
+      const curado = Math.round(hpMax() * (healBase * (1 + (petLv - 1) * 0.012)) + (defTotal() * 0.35));
       const antes = state.hp;
       state.hp = clamp(state.hp + curado, 0, hpMax());
       guardar(state);
       if (hab.limpia) { enemigo.dot = 0; log("🧼 Limpias efectos negativos.", "curar"); }
       if (hab.buff) {
         Object.entries(hab.buff).forEach(([k, v]) => {
-          if (["atk", "def"].includes(k)) buffsHeroe.push({ tipo: k, val: v, turnos: hab.buff.dur || 3, label: k.toUpperCase() });
+          if (["atk", "def"].includes(k)) {
+            const vEscalado = Math.round(v * escalaHabilidad);
+            buffsHeroe.push({ tipo: k, val: vEscalado, turnos: hab.buff.dur || 3, label: k.toUpperCase() });
+          }
         });
         renderBuffs();
       }
@@ -1316,16 +1347,18 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
     if (hab.tipo === "daño_indirecto") {
       const esAoE = hab.alcance === "todos";
-      enemigo.dot = Math.round(enemigo.hpMax * (hab.dmgInd || 0.1));
+      // Daño continuo escala con el ATK del héroe y nivel
+      const dotBase = Math.round((enemigo.hpMax * (hab.dmgInd || 0.1)) + (atkTotal() * 0.12 * escalaHabilidad));
+      enemigo.dot = dotBase;
       enemigo.dotDur = hab.dur || 3;
       if (hab.debuff) {
         const k = hab.debuff.atk ? "atk" : "def";
-        const v = -(hab.debuff.atk || hab.debuff.def);
+        const v = -Math.round((hab.debuff.atk || hab.debuff.def) * escalaHabilidad);
         buffsEnemigo.push({ tipo: k, val: v, turnos: hab.debuff.dur || 3, label: "-" + k.toUpperCase() });
         renderBuffs();
       }
       log(`☠️ ${hab.nombre}: ${enemigo.dot} dmg por ${enemigo.dotDur} turnos.`, "critico");
-      const dmg0 = Math.max(1, Math.round(atkTotal() * 0.5));
+      const dmg0 = Math.max(1, Math.round((atkTotal() * 0.55 * escalaHabilidad) + statScaleBonus));
       aplicarDmgEnemigo(dmg0, esAoE);
       floatDmg("#sprite-enemigo", "-" + dmg0, "daño");
       FX({ tipo: "attack", target: "enemy", valor: dmg0, fxKey: fxKey });
@@ -1344,7 +1377,9 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     for (let i = 0; i < hits; i++) {
       const crit = Math.random() < critBase;
       if (crit) algunCrit = true;
-      let dmg = Math.round((atkBuffed * (hab.mult || 1)) - rnd(1, 4));
+      // Multiplicador base de habilidad escalado por nivel y stats equipados
+      const multTotal = (hab.mult || 1) * escalaHabilidad;
+      let dmg = Math.round((atkBuffed * multTotal) + (statScaleBonus / hits) - rnd(1, 4));
       if (crit) dmg = Math.round(dmg * 1.8);
       if (enemigo.jefe && tieneBonus("crit_jefe")) dmg = Math.round(dmg * (1 + bonusTipo("crit_jefe") / 100));
       dmg = Math.max(1, dmg);
