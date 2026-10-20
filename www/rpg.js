@@ -156,7 +156,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
           hp: Math.round((hpBase + hpJefe + hpMini) * multEndGame),
           atk: Math.round((atkBase + atkJefe + atkMini) * multAtkEndGame),
           xp: Math.round((25 + idx * 18 + (esJefe ? idx * 36 : esMini ? idx * 18 : 0)) * (idx >= 100 ? 1.25 : 1)),
-          monedas: Math.round((20 + idx * 7.5 + (esJefe ? 140 + idx * 4 : esMini ? 55 + idx * 2 : 0)) * (idx >= 100 ? 1.25 : 1)),
+          monedas: Math.round((8 + idx * 2.8 + (esJefe ? 45 + idx * 1.5 : esMini ? 18 + idx * 0.8 : 0)) * (idx >= 100 ? 1.15 : 1)),
           jefe: esJefe, miniJefe: esMini, region: reg.id, regionNombre: reg.nombre, orden: idx
         });
       }

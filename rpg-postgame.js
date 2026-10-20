@@ -99,7 +99,7 @@
       hpBase: 16500,
       atkBase: 440,
       xpBase: 12500,
-      monedasBase: 8000,
+      monedasBase: 2800,
       recompensaDesc: "Cofre Celestial garantizado + Probabilidad x3 de Tornasol"
     },
     {
@@ -113,7 +113,7 @@
       hpBase: 24000,
       atkBase: 480,
       xpBase: 15000,
-      monedasBase: 9500,
+      monedasBase: 3400,
       recompensaDesc: "Cofre Celestial garantizado + 150 Puntos de Prestigio"
     },
     {
@@ -127,7 +127,7 @@
       hpBase: 31000,
       atkBase: 560,
       xpBase: 19000,
-      monedasBase: 12000,
+      monedasBase: 4200,
       recompensaDesc: "Cofre Celestial + Multiplicador de Botín Épico"
     },
     {
@@ -141,7 +141,7 @@
       hpBase: 38000,
       atkBase: 620,
       xpBase: 23000,
-      monedasBase: 15000,
+      monedasBase: 5200,
       recompensaDesc: "Reliquia del Vacío + Drop ultra alto de gemas"
     },
     {
@@ -155,7 +155,7 @@
       hpBase: 46000,
       atkBase: 690,
       xpBase: 28000,
-      monedasBase: 18500,
+      monedasBase: 6500,
       recompensaDesc: "Cofre Celestial + Doble Premio en SunCoins"
     },
     {
@@ -169,7 +169,7 @@
       hpBase: 58000,
       atkBase: 760,
       xpBase: 36000,
-      monedasBase: 25000,
+      monedasBase: 8500,
       recompensaDesc: "🌟 Máxima Gloria Post-Game + Título 'Vencedor del Multiverso'"
     }
   ];
@@ -556,7 +556,7 @@
     const hp = Math.round(8500 * escalado);
     const atk = Math.round(320 * escalado);
     const xp = Math.round(6000 * escalado);
-    const mon = Math.round(4500 * (1 + (piso - 1) * 0.15));
+    const mon = Math.round(1200 * (1 + (piso - 1) * 0.08));
 
     const eId = "orbinauta-vacio";
     const enemigoFalla = {
