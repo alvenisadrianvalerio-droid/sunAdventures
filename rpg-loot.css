@@ -1270,3 +1270,159 @@
   opacity: .85;
   color: #e0d0ff;
 }
+
+/* ============================================================
+   REROLL PERSONALIZADO (HASTA 9 OBJETOS SELECCIONADOS)
+   ============================================================ */
+.rpg-reroll-panel-seleccion {
+  margin: .6rem 0 .9rem;
+  padding: .75rem .9rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(108,184,255,0.08), rgba(166,132,240,0.08));
+  border: 1.5px solid rgba(108,184,255,0.3);
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  animation: fadeIn .25s ease;
+}
+
+.rpg-reroll-panel-seleccion.activo {
+  border-color: #6cb8ff;
+  box-shadow: 0 0 15px rgba(108,184,255,0.25);
+}
+
+.rpg-reroll-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.rpg-reroll-panel-info {
+  font-size: .82rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.rpg-reroll-panel-info strong {
+  color: #6cb8ff;
+}
+
+.rpg-reroll-panel-costo {
+  font-size: .78rem;
+  font-weight: 800;
+  color: #ffd93d;
+  background: rgba(255, 217, 61, 0.12);
+  padding: .2rem .5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 217, 61, 0.3);
+}
+
+.rpg-reroll-panel-acciones {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  flex-wrap: wrap;
+}
+
+.rpg-reroll-btn-ejecutar {
+  padding: .35rem .85rem;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #6cb8ff, #a684f0);
+  color: #0b0c12;
+  font-weight: 900;
+  font-size: .78rem;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s, filter .2s;
+  box-shadow: 0 4px 12px rgba(108,184,255,0.3);
+}
+
+.rpg-reroll-btn-ejecutar:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 16px rgba(108,184,255,0.45);
+}
+
+.rpg-reroll-btn-ejecutar:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+  transform: none;
+}
+
+.rpg-reroll-btn-cancelar {
+  padding: .35rem .7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  color: #ddd;
+  font-size: .75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.rpg-reroll-btn-cancelar:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+.rpg-reroll-btn-toggle {
+  margin-left: auto;
+  border-color: rgba(108,184,255,0.6) !important;
+  color: #6cb8ff !important;
+  font-weight: 900 !important;
+  background: rgba(108,184,255,0.08) !important;
+}
+
+.rpg-reroll-btn-toggle.activo {
+  background: linear-gradient(135deg, #6cb8ff, #a684f0) !important;
+  color: #0b0c12 !important;
+  box-shadow: 0 0 12px rgba(108,184,255,0.5) !important;
+}
+
+/* Estado de los items cuando está activo el modo selector de 9 items */
+.modo-reroll-activo .rpg-coleccion-item:not(.bloqueado) {
+  cursor: pointer !important;
+  transition: transform .15s, border-color .15s, box-shadow .15s;
+}
+
+.modo-reroll-activo .rpg-coleccion-item:not(.bloqueado):hover {
+  border-color: #6cb8ff !important;
+  box-shadow: 0 0 14px rgba(108,184,255,0.4) !important;
+}
+
+.rpg-coleccion-item.seleccionado-reroll {
+  border-color: #6cb8ff !important;
+  box-shadow: 0 0 18px rgba(108,184,255,0.8), inset 0 0 12px rgba(108,184,255,0.3) !important;
+  transform: translateY(-4px) scale(1.08) !important;
+}
+
+.rpg-coleccion-item.seleccionado-reroll::before {
+  content: attr(data-reroll-badge);
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #6cb8ff;
+  color: #0b0c12;
+  font-size: .65rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #0b0c12;
+  z-index: 5;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+  animation: popIn .2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

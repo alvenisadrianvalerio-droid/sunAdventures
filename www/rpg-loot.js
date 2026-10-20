@@ -782,6 +782,83 @@
     return { ok:true, nuevo, costo, rarezaAnterior:original.rar, rarezaNueva:rarezaFinal, cambioRareza:delta !== 0, delta };
   }
 
+  /* ---------- Reroll Personalizado (hasta 9 items elegidos) ---------- */
+  let seleccionReroll = new Set();
+  let modoSeleccionReroll = false;
+
+  async function rerollItemsPersonalizados(itemIds) {
+    if (!itemIds || !itemIds.length) return { error: "No has seleccionado ningún objeto." };
+    if (itemIds.length > 9) return { error: "Solo puedes rerollear un máximo de 9 objetos elegidos." };
+
+    const loot = cargarLoot();
+    // Validar que el usuario posea al menos 1 unidad de cada item
+    for (const id of itemIds) {
+      if (!loot[id] || loot[id] <= 0) {
+        const itemObj = POOL.find(p => p.id === id);
+        return { error: `No posees el objeto "${itemObj ? itemObj.nombre : id}".` };
+      }
+    }
+
+    const totalCosto = itemIds.reduce((sum, id) => {
+      const it = POOL.find(p => p.id === id);
+      return sum + (it ? (COSTO_REROLL[it.rar] || 500) : 500);
+    }, 0);
+
+    if (getMonedas() < totalCosto) {
+      return { error: `Necesitas ${totalCosto} monedas para rerollear estos ${itemIds.length} objetos.` };
+    }
+
+    const ok = await confirmar({
+      title: `¿Rerollear ${itemIds.length} objeto${itemIds.length > 1 ? 's' : ''} elegidos?`,
+      message: `Se rerollearán tus <strong>${itemIds.length}</strong> objetos elegidos por <strong>${totalCosto} monedas</strong>.<br><br><em>88% misma rareza · 9% +1 tier · 2% +2 tiers · 1% -1 tier</em>`,
+      variant: "warning",
+      icon: "🎲",
+      confirmText: `Pagar ${totalCosto} 🪙`,
+      cancelText: "Cancelar"
+    });
+    if (!ok) return { cancel: true };
+
+    setMonedas(getMonedas() - totalCosto);
+    let cambiados = 0, mejoras = 0, bajadas = 0;
+    const nuevosItems = [];
+
+    itemIds.forEach(id => {
+      const original = POOL.find(p => p.id === id);
+      if (!original) return;
+
+      const rarezaSorteada = sortearNuevaRareza(original.rar);
+      const { cand, rarezaFinal } = buscarCandidatos(original, rarezaSorteada);
+      if (!cand.length) return;
+
+      const nuevo = cand[Math.floor(Math.random() * cand.length)];
+      quitarBonus(original);
+      if (!nuevo.consumible) aplicarBonus(nuevo);
+
+      loot[id]--;
+      if (loot[id] <= 0) delete loot[id];
+      loot[nuevo.id] = (loot[nuevo.id] || 0) + 1;
+
+      cambiados++;
+      nuevosItems.push(nuevo);
+      const delta = ORDEN_RAREZAS.indexOf(rarezaFinal) - ORDEN_RAREZAS.indexOf(original.rar);
+      if (delta > 0) mejoras++;
+      else if (delta < 0) bajadas++;
+    });
+
+    guardarLoot(loot);
+    seleccionReroll.clear();
+    modoSeleccionReroll = false;
+    renderColeccion();
+    window.dispatchEvent(new Event("rpg:stats-cambiados"));
+    SND(mejoras > 0 ? "victoria" : "sparkle");
+
+    if (nuevosItems.length > 0) {
+      mostrarPopup(nuevosItems[nuevosItems.length - 1]);
+    }
+
+    return { ok: true, cambiados, mejoras, bajadas, total: totalCosto };
+  }
+
   async function rerollCategoria(cat) {
     const loot = cargarLoot();
     const ids = Object.keys(loot).filter(id => {
@@ -989,10 +1066,40 @@
     const filtros = CATS.map(x => `<button class="rpg-col-filtro ${x.id === filtro ? "active" : ""}" data-cat="${x.id}">${x.label}</button>`).join("");
     const puedeReroll = filtro === "loot1" || filtro === "loot2";
 
+    // Panel de selección de hasta 9 objetos para reroll
+    const arrSeleccion = [...seleccionReroll];
+    const cantSeleccionados = arrSeleccion.length;
+    let costoTotalSeleccion = 0;
+    arrSeleccion.forEach(id => {
+      const it = POOL.find(p => p.id === id);
+      costoTotalSeleccion += it ? (COSTO_REROLL[it.rar] || 500) : 500;
+    });
+
+    const panelRerollHtml = modoSeleccionReroll ? `
+      <div class="rpg-reroll-panel-seleccion activo">
+        <div class="rpg-reroll-panel-header">
+          <span class="rpg-reroll-panel-info">
+            🎲 <strong>Selecciona hasta 9 objetos</strong> de tu botín (${cantSeleccionados}/9 elegidos)
+          </span>
+          <div class="rpg-reroll-panel-acciones">
+            <span class="rpg-reroll-panel-costo">Total: ${costoTotalSeleccion} 🪙</span>
+            <button type="button" class="rpg-reroll-btn-ejecutar" id="btn-ejecutar-reroll-sel" ${cantSeleccionados === 0 ? "disabled" : ""}>
+              🎲 Rerollear ${cantSeleccionados} objeto${cantSeleccionados === 1 ? '' : 's'}
+            </button>
+            <button type="button" class="rpg-reroll-btn-cancelar" id="btn-cancelar-reroll-sel">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    ` : "";
+
     let grid = "";
     pool.forEach(p => {
       const t = loot[p.id] || 0;
-      grid += `<div class="rpg-coleccion-item rar-${p.rar || "comun"}${t ? "" : " bloqueado"}" data-id="${p.id}">${renderIcono(p)}${t ? `<span class="rpg-coleccion-cant">×${t}</span>` : ""}</div>`;
+      const estaSel = seleccionReroll.has(p.id);
+      const selIdx = estaSel ? (arrSeleccion.indexOf(p.id) + 1) : 0;
+      const clsSel = estaSel ? " seleccionado-reroll" : "";
+      const badgeAttr = estaSel ? ` data-reroll-badge="${selIdx}"` : "";
+      grid += `<div class="rpg-coleccion-item rar-${p.rar || "comun"}${t ? "" : " bloqueado"}${clsSel}" data-id="${p.id}"${badgeAttr}>${renderIcono(p)}${t ? `<span class="rpg-coleccion-cant">×${t}</span>` : ""}</div>`;
     });
 
     c.innerHTML = `
@@ -1002,12 +1109,41 @@
       </div>
       <div class="rpg-col-filtros">
         ${filtros}
-        ${puedeReroll ? `<button class="rpg-col-filtro" id="btn-reroll-cat" style="margin-left:auto;border-color:rgba(108,184,255,.5);color:#6cb8ff;font-weight:900;" title="88% misma · 9% +1 · 2% +2 · 1% -1">🎲 Reroll ${cat.label}</button>` : ""}
+        <button class="rpg-col-filtro rpg-reroll-btn-toggle ${modoSeleccionReroll ? "activo" : ""}" id="btn-toggle-reroll-sel" title="Elige hasta 9 objetos para rerollearlos juntos">
+          🎲 ${modoSeleccionReroll ? "Cancelar Selección" : "Elegir 9 para Reroll"}
+        </button>
+        ${puedeReroll ? `<button class="rpg-col-filtro" id="btn-reroll-cat" style="border-color:rgba(108,184,255,.5);color:#6cb8ff;font-weight:900;" title="88% misma · 9% +1 · 2% +2 · 1% -1">🎲 Reroll Todo ${cat.label}</button>` : ""}
       </div>
-      <div class="rpg-coleccion-grid">${grid}</div>`;
+      ${panelRerollHtml}
+      <div class="rpg-coleccion-grid ${modoSeleccionReroll ? "modo-reroll-activo" : ""}">${grid}</div>`;
 
     if (window.hidratarIconos) window.hidratarIconos(c);
     qsa(".rpg-col-filtro[data-cat]", c).forEach(b => b.addEventListener("click", () => { filtro = b.dataset.cat; renderColeccion(); }));
+
+    // Toggle modo seleccion 9 items
+    $("btn-toggle-reroll-sel")?.addEventListener("click", () => {
+      modoSeleccionReroll = !modoSeleccionReroll;
+      if (!modoSeleccionReroll) seleccionReroll.clear();
+      renderColeccion();
+    });
+
+    $("btn-cancelar-reroll-sel")?.addEventListener("click", () => {
+      modoSeleccionReroll = false;
+      seleccionReroll.clear();
+      renderColeccion();
+    });
+
+    $("btn-ejecutar-reroll-sel")?.addEventListener("click", async () => {
+      if (!seleccionReroll.size) return;
+      const r = await rerollItemsPersonalizados([...seleccionReroll]);
+      if (r.error) alert(r.error);
+      else if (!r.cancel) {
+        let msg = `🎲 ${r.cambiados} objetos elegidos rerolleados.\nCoste: ${r.total} 🪙`;
+        if (r.mejoras > 0) msg += `\n⭐ ${r.mejoras} mejoras de rareza!`;
+        if (r.bajadas > 0) msg += `\n💧 ${r.bajadas} bajadas...`;
+        alert(msg);
+      }
+    });
     
     // Mini pop-up tooltip en hover / tap y detalle modal en click
     qsa(".rpg-coleccion-item", c).forEach(el => {
@@ -1015,18 +1151,43 @@
       if (!it) return;
 
       el.addEventListener("pointerenter", e => {
-        if (e.pointerType === "mouse") mostrarTooltipItem(it, e.clientX, e.clientY);
+        if (!modoSeleccionReroll && e.pointerType === "mouse") mostrarTooltipItem(it, e.clientX, e.clientY);
       });
       el.addEventListener("mousemove", e => {
-        mostrarTooltipItem(it, e.clientX, e.clientY);
+        if (!modoSeleccionReroll) mostrarTooltipItem(it, e.clientX, e.clientY);
       });
       el.addEventListener("pointerleave", () => {
         ocultarTooltipItem();
       });
 
-      // En dispositivos táctiles (o click/tap directo)
+      // Click o tap en item
       el.addEventListener("click", e => {
-        // En móvil/touch, el primer tap muestra el tooltip si no está activo, o abre el modal si se pulsa dos veces / click directo
+        const tieneEnInv = (loot[it.id] || 0) > 0;
+
+        // Si está en modo selección de 9 ítems de reroll
+        if (modoSeleccionReroll) {
+          e.stopPropagation();
+          ocultarTooltipItem();
+          if (!tieneEnInv) {
+            notifMascota?.("Objeto bloqueado", "Solo puedes seleccionar objetos que poseas en tu botín.");
+            return;
+          }
+          if (seleccionReroll.has(it.id)) {
+            seleccionReroll.delete(it.id);
+            SND("blip");
+          } else {
+            if (seleccionReroll.size >= 9) {
+              notifMascota?.("Límite alcanzado", "Solo puedes seleccionar un máximo de 9 objetos.");
+              return;
+            }
+            seleccionReroll.add(it.id);
+            SND("moneda");
+          }
+          renderColeccion();
+          return;
+        }
+
+        // Modo normal: En móvil/touch, el primer tap muestra el tooltip si no está activo, o abre el modal si se pulsa dos veces / click directo
         if (window.matchMedia("(hover: none)").matches) {
           const tip = getTooltipEl();
           const activo = tip.classList.contains("active") && tip.dataset.currentId === it.id;
@@ -1184,7 +1345,7 @@
     usarConsumible, getConsumibles,
     mostrarDetalleItem, mostrarPopup, renderIcono,
     renderColeccion, renderCofres, abrirCofre,
-    rerollItem, rerollCategoria, añadirBotonReroll,
+    rerollItem, rerollCategoria, rerollItemsPersonalizados, añadirBotonReroll,
     moverRareza, sortearNuevaRareza,
     simular: jefe => {
       const it = sortearItemVictoria(!!jefe);
