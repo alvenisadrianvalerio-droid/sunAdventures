@@ -24,6 +24,7 @@
       fallaNivel: 1,
       fallaMaxNivel: 1,
       jefesCaosDerrotados: [],
+      tornasolDominiosDerrotados: [],
       ascensiones: 0,
       prestigioPuntos: 0,
       bendiciones: {
@@ -175,6 +176,128 @@
   ];
 
   /* ------------------------------------------------------------
+     DOMINIOS Y DESAFÍOS TORNASOL (Post-Game desbloqueable por cada tornasol)
+     Cada objeto Tornasol diferente que el jugador consigue en su colección
+     desbloquea un Reino / Jefe Cósmico único con recompensas colosales.
+     ------------------------------------------------------------ */
+  const TORNASOL_DOMINIOS = [
+    {
+      itemId: "item-7-2",
+      coord: "7,2",
+      nombreItem: "Astronomía.",
+      id: "dominio-supernova",
+      reinoNombre: "La Franja Supernova",
+      jefeId: "supernova-primordial",
+      jefeNombre: "Avatar de la Supernova Estelar",
+      titulo: "Corazón de la Galaxia Naciente",
+      sprite: "Bosses/dragon.png",
+      icono: "☄️",
+      hpBase: 78000,
+      atkBase: 860,
+      xpBase: 48000,
+      monedasBase: 12500,
+      afijo: { id: "colapso_estelar", nombre: "Colapso Estelar", icono: "💫", desc: "Cada impacto genera pulsos gravitatorios que desgastan 10% del escudo y curan al Avatar." },
+      recompensaDesc: "Reliquia Estelar + 200 Puntos de Prestigio + Cofre Celestial",
+      beneficioPasivo: "🌟 +15% Daño con Cometa Astral y +5% crítico cósmico permanente."
+    },
+    {
+      itemId: "item-5-4",
+      coord: "5,4",
+      nombreItem: "Origen de la vida.",
+      id: "dominio-genesis",
+      reinoNombre: "El Manantial del Génesis",
+      jefeId: "arbol-vida-eterno",
+      jefeNombre: "Titán del Génesis Primordial",
+      titulo: "Encarnación de la Flor Cósmica",
+      sprite: "Bosses/golem.png",
+      icono: "🌱",
+      hpBase: 95000,
+      atkBase: 790,
+      xpBase: 52000,
+      monedasBase: 14000,
+      afijo: { id: "clorofila_inmortal", nombre: "Clorofila Inmortal", icono: "🍃", desc: "Regenera 4% de su vida máxima en cada turno y posee barrera espinosa que devuelve 20% de daño." },
+      recompensaDesc: "Semilla del Génesis + 220 Puntos de Prestigio + 2 Cofres Celestiales",
+      beneficioPasivo: "🌿 +500 HP máximos permanentes y regeneración celular +50 HP/turno para todas las mascotas."
+    },
+    {
+      itemId: "item-4-6",
+      coord: "4,6",
+      nombreItem: "Maguito Manguito.",
+      id: "dominio-caos-arcano",
+      reinoNombre: "El Vórtice de la Locura Arcana",
+      jefeId: "maguito-dimensional",
+      jefeNombre: "El Magoooooooo del Vacío",
+      titulo: "Hechicero del Caos y las Probabilidades",
+      sprite: "Bosses/mago.webp",
+      icono: "🧙‍♂️",
+      hpBase: 84000,
+      atkBase: 920,
+      xpBase: 55000,
+      monedasBase: 15000,
+      afijo: { id: "paradoja_espectral", nombre: "Paradoja Espectral", icono: "🌀", desc: "Posee 40% de probabilidad de esquivar cualquier ataque y desata ráfagas aleatorias." },
+      recompensaDesc: "Espejo del Mago Supremo + 250 Puntos de Prestigio + Cofre Celestial",
+      beneficioPasivo: "🔮 +12% Probabilidad de Crítico global y +8% de Esquiva permanente."
+    },
+    {
+      itemId: "item-6-8",
+      coord: "6,8",
+      nombreItem: "Vela de mucha gracia.",
+      id: "dominio-gracia-solar",
+      reinoNombre: "La Cripta Solar de la Gracia Eterna",
+      jefeId: "faraon-solar",
+      jefeNombre: "Faraón de la Luz Incandescente",
+      titulo: "Guardián de la Riqueza Celestial",
+      sprite: "Bosses/demonio.png",
+      icono: "🕯️",
+      hpBase: 90000,
+      atkBase: 880,
+      xpBase: 58000,
+      monedasBase: 25000,
+      afijo: { id: "aureola_solar", nombre: "Aureola Solar", icono: "☀️", desc: "Comienza la batalla con una barrera solar impenetrable de 25,000 HP." },
+      recompensaDesc: "Bendición del Rey Sol + 300 Puntos de Prestigio + 25,000 SunCoins",
+      beneficioPasivo: "🪙 +35% SunCoins en todas las victorias del juego y protección contra muerte súbita reforzada."
+    },
+    {
+      itemId: "item-7-8",
+      coord: "7,8",
+      nombreItem: "Caldo de pollo.",
+      id: "dominio-sopa-primordial",
+      reinoNombre: "El Caldero del Big Bang",
+      jefeId: "cocinero-cosmico",
+      jefeNombre: "Kraken Caldoso del Fin de los Tiempos",
+      titulo: "Cocinero del Orden Universal",
+      sprite: "Bosses/kraken.png",
+      icono: "🍲",
+      hpBase: 110000,
+      atkBase: 980,
+      xpBase: 70000,
+      monedasBase: 20000,
+      afijo: { id: "ebullicion_cosmica", nombre: "Ebullición Cósmica", icono: "🔥", desc: "Aplica quemadura abrasadora de 350 daño por turno y aturde si conectas 3 golpes seguidos." },
+      recompensaDesc: "Cucharón del Big Bang + 350 Puntos de Prestigio + Título 'Chef del Cosmos'",
+      beneficioPasivo: "🍜 +30% Experiencia (XP) en todas las fuentes y +40 ATK permanente a tus mascotas."
+    }
+  ];
+
+  // Helper para verificar qué tornasoles posee el jugador en su colección
+  const getTornasolesDesbloqueados = () => {
+    try {
+      const loot = window.RpgLoot?.cargarLoot?.() || {};
+      const pool = window.RpgLoot?.POOL || [];
+      const tornasoles = pool.filter(p => p.rar === "tornasol");
+      const obtenidos = [];
+
+      tornasoles.forEach(t => {
+        if ((loot[t.id] || 0) > 0) {
+          obtenidos.push(t);
+        }
+      });
+      return obtenidos;
+    } catch {
+      return [];
+    }
+  };
+
+  /* ------------------------------------------------------------
      Inyección de la Pestaña Post-Game en la barra de pestañas RPG
      ------------------------------------------------------------ */
   function inyectarTabPostGame() {
@@ -246,6 +369,7 @@
     const bonusHp = (pgState.bendiciones.armaduraCosmica || 0) * 50;
     const bonusTornasol = ((pgState.bendiciones.ojoTornasol || 0) * 0.05).toFixed(2);
     const bonusMonedas = (pgState.bendiciones.bendicionMonedas || 0) * 10;
+    const tornasolesPoseidos = getTornasolesDesbloqueados();
 
     panel.innerHTML = `
       <div class="rpg-postgame-wrap">
@@ -281,6 +405,9 @@
         <div class="rpg-postgame-subtabs">
           <button type="button" class="rpg-pg-subtab active" data-pg-view="jefes">
             ⚔️ Rematch de Jefes Ancestrales (${jefesCompletados}/${totalJefes})
+          </button>
+          <button type="button" class="rpg-pg-subtab" data-pg-view="tornasol">
+            🌈 Dominios Tornasol (${tornasolesPoseidos.length}/${TORNASOL_DOMINIOS.length})
           </button>
           <button type="button" class="rpg-pg-subtab" data-pg-view="falla">
             🌀 Falla Infinita (Piso ${pgState.fallaNivel})
@@ -340,6 +467,79 @@
                 </div>
               `;
             }).join("")}
+          </div>
+        </div>
+
+        <!-- Vista 4: Dominios Tornasol Desbloqueables por cada Tornasol -->
+        <div class="rpg-pg-section-view" id="pg-view-tornasol" style="display:none;">
+          <div class="rpg-tornasol-panel">
+            <header class="rpg-tornasol-header">
+              <div class="rpg-tornasol-badge-banner">🌈 DOMINIOS TORNASOL · POST-GAME ESPECIAL</div>
+              <h3>Los 5 Reinos de la Dimensión Iridiscente</h3>
+              <p>
+                Cada objeto <strong>Tornasol</strong> que obtienes en tu colección de botín abre un portal único a su propio reino primordial.
+                Enfréntate a las encarnaciones astrales de tus reliquias para reclamar <strong>Bendiciones Pasivas Cósmicas</strong> que potencian a todo tu equipo.
+              </p>
+              <div class="rpg-tornasol-counter">
+                Objetos Tornasol en Posesión: <strong>${tornasolesPoseidos.length} de ${TORNASOL_DOMINIOS.length}</strong>
+              </div>
+            </header>
+
+            <div class="rpg-pg-cards-grid">
+              ${TORNASOL_DOMINIOS.map((dom, i) => {
+                const tieneItem = tornasolesPoseidos.some(t => t.id === dom.itemId || (t.sprite && `${t.sprite[0]},${t.sprite[1]}` === dom.coord) || (t.nombre && t.nombre.includes(dom.nombreItem.replace(/\./g, ""))));
+                const completado = Array.isArray(pgState.tornasolDominiosDerrotados) && pgState.tornasolDominiosDerrotados.includes(dom.id);
+                const sprHtml = window.RpgData?.renderMobAnimado ? window.RpgData.renderMobAnimado(dom.sprite, 84, "rpg-boss-anim-card") : `<img src="img/48x48/${dom.sprite}" style="width:76px;height:76px;">`;
+
+                return `
+                  <div class="rpg-boss-caos-card tornasol-card ${completado ? 'conquistado' : ''} ${tieneItem ? 'desbloqueado' : 'bloqueado'}">
+                    <div class="rpg-boss-caos-top">
+                      <span class="rpg-boss-tier-badge tornasol-badge">🌈 REINO TORNASOL ${i + 1}</span>
+                      <span class="rpg-boss-afijo-pill tornasol-afijo">${dom.icono} ${dom.afijo.nombre}</span>
+                    </div>
+                    <div class="rpg-boss-sprite-zone tornasol-glow">
+                      ${sprHtml}
+                    </div>
+                    <div class="rpg-boss-info">
+                      <div class="rpg-tornasol-req-pill ${tieneItem ? 'ok' : 'falta'}">
+                        ${tieneItem ? '✨ Desbloqueado con ' : '🔒 Requiere ' } <strong>${dom.nombreItem}</strong>
+                      </div>
+                      <h3 class="rpg-boss-name">${dom.jefeNombre}</h3>
+                      <div class="rpg-boss-title">${dom.reinoNombre} · ${dom.titulo}</div>
+                      <div class="rpg-boss-stats-row">
+                        <span>❤️ ${dom.hpBase.toLocaleString()} HP</span>
+                        <span>⚔️ ${dom.atkBase} ATK</span>
+                        <span>⭐ +${dom.xpBase.toLocaleString()} XP</span>
+                      </div>
+                      <p class="rpg-boss-afijo-desc">
+                        <em>${dom.afijo.desc}</em>
+                      </p>
+                      <div class="rpg-boss-loot-highlight">
+                        🎁 ${dom.recompensaDesc}
+                      </div>
+                      <div class="rpg-tornasol-passive-highlight">
+                        ${dom.beneficioPasivo}
+                      </div>
+                    </div>
+                    <div class="rpg-boss-footer">
+                      ${completado ? `
+                        <button type="button" class="rpg-btn-caos repetible tornasol-btn" data-tornasol-dominio="${dom.id}">
+                          🌈 Re-desafiar Reino Conquistado
+                        </button>
+                      ` : tieneItem ? `
+                        <button type="button" class="rpg-btn-caos iniciar tornasol-btn" data-tornasol-dominio="${dom.id}">
+                          ⚡ Entrar al Dominio (${dom.nombreItem})
+                        </button>
+                      ` : `
+                        <button type="button" class="rpg-btn-caos bloqueado" disabled title="Consigue el item ${dom.nombreItem} en cofres o victorias">
+                          🔒 Consigue "${dom.nombreItem}" para desbloquear
+                        </button>
+                      `}
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
           </div>
         </div>
 
@@ -456,7 +656,12 @@
     qsa(".rpg-btn-caos:not([disabled])", panel).forEach(b => {
       b.addEventListener("click", () => {
         const jefeId = b.dataset.caosId;
-        iniciarCombateJefeCaos(jefeId);
+        const dominioId = b.dataset.tornasolDominio;
+        if (dominioId) {
+          iniciarCombateDominioTornasol(dominioId);
+        } else if (jefeId) {
+          iniciarCombateJefeCaos(jefeId);
+        }
       });
     });
 
@@ -480,6 +685,68 @@
         comprarBendicion(tipo);
       });
     });
+  }
+
+  /* ------------------------------------------------------------
+     Mecánica de Combate: Dominio Tornasol
+     ------------------------------------------------------------ */
+  function iniciarCombateDominioTornasol(dominioId) {
+    const dom = TORNASOL_DOMINIOS.find(d => d.id === dominioId);
+    if (!dom) return;
+
+    const enemigoTornasol = {
+      id: dom.id,
+      nombre: dom.jefeNombre,
+      sprite: dom.sprite,
+      iconoKey: "corona",
+      icono: dom.icono || "🌈",
+      hpMax: dom.hpBase,
+      hp: dom.hpBase,
+      atk: dom.atkBase,
+      xp: dom.xpBase,
+      monedas: dom.monedasBase,
+      jefe: true,
+      miniJefe: false,
+      esHorda: false,
+      esPostGame: true,
+      esDominioTornasol: true,
+      dominioData: dom,
+      afijoCaos: dom.afijo,
+      dot: 0, dotDur: 0, sangrado: 0, sangradoDur: 0,
+      shield: dom.afijo.id === "aureola_solar" ? 25000 : Math.round(dom.hpBase * 0.15),
+      phase: 1,
+      tier: 'jefe',
+      special: dom.afijo.id === "ebullicion_cosmica" ? 'firebreath' : 'apocalypse',
+      specialCD: 2,
+      specialTimer: 2
+    };
+
+    if (typeof window._rpgIniciarCombateDirecto === "function") {
+      window._rpgIniciarCombateDirecto(enemigoTornasol, `${dom.reinoNombre} · ${dom.jefeNombre}`);
+    } else {
+      const zonaSimulada = {
+        id: dom.id,
+        nombre: `${dom.reinoNombre} · ${dom.jefeNombre}`,
+        desc: `🌈 DOMINIO TORNASOL · ${dom.afijo.nombre}`,
+        icono: dom.icono || "🌈",
+        nivel: 60,
+        enemigos: [dom.jefeId],
+        hp: dom.hpBase,
+        atk: dom.atkBase,
+        xp: dom.xpBase,
+        monedas: dom.monedasBase,
+        jefe: true,
+        miniJefe: false,
+        region: "vacio",
+        regionNombre: dom.reinoNombre,
+        orden: 160
+      };
+      if (window.Rpg?.zonas) {
+        const exist = window.Rpg.zonas.find(x => x.id === dom.id);
+        if (!exist) window.Rpg.zonas.push(zonaSimulada);
+      }
+      window._rpgEntrarZona?.(dom.id);
+    }
   }
 
   /* ------------------------------------------------------------
@@ -637,8 +904,26 @@
     const st = getPostGameState();
     let huboCambio = false;
 
+    // Si fue un Dominio Tornasol
+    if (en.esDominioTornasol && en.id) {
+      if (!Array.isArray(st.tornasolDominiosDerrotados)) st.tornasolDominiosDerrotados = [];
+      if (!st.tornasolDominiosDerrotados.includes(en.id)) {
+        st.tornasolDominiosDerrotados.push(en.id);
+        st.prestigioPuntos += 200;
+        huboCambio = true;
+        try {
+          window._darPremio?.(0, 100, `¡Dominio Tornasol Conquistado: ${en.nombre}!`);
+          window.RpgLoot?.agregarCofreInventario?.("celestial", 2);
+          window.RpgParticulas?.flashRareza?.("#b0f5ff");
+        } catch { }
+      } else {
+        st.prestigioPuntos += 40;
+        huboCambio = true;
+      }
+    }
+
     // Si fue un Jefe del Caos
-    if (en.afijoCaos && en.id) {
+    if (en.afijoCaos && en.id && !en.esDominioTornasol) {
       if (!st.jefesCaosDerrotados.includes(en.id)) {
         st.jefesCaosDerrotados.push(en.id);
         st.prestigioPuntos += 100;
@@ -715,7 +1000,9 @@
     saveState: savePostGameState,
     abrir: activarTabPostGame,
     jefesCaos: JEFES_CAOS,
-    afijos: AFIJOS
+    afijos: AFIJOS,
+    dominiosTornasol: TORNASOL_DOMINIOS,
+    getTornasolesDesbloqueados: getTornasolesDesbloqueados
   };
 
   // Observador para inyectar pestaña y banners en el ciclo de vida de la vista RPG

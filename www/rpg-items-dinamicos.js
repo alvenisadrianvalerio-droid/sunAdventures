@@ -108,7 +108,7 @@
 
                     // Si el objeto tiene stats configurados fijos o específicos como Origen de la vida
                     if (coord === "5,4" || info.nombre?.includes("Origen de la vida")) {
-                        statsEscalados.hp = 1500;
+                        statsEscalados.hp = 3500;
                     }
 
                     const valorPrincipal = statsEscalados.atk || statsEscalados.def || statsEscalados.hp ||

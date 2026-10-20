@@ -2338,6 +2338,113 @@ html.animations-disabled .rpg-rl-log-line { opacity: 1 !important; }
 }
 
 /* ============================================================
+   PANEL Y DOMINIOS TORNASOL POST-GAME
+   ============================================================ */
+.rpg-tornasol-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+.rpg-tornasol-header {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 0.6rem;
+}
+.rpg-tornasol-badge-banner {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 84, 112, 0.25), rgba(176, 245, 255, 0.25), rgba(166, 132, 240, 0.25));
+  border: 1px solid rgba(176, 245, 255, 0.5);
+  color: #b0f5ff;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 10px rgba(176, 245, 255, 0.6);
+}
+.rpg-tornasol-header h3 {
+  font-size: 1.4rem;
+  color: #b0f5ff;
+  margin-bottom: 0.4rem;
+  text-shadow: 0 0 14px rgba(176, 245, 255, 0.4);
+}
+.rpg-tornasol-header p {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.45;
+  margin-bottom: 0.8rem;
+}
+.rpg-tornasol-counter {
+  display: inline-block;
+  background: rgba(176, 245, 255, 0.12);
+  border: 1px solid rgba(176, 245, 255, 0.4);
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  color: #b0f5ff;
+  font-size: 0.88rem;
+}
+.rpg-boss-caos-card.tornasol-card {
+  border-color: rgba(176, 245, 255, 0.35);
+  background: linear-gradient(135deg, rgba(14, 20, 36, 0.95), rgba(24, 18, 38, 0.95));
+}
+.rpg-boss-caos-card.tornasol-card.desbloqueado {
+  box-shadow: 0 0 20px rgba(176, 245, 255, 0.2);
+}
+.rpg-boss-tier-badge.tornasol-badge {
+  background: linear-gradient(90deg, #ff5470, #ffd93d, #6cb8ff);
+  color: #0b0c12;
+  font-weight: 900;
+}
+.rpg-boss-afijo-pill.tornasol-afijo {
+  background: rgba(176, 245, 255, 0.15);
+  border: 1px solid rgba(176, 245, 255, 0.4);
+  color: #b0f5ff;
+}
+.rpg-boss-sprite-zone.tornasol-glow {
+  background: radial-gradient(circle, rgba(176, 245, 255, 0.2) 0%, transparent 70%);
+}
+.rpg-tornasol-req-pill {
+  font-size: 0.74rem;
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  margin-bottom: 0.3rem;
+  font-weight: 700;
+}
+.rpg-tornasol-req-pill.ok {
+  background: rgba(77, 212, 142, 0.18);
+  color: #4dd48e;
+  border: 1px solid rgba(77, 212, 142, 0.35);
+}
+.rpg-tornasol-req-pill.falta {
+  background: rgba(255, 84, 112, 0.15);
+  color: #ff7675;
+  border: 1px solid rgba(255, 84, 112, 0.35);
+}
+.rpg-tornasol-passive-highlight {
+  font-size: 0.77rem;
+  background: linear-gradient(135deg, rgba(176, 245, 255, 0.1), rgba(166, 132, 240, 0.1));
+  border: 1px solid rgba(176, 245, 255, 0.3);
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  color: #b0f5ff;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.rpg-btn-caos.tornasol-btn {
+  background: linear-gradient(135deg, #0984e3, #a684f0, #ff7675);
+  background-size: 200% 200%;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(166, 132, 240, 0.4);
+}
+.rpg-btn-caos.tornasol-btn:hover {
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(176, 245, 255, 0.5);
+}
+
+/* ============================================================
    SELECTOR DE MASCOTAS (AVENTURA & ROGUELIKE)
    ============================================================ */
 .rpg-hero-avatar-btn {

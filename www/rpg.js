@@ -1200,13 +1200,14 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         SND("victoria");
       }
 
-      if (evento === "recibir-muerte" && (texto.includes("inmune") || texto.includes("invulnerable") || texto.includes("bloqueo total"))) {
+      if (evento === "recibir-muerte" && (texto.includes("inmune") || texto.includes("invulnerable") || texto.includes("bloqueo total") || texto.includes("milagro de la gracia") || texto.includes("gracia"))) {
         if (state._inmuneUsado) return;
         state._inmuneUsado = true;
         activada = true;
-        state.hp = Math.round(hpMax() * 0.5);
-        log(`🛡️ ¡${hab.nombre} activado! Bloqueas el daño letal.`, "critico");
-        floatDmg("#sprite-heroe", "¡INMUNE!", "curar");
+        state.hp = Math.max(500, Math.round(hpMax() * 0.5));
+        buffsHeroe.push({ tipo: "def", val: 500, turnos: 3, label: "🛡️ GRACIA" });
+        log(`🕯️ ¡${hab.nombre} activado! La Gracia Solar anula la muerte: revives con ${state.hp} HP y escudo celestial.`, "critico");
+        floatDmg("#sprite-heroe", "¡MILAGRO SOLAR!", "curar");
         SND("victoria");
       }
 
@@ -1232,17 +1233,33 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
       if (evento === "turno-propio" && texto.includes("conocimiento absoluto")) {
         const curaMatch = desc.match(/(\d+)\s*(?:de\s+)?vida/);
-        const curaPorTurno = curaMatch ? parseInt(curaMatch[1]) : (hab.val || 200);
+        const curaPorTurno = curaMatch ? parseInt(curaMatch[1]) : (hab.val || 600);
         state.hp = Math.min(hpMax(), state.hp + curaPorTurno);
-        log(`📚 ${hab.nombre}: +${curaPorTurno} HP por turno.`, "curar");
+        buffsHeroe.push({ tipo: "def", val: 200, turnos: 2, label: "🛡️ ESCUDO CÓSMICO" });
+        log(`📚 ${hab.nombre}: +${curaPorTurno} HP y +400 escudo primordial cada turno.`, "curar");
         activada = true;
       }
 
       if (evento === "turno-propio" && (texto.includes("el mago") || (texto.includes("mago") && texto.includes("esquiva")))) {
         buffsHeroe.push({ tipo: "def", val: -5, turnos: 999, label: "🧙 -5 DEF" });
-        buffsHeroe.push({ tipo: "esq", val: 5, turnos: 999, label: "🧙 +5% ESQ" });
-        buffsHeroe.push({ tipo: "crit", val: 10, turnos: 999, label: "🧙 +10% CRIT" });
-        log(`🧙 ${hab.nombre}: -5 DEF, +10% crítico, +5% esquiva.`, "info");
+        buffsHeroe.push({ tipo: "esq", val: 10, turnos: 999, label: "🧙 +10% ESQ" });
+        buffsHeroe.push({ tipo: "crit", val: 15, turnos: 999, label: "🧙 +15% CRIT" });
+        if (enemigo && !enemigo.terminado) {
+          const dmgArcano = 450;
+          aplicarDmgEnemigo(dmgArcano);
+          log(`🧙 ${hab.nombre}: +15% crítico, +10% esquiva y ¡destello arcano de ${dmgArcano} daño!`, "critico");
+          floatDmg("#sprite-enemigo", "-" + dmgArcano, "critico");
+          FX({ tipo: "attack", target: "enemy", valor: dmgArcano, fxKey: "magic" });
+        } else {
+          log(`🧙 ${hab.nombre}: +15% crítico, +10% esquiva.`, "info");
+        }
+        renderBuffs();
+        activada = true;
+      }
+
+      if (evento === "turno-propio" && (texto.includes("poder estelar") || texto.includes("cometa astral"))) {
+        buffsHeroe.push({ tipo: "atk", val: 35, turnos: 999, label: "⭐ +35% ATK" });
+        log(`⭐ ${hab.nombre}: la estrella pulsa aumentando tu poder +35% ATK acumulativo.`, "curar");
         renderBuffs();
         activada = true;
       }
@@ -1548,7 +1565,109 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
     // CONOCIMIENTO ABSOLUTO (pasiva)
     if (texto.includes("conocimiento absoluto")) {
-      return { ejecutar: () => log(`📚 ${nombre} es pasiva: cura HP por turno.`, "info") };
+      return { ejecutar: () => log(`📚 ${nombre} es pasiva: regenera HP y genera escudo por turno.`, "info") };
+    }
+
+    // COMETA ASTRAL (Tornasol)
+    if (texto.includes("cometa astral") || texto.includes("cometa.")) {
+      return {
+        ejecutar: () => {
+          const dmg = val >= 100 ? val : Math.max(1200, Math.round(atkTotal() * 4.5));
+          aplicarDmgEnemigo(dmg);
+          if (enemigo) {
+            enemigo.dot = Math.round(dmg * 0.15);
+            enemigo.dotDur = 3;
+          }
+          log(`☄️ ${nombre}: ¡Impacto cósmico masivo de ${dmg} daño y quemadura estelar!`, "critico");
+          floatDmg("#sprite-enemigo", "-" + dmg, "critico");
+          FX({ tipo: "attack", target: "enemy", valor: dmg, fxKey: "fireball", critico: true });
+          SND("victoria");
+        }
+      };
+    }
+
+    // GÉNESIS CÓSMICA (Tornasol)
+    if (texto.includes("génesis cósmica") || texto.includes("genesis cosmica")) {
+      return {
+        ejecutar: () => {
+          const cura = val >= 100 ? val : 1500;
+          const antes = state.hp;
+          state.hp = Math.min(hpMax(), state.hp + cura);
+          state.sangrado = 0;
+          buffsHeroe = buffsHeroe.filter(b => (b.val || 0) >= 0);
+          const c = Math.round(state.hp - antes);
+          log(`✨ ${nombre}: ¡Génesis Celestial! +${c} HP y purificación total de estados negativos.`, "curar");
+          floatDmg("#sprite-heroe", `+${c}`, "curar");
+          FX({ tipo: "heal", target: "hero", valor: c, fxKey: "heal" });
+          SND("sparkle");
+        }
+      };
+    }
+
+    // TRASCENDENCIA ESPECTRAL (Tornasol)
+    if (texto.includes("trascendencia espectral")) {
+      return {
+        ejecutar: () => {
+          const dmg = val >= 100 ? val : 1200;
+          aplicarDmgEnemigo(dmg);
+          buffsHeroe.push({ tipo: "esq", val: 100, turnos: 2, label: "👻 ESPECTRAL 100%" });
+          log(`🌌 ${nombre}: ${dmg} daño arcano y te vuelves intangible (+100% esquiva).`, "critico");
+          floatDmg("#sprite-enemigo", "-" + dmg, "critico");
+          FX({ tipo: "attack", target: "enemy", valor: dmg, fxKey: "shadow", critico: true });
+          renderBuffs();
+          SND("victoria");
+        }
+      };
+    }
+
+    // AURA DE GRACIA INFINITA (Tornasol)
+    if (texto.includes("aura de gracia")) {
+      return {
+        ejecutar: () => {
+          const escudo = val >= 100 ? val : 1000;
+          buffsHeroe.push({ tipo: "def", val: Math.round(escudo / 2), turnos: 4, label: `🕯️ +${escudo} ESCUDO` });
+          log(`🕯️ ${nombre}: Aura Solar envolvente. +${escudo} escudo celestial y prosperidad bendecida.`, "curar");
+          floatDmg("#sprite-heroe", `+${escudo} ESCUDO`, "curar");
+          FX({ tipo: "buff", target: "hero", fxKey: "buffDef" });
+          renderBuffs();
+          SND("sparkle");
+        }
+      };
+    }
+
+    // HERVOR GALÁCTICO (Tornasol)
+    if (texto.includes("hervor galáctico") || texto.includes("hervor galactico")) {
+      return {
+        ejecutar: () => {
+          const dmg = val >= 100 ? val : 1400;
+          aplicarDmgEnemigo(dmg);
+          if (enemigo) {
+            enemigo.specialTimer = Math.max(enemigo.specialTimer, 3);
+          }
+          log(`🍲 ${nombre}: ¡Onda de choque hirviente! ${dmg} daño y el enemigo queda aturdido 2 turnos.`, "critico");
+          floatDmg("#sprite-enemigo", `-${dmg} ATURDIDO`, "critico");
+          FX({ tipo: "attack", target: "enemy", valor: dmg, fxKey: "icebolt", critico: true });
+          SND("victoria");
+        }
+      };
+    }
+
+    // NUTRICIÓN CÓSMICA (Tornasol)
+    if (texto.includes("nutrición cósmica") || texto.includes("nutricion cosmica")) {
+      return {
+        ejecutar: () => {
+          const cura = val >= 100 ? val : 800;
+          const antes = state.hp;
+          state.hp = Math.min(hpMax(), state.hp + cura);
+          buffsHeroe.push({ tipo: "atk", val: 30, turnos: 999, label: "💪 +30 ATK" });
+          const c = Math.round(state.hp - antes);
+          log(`🍗 ${nombre}: Nutrición estelar +${c} HP y +30 ATK permanente.`, "curar");
+          floatDmg("#sprite-heroe", `+${c} HP`, "curar");
+          FX({ tipo: "heal", target: "hero", valor: c, fxKey: "heal" });
+          renderBuffs();
+          SND("sparkle");
+        }
+      };
     }
 
     // PODER ABSOLUTO (pasiva)
