@@ -23,6 +23,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const SVG_RUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;display:inline-block;vertical-align:-3px;margin-right:5px;"><circle cx="14" cy="4" r="2"/><path d="m9 20 3-6-3-3 4-2 3 3h4"/><path d="m6 16 3-3"/><path d="M14 14l2 6"/></svg>';
   const SVG_SWORD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rpg-stat-svg" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px;color:#ff9a3d;"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>';
   const SVG_SHIELD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rpg-stat-svg" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px;color:#6cb8ff;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+  const SVG_ZAP = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none" class="rpg-stat-svg" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px;color:#ffd93d;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+  const SVG_WIND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" class="rpg-stat-svg" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px;color:#a8ff78;"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>';
 
   const D = window.RpgData || {};
   const DIR_48 = D.DIR_48 || 'img/48x48/';
@@ -268,7 +270,12 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
       if (encontrado) {
         const merged = { ...def(), ...encontrado };
-        if (!merged.statsBase) merged.statsBase = { atk: 14, def: 5 };
+        if (!Array.isArray(merged.zonasConquistadas)) merged.zonasConquistadas = [];
+        if (!Array.isArray(merged.jefesDerrotados)) merged.jefesDerrotados = [];
+        if (typeof merged.nivel !== "number" || isNaN(merged.nivel) || merged.nivel < 1) merged.nivel = 1;
+        if (typeof merged.xp !== "number" || isNaN(merged.xp) || merged.xp < 0) merged.xp = 0;
+        if (typeof merged.enemigosDerrotados !== "number" || isNaN(merged.enemigosDerrotados) || merged.enemigosDerrotados < 0) merged.enemigosDerrotados = 0;
+        if (!merged.statsBase || typeof merged.statsBase !== "object") merged.statsBase = { atk: 14, def: 5 };
         // Migrar a la clave del usuario autenticado de la mascota actual si provenía de un fallback
         if (claveGanadora && claveGanadora !== kPrincipal && u !== "local") {
           try { localStorage.setItem(kPrincipal, JSON.stringify(merged)); } catch { }
@@ -480,8 +487,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
             <div class="rpg-hero-stats-badges">
               <span class="rpg-stat-badge" title="Ataque">${SVG_SWORD}${totalAtk}</span>
               <span class="rpg-stat-badge" title="Defensa">${SVG_SHIELD}${totalDef}</span>
-              ${critPct > 15 ? `<span class="rpg-stat-badge" title="Crítico">⚡ ${critPct}%</span>` : ""}
-              ${esqPct > 0 ? `<span class="rpg-stat-badge" title="Esquiva">💨 ${esqPct}%</span>` : ""}
+              ${critPct > 15 ? `<span class="rpg-stat-badge" title="Crítico">${SVG_ZAP}${critPct}%</span>` : ""}
+              ${esqPct > 0 ? `<span class="rpg-stat-badge" title="Esquiva">${SVG_WIND}${esqPct}%</span>` : ""}
             </div>
           </div>
           <div class="rpg-barra-label"><span>HP</span><span>${Math.round(state.hp)} / ${totalHpMax}</span></div>
@@ -664,7 +671,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
               } catch {}
             }
             return `
-              <button type="button" class="rpg-popup-mascota-card ${esActiva ? "activa" : ""}" data-mascota-sel="${id}">
+              <button type="button" class="rpg-popup-mascota-card pet-theme-${id} ${esActiva ? "activa" : ""}" data-mascota-sel="${id}">
                 ${esActiva ? `<div class="rpg-popup-mascota-activa-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>` : ""}
                 <div class="rpg-popup-mascota-img-wrap">
                   <div class="rpg-popup-mascota-aura"></div>
@@ -674,17 +681,33 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
                   <strong class="rpg-popup-mascota-nombre">${data.nombre || id}</strong>
                   <span class="rpg-popup-mascota-level-pill ${esActiva ? 'pill-activa' : ''}">${nivelTxt}</span>
                 </div>
-                ${esActiva ? `<span class="rpg-popup-mascota-status-tag">En equipo</span>` : `<span class="rpg-popup-mascota-select-hint">Seleccionar</span>`}
+                <div class="rpg-popup-mascota-footer">
+                  ${esActiva 
+                    ? `<span class="rpg-popup-mascota-status-tag"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg> En equipo</span>` 
+                    : `<span class="rpg-popup-mascota-btn-action">Seleccionar</span>`}
+                </div>
               </button>
             `;
           }).join("")}
         </div>
       </div>
     `;
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
     document.body.appendChild(p);
     requestAnimationFrame(() => p.classList.add("active"));
   }
   window._rpgAbrirPopupMascotas = abrirPopupMascotas;
+
+  function cerrarPopupMascotas() {
+    const popupMascotas = $("rpg-popup-mascotas");
+    if (popupMascotas) {
+      popupMascotas.classList.remove("active");
+      setTimeout(() => popupMascotas.remove(), 250);
+    }
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  }
 
   document.addEventListener("click", e => {
     const btnCambiarMascota = e.target.closest('[data-rpg-accion="cambiar-mascota"]');
@@ -700,19 +723,14 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       if (nuevoId) {
         localStorage.setItem("mascota_actual", nuevoId);
         SND("blip");
-        const popupMascotas = $("rpg-popup-mascotas");
-        if (popupMascotas) {
-          popupMascotas.classList.remove("active");
-          setTimeout(() => popupMascotas.remove(), 200);
-        }
+        cerrarPopupMascotas();
         window.dispatchEvent(new Event("sunad:mascota-cambiada"));
       }
       return;
     }
     const popupMascotas = e.target.closest("#rpg-popup-mascotas");
     if (popupMascotas && (e.target === popupMascotas || e.target.classList.contains("rpg-popup-close"))) {
-      popupMascotas.classList.remove("active");
-      setTimeout(() => popupMascotas.remove(), 250);
+      cerrarPopupMascotas();
       return;
     }
 
@@ -2521,7 +2539,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
     batallaEl.appendChild(overlay);
 
-    overlay.querySelector("#btn-combatir-otra-vez")?.addEventListener("click", () => {
+    overlay.querySelector("#btn-combatir-otra-vez")?.addEventListener("click", (e) => {
+      e.target.disabled = true;
       overlay.remove();
       const zActual = state.zonaActual;
       enemigo = null;
@@ -2531,7 +2550,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       entrarZona(zActual);
     });
 
-    overlay.querySelector("#btn-salir-mapa")?.addEventListener("click", () => {
+    overlay.querySelector("#btn-salir-mapa")?.addEventListener("click", (e) => {
+      e.target.disabled = true;
       overlay.remove();
       enemigo = null;
       buffsHeroe = [];
@@ -2599,8 +2619,11 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       } catch { }
     }
     let sub = 0;
-    while (state.nivel < NIVEL_MAX && state.xp >= xpParaSubir()) {
-      state.xp -= xpParaSubir();
+    let maxSubidas = 100;
+    while (state.nivel < NIVEL_MAX && maxSubidas-- > 0) {
+      const req = xpParaSubir();
+      if (!isFinite(req) || req <= 0 || state.xp < req) break;
+      state.xp -= req;
       state.nivel++;
       state.hp = hpMax();
       sub++;
@@ -2854,6 +2877,12 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     abrirPopupGrupo,
     reset: () => { localStorage.removeItem(KEY()); state = def(); render(); }
   };
+  window.addEventListener("beforeunload", () => {
+    try {
+      if (state) guardar(state);
+    } catch { }
+  });
+
   window._rpgEntrarZona = entrarZona;
   window._rpgIniciarCombateDirecto = iniciarCombateDirecto;
   window._comprobarPasivas = comprobarPasivas;

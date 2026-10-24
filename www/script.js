@@ -1612,10 +1612,92 @@ sprite.style.opacity = "0.25";
   }
   window.abrirDescarga = abrirDescarga;
 
-  /* ---------- PWA ---------- */
+  /* ---------- PWA / APK AUTO-ACTUALIZABLE CON POP-UP ---------- */
   try {
-    if ("serviceWorker" in navigator)
-      window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(e => console.warn("SW:", e)));
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        let actualizacionMostrada = false;
+
+        function mostrarModalActualizacion(workerParaActivar) {
+          if (actualizacionMostrada) return;
+          actualizacionMostrada = true;
+
+          const accionActualizar = () => {
+            if (workerParaActivar) {
+              workerParaActivar.postMessage({ type: "SKIP_WAITING" });
+            }
+            setTimeout(() => {
+              window.location.reload();
+            }, 300);
+          };
+
+          if (window.SunModal && typeof window.SunModal.confirm === "function") {
+            window.SunModal.confirm({
+              title: "Necesita actualización",
+              message: "Hay una versión nueva de SunAdventures lista con mejoras y optimizaciones. ¿Deseas actualizar ahora?",
+              icon: "🚀",
+              confirmText: "Actualizar ahora",
+              cancelText: "Más tarde",
+              variant: "warning"
+            }).then(acepto => {
+              if (acepto) accionActualizar();
+            });
+          } else {
+            // Fallback en caso de que SunModal no esté en el contexto
+            const overlay = document.createElement("div");
+            overlay.className = "sun-modal-overlay active";
+            overlay.innerHTML = `
+              <div class="sun-modal-card warning" role="dialog" aria-modal="true" style="opacity:1;transform:scale(1)">
+                <div class="sun-modal-icon">🚀</div>
+                <h3 class="sun-modal-title">Necesita actualización</h3>
+                <p class="sun-modal-msg">Hay una versión nueva de SunAdventures con mejoras. Actualiza para disfrutar de la mejor experiencia.</p>
+                <div class="sun-modal-actions">
+                  <button type="button" class="sun-modal-btn secondary" id="btn-upd-later">Más tarde</button>
+                  <button type="button" class="sun-modal-btn primary" id="btn-upd-now">Actualizar ahora</button>
+                </div>
+              </div>`;
+            document.body.appendChild(overlay);
+            overlay.querySelector("#btn-upd-later")?.addEventListener("click", () => overlay.remove());
+            overlay.querySelector("#btn-upd-now")?.addEventListener("click", () => {
+              overlay.remove();
+              accionActualizar();
+            });
+          }
+        }
+
+        navigator.serviceWorker.register("./service-worker.js").then(reg => {
+          // 1. Comprobar actualizaciones cada 10 minutos
+          setInterval(() => {
+            try { reg.update(); } catch (_) { }
+          }, 10 * 60 * 1000);
+
+          // 2. Si ya hay un worker en espera (esperando activación) al abrir la app
+          if (reg.waiting) {
+            mostrarModalActualizacion(reg.waiting);
+          }
+
+          // 3. Cuando se detecte una nueva versión descargándose
+          reg.addEventListener("updatefound", () => {
+            const nuevoWorker = reg.installing;
+            if (!nuevoWorker) return;
+            nuevoWorker.addEventListener("statechange", () => {
+              if (nuevoWorker.state === "installed" && navigator.serviceWorker.controller) {
+                mostrarModalActualizacion(nuevoWorker);
+              }
+            });
+          });
+        }).catch(e => console.warn("SW:", e));
+
+        // 4. Recargar cuando el nuevo worker tome el control
+        let recargando = false;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (!recargando && actualizacionMostrada) {
+            recargando = true;
+            window.location.reload();
+          }
+        });
+      });
+    }
   } catch {}
 
   /* ---------- Recuperar contraseña ---------- */

@@ -498,7 +498,12 @@ function sustituirEmojis(root) {
           }
         }
       }
-      return { ...metaDef(), ...(parsed || {}) };
+      const merged = { ...metaDef(), ...(parsed || {}) };
+      if (!Array.isArray(merged.desbloqueos)) merged.desbloqueos = [];
+      ['runs', 'mejorPiso', 'victorias', 'maldicionesTotales', 'bossesDerrotados'].forEach(k => {
+        if (typeof merged[k] !== 'number' || isNaN(merged[k]) || merged[k] < 0) merged[k] = 0;
+      });
+      return merged;
     } catch {
       return metaDef();
     }
@@ -585,7 +590,14 @@ function sustituirEmojis(root) {
       const saved = JSON.parse(r);
       if (!saved || typeof saved !== "object") return null;
       const base = nuevoRun(saved.mascota || m);
-      return { ...base, ...saved };
+      const merged = { ...base, ...saved };
+      if (!Array.isArray(merged.reliquias)) merged.reliquias = [];
+      if (!Array.isArray(merged.maldiciones)) merged.maldiciones = [];
+      if (!Array.isArray(merged.log)) merged.log = [];
+      if (typeof merged.piso !== 'number' || isNaN(merged.piso) || merged.piso < 1) merged.piso = 1;
+      if (typeof merged.oro !== 'number' || isNaN(merged.oro) || merged.oro < 0) merged.oro = 0;
+      if (typeof merged.hp !== 'number' || isNaN(merged.hp) || merged.hp < 0) merged.hp = merged.hpMax || 100;
+      return merged;
     } catch { return null; }
   };
   const guardarRun = s => { try { localStorage.setItem(KEY_RUN(), JSON.stringify(s)); } catch {} };
@@ -1639,7 +1651,9 @@ function sustituirEmojis(root) {
     state.xp += e.xp;
     let subido = false;
     let lvlsSubidos = 0;
-    while (state.xp >= state.xpSig) {
+    let maxSubidas = 50;
+    while (state.xp >= state.xpSig && maxSubidas-- > 0) {
+      if (!isFinite(state.xpSig) || state.xpSig <= 0) break;
       state.xp -= state.xpSig;
       state.nivel++;
       state.xpSig = Math.round(state.xpSig * 1.45);
@@ -2404,6 +2418,12 @@ if (maldicionAplicada) lineas.push(`💀 MALDICIÓN: ${maldicionAplicada.nombre}
     state = null;
     const p = $("rpg-roguelike-panel");
     if (p) p.style.display = "none";
+  });
+
+  window.addEventListener("beforeunload", () => {
+    try {
+      if (state && state.vivo) guardarRun(state);
+    } catch {}
   });
 
   console.log('✅ rpg-roguelike.js v3 listo · panel auto-reinyectable');

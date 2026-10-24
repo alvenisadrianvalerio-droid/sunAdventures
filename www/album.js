@@ -29,9 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "src/modules/album-fotos.js",
     "src/modules/album-chat.js",
     "src/modules/album-notas.js",
-    "src/modules/album-playlists.js",
-    "src/modules/album-player.js",
-    "src/modules/album-eventos.js",
     "src/modules/album-auth.js",
     "src/modules/album-router.js"
   ];

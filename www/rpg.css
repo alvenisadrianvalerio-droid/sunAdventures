@@ -2622,17 +2622,34 @@ body.light .rpg-btn-cambiar-mascota:hover {
    MODAL DE SELECCIÓN DE MASCOTA (PREMIUM REDESIGN)
 ======================================================== */
 .rpg-popup-mascotas-panel {
-  max-width: 580px !important;
-  width: min(94vw, 580px) !important;
-  background: radial-gradient(circle at 50% 0%, rgba(30, 41, 75, 0.95), rgba(10, 15, 30, 0.98)) !important;
-  border: 1px solid rgba(255, 217, 61, 0.22) !important;
-  border-radius: 26px !important;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8),
-              0 0 35px rgba(255, 217, 61, 0.08),
-              inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
-  padding: 1.5rem 1.4rem 1.4rem !important;
+  max-width: 620px !important;
+  width: min(95vw, 620px) !important;
+  background: radial-gradient(ellipse 110% 80% at 50% -15%, rgba(42, 58, 102, 0.95), rgba(10, 14, 28, 0.98)) !important;
+  border: 1px solid rgba(255, 217, 61, 0.3) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 30px 80px -10px rgba(0, 0, 0, 0.85),
+              0 0 50px rgba(255, 217, 61, 0.12),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25),
+              inset 0 0 30px rgba(255, 255, 255, 0.02) !important;
+  padding: 1.75rem 1.6rem 1.5rem !important;
   position: relative;
   overflow: hidden !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+}
+
+/* Efecto halo de luz superior ambiental */
+.rpg-popup-mascotas-panel::after {
+  content: "";
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 160px;
+  background: radial-gradient(ellipse at center, rgba(255, 217, 61, 0.22), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .rpg-popup-mascotas-header {
@@ -2640,196 +2657,257 @@ body.light .rpg-btn-cambiar-mascota:hover {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding-bottom: 1.1rem;
-  margin-bottom: 0.85rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding-bottom: 1.2rem;
+  margin-bottom: 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   position: relative;
+  z-index: 1;
 }
 
 .rpg-popup-mascotas-header-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.26rem 0.75rem;
-  border-radius: 20px;
-  background: rgba(255, 217, 61, 0.1);
-  border: 1px solid rgba(255, 217, 61, 0.25);
+  gap: 0.45rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 217, 61, 0.18), rgba(255, 171, 61, 0.1));
+  border: 1px solid rgba(255, 217, 61, 0.4);
   color: #ffd93d;
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 800;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  margin-bottom: 0.45rem;
-  box-shadow: 0 2px 8px rgba(255, 217, 61, 0.1);
+  margin-bottom: 0.55rem;
+  box-shadow: 0 4px 14px rgba(255, 217, 61, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .rpg-header-sparkle {
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   animation: rpgSparkleSpin 3s linear infinite;
+  color: #fff;
+  text-shadow: 0 0 8px #ffd93d;
 }
 
 @keyframes rpgSparkleSpin {
-  0% { transform: scale(1) rotate(0deg); opacity: 0.8; }
-  50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
-  100% { transform: scale(1) rotate(360deg); opacity: 0.8; }
+  0% { transform: scale(1) rotate(0deg); opacity: 0.85; }
+  50% { transform: scale(1.25) rotate(180deg); opacity: 1; }
+  100% { transform: scale(1) rotate(360deg); opacity: 0.85; }
 }
 
 .rpg-popup-mascotas-title {
-  font-size: 1.55rem;
+  font-size: 1.7rem;
   font-weight: 900;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   margin: 0 0 0.35rem;
-  background: linear-gradient(135deg, #ffffff 40%, #ffd93d 100%);
+  background: linear-gradient(135deg, #ffffff 30%, #fff0a8 70%, #ffd93d 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  line-height: 1.15;
+  line-height: 1.2;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.4));
 }
 
 .rpg-popup-mascotas-desc {
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.82rem;
+  color: rgba(230, 238, 255, 0.7);
   margin: 0;
-  max-width: 440px;
-  line-height: 1.4;
+  max-width: 460px;
+  line-height: 1.45;
+  font-weight: 450;
 }
 
 .rpg-popup-mascotas-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
-  gap: 0.85rem;
-  padding: 0.3rem 0.2rem;
-  max-height: 52vh;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 1rem;
+  padding: 0.4rem 0.25rem 0.6rem;
+  max-height: 54vh;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 217, 61, 0.25) transparent;
+  scrollbar-color: rgba(255, 217, 61, 0.3) transparent;
+  position: relative;
+  z-index: 1;
 }
 
 .rpg-popup-mascotas-grid::-webkit-scrollbar {
   width: 6px;
 }
 .rpg-popup-mascotas-grid::-webkit-scrollbar-thumb {
-  background: rgba(255, 217, 61, 0.25);
-  border-radius: 4px;
+  background: rgba(255, 217, 61, 0.3);
+  border-radius: 999px;
 }
 
+/* ========================================================
+   TARJETAS DE MASCOTAS
+   ======================================================== */
 .rpg-popup-mascota-card {
+  --pet-glow: rgba(255, 217, 61, 0.25);
+  --pet-accent: #ffd93d;
   position: relative;
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.06) 0%, rgba(20, 27, 45, 0.6) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 20px;
-  padding: 1.15rem 0.75rem 0.95rem;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.07) 0%, rgba(18, 24, 42, 0.85) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  padding: 1.25rem 0.85rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.75rem;
   cursor: pointer;
   color: var(--text);
   font: inherit;
-  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   outline: none;
   overflow: hidden;
 }
 
+/* Identidades cromáticas por Mascota */
+.rpg-popup-mascota-card.pet-theme-mapache {
+  --pet-glow: rgba(255, 204, 51, 0.35);
+  --pet-accent: #ffcc33;
+}
+.rpg-popup-mascota-card.pet-theme-gatito-negro {
+  --pet-glow: rgba(162, 116, 255, 0.35);
+  --pet-accent: #c09aff;
+}
+.rpg-popup-mascota-card.pet-theme-oveja {
+  --pet-glow: rgba(85, 230, 190, 0.35);
+  --pet-accent: #6ee7b7;
+}
+.rpg-popup-mascota-card.pet-theme-gatito {
+  --pet-glow: rgba(255, 140, 180, 0.35);
+  --pet-accent: #f472b6;
+}
+.rpg-popup-mascota-card.pet-theme-girasol {
+  --pet-glow: rgba(255, 180, 30, 0.4);
+  --pet-accent: #f59e0b;
+}
+.rpg-popup-mascota-card.pet-theme-dragon-bebe,
+.rpg-popup-mascota-card.pet-theme-dragon-anciano {
+  --pet-glow: rgba(255, 87, 87, 0.4);
+  --pet-accent: #f87171;
+}
+
+/* Brillo ambiental dentro de cada tarjeta */
 .rpg-popup-mascota-card::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 20px;
-  background: radial-gradient(circle at 50% 15%, rgba(255, 217, 61, 0.15), transparent 70%);
-  opacity: 0;
+  border-radius: 22px;
+  background: radial-gradient(circle at 50% 20%, var(--pet-glow), transparent 75%);
+  opacity: 0.15;
   transition: opacity 0.3s ease;
   pointer-events: none;
 }
 
 .rpg-popup-mascota-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  border-color: rgba(255, 217, 61, 0.5);
-  background: linear-gradient(165deg, rgba(255, 217, 61, 0.1) 0%, rgba(25, 35, 60, 0.7) 100%);
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 217, 61, 0.18);
+  transform: translateY(-5px) scale(1.025);
+  border-color: var(--pet-accent);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.12) 0%, rgba(24, 32, 56, 0.9) 100%);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 25px var(--pet-glow);
 }
 
 .rpg-popup-mascota-card:hover::before {
-  opacity: 1;
+  opacity: 0.65;
 }
 
+/* Tarjeta Activa (Seleccionada) */
 .rpg-popup-mascota-card.activa {
-  background: linear-gradient(165deg, rgba(255, 217, 61, 0.16) 0%, rgba(255, 179, 0, 0.05) 100%);
-  border: 1.5px solid #ffd93d;
-  box-shadow: 0 0 26px rgba(255, 217, 61, 0.25),
-              0 8px 22px rgba(0, 0, 0, 0.4),
-              inset 0 0 14px rgba(255, 217, 61, 0.12);
+  background: linear-gradient(165deg, rgba(255, 217, 61, 0.22) 0%, rgba(20, 28, 48, 0.95) 100%);
+  border: 1.8px solid #ffd93d;
+  box-shadow: 0 0 32px rgba(255, 217, 61, 0.32),
+              0 12px 28px rgba(0, 0, 0, 0.5),
+              inset 0 0 16px rgba(255, 217, 61, 0.16);
 }
 
 .rpg-popup-mascota-card.activa::before {
-  opacity: 1;
+  opacity: 0.8;
 }
 
+/* Contenedor del Sprite de Mascota */
 .rpg-popup-mascota-img-wrap {
-  width: 72px;
-  height: 72px;
-  border-radius: 18px;
-  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.1), rgba(12, 18, 34, 0.8));
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  width: 80px;
+  height: 80px;
+  border-radius: 22px;
+  background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.15), rgba(12, 17, 32, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.18);
   display: grid;
   place-items: center;
   position: relative;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: inset 0 2px 5px rgba(255, 255, 255, 0.08), 0 5px 12px rgba(0, 0, 0, 0.35);
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.12), 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+/* Pedestal de luz bajo el personaje */
+.rpg-popup-mascota-img-wrap::after {
+  content: "";
+  position: absolute;
+  bottom: 8px;
+  width: 50px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.6) 20%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .rpg-popup-mascota-card:hover .rpg-popup-mascota-img-wrap {
-  transform: scale(1.08) translateY(-2px);
-  border-color: rgba(255, 217, 61, 0.4);
+  transform: scale(1.1) translateY(-3px);
+  border-color: var(--pet-accent);
+  box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.25), 0 10px 24px rgba(0, 0, 0, 0.5), 0 0 20px var(--pet-glow);
 }
 
 .rpg-popup-mascota-card.activa .rpg-popup-mascota-img-wrap {
-  background: radial-gradient(circle at 50% 35%, rgba(255, 217, 61, 0.25), rgba(16, 22, 40, 0.85));
-  border-color: rgba(255, 217, 61, 0.55);
-  box-shadow: 0 0 18px rgba(255, 217, 61, 0.3), inset 0 0 10px rgba(255, 217, 61, 0.2);
+  background: radial-gradient(circle at 50% 35%, rgba(255, 217, 61, 0.3), rgba(16, 22, 40, 0.95));
+  border-color: rgba(255, 217, 61, 0.7);
+  box-shadow: 0 0 24px rgba(255, 217, 61, 0.38), inset 0 0 12px rgba(255, 217, 61, 0.25);
 }
 
 .rpg-popup-mascota-aura {
   position: absolute;
-  inset: -4px;
-  border-radius: 22px;
-  background: radial-gradient(circle, rgba(255, 217, 61, 0.35) 0%, transparent 70%);
+  inset: -6px;
+  border-radius: 26px;
+  background: radial-gradient(circle, var(--pet-glow) 0%, transparent 70%);
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
 }
 
+.rpg-popup-mascota-card:hover .rpg-popup-mascota-aura,
 .rpg-popup-mascota-card.activa .rpg-popup-mascota-aura {
   opacity: 1;
 }
 
 .rpg-popup-mascota-img-wrap img {
-  width: 54px;
-  height: 54px;
+  width: 58px;
+  height: 58px;
   object-fit: contain;
   image-rendering: pixelated;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
-  transition: filter 0.25s ease;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.6));
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .rpg-popup-mascota-card:hover .rpg-popup-mascota-img-wrap img {
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.65));
+  transform: scale(1.06);
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.75));
 }
 
+/* Badge de Activa (Checkmark) */
 .rpg-popup-mascota-activa-badge {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: linear-gradient(135deg, #2ed573, #10ac84);
+  background: linear-gradient(135deg, #10b981, #059669);
   color: #fff;
   border-radius: 50%;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   display: grid;
   place-items: center;
-  box-shadow: 0 2px 10px rgba(46, 213, 115, 0.6), 0 0 0 2.5px rgba(10, 15, 30, 0.95);
+  box-shadow: 0 3px 12px rgba(16, 185, 129, 0.6), 0 0 0 2.5px rgba(10, 15, 30, 0.95);
   z-index: 2;
-  animation: rpgPopIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: rpgPopIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes rpgPopIn {
@@ -2842,19 +2920,19 @@ body.light .rpg-btn-cambiar-mascota:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.3rem;
   width: 100%;
 }
 
 .rpg-popup-mascota-nombre {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #f1f2f6;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #f8fafc;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 118px;
-  letter-spacing: -0.01em;
+  max-width: 126px;
+  letter-spacing: -0.015em;
   transition: color 0.2s ease;
 }
 
@@ -2864,64 +2942,99 @@ body.light .rpg-btn-cambiar-mascota:hover {
 
 .rpg-popup-mascota-card.activa .rpg-popup-mascota-nombre {
   color: #ffd93d;
-  font-weight: 800;
+  font-weight: 900;
+  text-shadow: 0 0 12px rgba(255, 217, 61, 0.4);
 }
 
 .rpg-popup-mascota-level-pill {
-  font-size: 0.68rem;
-  font-weight: 600;
-  padding: 0.15rem 0.55rem;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.75);
-  letter-spacing: 0.02em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.18rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.03em;
+  transition: all 0.2s ease;
+}
+
+.rpg-popup-mascota-card:hover .rpg-popup-mascota-level-pill {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
 }
 
 .rpg-popup-mascota-level-pill.pill-activa {
-  background: rgba(255, 217, 61, 0.18);
+  background: rgba(255, 217, 61, 0.2);
+  border-color: rgba(255, 217, 61, 0.45);
   color: #ffd93d;
-  font-weight: 700;
+  font-weight: 800;
+}
+
+/* Botón / Footer de acción */
+.rpg-popup-mascota-footer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0.1rem;
 }
 
 .rpg-popup-mascota-status-tag {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 800;
-  color: #2ed573;
+  color: #10b981;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.75rem;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.rpg-popup-mascota-btn-action {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-top: 0.1rem;
+  padding: 0.32rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: center;
 }
 
-.rpg-popup-mascota-select-hint {
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-top: 0.1rem;
-  transition: color 0.2s ease, opacity 0.2s ease;
-}
-
-.rpg-popup-mascota-card:hover .rpg-popup-mascota-select-hint {
-  color: #ffd93d;
-  opacity: 0.9;
+.rpg-popup-mascota-card:hover .rpg-popup-mascota-btn-action {
+  background: linear-gradient(135deg, var(--pet-accent), #f59e0b);
+  border-color: transparent;
+  color: #1a1405;
+  font-weight: 900;
+  box-shadow: 0 4px 14px var(--pet-glow);
+  transform: translateY(-1px);
 }
 
 /* Modo Claro Adaptativo */
 body.light .rpg-popup-mascotas-panel {
-  background: radial-gradient(circle at 50% 0%, #ffffff, #f0f4f8) !important;
-  border-color: rgba(212, 148, 30, 0.35) !important;
-  box-shadow: 0 25px 60px -15px rgba(25, 42, 70, 0.25), 0 0 25px rgba(255, 179, 0, 0.12) !important;
+  background: radial-gradient(ellipse 110% 80% at 50% -15%, #ffffff, #edf2f7) !important;
+  border-color: rgba(212, 148, 30, 0.4) !important;
+  box-shadow: 0 30px 80px -10px rgba(25, 42, 70, 0.25), 0 0 30px rgba(255, 179, 0, 0.15) !important;
 }
 
 body.light .rpg-popup-mascotas-title {
-  background: linear-gradient(135deg, #1e293b 40%, #b45309 100%);
+  background: linear-gradient(135deg, #0f172a 40%, #b45309 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 body.light .rpg-popup-mascotas-desc {
-  color: #64748b;
+  color: #475569;
 }
 
 body.light .rpg-popup-mascotas-header {
@@ -2930,8 +3043,23 @@ body.light .rpg-popup-mascotas-header {
 
 body.light .rpg-popup-mascota-card {
   background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+body.light .rpg-popup-mascota-nombre {
+  color: #1e293b;
+}
+
+body.light .rpg-popup-mascota-level-pill {
+  background: rgba(0, 0, 0, 0.05);
+  color: #475569;
+}
+
+body.light .rpg-popup-mascota-btn-action {
+  background: rgba(0, 0, 0, 0.04);
   border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  color: #334155;
 }
 
 body.light .rpg-popup-mascota-card:hover {

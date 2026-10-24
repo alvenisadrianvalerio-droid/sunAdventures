@@ -1,12 +1,10 @@
-const CACHE_NAME = "sunad-v217";
+const CACHE_NAME = "sunad-v232";
 const ASSETS_ESTATICOS = [
   "./", "./index.html", "./styles.css", "./album.css", "./juegos.css",
-  "./rpg.css", "./rpg-loot.css", "./temas.css", "./finanzas.css", "./capsula-tiempo.css", "./pareja-chat.css",
-  "./youtube-spotify-metadata.js",
-  "./script.js", "./album.js", "./capsula-tiempo.js", "./preferences.js", "./finanzas.js", "./icons-emojis.js", "./juegos.js",
+  "./rpg.css", "./rpg-loot.css", "./temas.css", "./finanzas.css", "./capsula-tiempo.css", "./pareja-chat.css", "./diccionario.css", "./recetas.css",
+  "./script.js", "./album.js", "./capsula-tiempo.js", "./preferences.js", "./finanzas.js", "./diccionario.js", "./recetas.js", "./icons-emojis.js", "./juegos.js",
   "./src/modules/album-core.js", "./src/modules/album-grupo.js", "./src/modules/album-logros.js",
-  "./src/modules/album-fotos.js", "./src/modules/album-chat.js", "./src/modules/album-notas.js",
-  "./src/modules/album-playlists.js", "./src/modules/album-player.js", "./src/modules/album-eventos.js", "./src/modules/album-auth.js",
+  "./src/modules/album-fotos.js", "./src/modules/album-chat.js", "./src/modules/album-notas.js", "./src/modules/album-auth.js",
   "./src/modules/album-router.js",
   "./ds.js", "./offline.js", "./tienda.js", "./perfil.js", "./logros-extra.js",
   "./sprites-config.js", "./efectos.js", "./rpg-data.js", "./rpg.js", "./rpg-postgame.js", "./rpg-loot.js",
@@ -59,6 +57,12 @@ self.addEventListener("install", (e) => {
       Promise.all(ASSETS_ESTATICOS.map((u) => c.add(u).catch(() => { })))
     )
   );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("activate", (e) => {

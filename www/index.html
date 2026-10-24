@@ -29,14 +29,15 @@
   <link rel="stylesheet" href="styles.css?v=122">
   <link rel="stylesheet" href="album.css?v=120">
   <link rel="stylesheet" href="juegos.css?v=120">
-  <link rel="stylesheet" href="rpg.css?v=5">
+  <link rel="stylesheet" href="rpg.css?v=7">
   <link rel="stylesheet" href="rpg-loot.css?v=4">
   <link rel="stylesheet" href="temas.css?v=1">
   <link rel="stylesheet" href="finanzas.css?v=5">
   <link rel="stylesheet" href="player-extras.css?v=1">
-  <link rel="stylesheet" href="musica-local.css?v=1">
   <link rel="stylesheet" href="capsula-tiempo.css?v=1">
   <link rel="stylesheet" href="pareja-chat.css?v=1">
+  <link rel="stylesheet" href="diccionario.css?v=5">
+  <link rel="stylesheet" href="recetas.css?v=5">
   <style>
     svg {
       max-width: 100%;
@@ -228,20 +229,35 @@
     /* Ocultar botones de descargar app cuando se ejecuta dentro de la APK */
     html.en-apk [data-action="descargar"],
     html.en-apk [data-action="descargar-directo"],
-    html.en-apk #descarga-app-modal {
+    html.en-apk #descarga-app-modal,
+    html.en-apk button.lobby-btn[data-action="descargar"],
+    html.en-apk .user-dropdown-item[data-action="descargar"],
+    body.en-apk [data-action="descargar"],
+    body.en-apk #descarga-app-modal {
       display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      opacity: 0 !important;
     }
   </style>
   <script>
-    /* Detección de APK nativa (Capacitor / WebView / Standalone) */
+    /* Detección de APK nativa (Capacitor / WebView / Standalone / TWA / Custom Scheme) */
     (function () {
       try {
+        var ua = navigator.userAgent || "";
         var esCapacitor = !!(window.Capacitor && (window.Capacitor.isNative || (typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform())));
-        var esAndroidAsset = window.location.protocol === 'capacitor:' || window.location.protocol === 'file:' || window.location.hostname === 'localhost' && window.location.port === '' && /Android/i.test(navigator.userAgent);
+        var esAndroidAsset = window.location.protocol === 'capacitor:' || window.location.protocol === 'file:' || (window.location.hostname === 'localhost' && window.location.port === '' && /Android/i.test(ua));
         var esStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-        var esApkUserAgent = /SunAdventures|wv|Capacitor/i.test(navigator.userAgent);
-        if (esCapacitor || esAndroidAsset || esApkUserAgent || esStandalone) {
+        var esApkUserAgent = /SunAdventures|SunAd|wv|WebView|Capacitor|Crosswalk|Android.*Version\/[0-9.]+/i.test(ua);
+        var esPackageParam = window.location.search.indexOf("app=1") !== -1 || window.location.search.indexOf("platform=apk") !== -1 || localStorage.getItem("sunad_es_apk") === "true";
+
+        if (esCapacitor || esAndroidAsset || esApkUserAgent || esStandalone || esPackageParam) {
           document.documentElement.classList.add("en-apk");
+          if (document.body) document.body.classList.add("en-apk");
+          localStorage.setItem("sunad_es_apk", "true");
         }
       } catch (e) { }
     })();
@@ -282,6 +298,10 @@
             data-icono="huella"></span><span class="nav-link-text">Mascotas</span></a>
         <a href="#finanzas" class="nav-link" data-view-link="finanzas" aria-label="Finanzas"><span
             class="ui-icon nav-link-icon" data-icono="finanzas"></span><span class="nav-link-text">Finanzas</span></a>
+        <a href="#diccionario" class="nav-link" data-view-link="diccionario" aria-label="Diccionario"><span
+            class="ui-icon nav-link-icon" data-icono="libro"></span><span class="nav-link-text">Diccionario</span></a>
+        <a href="#recetas" class="nav-link" data-view-link="recetas" aria-label="Recetas"><span
+            class="ui-icon nav-link-icon" data-icono="comida"></span><span class="nav-link-text">Recetas</span></a>
       </nav>
       <div class="nav-actions">
         <button id="btn-open-login" class="btn-auth" aria-label="Entrar"><span class="btn-auth-icon"><img
@@ -301,8 +321,10 @@
                 data-icono="trofeo"></span><span>Logros</span></a>
             <a href="#notas" class="user-dropdown-item" data-view-link="notas"><span class="user-dropdown-icon"
                 data-icono="nota"></span><span>Notitas</span></a>
-            <a href="#musica-local" class="user-dropdown-item" data-view-link="musica-local"><span
-                class="user-dropdown-icon" data-icono="musica"></span><span>Playlists</span></a>
+            <a href="#diccionario" class="user-dropdown-item" data-view-link="diccionario"><span
+                class="user-dropdown-icon" data-icono="libro"></span><span>Diccionario 📖</span></a>
+            <a href="#recetas" class="user-dropdown-item" data-view-link="recetas"><span
+                class="user-dropdown-icon" data-icono="comida"></span><span>Recetas 🍳</span></a>
             <div class="user-dropdown-divider"></div>
             <button type="button" class="user-dropdown-item" data-action="perfil"><span class="user-dropdown-icon"
                 data-icono="persona"></span><span>Mi perfil</span></button>
@@ -343,12 +365,15 @@
         <a href="#notas" class="lobby-btn" data-view-link="notas"><span class="lobby-btn-icon"
             data-icono="nota"></span><span class="lobby-btn-text"><strong>Notitas para ti</strong><small>Pensamientos
               que quiero guardar</small></span></a>
-        <a href="#musica-local" class="lobby-btn" data-view-link="musica-local"><span class="lobby-btn-icon"
-            data-icono="musica"></span><span class="lobby-btn-text"><strong>Nuestras Playlists</strong><small>Las
-              canciones de nosotros</small></span></a>
         <a href="#mascotas" class="lobby-btn" data-view-link="mascotas"><span class="lobby-btn-icon"
             data-icono="huella"></span><span class="lobby-btn-text"><strong>Nuestras mascotas</strong><small>Las
               compañeras de nuestra historia</small></span></a>
+        <a href="#diccionario" class="lobby-btn" data-view-link="diccionario"><span class="lobby-btn-icon"
+            data-icono="libro"></span><span class="lobby-btn-text"><strong>Diccionario</strong><small>Descubre el
+              significado de cualquier palabra</small></span></a>
+        <a href="#recetas" class="lobby-btn" data-view-link="recetas"><span class="lobby-btn-icon"
+            data-icono="comida"></span><span class="lobby-btn-text"><strong>Recetario Mágico</strong><small>Platos del
+              mundo con preparación paso a paso</small></span></a>
         <button class="lobby-btn" data-action="descargar" type="button"><span class="lobby-btn-icon"
             data-icono="descargar"></span><span class="lobby-btn-text"><strong>Descargar la App</strong><small>Android,
               iOS o escritorio</small></span></button>
@@ -784,6 +809,232 @@
       </div>
     </div>
   </section>
+
+  <!-- ============================================================
+       VISTA DICCIONARIO
+       ============================================================ -->
+  <section id="diccionario" class="diccionario-section view" data-view="diccionario">
+    <div class="diccionario-container">
+      <header class="diccionario-header">
+        <span class="diccionario-badge">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          Herramienta de Consulta
+        </span>
+        <h1 class="diccionario-title">Diccionario</h1>
+        <p class="diccionario-desc">Escribe cualquier palabra para descubrir su significado, etimología y definiciones.</p>
+      </header>
+
+      <div class="diccionario-search-box">
+        <form id="diccionario-form" class="diccionario-form" autocomplete="off">
+          <span class="diccionario-search-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </span>
+          <input type="text" id="diccionario-input" class="diccionario-input" placeholder="Escribe una palabra o kanji/hangul (ej. 野菜, 사랑, amor, flower)..." maxlength="60" required>
+          <button type="submit" class="diccionario-btn-submit">
+            <span>Buscar</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <div class="diccionario-historial">
+        <div class="diccionario-historial-head">
+          <span>Búsquedas recientes</span>
+          <button type="button" id="diccionario-borrar-historial" class="diccionario-btn-limpiar">Limpiar historial</button>
+        </div>
+        <div id="diccionario-historial-chips" class="diccionario-historial-chips">
+          <!-- Chips dinámicos -->
+        </div>
+      </div>
+
+      <main id="diccionario-resultado" class="diccionario-resultado">
+        <div class="dic-empty">
+          <div class="dic-empty-icon">📖</div>
+          <h3>Explora el significado de las palabras</h3>
+          <p>Escribe cualquier término arriba o haz clic en una de las palabras del historial para ver su definición.</p>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       VISTA RECETARIO MÁGICO
+       ============================================================ -->
+  <section id="recetas" class="recetas-section view" data-view="recetas">
+    <div class="recetas-container">
+      <header class="recetas-header">
+        <span class="recetas-badge">
+          <span class="ui-icon" data-icono="comida"></span>
+          <span>Cocina Internacional</span>
+        </span>
+        <h1 class="recetas-title">Recetario Mágico</h1>
+        <p class="recetas-desc">Encuentra recetas exquisitas de todo el mundo con ingredientes traducidos y preparación guiada paso a paso.</p>
+      </header>
+
+      <div class="recetas-search-box">
+        <form id="recetas-form" class="recetas-form" autocomplete="off">
+          <span class="recetas-search-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </span>
+          <input type="text" id="recetas-input" class="recetas-input" placeholder="Busca un plato o ingrediente (ej. pasta, pollo, chocolate, pizza)..." maxlength="60">
+          <button type="submit" class="recetas-btn-submit">
+            <span>Buscar</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+          <button type="button" id="recetas-btn-sorpresa" class="recetas-btn-sorpresa" title="Elegir una receta al azar">
+            <svg class="receta-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="3"/>
+              <circle cx="8" cy="8" r="1.5" fill="currentColor"/>
+              <circle cx="16" cy="16" r="1.5" fill="currentColor"/>
+              <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+              <circle cx="16" cy="8" r="1.5" fill="currentColor"/>
+              <circle cx="8" cy="16" r="1.5" fill="currentColor"/>
+            </svg>
+            <span>¡Sorpréndeme!</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Categorías rápidas con Iconos SVG -->
+      <div class="recetas-categorias">
+        <button type="button" class="receta-cat-chip active" data-cat-chip="Chicken">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15.5 13a4.5 4.5 0 0 0-4.5-4.5 4.5 4.5 0 0 0-4.5 4.5c0 2 1.5 3.5 3.5 4l-4 4a1.5 1.5 0 0 0 2 2l4-4c.5 2 2 3.5 4 3.5a4.5 4.5 0 0 0 4.5-4.5 4.5 4.5 0 0 0-5-5z"/>
+          </svg>
+          <span>Pollo</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Pasta">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 13h18c0 4-3.5 8-9 8s-9-4-9-8z"/>
+            <path d="M12 5v5M8 6c0 2.5 1 4 1 4M16 6c0 2.5-1 4-1 4"/>
+          </svg>
+          <span>Pastas</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Beef">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5c0 3 2 6 6 7l2 3h2l2-3c4-1 6-4 6-7z"/>
+            <circle cx="8.5" cy="10" r="1.5" fill="currentColor"/>
+          </svg>
+          <span>Carne</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Seafood">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12c4-6 12-6 16 0-4 6-12 6-16 0z"/>
+            <circle cx="16" cy="12" r="1" fill="currentColor"/>
+            <path d="M2 10l2 2-2 2M20 12l2-2v4l-2-2z"/>
+          </svg>
+          <span>Mariscos</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Dessert">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 20h18v-6l-9-4-9 4v6z"/>
+            <path d="M3 14c3 0 3 2 6 2s3-2 6-2 3 2 6 2"/>
+            <circle cx="12" cy="7" r="2" fill="currentColor"/>
+          </svg>
+          <span>Postres</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Vegetarian">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21a9 9 0 0 0 9-9c0-5-4-9-9-9S3 7 3 12a9 9 0 0 0 9 9z"/>
+            <path d="M12 3v18M3 12c4.5-1 9 1 18 0"/>
+          </svg>
+          <span>Vegetariano</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Breakfast">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="14" rx="9" ry="6"/>
+            <ellipse cx="12" cy="10" rx="7.5" ry="4.5"/>
+            <ellipse cx="12" cy="7" rx="6" ry="3"/>
+          </svg>
+          <span>Desayunos</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Starter">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 14c0-5 3.5-9 8-9s8 4 8 9H4z"/>
+            <path d="M4 14c1 1.5 2 2 4 2s3-1 4-1 2 1 4 1 3-.5 4-2"/>
+          </svg>
+          <span>Entradas</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Pork">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5c0 3 2 6 6 7l2 3h2l2-3c4-1 6-4 6-7z"/>
+            <circle cx="8.5" cy="10" r="1.5" fill="currentColor"/>
+          </svg>
+          <span>Cerdo</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Vegan">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21a9 9 0 0 0 9-9c0-5-4-9-9-9S3 7 3 12a9 9 0 0 0 9 9z"/>
+            <path d="M12 3v18M3 12c4.5-1 9 1 18 0"/>
+          </svg>
+          <span>Vegano</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Lamb">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5c0 3 2 6 6 7l2 3h2l2-3c4-1 6-4 6-7z"/>
+          </svg>
+          <span>Cordero</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Miscellaneous">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/>
+            <path d="M7 2v20"/>
+            <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+          </svg>
+          <span>Variados</span>
+        </button>
+      </div>
+
+      <!-- Contador y Grilla de Recetas -->
+      <div class="recetas-info-bar">
+        <span id="recetas-contador" class="recetas-contador">Explorando recetas del mundo</span>
+      </div>
+
+      <div id="recetas-grid" class="recetas-grid">
+        <!-- Render dinámico -->
+      </div>
+
+      <!-- Paginación / Cargar Más Recetas -->
+      <div id="recetas-paginacion" class="recetas-paginacion hidden">
+        <button type="button" id="recetas-btn-mas" class="recetas-btn-mas">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          <span id="recetas-btn-mas-text">Cargar más recetas</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL DETALLE DE RECETA -->
+  <div id="receta-modal" class="receta-modal hidden" aria-modal="true" role="dialog">
+    <div class="receta-modal-content">
+      <button type="button" id="receta-modal-cerrar" class="receta-modal-cerrar" aria-label="Cerrar receta">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <div id="receta-modal-body">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL NOTA -->
   <div id="nota-modal" class="modal" aria-hidden="true">
@@ -1228,20 +1479,18 @@ Artista - Canción
   <script src="src/modules/album-fotos.js?v=2"></script>
   <script src="src/modules/album-chat.js?v=13"></script>
   <script src="src/modules/album-notas.js"></script>
-  <script src="src/modules/album-playlists.js"></script>
-  <script src="src/modules/album-player.js"></script>
-  <script src="src/modules/album-eventos.js"></script>
   <script src="src/modules/album-auth.js"></script>
+  <script src="diccionario.js?v=5"></script>
+  <script src="recetas.js?v=6"></script>
   <script src="src/modules/album-router.js"></script>
   <script src="album.js?v=121"></script>
-  <script src="musica-local.js?v=2"></script>
 
   <!-- RPG — Orden crítico -->
   <script src="rpg-loot.js?v=8"></script>
   <script src="rpg-items-dinamicos.js?v=8"></script>
   <script src="rpg-loadout.js?v=8"></script>
   <script src="rpg-data.js?v=1"></script>
-  <script src="rpg.js?v=17"></script>
+  <script src="rpg.js?v=20"></script>
   <script src="rpg-postgame.js?v=1"></script>
   <script src="rpg-habilidades.js"></script>
   <script src="rpg-minimap.js"></script>

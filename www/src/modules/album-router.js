@@ -4,7 +4,7 @@
 (function() {
   const { $, ocultarLoading } = window.AlbumApp;
 
-  const VISTAS = () => ["inicio", "album", "chat", "logros", "notas", "playlists", "calendario", "mascotas", "finanzas", ...(window._extraVistas || [])];
+  const VISTAS = () => ["inicio", "album", "chat", "logros", "notas", "mascotas", "finanzas", ...(window._extraVistas || [])];
   const rutaDesdeHash = () => {
     const h = (location.hash || "").replace(/^#/, "").trim();
     if (h === "mapa") return "inicio";

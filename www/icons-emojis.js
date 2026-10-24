@@ -21,6 +21,7 @@
     mapa: S(`<path d="M9 4l6 2 6-2v14l-6 2-6-2-6 2V6z"/><path d="M9 4v14M15 6v14"/>`),
     chat: S(`<path d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-6 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>`),
     finanzas: `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor" opacity=".14"/><path d="M16.2 8.2c-.8-.8-1.9-1.2-3.5-1.2-2 0-3.3 1-3.3 2.5 0 1.4 1.1 2 3.1 2.4 2 .4 3.2 1 3.2 2.5S14.3 17 12.3 17c-1.6 0-2.9-.5-3.8-1.5M12.3 5.5v13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+    libro: S(`<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>`),
     descargar: S(`<path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/>`),
     calendario: S(`<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>`),
     /* Tema */

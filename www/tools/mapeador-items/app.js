@@ -11,6 +11,7 @@
 
     /* ---------------- Configuración ---------------- */
     const SHEETS = [
+        { id: "items-actuales", label: "🎒 Ítems Actuales del Juego (97 ítems)", src: "sprites/items-actuales-sheet.png", cols: 10, rows: 10, baselineKey: "ITEMS_ACTUALES_NAMES" },
         { id: "loot-2", label: "⚔️ Loot 2 · Pool activo", src: "sprites/loot-2.png", cols: 8, rows: 9, baseline: true },
         { id: "loot-1", label: "🛡️ Loot 1 · Armería", src: "sprites/loot-1.png", cols: 8, rows: 9 },
         { id: "admurin", label: "👑 Tienda Admurin", src: "sprites/admurin-items.png", cols: 30, rows: 110 },
@@ -80,7 +81,11 @@
     function state() {
         if (!store[sheetCfg.id]) {
             store[sheetCfg.id] = { cols: sheetCfg.cols, rows: sheetCfg.rows, items: {} };
-            if (sheetCfg.baseline && window.SPRITE_NAMES) store[sheetCfg.id].items = normalizeMap(window.SPRITE_NAMES);
+            if (sheetCfg.baselineKey && window[sheetCfg.baselineKey]) {
+                store[sheetCfg.id].items = normalizeMap(window[sheetCfg.baselineKey]);
+            } else if (sheetCfg.baseline && window.SPRITE_NAMES) {
+                store[sheetCfg.id].items = normalizeMap(window.SPRITE_NAMES);
+            }
         }
         return store[sheetCfg.id];
     }
@@ -120,7 +125,19 @@
     function power(stats) {
         return Math.round(Object.entries(stats).reduce((s, [k, v]) => s + (STATS.find(x => x.v === k)?.peso ?? 1) * v, 0));
     }
-    function download(name, text, type) {
+    const NATIVE = !!window.Capacitor?.isNativePlatform?.();
+    async function download(name, text, type) {
+        if (NATIVE) {
+            // En la APK: escribir en caché y abrir el menú "Compartir" de Android
+            const { Filesystem, Share } = window.Capacitor.Plugins;
+            try {
+                const res = await Filesystem.writeFile({ path: name, data: text, directory: "CACHE", encoding: "utf8" });
+                await Share.share({ title: name, text: `Mapeo de ítems · ${name}`, files: [res.uri], dialogTitle: "Enviar archivo" });
+            } catch (err) {
+                if (!/cancel/i.test(err?.message || "")) toast("❌ No se pudo compartir: " + (err?.message || err));
+            }
+            return;
+        }
         const a = document.createElement("a");
         a.href = URL.createObjectURL(new Blob([text], { type }));
         a.download = name; a.click();
