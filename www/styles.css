@@ -1227,8 +1227,6 @@ body.light .girasol {
   animation: swing 1.2s ease-in-out infinite
 }
 
-.girasol-wrapper:hover .burbuja,
-.girasol-wrapper.activo .burbuja,
 .burbuja.visible {
   opacity: 1 !important;
   transform: translateX(-50%) translateY(0) scale(1) !important;

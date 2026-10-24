@@ -458,7 +458,14 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       <div class="rpg-hud">
         <div class="rpg-hero-avatar rpg-hero-avatar-btn" data-rpg-accion="cambiar-mascota" title="Clic para cambiar de mascota" style="cursor:pointer;position:relative;">
           <img src="${m.imagen}" alt="${m.nombre}" style="width:58px;height:58px;max-width:58px;max-height:58px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'">
-          <span class="rpg-hero-avatar-cambiar-badge" title="Cambiar mascota">🔄</span>
+          <span class="rpg-hero-avatar-cambiar-badge" title="Cambiar mascota" style="position:absolute;bottom:0px;right:0px;width:24px;height:24px;background:linear-gradient(135deg, #ffd93d 0%, #ff9f1a 100%);border:2px solid #1a1a24;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,0.6), 0 0 10px rgba(255,217,61,0.6);z-index:10;pointer-events:none;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#121217" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+              <path d="M16 16h5v5"/>
+            </svg>
+          </span>
         </div>
         <div class="rpg-hero-info">
           <div class="rpg-hero-name">
@@ -890,7 +897,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const s = $("sprite-heroe");
     if (!s) return;
     s.classList.add("atacando");
-    setTimeout(() => s.classList.remove("atacando"), 400);
+    setTimeout(() => s.classList.remove("atacando"), 420);
   }
 
   function renderBuffs() {
@@ -1221,8 +1228,9 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   function danoEscaladoJefe(mult) {
     const atkEnemigo = enemigo.atk + buffsEnemigo.filter(b => b.tipo === "atk").reduce((s, b) => s + b.val, 0);
     const defHeroe = defTotal() + buffVal("def");
-    const escalaHP = Math.min(1.4, 1 + (hpMax() - 300) / 2000);
-    return Math.max(1, Math.round((atkEnemigo * mult * escalaHP) - defHeroe + rnd(-3, 3)));
+    const escalaHP = Math.min(1.5, 1 + (hpMax() - 300) / 1800);
+    const minDmg = Math.max(12, Math.round(atkEnemigo * mult * 0.32));
+    return Math.max(minDmg, Math.round((atkEnemigo * mult * escalaHP) - (defHeroe * 0.75) + rnd(1, 6)));
   }
 
   function comprobarPasivas(evento, contexto = {}) {
@@ -2044,7 +2052,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const s = $("sprite-enemigo");
     if (!s) return;
     s.classList.add("atacando");
-    setTimeout(() => s.classList.remove("atacando"), 400);
+    setTimeout(() => s.classList.remove("atacando"), 440);
   }
 
   function ataqueHordaSecuencial(skipMobIdx = null) {
@@ -2096,7 +2104,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       const mobEl = qs(`.rpg-horda-item[data-horda-idx="${mob.id}"]`);
       if (mobEl) {
         mobEl.classList.add("mob-atacando");
-        setTimeout(() => mobEl.classList.remove("mob-atacando"), 220);
+        setTimeout(() => mobEl.classList.remove("mob-atacando"), 320);
       }
 
       // Comprobación individual de esquiva frente al ataque de este mob
@@ -2107,16 +2115,18 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         return setTimeout(siguienteMobAtaca, 200);
       }
 
-      // Cálculo de daño individual del mob
+      // Cálculo de daño individual del mob con penetración parcial de defensa
       const multLider = mob.esLider ? 1.4 : 1.0;
       const atkJunto = Math.max(1, Math.round(atkEnemigoBase * factorDmgMob * multLider));
-      // La defensa del héroe amortigua proporcionalmente cada golpe
-      const defMitigada = Math.max(0, Math.round(defHeroe * factorDmgMob * 0.9));
-      const dmg = Math.max(1, atkJunto - defMitigada + rnd(-1, 2));
+      // La defensa del héroe amortigua el golpe pero siempre deja pasar un mínimo tangible de daño (~18% del ataque del mob)
+      const defMitigada = Math.max(0, Math.round(defHeroe * factorDmgMob * 0.75));
+      const minDmg = Math.max(3, Math.round(atkJunto * 0.18));
+      const dmg = Math.max(minDmg, atkJunto - defMitigada + rnd(0, 3));
 
       state.hp = Math.max(0, state.hp - dmg);
       guardar(state);
-      SND("derrota");
+      // Sonido de impacto sutil y rápido para la horda (evita el sonido estridente repetido)
+      SND("mobHit");
       log(`⚔️ ${mob.nombre}${mob.esLider ? " (Líder)" : ""}: te golpea por ${dmg} daño.`, "daño");
       floatDmg("#sprite-heroe", `-${dmg}`, "daño");
       FX({ tipo: "attack", target: "hero", valor: dmg, fxKey: mob.esLider ? "hammer" : "slash" });
@@ -2165,9 +2175,10 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     }
     const atkEnemigo = Math.max(1, enemigo.atk + buffsEnemigo.filter(b => b.tipo === "atk").reduce((s, b) => s + b.val, 0));
     const defHeroe = defTotal() + buffVal("def");
-    const dmg = Math.max(1, atkEnemigo - defHeroe + rnd(-3, 3));
+    const minDmg = Math.max(6, Math.round(atkEnemigo * 0.22));
+    const dmg = Math.max(minDmg, Math.round(atkEnemigo - (defHeroe * 0.82)) + rnd(0, 4));
     state.hp = Math.max(0, state.hp - dmg); guardar(state);
-    SND("derrota");
+    SND("hit");
     log(enemigo.nombre + " te ataca por " + dmg + ".", "daño");
     floatDmg("#sprite-heroe", "-" + dmg, "daño");
     FX({ tipo: "attack", target: "hero", valor: dmg, fxKey: "bolt" });
@@ -2414,18 +2425,36 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const RL = window.RpgLoot; if (!RL?.usarConsumible) return;
     const item = RL.POOL.find(p => p.id === id); if (!item) return;
     if (!RL.usarConsumible(id)) return;
-    if (item.tipo === "hp" || item.tipo === "def") {
-      const cur = item.tipo === "hp" ? item.val : item.val * 3;
-      const a = state.hp;
-      state.hp = clamp(state.hp + cur, 0, hpMax()); guardar(state);
-      SND("comer"); log(`Usas ${item.nombre}. +${Math.round(state.hp - a)} HP.`, "curar");
-      floatDmg("#sprite-heroe", `+${Math.round(state.hp - a)}`, "curar");
-      FX({ tipo: "consumible", target: "hero", valor: Math.round(state.hp - a), fxKey: "potionBlue" });
+    const st = item.stats || {};
+    const curVal = st.hp || item.val || 100;
+    const a = state.hp;
+
+    if (item.tipo === "hp" || item.tipo === "def" || item.tipo === "soporte" || item.consumible) {
+      state.hp = clamp(state.hp + curVal, 0, hpMax());
+      guardar(state);
+      SND("comer");
+      const curado = Math.round(state.hp - a);
+      log(`Usas ${item.nombre}. +${curado} HP.`, "curar");
+      floatDmg("#sprite-heroe", `+${curado}`, "curar");
+      FX({ tipo: "consumible", target: "hero", valor: curado, fxKey: "potionBlue" });
+
+      if (st.def || (item.tipo === "def" && item.val)) {
+        const esc = st.def || Math.round(item.val * 2);
+        buffsHeroe.push({ tipo: "def", val: esc, turnos: 3, label: "DEF" });
+        log(`🛡️ ${item.nombre}: +${esc} DEF temporal.`, "curar");
+        renderBuffs();
+      }
+      if (st.atk) {
+        buffsHeroe.push({ tipo: "atk", val: st.atk, turnos: 3, label: "ATK" });
+        log(`⚔️ ${item.nombre}: +${st.atk} ATK temporal.`, "curar");
+        renderBuffs();
+      }
     } else if (item.tipo === "atk") {
-      aplicarDmgEnemigo(item.val);
-      SND("sparkle"); log(`¡Lanzas ${item.nombre}! ${item.val} de daño.`, "critico");
-      floatDmg("#sprite-enemigo", `-${item.val}`, "critico");
-      FX({ tipo: "attack", target: "enemy", valor: item.val, fxKey: "fireball", critico: true });
+      const dmg = st.atk || item.val || 50;
+      aplicarDmgEnemigo(dmg);
+      SND("sparkle"); log(`¡Lanzas ${item.nombre}! ${dmg} de daño.`, "critico");
+      floatDmg("#sprite-enemigo", `-${dmg}`, "critico");
+      FX({ tipo: "attack", target: "enemy", valor: dmg, fxKey: "fireball", critico: true });
       chequearFaseJefe();
     }
     actualizarHPs();
