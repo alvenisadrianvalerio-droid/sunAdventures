@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mapeador de Ítems · SunAdventures</title>
+    <meta name="description" content="Herramienta de balance para mapear sprites de ítems de SunAdventures y exportarlos a sprites-names.js.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="app.css">
+</head>
+
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <span class="brand-logo">🌻</span>
+            <div>
+                <h1>Mapeador de Ítems</h1>
+                <p>SunAdventures · Herramienta de balance</p>
+            </div>
+        </div>
+        <div class="top-actions">
+            <label class="chip-select">
+                <span>Sprite sheet</span>
+                <select id="sheet-select"></select>
+            </label>
+            <button id="btn-import" class="btn ghost" title="Importar sprites-names.js o un .json de otro compañero">📂 Importar</button>
+            <button id="btn-export-json" class="btn ghost" title="Guardar el trabajo para compartirlo con el equipo">💾 Exportar JSON</button>
+            <button id="btn-download-js" class="btn primary" title="Descargar el archivo listo para el juego">⬇️ Descargar sprites-names.js</button>
+            <input type="file" id="file-input" accept=".js,.json" hidden>
+        </div>
+    </header>
+
+    <main class="layout">
+        <!-- ===== Lista de ítems ===== -->
+        <aside class="panel list-panel" aria-label="Ítems mapeados">
+            <div class="panel-head">
+                <h2>Ítems <span class="count" id="item-count">0</span></h2>
+                <div class="progress"><div id="progress-bar"></div></div>
+                <small id="progress-text" class="muted"></small>
+            </div>
+            <input id="search" type="search" class="input" placeholder="🔍 Buscar por nombre, id o stat…">
+            <div class="filters" id="rar-filters"></div>
+            <ul id="item-list" class="item-list"></ul>
+        </aside>
+
+        <!-- ===== Sprite sheet ===== -->
+        <section class="panel sheet-panel" aria-label="Sprite sheet">
+            <div class="sheet-toolbar">
+                <label>Columnas <input id="cols" type="number" min="1" max="60" class="input sm"></label>
+                <label>Filas <input id="rows" type="number" min="1" max="200" class="input sm"></label>
+                <div class="zoom">
+                    <button id="zoom-out" class="btn icon" title="Alejar">−</button>
+                    <span id="zoom-val">100%</span>
+                    <button id="zoom-in" class="btn icon" title="Acercar">+</button>
+                    <button id="zoom-fit" class="btn icon" title="Ajustar">⤢</button>
+                </div>
+                <label class="toggle"><input type="checkbox" id="show-grid" checked> Cuadrícula</label>
+                <label class="toggle"><input type="checkbox" id="show-marks" checked> Marcas</label>
+            </div>
+            <div id="sheet-wrap">
+                <div id="sheet-stage">
+                    <img id="sheet" alt="Sprite sheet de ítems" draggable="false">
+                    <div id="overlay"></div>
+                    <div id="hover-box"></div>
+                    <div id="sel-box"></div>
+                </div>
+            </div>
+            <p class="hint">Clic = seleccionar · Flechas = moverse · <kbd>Ctrl</kbd>+<kbd>S</kbd> = guardar ítem · <kbd>Supr</kbd> = borrar</p>
+        </section>
+
+        <!-- ===== Editor ===== -->
+        <section class="panel editor-panel" aria-label="Editor de ítem">
+            <div class="preview">
+                <div class="preview-sprite" id="preview"></div>
+                <div class="preview-info">
+                    <span class="label">Coordenada</span>
+                    <span class="coords" id="coords">— , —</span>
+                    <span class="status" id="status">Haz clic en un sprite</span>
+                </div>
+            </div>
+
+            <form id="item-form" class="form" autocomplete="off">
+                <div class="field full">
+                    <label for="f-nombre">Nombre visible</label>
+                    <input id="f-nombre" class="input" maxlength="60" placeholder="Ej. Espada de acero templado">
+                </div>
+                <div class="field">
+                    <label for="f-rar">Rareza</label>
+                    <select id="f-rar" class="input"></select>
+                </div>
+                <div class="field">
+                    <label for="f-consumible">Tipo</label>
+                    <select id="f-consumible" class="input">
+                        <option value="no">Equipable · pasivo</option>
+                        <option value="si">Consumible</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="f-icono">Icono</label>
+                    <input id="f-icono" class="input" value="espada">
+                </div>
+                <div class="field">
+                    <label for="f-id">ID interno <small>opcional</small></label>
+                    <input id="f-id" class="input" placeholder="espada-acero">
+                </div>
+                <div class="field full">
+                    <label for="f-desc">Descripción</label>
+                    <textarea id="f-desc" class="input" rows="2" maxlength="300"></textarea>
+                </div>
+
+                <fieldset class="dyn">
+                    <legend>⚔️ Stats <span class="power" id="power" title="Puntuación orientativa de poder">Poder 0</span></legend>
+                    <div id="stats-list" class="dyn-list"></div>
+                    <button type="button" id="stats-add" class="btn dashed">＋ Añadir stat</button>
+                </fieldset>
+
+                <fieldset class="dyn">
+                    <legend>✨ Habilidades</legend>
+                    <div id="habs-list" class="dyn-list"></div>
+                    <button type="button" id="habs-add" class="btn dashed">＋ Añadir habilidad</button>
+                </fieldset>
+
+                <div class="form-actions">
+                    <button type="submit" id="btn-save" class="btn success">✔ Guardar ítem</button>
+                    <button type="button" id="btn-delete" class="btn danger" title="Quitar mapeo de esta celda">🗑</button>
+                </div>
+            </form>
+
+            <details class="code-block">
+                <summary>📋 Código generado <button id="btn-copy" class="btn ghost sm" type="button">Copiar</button></summary>
+                <textarea id="output" readonly spellcheck="false"></textarea>
+            </details>
+        </section>
+    </main>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <!-- Datos base del juego (snapshot de sprites-names.js) -->
+    <script src="data/sprites-names.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
