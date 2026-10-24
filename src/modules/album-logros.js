@@ -25,7 +25,6 @@
   const LOGROS = [
     { id: "primeros-pasos", tipo: "grupo", icono: SVG.medal, nombre: "Primeros pasos", descripcion: "Guarda la primera foto del grupo", meta: 1, medir: () => (window.AlbumApp.modules.fotos?.getFotos() || []).length },
     { id: "fotografos", tipo: "grupo", icono: SVG.camera, nombre: "Fotógrafos", descripcion: "Guarda 50 fotos del grupo", meta: 50, medir: () => (window.AlbumApp.modules.fotos?.getFotos() || []).length },
-    { id: "dj", tipo: "grupo", icono: SVG.music, nombre: "DJ", descripcion: "Añade 20 canciones al grupo", meta: 20, medir: () => (window.AlbumApp.modules.playlists?.getPlaylists() || []).reduce((t, p) => t + (p.canciones || []).length, 0) },
     { id: "poetas", tipo: "grupo", icono: SVG.note, nombre: "Poetas", descripcion: "Escribe 30 notas del grupo", meta: 30, medir: () => (window.AlbumApp.modules.notas?.getNotas() || []).length },
     { id: "racha", icono: SVG.fire, nombre: "Racha de 30 días", descripcion: "Abre la app 30 días seguidos", meta: 30, medir: () => visitasConsecutivas },
     { id: "trotamundos", tipo: "grupo", icono: SVG.globe, nombre: "Trotamundos", descripcion: "Guarda 10 fotos con ubicación", meta: 10, medir: () => (window.AlbumApp.modules.fotos?.getFotos() || []).filter(f => f.lat != null && f.lng != null).length },
@@ -131,8 +130,7 @@
     const u = getUserIdSafe();
     const fCount = (window.AlbumApp.modules.fotos?.getFotos() || []).length;
     const nCount = (window.AlbumApp.modules.notas?.getNotas() || []).length;
-    const pCount = (window.AlbumApp.modules.playlists?.getPlaylists() || []).reduce((t, p) => t + (p.canciones || []).length, 0);
-    const base = fCount * 10 + nCount * 5 + pCount * 8 + visitasConsecutivas * 20;
+    const base = fCount * 10 + nCount * 5 + visitasConsecutivas * 20;
 
     // 1. Minijuegos jugados
     const minijuegosCount = Math.max(0, Number(localStorage.getItem(`sa_minijuegos_jugados_${u}`)) || 0);

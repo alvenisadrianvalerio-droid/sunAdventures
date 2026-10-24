@@ -1,0 +1,602 @@
+/* ============================================================
+   ESTILOS DICCIONARIO MULTILINGÜE · SunAdventures
+   Diseño ultra-premium con glassmorphism, paleta nocturna y soporte multilingüe
+   ============================================================ */
+
+.diccionario-section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+  width: 100%;
+}
+
+.diccionario-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.diccionario-header {
+  text-align: center;
+  padding: 1.8rem 1.2rem;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 217, 61, 0.12), transparent 70%),
+              linear-gradient(165deg, rgba(26, 32, 54, 0.75), rgba(13, 17, 30, 0.85));
+  border: 1px solid rgba(255, 217, 61, 0.25);
+  border-radius: 24px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  position: relative;
+  overflow: hidden;
+}
+
+.diccionario-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 217, 61, 0.12);
+  border: 1px solid rgba(255, 217, 61, 0.35);
+  color: #ffd93d;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.diccionario-title {
+  margin: 0 0 0.4rem;
+  font-size: 2.1rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff 30%, #ffd93d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.diccionario-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Buscador */
+.diccionario-search-box {
+  background: rgba(18, 23, 38, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 0.45rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.diccionario-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.diccionario-search-icon {
+  position: absolute;
+  left: 1rem;
+  color: #ffd93d;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.diccionario-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0.85rem 1rem 0.85rem 3rem;
+  color: #fff;
+  font-size: 1.05rem;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.diccionario-input::placeholder {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.diccionario-btn-submit {
+  padding: 0.75rem 1.5rem;
+  border-radius: 14px;
+  border: none;
+  background: linear-gradient(135deg, #ffd93d, #ff9f3d);
+  color: #1a1405;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 4px 18px rgba(255, 217, 61, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+
+.diccionario-btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 217, 61, 0.5);
+}
+
+.diccionario-btn-submit:active {
+  transform: translateY(0);
+}
+
+/* Historial de búsquedas recientes */
+.diccionario-historial {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.8rem 1rem;
+  background: rgba(18, 23, 38, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+}
+
+.diccionario-historial-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.diccionario-btn-limpiar {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.72rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  transition: color 0.2s;
+}
+
+.diccionario-btn-limpiar:hover {
+  color: #ff6b8b;
+}
+
+.diccionario-historial-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.dic-chip {
+  padding: 0.32rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dic-chip:hover {
+  background: rgba(255, 217, 61, 0.15);
+  border-color: rgba(255, 217, 61, 0.4);
+  color: #ffd93d;
+  transform: translateY(-1px);
+}
+
+.dic-historial-vacio {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
+}
+
+/* Área de resultados */
+.diccionario-resultado {
+  min-height: 240px;
+}
+
+.dic-loading {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dic-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255, 217, 61, 0.2);
+  border-top-color: #ffd93d;
+  border-radius: 50%;
+  animation: dicSpin 0.9s linear infinite;
+}
+
+@keyframes dicSpin {
+  to { transform: rotate(360deg); }
+}
+
+.dic-empty {
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+  background: rgba(18, 23, 38, 0.5);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.dic-empty-icon {
+  font-size: 2.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.dic-empty h3 {
+  margin: 0 0 0.4rem;
+  color: #fff;
+  font-size: 1.25rem;
+}
+
+.dic-empty p {
+  margin: 0;
+  font-size: 0.88rem;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* Tarjeta Principal de Definición */
+.dic-card-def {
+  background: linear-gradient(165deg, rgba(26, 33, 56, 0.9), rgba(12, 16, 28, 0.95));
+  border: 1px solid rgba(255, 217, 61, 0.3);
+  border-radius: 22px;
+  padding: 1.8rem 1.5rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 0 0 25px rgba(255, 217, 61, 0.08);
+  animation: dicFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dicFadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dic-def-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-bottom: 1.2rem;
+  margin-bottom: 1.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  flex-wrap: wrap;
+}
+
+.dic-def-palabra-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dic-def-palabra {
+  margin: 0;
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.015em;
+}
+
+.dic-btn-audio {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 217, 61, 0.35);
+  background: rgba(255, 217, 61, 0.12);
+  color: #ffd93d;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s ease;
+}
+
+.dic-btn-audio:hover {
+  background: #ffd93d;
+  color: #121524;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(255, 217, 61, 0.4);
+}
+
+.dic-def-count-idiomas {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffd93d;
+  opacity: 0.9;
+}
+
+.dic-def-fuente {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.3rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  letter-spacing: 0.03em;
+}
+
+/* Bloques por Idioma */
+.dic-idiomas-bloques {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.dic-idioma-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.2rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dic-idioma-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.dic-idioma-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #ffd93d;
+  background: rgba(255, 217, 61, 0.12);
+  border: 1px solid rgba(255, 217, 61, 0.3);
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+.dic-def-categoria {
+  font-size: 0.85rem;
+  color: #ff9f3d;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.dic-btn-audio-mini {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s ease;
+  margin-left: auto;
+}
+
+.dic-btn-audio-mini:hover {
+  background: #ffd93d;
+  border-color: #ffd93d;
+  color: #121524;
+  transform: scale(1.15);
+}
+
+.dic-def-etimologia {
+  background: rgba(255, 217, 61, 0.07);
+  border-left: 3px solid #ffd93d;
+  padding: 0.7rem 0.9rem;
+  border-radius: 0 10px 10px 0;
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+}
+
+.dic-def-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dic-def-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.2s;
+}
+
+.dic-def-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dic-def-num {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(255, 217, 61, 0.18);
+  color: #ffd93d;
+  font-size: 0.75rem;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.dic-def-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.dic-def-disciplina {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #6ee7b7;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dic-def-texto {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  color: rgba(240, 245, 255, 0.92);
+}
+
+/* Modo claro adaptativo */
+body.light .diccionario-header {
+  background: radial-gradient(circle at 50% 0%, rgba(212, 148, 30, 0.15), transparent 70%),
+              linear-gradient(165deg, #ffffff, #f0f4f8);
+  border-color: rgba(212, 148, 30, 0.3);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+}
+
+body.light .diccionario-title {
+  background: linear-gradient(135deg, #1e293b 30%, #b45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body.light .diccionario-desc {
+  color: #64748b;
+}
+
+body.light .diccionario-search-box {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+body.light .diccionario-input {
+  color: #1e293b;
+}
+
+body.light .diccionario-input::placeholder {
+  color: #94a3b8;
+}
+
+body.light .dic-card-def {
+  background: #ffffff;
+  border-color: rgba(212, 148, 30, 0.35);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.06);
+}
+
+body.light .dic-def-palabra {
+  color: #0f172a;
+}
+
+body.light .dic-idioma-bloque {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+body.light .dic-def-texto {
+  color: #334155;
+}
+
+body.light .dic-def-item {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+body.light .dic-def-etimologia {
+  background: #fffbeb;
+  color: #78350f;
+}
+
+.dic-def-lectura {
+  background: rgba(110, 231, 183, 0.08);
+  border-left: 3px solid #10b981;
+  padding: 0.55rem 0.9rem;
+  border-radius: 0 10px 10px 0;
+  font-size: 0.88rem;
+  color: #a7f3d0;
+  line-height: 1.45;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.dic-def-lectura strong {
+  color: #34d399;
+}
+
+body.light .dic-def-lectura {
+  background: #ecfdf5;
+  color: #065f46;
+  border-left-color: #059669;
+}
+
+body.light .dic-def-lectura strong {
+  color: #047857;
+}
+
+.dic-def-orig {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dic-badge-traducido {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #6ee7b7;
+  background: rgba(110, 231, 183, 0.1);
+  border: 1px solid rgba(110, 231, 183, 0.25);
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+}
+
+.dic-btn-audio.playing,
+.dic-btn-audio-mini.playing {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+  animation: dicPulse 0.9s ease infinite;
+}
+
+@keyframes dicPulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+body.light .dic-def-orig {
+  color: #64748b;
+}
+
+body.light .dic-badge-traducido {
+  background: #ecfdf5;
+  color: #059669;
+  border-color: #a7f3d0;
+}

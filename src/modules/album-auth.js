@@ -84,16 +84,12 @@
 
         await Promise.allSettled([
           window.AlbumApp.modules.fotos?.cargarFotos(),
-          window.AlbumApp.modules.notas?.cargarNotas(),
-          window.AlbumApp.modules.playlists?.cargarPlaylists(),
-          window.AlbumApp.modules.eventos?.cargarEventos()
+          window.AlbumApp.modules.notas?.cargarNotas()
         ]);
 
         await Promise.allSettled([
           window.AlbumApp.modules.fotos?.render(),
           Promise.resolve(window.AlbumApp.modules.notas?.renderNotas()),
-          Promise.resolve(window.AlbumApp.modules.playlists?.renderPlaylists()),
-          Promise.resolve(window.AlbumApp.modules.eventos?.renderCalendario()),
           Promise.resolve(window.AlbumApp.modules.logros?.renderLogros())
         ]);
 
@@ -106,13 +102,8 @@
         window._sunUserEmail = "";
         window.AlbumApp.modules.fotos?.setFotos([]);
         window.AlbumApp.modules.notas?.setNotas([]);
-        window.AlbumApp.modules.playlists?.setPlaylists([]);
-        window.AlbumApp.modules.eventos?.setEventos([]);
         if (grid) grid.innerHTML = ""; if (empty) empty.classList.remove("hidden");
         if (notasGrid) notasGrid.innerHTML = ""; if (notasEmpty) notasEmpty.classList.remove("hidden");
-        if (playlistsGrid) playlistsGrid.innerHTML = ""; if (playlistsEmpty) playlistsEmpty.classList.remove("hidden");
-        if (calGrid) calGrid.innerHTML = ""; if (calProximos) calProximos.innerHTML = "";
-        if (calProximosVacio) calProximosVacio.classList.remove("hidden");
         if (calendarioEmpty) calendarioEmpty.classList.remove("hidden");
         const mGrid = $("mascotas-grid"); if (mGrid) mGrid.innerHTML = "";
         window.AlbumApp.modules.logros?.renderExperiencia();

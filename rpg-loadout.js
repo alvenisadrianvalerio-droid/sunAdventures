@@ -82,7 +82,12 @@
 
     // ─── Obtener todas las habilidades disponibles ───
     function getTodasHabilidades() {
-        return (_getHabsActivasOrig ? _getHabsActivasOrig.call(window.RpgItems) : []) || [];
+        const raw = (_getHabsActivasOrig ? _getHabsActivasOrig.call(window.RpgItems) : []) || [];
+        const RL = window.RpgLoot;
+        return raw.filter(h => {
+            const it = RL?.POOL?.find(p => p.id === h.itemId);
+            return !it || !it.consumible;
+        });
     }
 
     // ─── Obtener habilidades equipadas (para combate) ───

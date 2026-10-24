@@ -846,15 +846,12 @@
     });
 
     guardarLoot(loot);
-    seleccionReroll.clear();
-    modoSeleccionReroll = false;
+    // Actualizar la selección con los nuevos items para permitir rerollear varias veces seguidas
+    seleccionReroll = new Set(nuevosItems.map(n => n.id));
+    modoSeleccionReroll = true;
     renderColeccion();
     window.dispatchEvent(new Event("rpg:stats-cambiados"));
     SND(mejoras > 0 ? "victoria" : "sparkle");
-
-    if (nuevosItems.length > 0) {
-      mostrarPopup(nuevosItems[nuevosItems.length - 1]);
-    }
 
     return { ok: true, cambiados, mejoras, bajadas, total: totalCosto };
   }
@@ -1109,10 +1106,9 @@
       </div>
       <div class="rpg-col-filtros">
         ${filtros}
-        <button class="rpg-col-filtro rpg-reroll-btn-toggle ${modoSeleccionReroll ? "activo" : ""}" id="btn-toggle-reroll-sel" title="Elige hasta 9 objetos para rerollearlos juntos">
+        <button class="rpg-col-filtro rpg-reroll-btn-toggle ${modoSeleccionReroll ? "activo" : ""}" id="btn-toggle-reroll-sel" title="Elige hasta 9 objetos para rerollearlos">
           🎲 ${modoSeleccionReroll ? "Cancelar Selección" : "Elegir 9 para Reroll"}
         </button>
-        ${puedeReroll ? `<button class="rpg-col-filtro" id="btn-reroll-cat" style="border-color:rgba(108,184,255,.5);color:#6cb8ff;font-weight:900;" title="88% misma · 9% +1 · 2% +2 · 1% -1">🎲 Reroll Todo ${cat.label}</button>` : ""}
       </div>
       ${panelRerollHtml}
       <div class="rpg-coleccion-grid ${modoSeleccionReroll ? "modo-reroll-activo" : ""}">${grid}</div>`;
@@ -1136,12 +1132,14 @@
     $("btn-ejecutar-reroll-sel")?.addEventListener("click", async () => {
       if (!seleccionReroll.size) return;
       const r = await rerollItemsPersonalizados([...seleccionReroll]);
-      if (r.error) alert(r.error);
-      else if (!r.cancel) {
-        let msg = `🎲 ${r.cambiados} objetos elegidos rerolleados.\nCoste: ${r.total} 🪙`;
-        if (r.mejoras > 0) msg += `\n⭐ ${r.mejoras} mejoras de rareza!`;
-        if (r.bajadas > 0) msg += `\n💧 ${r.bajadas} bajadas...`;
-        alert(msg);
+      if (r.error) {
+        notifMascota?.("Reroll", r.error);
+        alert(r.error);
+      } else if (!r.cancel) {
+        let msg = `¡${r.cambiados} objetos rerolleados! (${r.total} 🪙)`;
+        if (r.mejoras > 0) msg += ` · ⭐ ${r.mejoras} mejoras`;
+        if (r.bajadas > 0) msg += ` · 💧 ${r.bajadas} bajadas`;
+        notifMascota?.("🎲 Reroll de 9 Objetos", msg);
       }
     });
     

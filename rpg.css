@@ -247,6 +247,8 @@
   border-radius: 16px;
   background: radial-gradient(circle at 50% 50%, rgba(255,255,255,.08), transparent 70%);
   position: relative;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 .rpg-fighter-sprite img,
 .rpg-fighter-sprite svg {
@@ -255,6 +257,7 @@
   object-fit: contain;
   image-rendering: pixelated;
   filter: drop-shadow(0 6px 12px rgba(0,0,0,.4));
+  backface-visibility: hidden;
 }
 .rpg-fighter-sprite.enemigo {
   filter: drop-shadow(0 8px 16px rgba(0,0,0,.6));
@@ -263,6 +266,8 @@
   image-rendering: pixelated;
   filter: drop-shadow(0 6px 12px rgba(0,0,0,.5));
   transform-origin: center center;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 .rpg-sprite-thumb-48 {
   border-radius: 6px;
@@ -353,55 +358,116 @@
   100% { transform: translateY(-7px) scale(1.05) rotate(1.5deg); }
 }
 
-/* Ataque de la mascota: embestida hacia adelante con estiramiento e impacto */
+/* ============================================================
+   ANIMACIONES DE COMBATE ULTRA-FLUIDAS (OPTIMIZADAS CON GPU)
+   Usan translate3d / scale3d y will-change para rendimiento de 60fps
+   incluso en teléfonos y dispositivos de gama baja.
+   ============================================================ */
+
+/* Ataque de la mascota: embestida elástica con preparación, estiramiento e impacto */
 .rpg-fighter-sprite.hero-pet.atacando .rpg-pet-avatar-combat,
 .rpg-fighter-sprite.hero-pet.atacando {
-  animation: animPetLunge 0.38s cubic-bezier(0.18, 0.89, 0.32, 1.28) !important;
+  will-change: transform, filter;
+  animation: animPetLunge 0.42s cubic-bezier(0.2, 0.9, 0.28, 1.3) !important;
 }
 @keyframes animPetLunge {
-  0%   { transform: translateX(0) scale(1); }
-  35%  { transform: translateX(-16px) scale(0.92) rotate(-4deg); }
-  65%  { transform: translateX(45px) scale(1.22) rotate(6deg); filter: brightness(1.3) drop-shadow(0 0 16px var(--accent, #ffd84d)); }
-  100% { transform: translateX(0) scale(1) rotate(0deg); }
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(0deg);
+  }
+  24% {
+    /* Tensión preparatoria hacia atrás */
+    transform: translate3d(-18px, 4px, 0) scale3d(0.9, 1.12, 1) rotate(-6deg);
+  }
+  56% {
+    /* Embestida a toda velocidad con estiramiento dinámico hacia el enemigo */
+    transform: translate3d(58px, -6px, 0) scale3d(1.24, 0.88, 1) rotate(7deg);
+    filter: drop-shadow(0 0 16px var(--accent, #ffd84d)) brightness(1.28);
+  }
+  78% {
+    /* Rebote de impacto */
+    transform: translate3d(40px, 0, 0) scale3d(1.08, 0.96, 1) rotate(2deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(0deg);
+  }
 }
 
-/* Ataque del enemigo: embestida amenazante hacia la mascota */
+/* Ataque del enemigo / Boss: embestida amenazante y agresiva hacia el héroe */
 .rpg-fighter-sprite.enemigo.atacando,
 .rpg-fighter-sprite.enemigo.atacando .rpg-mob-animado,
 .rpg-fighter-sprite.enemigo.atacando .rpg-boss-animado {
-  animation: animEnemyLunge 0.38s cubic-bezier(0.18, 0.89, 0.32, 1.28) !important;
+  will-change: transform, filter;
+  animation: animEnemyLunge 0.44s cubic-bezier(0.2, 0.9, 0.28, 1.3) !important;
 }
 @keyframes animEnemyLunge {
-  0%   { transform: translateX(0) scale(1); }
-  30%  { transform: translateX(16px) scale(0.92) rotate(3deg); }
-  65%  { transform: translateX(-45px) scale(1.2) rotate(-5deg); filter: brightness(1.3) drop-shadow(0 0 16px rgba(255, 60, 60, 0.85)); }
-  100% { transform: translateX(0) scale(1) rotate(0deg); }
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(0deg);
+  }
+  22% {
+    /* Retroceso amenazante de carga */
+    transform: translate3d(22px, -3px, 0) scale3d(0.92, 1.14, 1) rotate(5deg);
+  }
+  55% {
+    /* Golpe masivo hacia adelante */
+    transform: translate3d(-62px, 6px, 0) scale3d(1.28, 0.86, 1) rotate(-8deg);
+    filter: drop-shadow(0 0 18px rgba(255, 60, 60, 0.92)) brightness(1.35);
+  }
+  75% {
+    /* Recuperación del golpe */
+    transform: translate3d(-42px, 0, 0) scale3d(1.1, 0.95, 1) rotate(-3deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(0deg);
+  }
 }
 
-/* Recibir daño de la mascota */
+/* Recibir daño de la mascota (shake elástico ligero) */
 .rpg-fighter-sprite.hero-pet.golpeado .rpg-pet-avatar-combat,
 .rpg-fighter-sprite.hero-pet.golpeado {
-  animation: animPetHurt 0.36s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
-  filter: brightness(1.5) drop-shadow(0 0 16px rgba(255, 60, 60, 0.95)) !important;
+  will-change: transform, filter;
+  animation: animPetHurt 0.34s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
+  filter: drop-shadow(0 0 14px rgba(255, 60, 60, 0.9)) brightness(1.4) !important;
 }
 @keyframes animPetHurt {
-  0%, 100% { transform: translateX(0) scale(1); }
-  20% { transform: translateX(-14px) rotate(-8deg) scale(0.88); }
-  45% { transform: translateX(10px) rotate(6deg) scale(0.94); }
-  70% { transform: translateX(-6px) rotate(-3deg); }
+  0%, 100% { transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(0deg); }
+  20%      { transform: translate3d(-15px, 2px, 0) scale3d(0.9, 1.05, 1) rotate(-7deg); }
+  45%      { transform: translate3d(12px, -2px, 0) scale3d(1.05, 0.95, 1) rotate(5deg); }
+  70%      { transform: translate3d(-5px, 0, 0) scale3d(0.98, 1, 1) rotate(-2deg); }
 }
 
-/* Efecto de impacto sísmico en el campo de batalla */
+/* Efecto de impacto sísmico en el campo de batalla (acelerado por GPU) */
 .rpg-batalla.rpg-shake {
+  will-change: transform;
   animation: rpgBatallaShake 0.32s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 @keyframes rpgBatallaShake {
-  0%, 100% { transform: translate(0, 0); }
-  15% { transform: translate(-4px, 2px); }
-  30% { transform: translate(4px, -3px); }
-  50% { transform: translate(-3px, 3px); }
-  70% { transform: translate(3px, -2px); }
-  85% { transform: translate(-1px, 1px); }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  15%      { transform: translate3d(-5px, 2px, 0); }
+  35%      { transform: translate3d(4px, -3px, 0); }
+  55%      { transform: translate3d(-3px, 2px, 0); }
+  75%      { transform: translate3d(2px, -1px, 0); }
+}
+
+/* Animación de ataque individual de los miembros de la horda */
+.rpg-horda-item.mob-atacando {
+  will-change: transform, filter;
+  animation: animHordaMobLunge 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.3) forwards !important;
+  z-index: 10 !important;
+}
+@keyframes animHordaMobLunge {
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(10px, 0, 0) scale3d(0.9, 1.1, 1) rotate(4deg);
+  }
+  60% {
+    transform: translate3d(-32px, -3px, 0) scale3d(1.42, 0.88, 1) rotate(-9deg);
+    filter: drop-shadow(0 0 14px #ff5470) brightness(1.35);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(0deg);
+  }
 }
 
 /* Cuadrícula de Hordas (9 enemigos en 3x3) */
@@ -475,12 +541,6 @@
 @keyframes rpgTargetPulse {
   0% { box-shadow: 0 0 8px rgba(255, 84, 112, 0.6); }
   100% { box-shadow: 0 0 18px rgba(255, 216, 77, 0.9); outline-color: #ffd84d; }
-}
-.rpg-horda-item.mob-atacando {
-  transform: scale(1.3) translateX(-12px);
-  filter: drop-shadow(0 0 10px #ff5470);
-  z-index: 5;
-  transition: transform 0.15s ease-out;
 }
 .rpg-horda-item.caido {
   opacity: 0.22;
@@ -2449,6 +2509,7 @@ html.animations-disabled .rpg-rl-log-line { opacity: 1 !important; }
    ============================================================ */
 .rpg-hero-avatar-btn {
   position: relative;
+  overflow: visible !important;
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .rpg-hero-avatar-btn:hover {
@@ -2458,24 +2519,36 @@ html.animations-disabled .rpg-rl-log-line { opacity: 1 !important; }
 }
 .rpg-hero-avatar-cambiar-badge {
   position: absolute;
-  bottom: -4px;
-  right: -4px;
-  background: linear-gradient(135deg, #2a2517, #181510);
-  border: 1.5px solid var(--accent);
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.72rem;
-  color: #ffd93d;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 10px rgba(255, 217, 61, 0.35);
+  bottom: 0px;
+  right: 0px;
+  background: linear-gradient(135deg, #ffd93d 0%, #ff9f1a 100%) !important;
+  border: 2px solid #10141f !important;
+  border-radius: 50% !important;
+  width: 24px !important;
+  height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #121217 !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 217, 61, 0.6) !important;
   pointer-events: none;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 10 !important;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease !important;
+}
+.rpg-hero-avatar-cambiar-badge svg {
+  display: block;
+  stroke: #121217 !important;
+  width: 14px !important;
+  height: 14px !important;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .rpg-hero-avatar-btn:hover .rpg-hero-avatar-cambiar-badge {
-  transform: rotate(180deg) scale(1.15);
+  background: linear-gradient(135deg, #fff176, #ffd93d) !important;
+  box-shadow: 0 0 16px rgba(255, 217, 61, 0.9) !important;
+  transform: scale(1.18);
+}
+.rpg-hero-avatar-btn:hover .rpg-hero-avatar-cambiar-badge svg {
+  transform: rotate(180deg);
 }
 
 .rpg-btn-cambiar-mascota {
@@ -2545,91 +2618,486 @@ body.light .rpg-btn-cambiar-mascota:hover {
   border-color: #d4941e !important;
   color: #5c3400 !important;
 }
+/* ========================================================
+   MODAL DE SELECCIÓN DE MASCOTA (PREMIUM REDESIGN)
+======================================================== */
 .rpg-popup-mascotas-panel {
-  max-width: 540px !important;
+  max-width: 620px !important;
+  width: min(95vw, 620px) !important;
+  background: radial-gradient(ellipse 110% 80% at 50% -15%, rgba(42, 58, 102, 0.95), rgba(10, 14, 28, 0.98)) !important;
+  border: 1px solid rgba(255, 217, 61, 0.3) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 30px 80px -10px rgba(0, 0, 0, 0.85),
+              0 0 50px rgba(255, 217, 61, 0.12),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25),
+              inset 0 0 30px rgba(255, 255, 255, 0.02) !important;
+  padding: 1.75rem 1.6rem 1.5rem !important;
+  position: relative;
+  overflow: hidden !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
 }
-.rpg-popup-mascotas-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 0.75rem;
-  padding: 1.2rem;
-  max-height: 60vh;
-  overflow-y: auto;
+
+/* Efecto halo de luz superior ambiental */
+.rpg-popup-mascotas-panel::after {
+  content: "";
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 160px;
+  background: radial-gradient(ellipse at center, rgba(255, 217, 61, 0.22), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
-.rpg-popup-mascota-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  padding: 0.75rem 0.5rem;
+
+.rpg-popup-mascotas-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  text-align: center;
+  padding-bottom: 1.2rem;
+  margin-bottom: 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 1;
+}
+
+.rpg-popup-mascotas-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 217, 61, 0.18), rgba(255, 171, 61, 0.1));
+  border: 1px solid rgba(255, 217, 61, 0.4);
+  color: #ffd93d;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin-bottom: 0.55rem;
+  box-shadow: 0 4px 14px rgba(255, 217, 61, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.rpg-header-sparkle {
+  font-size: 0.85rem;
+  animation: rpgSparkleSpin 3s linear infinite;
+  color: #fff;
+  text-shadow: 0 0 8px #ffd93d;
+}
+
+@keyframes rpgSparkleSpin {
+  0% { transform: scale(1) rotate(0deg); opacity: 0.85; }
+  50% { transform: scale(1.25) rotate(180deg); opacity: 1; }
+  100% { transform: scale(1) rotate(360deg); opacity: 0.85; }
+}
+
+.rpg-popup-mascotas-title {
+  font-size: 1.7rem;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.35rem;
+  background: linear-gradient(135deg, #ffffff 30%, #fff0a8 70%, #ffd93d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.4));
+}
+
+.rpg-popup-mascotas-desc {
+  font-size: 0.82rem;
+  color: rgba(230, 238, 255, 0.7);
+  margin: 0;
+  max-width: 460px;
+  line-height: 1.45;
+  font-weight: 450;
+}
+
+.rpg-popup-mascotas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 1rem;
+  padding: 0.4rem 0.25rem 0.6rem;
+  max-height: 54vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 217, 61, 0.3) transparent;
+  position: relative;
+  z-index: 1;
+}
+
+.rpg-popup-mascotas-grid::-webkit-scrollbar {
+  width: 6px;
+}
+.rpg-popup-mascotas-grid::-webkit-scrollbar-thumb {
+  background: rgba(255, 217, 61, 0.3);
+  border-radius: 999px;
+}
+
+/* ========================================================
+   TARJETAS DE MASCOTAS
+   ======================================================== */
+.rpg-popup-mascota-card {
+  --pet-glow: rgba(255, 217, 61, 0.25);
+  --pet-accent: #ffd93d;
+  position: relative;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.07) 0%, rgba(18, 24, 42, 0.85) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  padding: 1.25rem 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
   cursor: pointer;
   color: var(--text);
   font: inherit;
-  transition: all 0.2s ease;
-  position: relative;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  outline: none;
+  overflow: hidden;
 }
+
+/* Identidades cromáticas por Mascota */
+.rpg-popup-mascota-card.pet-theme-mapache {
+  --pet-glow: rgba(255, 204, 51, 0.35);
+  --pet-accent: #ffcc33;
+}
+.rpg-popup-mascota-card.pet-theme-gatito-negro {
+  --pet-glow: rgba(162, 116, 255, 0.35);
+  --pet-accent: #c09aff;
+}
+.rpg-popup-mascota-card.pet-theme-oveja {
+  --pet-glow: rgba(85, 230, 190, 0.35);
+  --pet-accent: #6ee7b7;
+}
+.rpg-popup-mascota-card.pet-theme-gatito {
+  --pet-glow: rgba(255, 140, 180, 0.35);
+  --pet-accent: #f472b6;
+}
+.rpg-popup-mascota-card.pet-theme-girasol {
+  --pet-glow: rgba(255, 180, 30, 0.4);
+  --pet-accent: #f59e0b;
+}
+.rpg-popup-mascota-card.pet-theme-dragon-bebe,
+.rpg-popup-mascota-card.pet-theme-dragon-anciano {
+  --pet-glow: rgba(255, 87, 87, 0.4);
+  --pet-accent: #f87171;
+}
+
+/* Brillo ambiental dentro de cada tarjeta */
+.rpg-popup-mascota-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  background: radial-gradient(circle at 50% 20%, var(--pet-glow), transparent 75%);
+  opacity: 0.15;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
 .rpg-popup-mascota-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 217, 61, 0.5);
-  background: rgba(255, 217, 61, 0.08);
+  transform: translateY(-5px) scale(1.025);
+  border-color: var(--pet-accent);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.12) 0%, rgba(24, 32, 56, 0.9) 100%);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 25px var(--pet-glow);
 }
+
+.rpg-popup-mascota-card:hover::before {
+  opacity: 0.65;
+}
+
+/* Tarjeta Activa (Seleccionada) */
 .rpg-popup-mascota-card.activa {
-  border-color: var(--accent);
-  background: rgba(255, 217, 61, 0.14);
-  box-shadow: 0 0 14px rgba(255, 217, 61, 0.2);
+  background: linear-gradient(165deg, rgba(255, 217, 61, 0.22) 0%, rgba(20, 28, 48, 0.95) 100%);
+  border: 1.8px solid #ffd93d;
+  box-shadow: 0 0 32px rgba(255, 217, 61, 0.32),
+              0 12px 28px rgba(0, 0, 0, 0.5),
+              inset 0 0 16px rgba(255, 217, 61, 0.16);
 }
+
+.rpg-popup-mascota-card.activa::before {
+  opacity: 0.8;
+}
+
+/* Contenedor del Sprite de Mascota */
 .rpg-popup-mascota-img-wrap {
-  width: 54px;
-  height: 54px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.25);
+  width: 80px;
+  height: 80px;
+  border-radius: 22px;
+  background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.15), rgba(12, 17, 32, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.18);
   display: grid;
   place-items: center;
   position: relative;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.12), 0 6px 16px rgba(0, 0, 0, 0.45);
 }
+
+/* Pedestal de luz bajo el personaje */
+.rpg-popup-mascota-img-wrap::after {
+  content: "";
+  position: absolute;
+  bottom: 8px;
+  width: 50px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.6) 20%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.rpg-popup-mascota-card:hover .rpg-popup-mascota-img-wrap {
+  transform: scale(1.1) translateY(-3px);
+  border-color: var(--pet-accent);
+  box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.25), 0 10px 24px rgba(0, 0, 0, 0.5), 0 0 20px var(--pet-glow);
+}
+
+.rpg-popup-mascota-card.activa .rpg-popup-mascota-img-wrap {
+  background: radial-gradient(circle at 50% 35%, rgba(255, 217, 61, 0.3), rgba(16, 22, 40, 0.95));
+  border-color: rgba(255, 217, 61, 0.7);
+  box-shadow: 0 0 24px rgba(255, 217, 61, 0.38), inset 0 0 12px rgba(255, 217, 61, 0.25);
+}
+
+.rpg-popup-mascota-aura {
+  position: absolute;
+  inset: -6px;
+  border-radius: 26px;
+  background: radial-gradient(circle, var(--pet-glow) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.rpg-popup-mascota-card:hover .rpg-popup-mascota-aura,
+.rpg-popup-mascota-card.activa .rpg-popup-mascota-aura {
+  opacity: 1;
+}
+
 .rpg-popup-mascota-img-wrap img {
-  width: 44px;
-  height: 44px;
+  width: 58px;
+  height: 58px;
   object-fit: contain;
   image-rendering: pixelated;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.6));
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
+  position: relative;
+  z-index: 1;
 }
+
+.rpg-popup-mascota-card:hover .rpg-popup-mascota-img-wrap img {
+  transform: scale(1.06);
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.75));
+}
+
+/* Badge de Activa (Checkmark) */
 .rpg-popup-mascota-activa-badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #2ed573;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #10b981, #059669);
   color: #fff;
   border-radius: 50%;
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   display: grid;
   place-items: center;
-  font-size: 0.65rem;
-  font-weight: 900;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  box-shadow: 0 3px 12px rgba(16, 185, 129, 0.6), 0 0 0 2.5px rgba(10, 15, 30, 0.95);
+  z-index: 2;
+  animation: rpgPopIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+@keyframes rpgPopIn {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 .rpg-popup-mascota-info {
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  align-items: center;
+  gap: 0.3rem;
+  width: 100%;
 }
-.rpg-popup-mascota-info strong {
-  font-size: 0.82rem;
-  color: var(--text);
+
+.rpg-popup-mascota-nombre {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #f8fafc;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 120px;
+  max-width: 126px;
+  letter-spacing: -0.015em;
+  transition: color 0.2s ease;
 }
-.rpg-popup-mascota-card.activa .rpg-popup-mascota-info strong {
-  color: var(--accent);
+
+.rpg-popup-mascota-card:hover .rpg-popup-mascota-nombre {
+  color: #ffffff;
 }
-.rpg-popup-mascota-info span {
+
+.rpg-popup-mascota-card.activa .rpg-popup-mascota-nombre {
+  color: #ffd93d;
+  font-weight: 900;
+  text-shadow: 0 0 12px rgba(255, 217, 61, 0.4);
+}
+
+.rpg-popup-mascota-level-pill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.18rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.03em;
+  transition: all 0.2s ease;
+}
+
+.rpg-popup-mascota-card:hover .rpg-popup-mascota-level-pill {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.rpg-popup-mascota-level-pill.pill-activa {
+  background: rgba(255, 217, 61, 0.2);
+  border-color: rgba(255, 217, 61, 0.45);
+  color: #ffd93d;
+  font-weight: 800;
+}
+
+/* Botón / Footer de acción */
+.rpg-popup-mascota-footer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0.1rem;
+}
+
+.rpg-popup-mascota-status-tag {
   font-size: 0.68rem;
-  opacity: 0.75;
+  font-weight: 800;
+  color: #10b981;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.75rem;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.rpg-popup-mascota-btn-action {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.32rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.rpg-popup-mascota-card:hover .rpg-popup-mascota-btn-action {
+  background: linear-gradient(135deg, var(--pet-accent), #f59e0b);
+  border-color: transparent;
+  color: #1a1405;
+  font-weight: 900;
+  box-shadow: 0 4px 14px var(--pet-glow);
+  transform: translateY(-1px);
+}
+
+/* Modo Claro Adaptativo */
+body.light .rpg-popup-mascotas-panel {
+  background: radial-gradient(ellipse 110% 80% at 50% -15%, #ffffff, #edf2f7) !important;
+  border-color: rgba(212, 148, 30, 0.4) !important;
+  box-shadow: 0 30px 80px -10px rgba(25, 42, 70, 0.25), 0 0 30px rgba(255, 179, 0, 0.15) !important;
+}
+
+body.light .rpg-popup-mascotas-title {
+  background: linear-gradient(135deg, #0f172a 40%, #b45309 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body.light .rpg-popup-mascotas-desc {
+  color: #475569;
+}
+
+body.light .rpg-popup-mascotas-header {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+body.light .rpg-popup-mascota-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+body.light .rpg-popup-mascota-nombre {
+  color: #1e293b;
+}
+
+body.light .rpg-popup-mascota-level-pill {
+  background: rgba(0, 0, 0, 0.05);
+  color: #475569;
+}
+
+body.light .rpg-popup-mascota-btn-action {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #334155;
+}
+
+body.light .rpg-popup-mascota-card:hover {
+  background: #fffdf5;
+  border-color: #d4941e;
+  box-shadow: 0 8px 20px -4px rgba(212, 148, 30, 0.25);
+}
+
+body.light .rpg-popup-mascota-card.activa {
+  background: #fffbeb;
+  border-color: #d4941e;
+  box-shadow: 0 0 20px rgba(212, 148, 30, 0.22);
+}
+
+body.light .rpg-popup-mascota-img-wrap {
+  background: radial-gradient(circle at 50% 40%, #f1f5f9, #e2e8f0);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+body.light .rpg-popup-mascota-nombre {
+  color: #1e293b;
+}
+
+body.light .rpg-popup-mascota-card.activa .rpg-popup-mascota-nombre {
+  color: #b45309;
+}
+
+body.light .rpg-popup-mascota-level-pill {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+body.light .rpg-popup-mascota-level-pill.pill-activa {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+body.light .rpg-popup-mascota-select-hint {
+  color: #94a3b8;
 }
 

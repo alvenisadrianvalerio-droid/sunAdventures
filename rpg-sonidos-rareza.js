@@ -28,97 +28,83 @@
         if (ac.state === "suspended") ac.resume().catch(() => { });
         return ac;
     }
-    const vol = () => Number(localStorage.getItem("app_volume") || 0.8);
+    const vol = () => Number(localStorage.getItem("app_volume") || 0.65);
 
-    function tono(f, dur, tipo = "sine", v = 0.15, delay = 0, freqFinal = null) {
-        v *= vol();
+    function tono(f, dur, tipo = "sine", v = 0.08, delay = 0, freqFinal = null) {
+        v = v * 0.5 * vol();
         if (v <= 0) return;
         const c = getAC(); if (!c) return;
         const t = c.currentTime + delay;
         const o = c.createOscillator(), g = c.createGain();
-        o.type = tipo;
+        o.type = (tipo === "sawtooth" || tipo === "square") ? "sine" : tipo;
         o.frequency.setValueAtTime(f, t);
-        if (freqFinal) o.frequency.exponentialRampToValueAtTime(freqFinal, t + dur);
-        g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(v, t + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        if (freqFinal) o.frequency.exponentialRampToValueAtTime(Math.max(20, freqFinal), t + dur);
+        g.gain.setValueAtTime(0.0001, t);
+        const attack = Math.min(0.04, dur * 0.25);
+        g.gain.linearRampToValueAtTime(v, t + attack);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
         o.connect(g).connect(c.destination);
-        o.start(t); o.stop(t + dur + 0.05);
+        o.start(t); o.stop(t + dur + 0.06);
     }
 
-    function ruido(dur = 0.2, v = 0.15, filtro = null) {
-        v *= vol();
+    function ruido(dur = 0.15, v = 0.05, filtro = 2000) {
+        v = v * 0.4 * vol();
         if (v <= 0) return;
         const c = getAC(); if (!c) return;
         const t = c.currentTime;
-        const sr = c.sampleRate * dur;
+        const sr = Math.max(1, Math.floor(c.sampleRate * dur));
         const buffer = c.createBuffer(1, sr, c.sampleRate);
         const data = buffer.getChannelData(0);
-        for (let i = 0; i < sr; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / sr, 2);
+        let prev = 0;
+        for (let i = 0; i < sr; i++) {
+            prev = (prev + (Math.random() * 2 - 1) * 0.08) / 1.08;
+            data[i] = prev * Math.pow(1 - i / sr, 2) * 2;
+        }
         const source = c.createBufferSource();
         source.buffer = buffer;
         const gain = c.createGain();
-        gain.gain.setValueAtTime(v, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
-        if (filtro) {
-            const filter = c.createBiquadFilter();
-            filter.type = "bandpass";
-            filter.frequency.value = filtro;
-            source.connect(filter).connect(gain).connect(c.destination);
-        } else {
-            source.connect(gain).connect(c.destination);
-        }
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.linearRampToValueAtTime(v, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        const filter = c.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.value = Math.min(filtro || 2000, 2400);
+        source.connect(filter).connect(gain).connect(c.destination);
         source.start(t);
     }
 
     // ============================================================
-    // SONIDOS POR RAREZA
+    // SONIDOS POR RAREZA (Relajantes y agradables)
     // ============================================================
     const SONIDOS = {
         comun: () => {
-            // Un pequeño "pop"
-            tono(600, 0.08, "sine", 0.1);
+            tono(523, 0.12, "sine", 0.05);
         },
         raro: () => {
-            // Dos notas ascendentes
-            tono(660, 0.1, "sine", 0.1);
-            tono(880, 0.15, "sine", 0.12, 0.1);
+            tono(523, 0.14, "sine", 0.05);
+            tono(659, 0.18, "sine", 0.06, 0.08);
         },
         epico: () => {
-            // Tres notas + chispa
-            tono(660, 0.08, "triangle", 0.1);
-            tono(880, 0.08, "triangle", 0.1, 0.08);
-            tono(1100, 0.15, "triangle", 0.12, 0.16);
-            ruido(0.3, 0.08, 3000);
+            tono(523, 0.15, "sine", 0.05);
+            tono(659, 0.15, "sine", 0.05, 0.07);
+            tono(784, 0.22, "sine", 0.06, 0.14);
+            ruido(0.2, 0.03, 1800);
         },
         legendario: () => {
-            // Fanfarria de 5 notas + brillo
-            [523, 659, 784, 1046, 1318].forEach((f, i) => {
-                tono(f, 0.2, "triangle", 0.12, i * 0.08);
+            [440, 554, 659, 880, 1046].forEach((f, i) => {
+                tono(f, 0.25, "sine", 0.05, i * 0.07);
             });
-            ruido(0.5, 0.1, 4000);
-            tono(1568, 0.4, "sine", 0.1, 0.4);
+            ruido(0.3, 0.03, 1600);
         },
         mitico: () => {
-            // Acorde ascendente + eco místico
-            [523, 659, 784].forEach((f, i) => tono(f, 0.6, "sine", 0.1, i * 0.04));
-            [1046, 1318, 1568].forEach((f, i) => tono(f, 0.4, "triangle", 0.1, 0.3 + i * 0.05));
-            ruido(0.8, 0.12, 5000);
-            tono(2093, 0.5, "sine", 0.08, 0.7);
+            [440, 554, 659].forEach((f, i) => tono(f, 0.5, "sine", 0.05, i * 0.06));
+            [880, 1108].forEach((f, i) => tono(f, 0.4, "sine", 0.04, 0.25 + i * 0.06));
+            ruido(0.35, 0.03, 1500);
         },
         tornasol: () => {
-            // Fanfarria épica completa con eco arcoíris
-            // Base: acorde mayor
-            [523, 659, 784, 1046].forEach((f, i) => tono(f, 1.0, "sine", 0.12, i * 0.03));
-            // Segunda capa: arpegio
-            [1318, 1568, 2093, 2637].forEach((f, i) => tono(f, 0.4, "triangle", 0.1, 0.3 + i * 0.08));
-            // Chispas: barrido de ruido
-            ruido(1.2, 0.15, 6000);
-            ruido(0.8, 0.12, 8000);
-            // Toque final: campanilla
-            [2093, 2637, 3136].forEach((f, i) => tono(f, 0.8, "sine", 0.09, 1.0 + i * 0.12));
-            // Vibrato final
-            for (let i = 0; i < 6; i++) tono(1760 + i * 50, 0.15, "sine", 0.06, 1.5 + i * 0.05);
+            [440, 554, 659, 880].forEach((f, i) => tono(f, 0.6, "sine", 0.05, i * 0.05));
+            [1108, 1318].forEach((f, i) => tono(f, 0.35, "sine", 0.04, 0.28 + i * 0.07));
+            ruido(0.4, 0.03, 1600);
         }
     };
 

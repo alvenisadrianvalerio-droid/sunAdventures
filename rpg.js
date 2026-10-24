@@ -23,6 +23,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   const SVG_RUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;display:inline-block;vertical-align:-3px;margin-right:5px;"><circle cx="14" cy="4" r="2"/><path d="m9 20 3-6-3-3 4-2 3 3h4"/><path d="m6 16 3-3"/><path d="M14 14l2 6"/></svg>';
   const SVG_SWORD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rpg-stat-svg" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px;color:#ff9a3d;"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>';
   const SVG_SHIELD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="rpg-stat-svg" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px;color:#6cb8ff;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+  const SVG_ZAP = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none" class="rpg-stat-svg" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px;color:#ffd93d;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+  const SVG_WIND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" class="rpg-stat-svg" style="width:13px;height:13px;display:inline-block;vertical-align:-2px;margin-right:3px;color:#a8ff78;"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>';
 
   const D = window.RpgData || {};
   const DIR_48 = D.DIR_48 || 'img/48x48/';
@@ -268,7 +270,12 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
       if (encontrado) {
         const merged = { ...def(), ...encontrado };
-        if (!merged.statsBase) merged.statsBase = { atk: 14, def: 5 };
+        if (!Array.isArray(merged.zonasConquistadas)) merged.zonasConquistadas = [];
+        if (!Array.isArray(merged.jefesDerrotados)) merged.jefesDerrotados = [];
+        if (typeof merged.nivel !== "number" || isNaN(merged.nivel) || merged.nivel < 1) merged.nivel = 1;
+        if (typeof merged.xp !== "number" || isNaN(merged.xp) || merged.xp < 0) merged.xp = 0;
+        if (typeof merged.enemigosDerrotados !== "number" || isNaN(merged.enemigosDerrotados) || merged.enemigosDerrotados < 0) merged.enemigosDerrotados = 0;
+        if (!merged.statsBase || typeof merged.statsBase !== "object") merged.statsBase = { atk: 14, def: 5 };
         // Migrar a la clave del usuario autenticado de la mascota actual si provenía de un fallback
         if (claveGanadora && claveGanadora !== kPrincipal && u !== "local") {
           try { localStorage.setItem(kPrincipal, JSON.stringify(merged)); } catch { }
@@ -458,7 +465,14 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       <div class="rpg-hud">
         <div class="rpg-hero-avatar rpg-hero-avatar-btn" data-rpg-accion="cambiar-mascota" title="Clic para cambiar de mascota" style="cursor:pointer;position:relative;">
           <img src="${m.imagen}" alt="${m.nombre}" style="width:58px;height:58px;max-width:58px;max-height:58px;object-fit:contain;display:block;image-rendering:pixelated;" onerror="this.onerror=null;this.src='img/girasol-loading.png'">
-          <span class="rpg-hero-avatar-cambiar-badge" title="Cambiar mascota">🔄</span>
+          <span class="rpg-hero-avatar-cambiar-badge" title="Cambiar mascota" style="position:absolute;bottom:0px;right:0px;width:24px;height:24px;background:linear-gradient(135deg, #ffd93d 0%, #ff9f1a 100%);border:2px solid #1a1a24;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,0.6), 0 0 10px rgba(255,217,61,0.6);z-index:10;pointer-events:none;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#121217" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+              <path d="M16 16h5v5"/>
+            </svg>
+          </span>
         </div>
         <div class="rpg-hero-info">
           <div class="rpg-hero-name">
@@ -473,8 +487,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
             <div class="rpg-hero-stats-badges">
               <span class="rpg-stat-badge" title="Ataque">${SVG_SWORD}${totalAtk}</span>
               <span class="rpg-stat-badge" title="Defensa">${SVG_SHIELD}${totalDef}</span>
-              ${critPct > 15 ? `<span class="rpg-stat-badge" title="Crítico">⚡ ${critPct}%</span>` : ""}
-              ${esqPct > 0 ? `<span class="rpg-stat-badge" title="Esquiva">💨 ${esqPct}%</span>` : ""}
+              ${critPct > 15 ? `<span class="rpg-stat-badge" title="Crítico">${SVG_ZAP}${critPct}%</span>` : ""}
+              ${esqPct > 0 ? `<span class="rpg-stat-badge" title="Esquiva">${SVG_WIND}${esqPct}%</span>` : ""}
             </div>
           </div>
           <div class="rpg-barra-label"><span>HP</span><span>${Math.round(state.hp)} / ${totalHpMax}</span></div>
@@ -620,26 +634,31 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const u = resolveUid();
 
     p.innerHTML = `
-      <div class="rpg-popup-panel rpg-popup-mascotas-panel" style="max-width:520px;">
+      <div class="rpg-popup-panel rpg-popup-mascotas-panel">
         <button class="rpg-popup-close" aria-label="Cerrar">×</button>
-        <header class="rpg-popup-hero" style="min-height:auto;padding:1.2rem;">
-          <div class="rpg-popup-titulo">
-            <small>CAMBIAR COMPAÑERO · ${modo === "roguelike" ? "MODO ROGUELIKE" : "MODO AVENTURA"}</small>
-            <span style="font-size:1.3rem;">Elige tu Mascota</span>
-            <em>Cada mascota tiene su progreso, nivel, mapa y equipamiento independiente.</em>
+        <header class="rpg-popup-mascotas-header">
+          <div class="rpg-popup-mascotas-header-badge">
+            <span class="rpg-header-sparkle">✦</span>
+            <span>${modo === "roguelike" ? "MODO ROGUELIKE" : "MODO AVENTURA"}</span>
           </div>
+          <h2 class="rpg-popup-mascotas-title">Elige tu Mascota</h2>
+          <p class="rpg-popup-mascotas-desc">Cada compañero cuenta con su propio progreso, nivel independiente y estilo único en combate.</p>
         </header>
         <div class="rpg-popup-mascotas-grid">
           ${disponibles.map(id => {
             const data = MASCOTAS[id] || {};
             const esActiva = id === actualId;
             let nivelTxt = "Nv 1";
+            let nivelNum = 1;
             if (modo === "aventura") {
               try {
                 const sRaw = localStorage.getItem(`sa_rpg_${u}_${id}`) || (id === "mapache" ? localStorage.getItem(`sa_rpg_${u}`) : null);
                 if (sRaw) {
                   const sObj = JSON.parse(sRaw);
-                  if (sObj?.nivel) nivelTxt = `Nv ${sObj.nivel}`;
+                  if (sObj?.nivel) {
+                    nivelNum = sObj.nivel;
+                    nivelTxt = `Nv ${sObj.nivel}`;
+                  }
                 }
               } catch {}
             } else {
@@ -647,19 +666,25 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
                 const mRaw = localStorage.getItem(`sa_rl_meta_${u}_${id}`) || (id === "mapache" ? localStorage.getItem(`sa_rl_meta_${u}`) : null);
                 if (mRaw) {
                   const mObj = JSON.parse(mRaw);
-                  nivelTxt = `${mObj?.runs || 0} runs · P.${mObj?.mejorPiso || 0}`;
+                  nivelTxt = `Piso ${mObj?.mejorPiso || 1}`;
                 }
               } catch {}
             }
             return `
-              <button type="button" class="rpg-popup-mascota-card ${esActiva ? "activa" : ""}" data-mascota-sel="${id}">
+              <button type="button" class="rpg-popup-mascota-card pet-theme-${id} ${esActiva ? "activa" : ""}" data-mascota-sel="${id}">
+                ${esActiva ? `<div class="rpg-popup-mascota-activa-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>` : ""}
                 <div class="rpg-popup-mascota-img-wrap">
+                  <div class="rpg-popup-mascota-aura"></div>
                   <img src="${data.imagen || 'img/girasol-loading.png'}" alt="${data.nombre}" onerror="this.onerror=null;this.src='img/girasol-loading.png'">
-                  ${esActiva ? `<span class="rpg-popup-mascota-activa-badge">✓</span>` : ""}
                 </div>
                 <div class="rpg-popup-mascota-info">
-                  <strong>${data.nombre || id}</strong>
-                  <span>${nivelTxt}</span>
+                  <strong class="rpg-popup-mascota-nombre">${data.nombre || id}</strong>
+                  <span class="rpg-popup-mascota-level-pill ${esActiva ? 'pill-activa' : ''}">${nivelTxt}</span>
+                </div>
+                <div class="rpg-popup-mascota-footer">
+                  ${esActiva 
+                    ? `<span class="rpg-popup-mascota-status-tag"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.8"><polyline points="20 6 9 17 4 12"/></svg> En equipo</span>` 
+                    : `<span class="rpg-popup-mascota-btn-action">Seleccionar</span>`}
                 </div>
               </button>
             `;
@@ -667,10 +692,22 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         </div>
       </div>
     `;
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
     document.body.appendChild(p);
     requestAnimationFrame(() => p.classList.add("active"));
   }
   window._rpgAbrirPopupMascotas = abrirPopupMascotas;
+
+  function cerrarPopupMascotas() {
+    const popupMascotas = $("rpg-popup-mascotas");
+    if (popupMascotas) {
+      popupMascotas.classList.remove("active");
+      setTimeout(() => popupMascotas.remove(), 250);
+    }
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  }
 
   document.addEventListener("click", e => {
     const btnCambiarMascota = e.target.closest('[data-rpg-accion="cambiar-mascota"]');
@@ -686,19 +723,14 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       if (nuevoId) {
         localStorage.setItem("mascota_actual", nuevoId);
         SND("blip");
-        const popupMascotas = $("rpg-popup-mascotas");
-        if (popupMascotas) {
-          popupMascotas.classList.remove("active");
-          setTimeout(() => popupMascotas.remove(), 200);
-        }
+        cerrarPopupMascotas();
         window.dispatchEvent(new Event("sunad:mascota-cambiada"));
       }
       return;
     }
     const popupMascotas = e.target.closest("#rpg-popup-mascotas");
     if (popupMascotas && (e.target === popupMascotas || e.target.classList.contains("rpg-popup-close"))) {
-      popupMascotas.classList.remove("active");
-      setTimeout(() => popupMascotas.remove(), 250);
+      cerrarPopupMascotas();
       return;
     }
 
@@ -883,7 +915,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const s = $("sprite-heroe");
     if (!s) return;
     s.classList.add("atacando");
-    setTimeout(() => s.classList.remove("atacando"), 400);
+    setTimeout(() => s.classList.remove("atacando"), 420);
   }
 
   function renderBuffs() {
@@ -1008,6 +1040,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       }
     }
 
+    const probEsquivaHorda = esHorda ? (nHorda <= 4 ? 0.22 : nHorda <= 8 ? 0.28 : 0.35) : 0;
+
     enemigo = {
       id: eId, iconoKey: eId, icono: z.icono, sprite: spriteName, nombre: NOMBRES[eId] || eId,
       hpMax: esHorda ? (hordaArr.reduce((s, x) => s + x.hpMax, 0)) : hpFinal,
@@ -1017,12 +1051,22 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       monedas: Math.round(z.monedas * multPremio),
       jefe: !!z.jefe, miniJefe: !!z.miniJefe, esHorda, horda: hordaArr,
       tamanoHorda: nHorda,
+      probEsquiva: probEsquivaHorda,
       dot: 0, dotDur: 0, sangrado: 0, sangradoDur: 0, shield: Math.round(z.shieldBase || 0), phase: 1, tier,
       special: esp, specialCD: z.jefe ? 2 : z.miniJefe ? 3 : 4, specialTimer: z.jefe ? 2 : z.miniJefe ? 3 : 4
     };
-    turnoJugador = true; overlayObjetos = false;
+    turnoJugador = false; overlayObjetos = false;
     buffsHeroe = []; buffsEnemigo = [];
     SND("blip"); render();
+
+    deshab(true);
+    if (esHorda) {
+      const tipoGrupo = nHorda <= 4 ? "La patrulla" : "La horda";
+      log(`⚡ ¡${tipoGrupo} es más rápida que tú y toma la iniciativa atacando primero!`, "critico");
+    } else {
+      log(`⚡ ¡${enemigo.nombre} es más rápido que tú y ataca primero!`, "critico");
+    }
+    setTimeout(turnoEnemigo, 700);
   }
 
   function log(txt, tipo = "info") {
@@ -1032,7 +1076,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     l.appendChild(d); l.scrollTop = l.scrollHeight;
   }
   function floatDmg(sel, txt, tipo = "daño") {
-    const el = qs(sel); if (!el) return;
+    const el = (sel instanceof Element) ? sel : qs(sel); if (!el) return;
     const f = document.createElement("span");
     f.className = "rpg-float " + tipo; f.textContent = txt;
     el.style.position = "relative"; f.style.left = "50%"; f.style.top = "20%";
@@ -1094,11 +1138,17 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if (enemigo.esHorda && Array.isArray(enemigo.horda)) {
       const vivos = enemigo.horda.filter(m => m.hp > 0);
       if (vivos.length > 0) {
+        const probEsq = enemigo.probEsquiva || (enemigo.tamanoHorda <= 4 ? 0.22 : enemigo.tamanoHorda <= 8 ? 0.28 : 0.35);
         if (esAoE) {
-          // Ataque en área: impacta de lleno a cada enemigo vivo
+          // Ataque en área: cada monstruo evalúa individualmente si logra esquivar
           vivos.forEach(m => {
-            m.hp = Math.max(0, m.hp - dmg);
             const el = qs(`.rpg-horda-item[data-horda-idx="${m.id}"]`);
+            if (probEsq > 0 && Math.random() < probEsq) {
+              log(`💨 ¡${m.nombre}${m.esLider ? " (Líder)" : ""} esquivó ágilmente el ataque en área!`, "curar");
+              if (el) floatDmg(el, "¡ESQUIVÓ!", "curar");
+              return;
+            }
+            m.hp = Math.max(0, m.hp - dmg);
             if (el) {
               const bar = el.querySelector(".rpg-horda-item-hp > span");
               if (bar) bar.style.width = `${Math.max(0, (m.hp / m.hpMax) * 100)}%`;
@@ -1110,15 +1160,22 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
             }
           });
         } else {
-          // Ataque a un solo objetivo: golpea directamente al mob seleccionado o primer vivo
+          // Ataque a un solo objetivo: comprobar si el objetivo seleccionado esquiva el golpe
           let target = enemigo.horda[mobHordaObjetivoIdx];
           if (!target || target.hp <= 0) {
             target = vivos[0];
             mobHordaObjetivoIdx = target ? target.id : 0;
           }
           if (target) {
-            target.hp = Math.max(0, target.hp - dmg);
             const el = qs(`.rpg-horda-item[data-horda-idx="${target.id}"]`);
+            if (probEsq > 0 && Math.random() < probEsq) {
+              log(`💨 ¡${target.nombre}${target.esLider ? " (Líder)" : ""} es demasiado rápido y esquivó tu ataque!`, "curar");
+              if (el) floatDmg(el, "¡ESQUIVÓ!", "curar");
+              else floatDmg("#sprite-enemigo", "¡ESQUIVÓ!", "curar");
+              SND("blip");
+              return;
+            }
+            target.hp = Math.max(0, target.hp - dmg);
             if (el) {
               const bar = el.querySelector(".rpg-horda-item-hp > span");
               if (bar) bar.style.width = `${Math.max(0, (target.hp / target.hpMax) * 100)}%`;
@@ -1189,8 +1246,9 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   function danoEscaladoJefe(mult) {
     const atkEnemigo = enemigo.atk + buffsEnemigo.filter(b => b.tipo === "atk").reduce((s, b) => s + b.val, 0);
     const defHeroe = defTotal() + buffVal("def");
-    const escalaHP = Math.min(1.4, 1 + (hpMax() - 300) / 2000);
-    return Math.max(1, Math.round((atkEnemigo * mult * escalaHP) - defHeroe + rnd(-3, 3)));
+    const escalaHP = Math.min(1.5, 1 + (hpMax() - 300) / 1800);
+    const minDmg = Math.max(12, Math.round(atkEnemigo * mult * 0.32));
+    return Math.max(minDmg, Math.round((atkEnemigo * mult * escalaHP) - (defHeroe * 0.75) + rnd(1, 6)));
   }
 
   function comprobarPasivas(evento, contexto = {}) {
@@ -2012,7 +2070,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const s = $("sprite-enemigo");
     if (!s) return;
     s.classList.add("atacando");
-    setTimeout(() => s.classList.remove("atacando"), 400);
+    setTimeout(() => s.classList.remove("atacando"), 440);
   }
 
   function ataqueHordaSecuencial(skipMobIdx = null) {
@@ -2072,19 +2130,21 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         log(`😎 ¡Esquivaste el ataque de ${mob.nombre}${mob.esLider ? " (Líder)" : ""}!`, "curar");
         floatDmg("#sprite-heroe", "¡ESQUIVA!", "curar");
         actualizarHPs();
-        return setTimeout(siguienteMobAtaca, 340);
+        return setTimeout(siguienteMobAtaca, 200);
       }
 
-      // Cálculo de daño individual del mob
+      // Cálculo de daño individual del mob con penetración parcial de defensa
       const multLider = mob.esLider ? 1.4 : 1.0;
       const atkJunto = Math.max(1, Math.round(atkEnemigoBase * factorDmgMob * multLider));
-      // La defensa del héroe amortigua proporcionalmente cada golpe
-      const defMitigada = Math.max(0, Math.round(defHeroe * factorDmgMob * 0.9));
-      const dmg = Math.max(1, atkJunto - defMitigada + rnd(-1, 2));
+      // La defensa del héroe amortigua el golpe pero siempre deja pasar un mínimo tangible de daño (~18% del ataque del mob)
+      const defMitigada = Math.max(0, Math.round(defHeroe * factorDmgMob * 0.75));
+      const minDmg = Math.max(3, Math.round(atkJunto * 0.18));
+      const dmg = Math.max(minDmg, atkJunto - defMitigada + rnd(0, 3));
 
       state.hp = Math.max(0, state.hp - dmg);
       guardar(state);
-      SND("derrota");
+      // Sonido de impacto sutil y rápido para la horda (evita el sonido estridente repetido)
+      SND("mobHit");
       log(`⚔️ ${mob.nombre}${mob.esLider ? " (Líder)" : ""}: te golpea por ${dmg} daño.`, "daño");
       floatDmg("#sprite-heroe", `-${dmg}`, "daño");
       FX({ tipo: "attack", target: "hero", valor: dmg, fxKey: mob.esLider ? "hammer" : "slash" });
@@ -2092,7 +2152,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       const heroeSpr = qs("#sprite-heroe");
       if (heroeSpr) {
         heroeSpr.classList.add("golpeado");
-        setTimeout(() => heroeSpr.classList.remove("golpeado"), 250);
+        setTimeout(() => heroeSpr.classList.remove("golpeado"), 180);
       }
 
       comprobarPasivas("recibir-dano", { dano: dmg, mob });
@@ -2109,8 +2169,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
         return setTimeout(derrota, 500);
       }
 
-      // Intervalo dinámico y fluido entre ataques individuales
-      setTimeout(siguienteMobAtaca, 360);
+      // Intervalo rápido y fluido entre ataques individuales (refleja la alta velocidad de la horda)
+      setTimeout(siguienteMobAtaca, 230);
     }
 
     siguienteMobAtaca();
@@ -2133,9 +2193,10 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     }
     const atkEnemigo = Math.max(1, enemigo.atk + buffsEnemigo.filter(b => b.tipo === "atk").reduce((s, b) => s + b.val, 0));
     const defHeroe = defTotal() + buffVal("def");
-    const dmg = Math.max(1, atkEnemigo - defHeroe + rnd(-3, 3));
+    const minDmg = Math.max(6, Math.round(atkEnemigo * 0.22));
+    const dmg = Math.max(minDmg, Math.round(atkEnemigo - (defHeroe * 0.82)) + rnd(0, 4));
     state.hp = Math.max(0, state.hp - dmg); guardar(state);
-    SND("derrota");
+    SND("hit");
     log(enemigo.nombre + " te ataca por " + dmg + ".", "daño");
     floatDmg("#sprite-heroe", "-" + dmg, "daño");
     FX({ tipo: "attack", target: "hero", valor: dmg, fxKey: "bolt" });
@@ -2382,18 +2443,36 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const RL = window.RpgLoot; if (!RL?.usarConsumible) return;
     const item = RL.POOL.find(p => p.id === id); if (!item) return;
     if (!RL.usarConsumible(id)) return;
-    if (item.tipo === "hp" || item.tipo === "def") {
-      const cur = item.tipo === "hp" ? item.val : item.val * 3;
-      const a = state.hp;
-      state.hp = clamp(state.hp + cur, 0, hpMax()); guardar(state);
-      SND("comer"); log(`Usas ${item.nombre}. +${Math.round(state.hp - a)} HP.`, "curar");
-      floatDmg("#sprite-heroe", `+${Math.round(state.hp - a)}`, "curar");
-      FX({ tipo: "consumible", target: "hero", valor: Math.round(state.hp - a), fxKey: "potionBlue" });
+    const st = item.stats || {};
+    const curVal = st.hp || item.val || 100;
+    const a = state.hp;
+
+    if (item.tipo === "hp" || item.tipo === "def" || item.tipo === "soporte" || item.consumible) {
+      state.hp = clamp(state.hp + curVal, 0, hpMax());
+      guardar(state);
+      SND("comer");
+      const curado = Math.round(state.hp - a);
+      log(`Usas ${item.nombre}. +${curado} HP.`, "curar");
+      floatDmg("#sprite-heroe", `+${curado}`, "curar");
+      FX({ tipo: "consumible", target: "hero", valor: curado, fxKey: "potionBlue" });
+
+      if (st.def || (item.tipo === "def" && item.val)) {
+        const esc = st.def || Math.round(item.val * 2);
+        buffsHeroe.push({ tipo: "def", val: esc, turnos: 3, label: "DEF" });
+        log(`🛡️ ${item.nombre}: +${esc} DEF temporal.`, "curar");
+        renderBuffs();
+      }
+      if (st.atk) {
+        buffsHeroe.push({ tipo: "atk", val: st.atk, turnos: 3, label: "ATK" });
+        log(`⚔️ ${item.nombre}: +${st.atk} ATK temporal.`, "curar");
+        renderBuffs();
+      }
     } else if (item.tipo === "atk") {
-      aplicarDmgEnemigo(item.val);
-      SND("sparkle"); log(`¡Lanzas ${item.nombre}! ${item.val} de daño.`, "critico");
-      floatDmg("#sprite-enemigo", `-${item.val}`, "critico");
-      FX({ tipo: "attack", target: "enemy", valor: item.val, fxKey: "fireball", critico: true });
+      const dmg = st.atk || item.val || 50;
+      aplicarDmgEnemigo(dmg);
+      SND("sparkle"); log(`¡Lanzas ${item.nombre}! ${dmg} de daño.`, "critico");
+      floatDmg("#sprite-enemigo", `-${dmg}`, "critico");
+      FX({ tipo: "attack", target: "enemy", valor: dmg, fxKey: "fireball", critico: true });
       chequearFaseJefe();
     }
     actualizarHPs();
@@ -2460,7 +2539,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
 
     batallaEl.appendChild(overlay);
 
-    overlay.querySelector("#btn-combatir-otra-vez")?.addEventListener("click", () => {
+    overlay.querySelector("#btn-combatir-otra-vez")?.addEventListener("click", (e) => {
+      e.target.disabled = true;
       overlay.remove();
       const zActual = state.zonaActual;
       enemigo = null;
@@ -2470,7 +2550,8 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       entrarZona(zActual);
     });
 
-    overlay.querySelector("#btn-salir-mapa")?.addEventListener("click", () => {
+    overlay.querySelector("#btn-salir-mapa")?.addEventListener("click", (e) => {
+      e.target.disabled = true;
       overlay.remove();
       enemigo = null;
       buffsHeroe = [];
@@ -2538,8 +2619,11 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       } catch { }
     }
     let sub = 0;
-    while (state.nivel < NIVEL_MAX && state.xp >= xpParaSubir()) {
-      state.xp -= xpParaSubir();
+    let maxSubidas = 100;
+    while (state.nivel < NIVEL_MAX && maxSubidas-- > 0) {
+      const req = xpParaSubir();
+      if (!isFinite(req) || req <= 0 || state.xp < req) break;
+      state.xp -= req;
       state.nivel++;
       state.hp = hpMax();
       sub++;
@@ -2751,12 +2835,15 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if (objClon.atk) objClon.atk = Math.round(objClon.atk * multPoderItems);
 
     enemigo = objClon;
-    turnoJugador = true;
+    turnoJugador = false;
     overlayObjetos = false;
     buffsHeroe = [];
     buffsEnemigo = [];
     SND("blip");
     render();
+    deshab(true);
+    log(`⚡ ¡${enemigo.nombre} es más rápido que tú y ataca primero!`, "critico");
+    setTimeout(turnoEnemigo, 700);
   }
 
   window.Rpg = {
@@ -2790,6 +2877,12 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     abrirPopupGrupo,
     reset: () => { localStorage.removeItem(KEY()); state = def(); render(); }
   };
+  window.addEventListener("beforeunload", () => {
+    try {
+      if (state) guardar(state);
+    } catch { }
+  });
+
   window._rpgEntrarZona = entrarZona;
   window._rpgIniciarCombateDirecto = iniciarCombateDirecto;
   window._comprobarPasivas = comprobarPasivas;

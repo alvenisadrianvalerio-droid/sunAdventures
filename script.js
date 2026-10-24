@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
   try {
     const g = qs(".girasol-wrapper"), pop = $("pop"), b = qs(".burbuja");
     if (g && pop) {
-      pop.volume = 0.4;
+      pop.volume = 0.15;
       const fr = [
         "Mi lugar favorito",
         "Contigo hasta el infinito",
@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (timerBurbuja) clearTimeout(timerBurbuja);
           timerBurbuja = setTimeout(() => {
             b.classList.remove("visible");
-          }, 3500);
+          }, 1600);
         }
       };
 
@@ -408,63 +408,82 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ---------- Audio ---------- */
   let ac = null;
   const appSoundVolume = () => {
-    const value = Number(localStorage.getItem("app_volume") ?? "0.8");
-    return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0.8;
+    const value = Number(localStorage.getItem("app_volume") ?? "0.65");
+    return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0.65;
   };
   const getAC = () => {
     if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch { return null; } }
     if (ac.state === "suspended") ac.resume().catch(() => {});
     return ac;
   };
-  const tono = (f, d, t = "sine", v = 0.15, dl = 0, ff = null) => {
-    v *= appSoundVolume();
+  const tono = (f, d, t = "sine", v = 0.08, dl = 0, ff = null) => {
+    v = v * 0.55 * appSoundVolume();
     if (v <= 0) return;
     const c = getAC(); if (!c) return;
     const ti = c.currentTime + dl;
     const o = c.createOscillator(), g = c.createGain();
-    o.type = t; o.frequency.setValueAtTime(f, ti);
-    if (ff) o.frequency.exponentialRampToValueAtTime(ff, ti + d);
-    g.gain.setValueAtTime(0, ti);
-    g.gain.linearRampToValueAtTime(v, ti + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.001, ti + d);
+    // Sustituir formas de onda agresivas por timbres suaves y cálidos
+    const suaveTipo = (t === "sawtooth" || t === "square") ? "triangle" : t;
+    o.type = suaveTipo;
+    o.frequency.setValueAtTime(f, ti);
+    if (ff) o.frequency.exponentialRampToValueAtTime(Math.max(20, ff), ti + d);
+    g.gain.setValueAtTime(0.0001, ti);
+    // Ataque suave para evitar clics/chasquidos auditivos molestos
+    const attack = Math.min(0.04, d * 0.25);
+    g.gain.linearRampToValueAtTime(v, ti + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, ti + d);
     o.connect(g).connect(c.destination);
-    o.start(ti); o.stop(ti + d + 0.05);
+    o.start(ti); o.stop(ti + d + 0.06);
   };
-  const ruido = (d = 0.15, v = 0.2) => {
-    v *= appSoundVolume();
+  const ruido = (d = 0.12, v = 0.06) => {
+    v = v * 0.45 * appSoundVolume();
     if (v <= 0) return;
     const c = getAC(); if (!c) return;
-    const ti = c.currentTime, s = c.sampleRate * d;
+    const ti = c.currentTime, s = Math.max(1, Math.floor(c.sampleRate * d));
     const b = c.createBuffer(1, s, c.sampleRate), da = b.getChannelData(0);
-    for (let i = 0; i < s; i++) da[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / s, 2);
-    const sr = c.createBufferSource(), g = c.createGain();
+    // Filtro brown/suave simulado para ruido menos chirriante y áspero
+    let last = 0;
+    for (let i = 0; i < s; i++) {
+      const white = (Math.random() * 2 - 1);
+      last = (last + (0.05 * white)) / 1.05;
+      da[i] = last * Math.pow(1 - i / s, 2) * 2;
+    }
+    const sr = c.createBufferSource(), g = c.createGain(), flt = c.createBiquadFilter();
+    flt.type = "lowpass";
+    flt.frequency.value = 1800;
     sr.buffer = b;
-    g.gain.setValueAtTime(v, ti);
-    g.gain.exponentialRampToValueAtTime(0.001, ti + d);
-    sr.connect(g).connect(c.destination);
+    g.gain.setValueAtTime(0.0001, ti);
+    g.gain.linearRampToValueAtTime(v, ti + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, ti + d);
+    sr.connect(flt).connect(g).connect(c.destination);
     sr.start(ti);
   };
   const SND = {
-    fireball:()=>{ruido(0.25,0.3);tono(180,0.4,"sawtooth",0.12,0,60);},
-    growl:()=>{tono(120,0.6,"sawtooth",0.1,0,80);tono(90,0.5,"sawtooth",0.08,0.2,60);},
-    chitter:()=>[0,0.07,0.14].forEach(d=>tono(1200+(d?200:0),0.05,"square",0.08,d)),
-    twinkle:()=>{tono(880,0.3,"sine",0.12);tono(1320,0.4,"sine",0.1,0.1);},
-    meow:()=>{tono(500,0.15,"sine",0.15,0,800);tono(800,0.4,"sine",0.15,0.15,400);},
-    crunch:()=>{ruido(0.15,0.2);ruido(0.1,0.15);},
-    baa:()=>tono(600,0.6,"sawtooth",0.08,0,400),
-    peep:()=>{tono(1800,0.1,"sine",0.12);tono(2000,0.08,"sine",0.12,0.12);},
-    blip:()=>{tono(300,0.3,"sine",0.15);tono(400,0.2,"sine",0.12,0.15);},
-    sparkle:()=>{[660,880,1100].forEach((f,i)=>tono(f,0.15,"sine",0.1,i*0.1));tono(1320,0.3,"sine",0.1,0.3);},
-    hop:()=>[420,620,860].forEach((f,i)=>tono(f,0.1,"triangle",0.1,i*0.08)),
-    mimos:()=>[660,880,990].forEach((f,i)=>tono(f,0.18,"sine",0.1,i*0.08)),
-    dormir:()=>{tono(440,0.5,"sine",0.12,0,220);tono(330,0.6,"sine",0.08,0.4,165);},
-    despertar:()=>[523,659,784].forEach((f,i)=>tono(f,0.15,"sine",0.12,i*0.1)),
-    comer:()=>{ruido(0.12,0.15);ruido(0.08,0.12);tono(600,0.2,"sine",0.1,0.15);},
-    moneda:()=>{tono(900,0.08,"square",0.1);tono(1300,0.12,"square",0.1,0.06);},
-    compra:()=>[523,659,784,1046].forEach((f,i)=>tono(f,0.12,"sine",0.1,i*0.07)),
-    atrapado:()=>{tono(880,0.06,"square",0.08);tono(1320,0.08,"square",0.08,0.04);},
-    victoria:()=>[523,659,784,1046,1318].forEach((f,i)=>tono(f,0.18,"triangle",0.12,i*0.09)),
-    derrota:()=>[600,500,400,300].forEach((f,i)=>tono(f,0.2,"sine",0.1,i*0.1))
+    fireball:()=>{ruido(0.2,0.06);tono(220,0.35,"sine",0.07,0,110);},
+    growl:()=>{tono(130,0.45,"triangle",0.06,0,95);tono(105,0.4,"sine",0.05,0.12,80);},
+    chitter:()=>[0,0.06,0.12].forEach(d=>tono(780+(d?100:0),0.06,"sine",0.04,d)),
+    twinkle:()=>{tono(784,0.3,"sine",0.06);tono(1046,0.35,"sine",0.05,0.08);},
+    meow:()=>{tono(440,0.14,"sine",0.07,0,660);tono(660,0.3,"sine",0.06,0.12,440);},
+    crunch:()=>{ruido(0.12,0.05);tono(220,0.08,"sine",0.04,0.04);},
+    baa:()=>tono(440,0.45,"triangle",0.05,0,330),
+    peep:()=>{tono(1046,0.08,"sine",0.05);tono(1318,0.07,"sine",0.04,0.06);},
+    blip:()=>{tono(392,0.18,"sine",0.06);tono(523,0.15,"sine",0.05,0.08);},
+    sparkle:()=>{[523,659,784].forEach((f,i)=>tono(f,0.2,"sine",0.05,i*0.08));tono(1046,0.3,"sine",0.05,0.26);},
+    hop:()=>[392,523,659].forEach((f,i)=>tono(f,0.12,"triangle",0.05,i*0.06)),
+    mimos:()=>[523,659,784].forEach((f,i)=>tono(f,0.22,"sine",0.06,i*0.08)),
+    dormir:()=>{tono(330,0.5,"sine",0.06,0,220);tono(261,0.6,"sine",0.05,0.3,174);},
+    despertar:()=>[392,523,659].forEach((f,i)=>tono(f,0.2,"sine",0.06,i*0.09)),
+    comer:()=>{ruido(0.08,0.04);tono(440,0.16,"sine",0.05,0.08);},
+    moneda:()=>{tono(659,0.1,"triangle",0.06);tono(988,0.14,"sine",0.05,0.06);},
+    compra:()=>[440,554,659,880].forEach((f,i)=>tono(f,0.16,"sine",0.05,i*0.06)),
+    atrapado:()=>{tono(659,0.08,"sine",0.05);tono(880,0.12,"sine",0.05,0.05);},
+    victoria:()=>[392,523,659,784,1046].forEach((f,i)=>tono(f,0.22,"triangle",0.06,i*0.08)),
+    derrota:()=>[440,392,330,261].forEach((f,i)=>tono(f,0.25,"sine",0.05,i*0.09)),
+    hit:()=>{ruido(0.06,0.05);tono(140,0.12,"sine",0.05,0,80);},
+    mobHit:()=>{ruido(0.03,0.03);tono(160,0.08,"sine",0.03,0,100);},
+    curar:()=>[440,554,659,880].forEach((f,i)=>tono(f,0.25,"sine",0.05,i*0.07)),
+    fanfarria:()=>[440,554,659,880].forEach((f,i)=>tono(f,0.25,"sine",0.05,i*0.07)),
+    pop:()=>{tono(523,0.08,"sine",0.06,0,330);}
   };
   const snd = t => { if (!t) return; try { (SND[t] || (() => tono(600, 0.2)))(); } catch {} };
   const getNombre = () => localStorage.getItem("sunad_username") || window._sunUserEmail?.split("@")[0] || "";
@@ -547,12 +566,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (mascota && mascotaImg && mascotaBurbuja) {
-    window.decirMascota = (t, d = 3000) => {
+    window.decirMascota = (t, d = 1600) => {
       try {
         mascotaBurbuja.textContent = t;
         mascotaBurbuja.classList.add("visible");
         if (burbujaT) clearTimeout(burbujaT);
-        burbujaT = setTimeout(() => mascotaBurbuja.classList.remove("visible"), d);
+        const dur = Math.min(d, 1800);
+        burbujaT = setTimeout(() => mascotaBurbuja.classList.remove("visible"), dur);
       } catch {}
     };
     window._setMascotaImg = setMascotaImg;
@@ -1592,10 +1612,92 @@ sprite.style.opacity = "0.25";
   }
   window.abrirDescarga = abrirDescarga;
 
-  /* ---------- PWA ---------- */
+  /* ---------- PWA / APK AUTO-ACTUALIZABLE CON POP-UP ---------- */
   try {
-    if ("serviceWorker" in navigator)
-      window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(e => console.warn("SW:", e)));
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        let actualizacionMostrada = false;
+
+        function mostrarModalActualizacion(workerParaActivar) {
+          if (actualizacionMostrada) return;
+          actualizacionMostrada = true;
+
+          const accionActualizar = () => {
+            if (workerParaActivar) {
+              workerParaActivar.postMessage({ type: "SKIP_WAITING" });
+            }
+            setTimeout(() => {
+              window.location.reload();
+            }, 300);
+          };
+
+          if (window.SunModal && typeof window.SunModal.confirm === "function") {
+            window.SunModal.confirm({
+              title: "Necesita actualización",
+              message: "Hay una versión nueva de SunAdventures lista con mejoras y optimizaciones. ¿Deseas actualizar ahora?",
+              icon: "🚀",
+              confirmText: "Actualizar ahora",
+              cancelText: "Más tarde",
+              variant: "warning"
+            }).then(acepto => {
+              if (acepto) accionActualizar();
+            });
+          } else {
+            // Fallback en caso de que SunModal no esté en el contexto
+            const overlay = document.createElement("div");
+            overlay.className = "sun-modal-overlay active";
+            overlay.innerHTML = `
+              <div class="sun-modal-card warning" role="dialog" aria-modal="true" style="opacity:1;transform:scale(1)">
+                <div class="sun-modal-icon">🚀</div>
+                <h3 class="sun-modal-title">Necesita actualización</h3>
+                <p class="sun-modal-msg">Hay una versión nueva de SunAdventures con mejoras. Actualiza para disfrutar de la mejor experiencia.</p>
+                <div class="sun-modal-actions">
+                  <button type="button" class="sun-modal-btn secondary" id="btn-upd-later">Más tarde</button>
+                  <button type="button" class="sun-modal-btn primary" id="btn-upd-now">Actualizar ahora</button>
+                </div>
+              </div>`;
+            document.body.appendChild(overlay);
+            overlay.querySelector("#btn-upd-later")?.addEventListener("click", () => overlay.remove());
+            overlay.querySelector("#btn-upd-now")?.addEventListener("click", () => {
+              overlay.remove();
+              accionActualizar();
+            });
+          }
+        }
+
+        navigator.serviceWorker.register("./service-worker.js").then(reg => {
+          // 1. Comprobar actualizaciones cada 10 minutos
+          setInterval(() => {
+            try { reg.update(); } catch (_) { }
+          }, 10 * 60 * 1000);
+
+          // 2. Si ya hay un worker en espera (esperando activación) al abrir la app
+          if (reg.waiting) {
+            mostrarModalActualizacion(reg.waiting);
+          }
+
+          // 3. Cuando se detecte una nueva versión descargándose
+          reg.addEventListener("updatefound", () => {
+            const nuevoWorker = reg.installing;
+            if (!nuevoWorker) return;
+            nuevoWorker.addEventListener("statechange", () => {
+              if (nuevoWorker.state === "installed" && navigator.serviceWorker.controller) {
+                mostrarModalActualizacion(nuevoWorker);
+              }
+            });
+          });
+        }).catch(e => console.warn("SW:", e));
+
+        // 4. Recargar cuando el nuevo worker tome el control
+        let recargando = false;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (!recargando && actualizacionMostrada) {
+            recargando = true;
+            window.location.reload();
+          }
+        });
+      });
+    }
   } catch {}
 
   /* ---------- Recuperar contraseña ---------- */

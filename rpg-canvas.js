@@ -362,19 +362,19 @@ shieldBurst:  { sheet:'loot2', col:2, row:4, w:70, h:70, tint:'#a684f0', pulse:t
         const hero = getHeroPos(fxLayer);
         const enemy = getEnemyPos(fxLayer);
 
-        // Daño al enemigo (atacamos)
-        if (cls.includes('daño') && txt.match(/daño|Atacas|golpe/i) && !txt.includes('te ataca')) {
+        // Daño al héroe (enemigo o mob ataca)
+        if (txt.match(/te ataca|te golpea/i)) {
+          fxLayer.projectile('slash', enemy.x, enemy.y, hero.x, hero.y, { dur: 0.4 });
+          setTimeout(() => fxLayer.burst('hit', hero.x, hero.y, 8), 350);
+        }
+        // Daño al enemigo (héroe ataca)
+        else if (cls.includes('daño') && txt.match(/daño|Atacas|golpe/i)) {
           const esCrit = cls.includes('critico');
           fxLayer.projectile('slash', hero.x, hero.y, enemy.x, enemy.y, { dur: 0.4 });
           setTimeout(() => {
             fxLayer.burst(esCrit ? 'crit' : 'hit', enemy.x, enemy.y, esCrit ? 14 : 9);
             if (esCrit) fxLayer.text(enemy.x, enemy.y - 40, '¡CRÍTICO!', '#ffae3d', 34);
           }, 350);
-        }
-        // Daño al héroe (enemigo ataca)
-        if (txt.match(/te ataca/i)) {
-          fxLayer.projectile('bolt', enemy.x, enemy.y, hero.x, hero.y, { dur: 0.4 });
-          setTimeout(() => fxLayer.burst('hit', hero.x, hero.y, 8), 350);
         }
         // Curación
         if (cls.includes('curar-enemigo') || (txt.includes('se cura') && !txt.includes('Te curas') && !txt.includes('te curas'))) {

@@ -355,7 +355,7 @@
                         Object.keys(loot).forEach(id => {
                             if ((loot[id] || 0) <= 0) return;
                             const it = RL.POOL.find(p => p.id === id);
-                            if (it && Array.isArray(it.habilidades)) {
+                            if (it && !it.consumible && Array.isArray(it.habilidades)) {
                                 it.habilidades.forEach(h => activas.push({ ...h, itemId: id }));
                             }
                         });

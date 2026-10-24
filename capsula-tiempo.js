@@ -167,23 +167,26 @@
     }
   }
 
-  /* Audio alegre opcional si AudioContext está disponible */
+  /* Audio suave y relajante si AudioContext está disponible */
   function sonarFanfarria() {
     try {
+      const volApp = Number(localStorage.getItem("app_volume") ?? "0.65");
+      if (volApp <= 0) return;
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const notas = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+      const notas = [440, 554, 659, 880]; // A4, C#5, E5, A5 armónico cálido
       notas.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
-        osc.type = "triangle";
-        osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.1);
-        gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + idx * 0.1 + 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.1 + 0.35);
+        osc.type = "sine";
+        const t = ctx.currentTime + idx * 0.08;
+        osc.frequency.setValueAtTime(freq, t);
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.linearRampToValueAtTime(0.06 * volApp, t + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
         osc.connect(gain);
         gain.connect(ctx.destination);
-        osc.start(ctx.currentTime + idx * 0.1);
-        osc.stop(ctx.currentTime + idx * 0.1 + 0.4);
+        osc.start(t);
+        osc.stop(t + 0.4);
       });
     } catch {
       // Ignorar si el audio está bloqueado por el navegador

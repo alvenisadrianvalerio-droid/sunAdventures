@@ -459,7 +459,7 @@
 
   window.SunPreferences = {
     getLanguage:() => currentLanguage,
-    getVolume:() => Number(localStorage.getItem("app_volume") ?? "0.8"),
+    getVolume:() => Number(localStorage.getItem("app_volume") ?? "0.65"),
     setLanguage,
     setAnimationsDisabled,
     setVolume
@@ -468,7 +468,10 @@
   function initPreferences() {
     setLanguage(currentLanguage);
     setAnimationsDisabled(localStorage.getItem("sunad_animations_disabled") === "true");
-    setVolume(localStorage.getItem("app_volume") ?? localStorage.getItem("player_volumen") ?? "0.8");
+    const savedVol = localStorage.getItem("app_volume") ?? localStorage.getItem("player_volumen");
+    // Actualizar valor guardado si era el 0.5 o 0.8 previo o si no existe
+    const finalVol = (savedVol === null || savedVol === "0.5" || savedVol === "0.8") ? "0.65" : savedVol;
+    setVolume(finalVol);
     languageSelect?.addEventListener("change", () => setLanguage(languageSelect.value));
     animationToggle?.addEventListener("change", () => setAnimationsDisabled(animationToggle.checked));
     volumeSlider?.addEventListener("input", () => setVolume(volumeSlider.value));
