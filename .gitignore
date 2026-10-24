@@ -5,3 +5,7 @@ android/build/
 android/app/build/
 .idea/
 android/.idea/
+
+www/tools.zip
+www/tools/*.apk
+www/tools/mapeador-apk/
