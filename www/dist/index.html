@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SunAd</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffd93d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SunAd">
+  <meta name="description" content="Un rincón para guardar nuestros recuerdos con girasoles">
+  <meta name="author" content="A.A.V.C">
+  <meta property="og:title" content="Four Sunflowers · Nuestro rincón">
+  <meta property="og:description" content="Un pedacito de nosotros en cada foto.">
+  <meta property="og:image" content="img/girasol.jpg">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/app.bundle.min.css">
+  <style>
+    svg {
+      max-width: 100%;
+      max-height: 100%
+    }
+
+    svg:not([width]):not([height]) {
+      width: 1em;
+      height: 1em
+    }
+
+    [data-view]:not(.active) {
+      display: none !important
+    }
+
+    #loading-screen:not(.active) {
+      display: none !important
+    }
+
+    .loading-flower {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 5rem;
+      height: 5rem;
+      transform-origin: center center;
+      -webkit-transform-origin: center center;
+      animation: loadingSpin 1.5s ease-in-out infinite !important;
+      filter: drop-shadow(0 6px 15px rgba(255, 217, 61, .4));
+      will-change: transform;
+    }
+
+    .loading-flower img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+      display: block;
+    }
+
+    @keyframes loadingSpin {
+      0% {
+        transform: rotate(0deg) scale(1);
+      }
+
+      50% {
+        transform: rotate(180deg) scale(1.15);
+      }
+
+      100% {
+        transform: rotate(360deg) scale(1);
+      }
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      align-items: center;
+      justify-content: center;
+      z-index: 100
+    }
+
+    .modal.active {
+      display: flex
+    }
+
+    /* ⚡ RENDERING ENGINE & MOBILE/PC HIGH-PERFORMANCE OPTIMIZATIONS */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Acelerar GPU en modales y overlays sin degradar FPS */
+    .modal,
+    .modal-content,
+    .polaroid,
+    .nav-container,
+    .rpg-horda-item {
+      will-change: auto;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+
+    /* Desplazamiento fluido nativo en teléfonos con contención de overscroll */
+    html,
+    body {
+      overscroll-behavior-y: none;
+      touch-action: pan-y pinch-zoom;
+    }
+
+    /* Responsive tap response: eliminar delay de 300ms en enlaces y botones móviles */
+    button,
+    a,
+    input,
+    select,
+    textarea,
+    .polaroid,
+    .nav-link,
+    [role="button"] {
+      touch-action: manipulation;
+    }
+
+    /* Optimización de decodificación y renderizado de imágenes */
+    img {
+      content-visibility: auto;
+    }
+
+    /* Reducir consumo de memoria en dispositivos con preferencia de ahorro o baja potencia */
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* ============================================================
+       OPTIMIZACIÓN MÓVILES GAMA BAJA / RENDERING LIGERO
+       Desactivar backdrop-filter pesado en pantallas móviles (< 768px)
+       y reemplazarlo por opacidad y color sólido de alta velocidad.
+       ============================================================ */
+    @media (max-width: 768px) {
+
+      .modal-backdrop,
+      .tienda-overlay,
+      .amistad-overlay,
+      .minijuego-overlay,
+      .rpg-fin-combate-overlay,
+      .nav-container,
+      .player,
+      .ml-player,
+      .ml-modal,
+      .sun-modal-overlay,
+      .polaroid-viewer,
+      body[class*="tema-fondo-"] .modal-backdrop,
+      [style*="backdrop-filter"] {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      .modal-backdrop,
+      .tienda-overlay,
+      .amistad-overlay,
+      .minijuego-overlay,
+      .sun-modal-overlay {
+        background: rgba(8, 10, 18, 0.92) !important;
+      }
+
+      .nav-container {
+        background: rgba(14, 16, 26, 0.96) !important;
+      }
+
+      /* Sombras difusas pesadas simplificadas para evitar repaint en GPU móvil */
+      .polaroid,
+      .rpg-zone-card,
+      .tienda-item,
+      .modal-content,
+      .experiencia-card,
+      .lobby-btn {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+      }
+
+      /* Filtros pesados de brillo/contraste desactivados en scroll */
+      .mascota-img {
+        filter: none !important;
+      }
+    }
+
+    /* Clase forzada para celulares de gama baja detectados automáticamente */
+    html.gama-baja *,
+    html.gama-baja *::before,
+    html.gama-baja *::after {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      text-shadow: none !important;
+    }
+
+    html.gama-baja .polaroid,
+    html.gama-baja .rpg-zone-card,
+    html.gama-baja .tienda-item,
+    html.gama-baja .modal-content,
+    html.gama-baja .experiencia-card,
+    html.gama-baja .receta-card {
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28) !important;
+      border-radius: 12px;
+    }
+
+    /* Reducir transiciones y animaciones redundantes en gama baja para aliviar el hilo de UI */
+    html.gama-baja *:not(.loading-flower):not(.loading-flower img):not(.rpg-fx-canvas) {
+      animation-duration: 0.15s !important;
+      transition-duration: 0.12s !important;
+    }
+
+    /* Evitar desbordes de repintado en modales y secciones complejas */
+    html.gama-baja .modal-backdrop,
+    html.gama-baja .tienda-overlay,
+    html.gama-baja .amistad-overlay,
+    html.gama-baja .minijuego-overlay,
+    html.gama-baja .rpg-fin-combate-overlay,
+    html.gama-baja .sun-modal-overlay {
+      background: rgba(8, 10, 18, 0.95) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    /* Ocultar botones de descargar app cuando se ejecuta dentro de la APK */
+    html.en-apk [data-action="descargar"],
+    html.en-apk [data-action="descargar-directo"],
+    html.en-apk #descarga-app-modal,
+    html.en-apk button.lobby-btn[data-action="descargar"],
+    html.en-apk .user-dropdown-item[data-action="descargar"],
+    body.en-apk [data-action="descargar"],
+    body.en-apk #descarga-app-modal {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      opacity: 0 !important;
+    }
+  </style>
+  <script>
+    /* Detección de APK nativa (Capacitor / WebView / Standalone / TWA / Custom Scheme) */
+    (function () {
+      try {
+        var ua = navigator.userAgent || "";
+        var esCapacitor = !!(window.Capacitor && (window.Capacitor.isNative || (typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform())));
+        var esAndroidAsset = window.location.protocol === 'capacitor:' || window.location.protocol === 'file:' || (window.location.hostname === 'localhost' && window.location.port === '' && /Android/i.test(ua));
+        var esStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        var esApkUserAgent = /SunAdventures|SunAd|wv|WebView|Capacitor|Crosswalk|Android.*Version\/[0-9.]+/i.test(ua);
+        var esPackageParam = window.location.search.indexOf("app=1") !== -1 || window.location.search.indexOf("platform=apk") !== -1 || localStorage.getItem("sunad_es_apk") === "true";
+
+        if (esCapacitor || esAndroidAsset || esApkUserAgent || esStandalone || esPackageParam) {
+          document.documentElement.classList.add("en-apk");
+          if (document.body) document.body.classList.add("en-apk");
+          localStorage.setItem("sunad_es_apk", "true");
+        }
+      } catch (e) { }
+    })();
+
+    /* Detección automática de hardware gama baja (<= 4 núcleos o <= 4GB RAM) y modo de ahorro */
+    (function () {
+      try {
+        var cores = navigator.hardwareConcurrency || 4;
+        var ram = navigator.deviceMemory || 4;
+        var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        var saveData = connection && connection.saveData;
+        var esMovil = /Android|iPhone|iPod|Mobile/i.test(navigator.userAgent);
+        var forzarGamaBaja = localStorage.getItem("sunad_modo_gama_baja") === "true";
+        if (forzarGamaBaja || saveData || (esMovil && (cores <= 4 || ram <= 3))) {
+          document.documentElement.classList.add("gama-baja");
+          window.IS_LOW_END_DEVICE = true;
+        }
+      } catch (e) { }
+    })();
+  </script>
+</head>
+
+<body>
+
+  <section id="background-container">
+    <header class="nav-container">
+      <button id="nav-hamburger" class="nav-hamburger" type="button" aria-label="Abrir menú" aria-expanded="false"
+        aria-controls="main-nav-links">
+        <span class="nav-hamburger-bar"></span>
+        <span class="nav-hamburger-bar"></span>
+        <span class="nav-hamburger-bar"></span>
+      </button>
+      <nav class="nav-links" id="main-nav-links">
+        <a href="#inicio" class="nav-link" data-view-link="inicio"><span class="ui-icon nav-link-icon"
+            data-icono="casa"></span><span class="nav-link-text">Inicio</span></a>
+        <a href="#album" class="nav-link" data-view-link="album"><span class="ui-icon nav-link-icon"
+            data-icono="camara"></span><span class="nav-link-text">Álbum</span></a>
+        <a href="#chat" class="nav-link" data-view-link="chat"><span class="ui-icon nav-link-icon"
+            data-icono="chat"></span><span class="nav-link-text">Chat</span><span class="nav-badge-dot"
+            id="chat-nav-badge" aria-label="Nuevos mensajes" hidden></span></a>
+        <a href="#mascotas" class="nav-link" data-view-link="mascotas"><span class="ui-icon nav-link-icon"
+            data-icono="huella"></span><span class="nav-link-text">Mascotas</span></a>
+        <a href="#finanzas" class="nav-link" data-view-link="finanzas" aria-label="Finanzas"><span
+            class="ui-icon nav-link-icon" data-icono="finanzas"></span><span class="nav-link-text">Finanzas</span></a>
+        <a href="#diccionario" class="nav-link" data-view-link="diccionario" aria-label="Diccionario"><span
+            class="ui-icon nav-link-icon" data-icono="libro"></span><span class="nav-link-text">Diccionario</span></a>
+        <a href="#recetas" class="nav-link" data-view-link="recetas" aria-label="Recetas"><span
+            class="ui-icon nav-link-icon" data-icono="comida"></span><span class="nav-link-text">Recetas</span></a>
+      </nav>
+      <div class="nav-actions">
+        <button id="btn-open-login" class="btn-auth" aria-label="Entrar"><span class="btn-auth-icon"><img
+              src="img/items%20de%20aventura/corona.webp" alt="" width="18" height="18" decoding="async"></span><span
+            class="btn-auth-text">Entrar</span></button>
+        <div id="user-info" class="user-info" style="display:none">
+          <button id="user-menu-toggle" class="user-pill" aria-haspopup="true"><span class="user-avatar"
+              data-icono="persona"></span><span id="user-email" class="user-email"></span><span
+              class="user-chevron">▾</span></button>
+          <div id="user-dropdown" class="user-dropdown" aria-hidden="true">
+            <div class="user-dropdown-header">
+              <div class="user-dropdown-avatar" data-icono="persona"></div>
+              <div class="user-dropdown-info"><span id="user-dropdown-name" class="user-dropdown-name"></span><span
+                  class="user-dropdown-role">Explorador de aventuras</span></div>
+            </div>
+            <a href="#logros" class="user-dropdown-item" data-view-link="logros"><span class="user-dropdown-icon"
+                data-icono="trofeo"></span><span>Logros</span></a>
+            <a href="#notas" class="user-dropdown-item" data-view-link="notas"><span class="user-dropdown-icon"
+                data-icono="nota"></span><span>Notitas</span></a>
+            <a href="#diccionario" class="user-dropdown-item" data-view-link="diccionario"><span
+                class="user-dropdown-icon" data-icono="libro"></span><span>Diccionario 📖</span></a>
+            <a href="#recetas" class="user-dropdown-item" data-view-link="recetas"><span class="user-dropdown-icon"
+                data-icono="comida"></span><span>Recetas 🍳</span></a>
+            <div class="user-dropdown-divider"></div>
+            <button type="button" class="user-dropdown-item" data-action="perfil"><span class="user-dropdown-icon"
+                data-icono="persona"></span><span>Mi perfil</span></button>
+            <button type="button" class="user-dropdown-item" data-action="pareja" style="color:#ff6ba8;"><span
+                class="user-dropdown-icon" data-icono="corazon"></span><span>Mi Pareja</span></button>
+            <button type="button" class="user-dropdown-item" data-action="amigos"><span class="user-dropdown-icon"
+                data-icono="amigos"></span><span>Mi Grupo de Aventuras 👥</span></button>
+            <button type="button" class="user-dropdown-item" data-action="ajustes"><span class="user-dropdown-icon"
+                data-icono="ajustes"></span><span>Ajustes</span></button>
+            <button type="button" class="user-dropdown-item" data-action="offline"><span class="user-dropdown-icon"
+                data-icono="descargar"></span><span>Descargar todo</span></button>
+            <button type="button" class="user-dropdown-item" data-action="descargar"><span class="user-dropdown-icon"
+                data-icono="descargar"></span><span>Descargar App (APK) 📱</span></button>
+            <div class="user-dropdown-divider"></div>
+            <button type="button" id="logout-btn" class="user-dropdown-item user-dropdown-item-danger"
+              data-action="logout"><span class="user-dropdown-icon"
+                data-icono="salir"></span><span>Salir</span></button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="lobby view active" data-view="inicio">
+      <div class="lobby-content">
+        <p class="lobby-eyebrow"><span class="ui-icon" data-icono="girasol"></span>Bienvenido a</p>
+        <h1 class="lobby-title"><span class="lobby-title-line">four</span><span
+            class="lobby-title-line lobby-title-accent">Sunflowers</span></h1>
+        <p class="lobby-subtitle">A.A.V.C</p>
+        <p class="lobby-dedicatoria">Un rincón para guardar lo nuestro <span class="ui-icon"
+            data-icono="girasol"></span></p>
+        <div class="experiencia-card">
+          <div class="experiencia-topline"><span id="experiencia-titulo">Novatos</span><strong
+              class="experiencia-xp-total"><img class="xp-icon" src="img/items%20de%20aventura/estrella.webp"
+                alt="XP" width="16" height="16" loading="lazy" decoding="async"><span id="experiencia-xp">0 XP</span></strong></div>
+          <div class="experiencia-barra"><span id="experiencia-progreso"></span></div>
+          <small id="experiencia-siguiente">100 XP para Enamorados.</small>
+        </div>
+        <a href="#notas" class="lobby-btn" data-view-link="notas"><span class="lobby-btn-icon"
+            data-icono="nota"></span><span class="lobby-btn-text"><strong>Notitas para ti</strong><small>Pensamientos
+              que quiero guardar</small></span></a>
+        <a href="#mascotas" class="lobby-btn" data-view-link="mascotas"><span class="lobby-btn-icon"
+            data-icono="huella"></span><span class="lobby-btn-text"><strong>Nuestras mascotas</strong><small>Las
+              compañeras de nuestra historia</small></span></a>
+        <a href="#diccionario" class="lobby-btn" data-view-link="diccionario"><span class="lobby-btn-icon"
+            data-icono="libro"></span><span class="lobby-btn-text"><strong>Diccionario</strong><small>Descubre el
+              significado de cualquier palabra</small></span></a>
+        <a href="#recetas" class="lobby-btn" data-view-link="recetas"><span class="lobby-btn-icon"
+            data-icono="comida"></span><span class="lobby-btn-text"><strong>Recetario Mágico</strong><small>Platos del
+              mundo con preparación paso a paso</small></span></a>
+        <button class="lobby-btn" data-action="descargar" type="button"><span class="lobby-btn-icon"
+            data-icono="descargar"></span><span class="lobby-btn-text"><strong>Descargar la App</strong><small>Android,
+              iOS o escritorio</small></span></button>
+      </div>
+      <div class="lobby-art">
+        <div class="girasol-wrapper">
+          <div class="burbuja">Te amo.</div><img class="girasol" src="img/girasol.webp" alt="Girasol" width="300" height="300" fetchpriority="high" decoding="async">
+        </div>
+      </div>
+    </div>
+    <audio id="pop" src="sounds/soundreality-pop-sound-423716.mp3" preload="auto"></audio>
+  </section>
+
+  <section id="chat" class="chat-section view" data-view="chat">
+    <div class="chat-layout">
+      <!-- SIDEBAR AMIGOS (Izquierda) -->
+      <aside class="chat-sidebar" id="chat-sidebar">
+        <div class="chat-sidebar-header">
+          <div class="chat-sidebar-title-row">
+            <span class="chat-sidebar-title">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              Amigos
+            </span>
+            <button type="button" class="chat-sidebar-reload-btn" id="chat-amigos-recargar" title="Actualizar amigos">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat grupal botón directo en la lista -->
+        <button type="button" class="chat-amigo-item active" id="chat-item-grupo" data-modo-directo="grupo">
+          <div class="chat-amigo-avatar chat-amigo-avatar-grupo">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </div>
+          <div class="chat-amigo-info">
+            <span class="chat-amigo-nombre">Chat de Grupo</span>
+            <span class="chat-amigo-sub">Todos los miembros</span>
+          </div>
+        </button>
+
+        <div class="chat-sidebar-sublabel">Tus amigos</div>
+        <div class="chat-amigos-lista" id="chat-amigos-lista">
+          <div class="chat-amigos-cargando">Cargando amigos...</div>
+        </div>
+      </aside>
+
+      <!-- PANEL PRINCIPAL DEL CHAT (Derecha) -->
+      <main class="chat-main-area">
+        <div class="chat-panel">
+          <div class="chat-panel-top">
+            <div class="chat-top-status">
+              <button type="button" class="chat-btn-mobile-sidebar" id="chat-btn-toggle-sidebar" title="Ver amigos">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <span>Amigos</span>
+              </button>
+              <span class="chat-status-dot online"></span>
+              <span id="chat-status" class="chat-status">Grupo activo</span>
+            </div>
+            <div class="chat-top-actions">
+              <button type="button" id="btn-enable-push" class="chat-push-btn-inline" title="Notificaciones Push">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+                <span class="push-btn-text">Notificaciones</span>
+              </button>
+            </div>
+          </div>
+          <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+          <form id="chat-form" class="chat-form">
+            <input type="file" id="chat-file-input" accept="image/*" style="display:none;" aria-label="Adjuntar imagen">
+            <button type="button" class="chat-btn-attach" id="chat-attach-btn"
+              title="Adjuntar foto (o pégala con Ctrl+V)">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </button>
+            <textarea id="chat-input" maxlength="2000" rows="1" autocomplete="off"
+              placeholder="Escribe un mensaje o pega una foto (Ctrl+V)..."></textarea>
+            <button type="submit" class="chat-btn-send" id="chat-submit-btn" aria-label="Enviar mensaje">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+              </svg>
+            </button>
+          </form>
+        </div>
+      </main>
+    </div>
+
+    <!-- MENÚ ACCIONES DE AMIGO (POPOVER) -->
+    <div id="chat-amigo-popover" class="chat-amigo-popover" hidden>
+      <div class="chat-amigo-popover-header">
+        <div class="chat-amigo-popover-avatar" id="chat-popover-avatar"></div>
+        <div>
+          <strong id="chat-popover-nombre">@usuario</strong>
+          <small id="chat-popover-status">Amigo del grupo</small>
+        </div>
+      </div>
+      <div class="chat-amigo-popover-actions">
+        <button type="button" class="chat-popover-btn" id="chat-popover-btn-privado">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          Abrir chat privado
+        </button>
+        <button type="button" class="chat-popover-btn" id="chat-popover-btn-grupo">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          Invitar a chat de grupo
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section id="logros" class="logros-section view" data-view="logros">
+    <div class="logros-header">
+      <h2 class="logros-title">Logros</h2>
+      <p class="logros-subtitle">Cada pequeño recuerdo, hazaña y batalla cuenta</p>
+    </div>
+
+    <div class="logros-resumen-card">
+      <div class="logros-resumen-stats">
+        <div class="logros-resumen-dato">
+          <strong id="logros-desbloqueados">0</strong>
+          <span>de <span id="logros-total-count">0</span> logros desbloqueados</span>
+        </div>
+        <span id="logros-porcentaje-global" class="logros-resumen-pct">0%</span>
+      </div>
+      <div class="logros-global-track">
+        <div id="logros-global-fill" class="logros-global-fill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Filtros de categoría -->
+    <div class="logros-filtros-bar" id="logros-filtros-bar">
+      <button type="button" class="logro-filtro-btn active" data-cat="todos">✨ Todos</button>
+      <button type="button" class="logro-filtro-btn" data-cat="rpg">⚔️ RPG & Falla</button>
+      <button type="button" class="logro-filtro-btn" data-cat="roguelike">💀 Roguelike</button>
+      <button type="button" class="logro-filtro-btn" data-cat="mascotas">🐾 Mascotas</button>
+      <button type="button" class="logro-filtro-btn" data-cat="minijuegos">🎮 Minijuegos</button>
+      <button type="button" class="logro-filtro-btn" data-cat="general">💬 General & Tienda</button>
+      <button type="button" class="logro-filtro-btn" data-cat="grupo">👥 Grupo</button>
+    </div>
+
+    <h3 class="logros-categoria" id="logros-cat-titulo-personal">Logros de mi cuenta</h3>
+    <div id="logros-personales-grid" class="logros-grid"></div>
+
+    <h3 class="logros-categoria" id="logros-cat-titulo-grupo">Logros del grupo</h3>
+    <div id="logros-grupo-grid" class="logros-grid"></div>
+  </section>
+
+  <section id="album" class="album-section view" data-view="album">
+    <div class="album-header">
+      <h2 class="album-title">Nuestro álbum</h2>
+      <p class="album-subtitle">Cada foto guarda un momento que no queremos olvidar.</p>
+    </div>
+    <div class="album-actions">
+      <button id="btn-add-photo" class="btn-primary"><span>+</span> Añadir un recuerdo</button>
+      <button id="btn-paste-photos" class="btn-secondary"
+        title="Pega fotos del portapapeles o selecciona múltiples archivos para guardarlos como polaroids">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;">
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+          <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+        </svg>Pegar fotos
+      </button>
+      <button id="btn-seleccionar-fotos" class="btn-secondary" type="button"
+        title="Activar modo de selección para eliminar varias fotos">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;">
+          <polyline points="9 11 12 14 22 4"></polyline>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>Seleccionar
+      </button>
+      <input type="file" id="input-paste-photos" accept="image/*" multiple style="display:none;">
+    </div>
+    <div id="album-seleccion-bar" class="album-seleccion-bar hidden" aria-live="polite">
+      <div class="album-seleccion-info">
+        <span id="album-seleccion-contador">0 seleccionadas</span>
+      </div>
+      <div class="album-seleccion-botones">
+        <button id="btn-seleccionar-todas" type="button" class="btn-secondary btn-sm">Seleccionar todas</button>
+        <button id="btn-eliminar-seleccionadas" type="button" class="btn-danger btn-sm" disabled>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;">
+            <path d="M3 6h18" />
+            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+          </svg>Eliminar seleccionadas
+        </button>
+        <button id="btn-cancelar-seleccion" type="button" class="btn-secondary btn-sm">Cancelar</button>
+      </div>
+    </div>
+    <div id="album-grid" class="album-grid"></div>
+    <div id="album-empty" class="album-empty">
+      <p>Aquí empieza nuestra historia.</p>
+      <p class="album-empty-hint">Aún no hay fotos. Sube la primera.</p>
+    </div>
+  </section>
+
+  <section id="notas" class="notas-section view" data-view="notas">
+    <div class="notas-header">
+      <h2 class="notas-title">Notitas para ti</h2>
+      <p class="notas-subtitle">Pensamientos que quiero guardar</p>
+    </div>
+    <div class="notas-actions"><button id="btn-add-nota" class="btn-primary"><span>+</span> Añadir notita</button></div>
+    <div id="notas-grid" class="notas-grid"></div>
+    <div id="notas-empty" class="notas-empty">
+      <p>Aún no hay notitas.</p>
+      <p class="notas-empty-hint">Escribe la primera.</p>
+    </div>
+  </section>
+
+  <section id="mascotas" class="mascotas-section view" data-view="mascotas">
+    <div class="mascotas-header">
+      <h2 class="mascotas-title">Adopción de Mascotas</h2>
+      <p class="mascotas-subtitle">Adopta nuevos compañeros con SunCoins. Puedes equiparlos individualmente dentro del
+        Modo Aventura y Roguelike.</p>
+    </div>
+    <div class="minijuegos-menu">
+      <button class="btn-minijuego" id="btn-juego-girasol" data-juego="girasol"><span class="btn-minijuego-icon"
+          data-icono="girasol"></span><span class="btn-minijuego-text">Atrapa el girasol</span></button>
+      <button class="btn-minijuego" id="btn-juego-memoria" data-juego="memoria"><span class="btn-minijuego-icon"
+          data-icono="imagen"></span><span class="btn-minijuego-text">Memoria</span></button>
+      <button class="btn-minijuego" id="btn-juego-adivina" data-juego="adivina"><span class="btn-minijuego-icon"
+          data-icono="globo"></span><span class="btn-minijuego-text">Adivina la mascota</span></button>
+    </div>
+    <section class="desafio-diario" id="desafio-minijuegos" aria-live="polite">
+      <div class="desafio-diario-cabecera"><span class="desafio-diario-icono" data-icono="calendario"></span>
+        <div>
+          <h3 id="desafio-minijuegos-titulo">Reto diario de minijuegos</h3>
+          <p>Prueba 2 minijuegos distintos. Sin rachas ni penalización por descansar.</p>
+        </div>
+      </div>
+      <div class="desafio-diario-progreso" role="progressbar" aria-valuemin="0" aria-valuemax="2" aria-valuenow="0">
+        <span id="desafio-minijuegos-progreso"></span>
+      </div>
+      <div class="desafio-diario-pie"><span id="desafio-minijuegos-estado">0 de 2 minijuegos distintos</span><span
+          class="desafio-diario-premio"><img class="desafio-diario-premio-icon coin-icon"
+            src="img/items%20de%20aventura/icon.webp" alt="SunCoins" width="16" height="16" loading="lazy" decoding="async"> +20 SunCoins · <img class="desafio-diario-premio-icon"
+            src="img/items%20de%20aventura/estrella.webp" alt="XP" width="16" height="16" loading="lazy" decoding="async"> +25 XP</span></div>
+      <p class="desafio-diario-juegos" id="desafio-minijuegos-juegos">Completa cualquier minijuego para empezar.</p>
+    </section>
+    <div class="mascotas-grid" id="mascotas-grid"></div>
+    <div id="mascotas-empty" class="mascotas-empty hidden">
+      <p>Aún no has desbloqueado ninguna mascota.</p>
+    </div>
+  </section>
+
+  <section id="finanzas" class="finanzas-section view" data-view="finanzas">
+    <div class="finanzas-shell">
+      <header class="finanzas-header">
+        <div>
+          <p class="finanzas-kicker">Cuidemos lo que construimos</p>
+          <h1>Finanzas</h1>
+          <p class="finanzas-intro">Tus gastos, acuerdos y metas en un solo lugar.</p>
+        </div>
+        <label class="finanzas-currency"><span>Moneda</span><select id="finanzas-moneda"
+            aria-label="Moneda de visualización">
+            <option value="EUR">EUR · Euro</option>
+            <option value="USD">USD · Dólar</option>
+            <option value="MXN">MXN · Peso mexicano</option>
+            <option value="ARS">ARS · Peso argentino</option>
+            <option value="COP">COP · Peso colombiano</option>
+            <option value="CLP">CLP · Peso chileno</option>
+            <option value="PEN">PEN · Sol</option>
+            <option value="VES">VES · Bolívar venezolano</option>
+          </select></label>
+      </header>
+      <p id="finanzas-error" class="finanzas-alert" role="status" aria-live="polite" hidden></p>
+      <div id="finanzas-login" class="finanzas-login" hidden><span class="finanzas-login-icon"
+          aria-hidden="true">↗</span>
+        <h2>Inicia sesión para empezar</h2>
+        <p>Los movimientos se guardan de forma segura y puedes compartir los de Pareja con tu grupo.</p><button
+          id="finanzas-login-btn" class="btn-primary" type="button">Entrar o crear cuenta</button>
+      </div>
+      <div id="finanzas-app" hidden>
+        <nav class="finanzas-tabs" aria-label="Apartados de finanzas">
+          <button type="button" class="finanzas-tab active" data-finanzas-section="resumen">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z" />
+                <path d="M19 3l.7 2.8L22 6.5l-2.3.7L19 10l-.7-2.8L16 6.5l2.3-.7L19 3z" opacity=".7" />
+              </svg></span>
+            <span class="finanzas-tab-text">Inicio</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="movimientos">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="2" />
+                <circle cx="12" cy="12" r="2.5" />
+                <path d="M6 12h.01M18 12h.01" />
+              </svg></span>
+            <span class="finanzas-tab-text">Movimientos</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="presupuestos">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20V10M18 20V4M6 20v-4" />
+              </svg></span>
+            <span class="finanzas-tab-text">Límites</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="metas">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <circle cx="12" cy="12" r="6" />
+                <circle cx="12" cy="12" r="2" fill="currentColor" />
+              </svg></span>
+            <span class="finanzas-tab-text">Ahorros</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="categorias">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                <line x1="7" y1="7" x2="7.01" y2="7" />
+              </svg></span>
+            <span class="finanzas-tab-text">Categorías</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="inventario">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
+              </svg></span>
+            <span class="finanzas-tab-text">Inventario</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="reportes">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 6l-9.5 9.5-5-5L1 18" />
+                <path d="M17 6h6v6" />
+              </svg></span>
+            <span class="finanzas-tab-text">Gráficos</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="cotizaciones">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 2.1l4 4-4 4" />
+                <path d="M3 6.1h18" />
+                <path d="M7 21.9l-4-4 4-4" />
+                <path d="M21 17.9H3" />
+              </svg></span>
+            <span class="finanzas-tab-text">Divisas</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="recordatorios">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg></span>
+            <span class="finanzas-tab-text">Avisos</span>
+          </button>
+        </nav>
+        <section id="finanzas-quote-card" class="finanzas-quote-card" hidden>
+          <div class="finanzas-quote-heading">
+            <div><span class="finanzas-eyebrow">MERCADO DE DIVISAS</span>
+              <h2 id="finanzas-quote-title">Precio frente al dólar</h2>
+            </div><span id="finanzas-quote-updated" class="finanzas-quote-updated" aria-live="polite">Consultando
+              cotización…</span>
+          </div>
+          <div id="finanzas-quote-values" class="finanzas-quote-values" aria-live="polite"></div>
+          <div id="finanzas-quote-chart" class="finanzas-quote-chart" role="img"
+            aria-label="Mini gráfico del precio de la moneda"></div>
+          <p id="finanzas-quote-status" class="finanzas-quote-status"></p>
+          <label class="finanzas-price-alert"><input id="finanzas-price-alert-toggle"
+              type="checkbox"><span><strong>Aviso discreto en el escritorio</strong><small>Silencioso, solo ante cambios
+                de 0,1 % o más y como máximo cada 15 minutos.</small></span></label>
+          <small id="finanzas-price-alert-status" class="finanzas-reminder-status" role="status"
+            aria-live="polite"></small>
+        </section>
+        <section id="finanzas-reminder-card" class="finanzas-reminder" hidden>
+          <div class="finanzas-reminder-copy"><span class="finanzas-eyebrow">RECORDATORIO DIARIO</span>
+            <h2 id="finanzas-reminder-title">Recordatorios diarios</h2>
+            <p>Recibe un aviso si todavía no registraste los gastos de hoy.</p>
+          </div>
+          <form id="finanzas-reminder-form" class="finanzas-reminder-form">
+            <label class="finanzas-reminder-option"><input id="finanzas-reminder-personal" type="checkbox"
+                checked><span>Finanzas personales</span></label>
+            <label class="finanzas-reminder-option"><input id="finanzas-reminder-group" type="checkbox"
+                checked><span>Finanzas del grupo</span></label>
+            <label class="finanzas-reminder-time"><span>Hora del aviso</span><input id="finanzas-reminder-time"
+                type="time" value="20:00" required></label>
+            <p id="finanzas-reminder-timezone" class="finanzas-reminder-timezone"></p>
+            <button id="finanzas-reminder-save" class="btn-primary" type="submit">Guardar recordatorios</button>
+            <small id="finanzas-reminder-status" class="finanzas-reminder-status" role="status"
+              aria-live="polite"></small>
+          </form>
+        </section>
+        <nav class="finanzas-scopes" aria-label="Ámbito de finanzas">
+          <button type="button" class="finanzas-scope active" data-finanzas-scope="personal"
+            aria-pressed="true">Personal</button>
+          <button type="button" class="finanzas-scope" data-finanzas-scope="pareja"
+            aria-pressed="false">Compartidas</button>
+        </nav>
+        <div class="finanzas-toolbar"><label><span>Período</span><input id="finanzas-periodo"
+              type="month"></label><button id="finanzas-recargar" class="btn-secondary"
+            type="button">Actualizar</button></div>
+        <main id="finanzas-panel" class="finanzas-panel"></main>
+      </div>
+    </div>
+  </section>
+
+    <!-- Bundles Minificados (Code Splitting por Secciones) -->
+  <script src="assets/vendor-core.bundle.min.js"></script>
+  <script src="assets/view-logros.bundle.min.js"></script>
+  <script src="assets/view-album-social.bundle.min.js"></script>
+  <script src="assets/view-utilidades.bundle.min.js"></script>
+  <script src="assets/view-rpg.bundle.min.js"></script>
+  <script src="assets/view-app-extras.bundle.min.js"></script>
+
+  <!-- FEATURES EXTRA RPG (descomenta cuando confirmes que la base funciona) -->
+  <!--
+<script src="rpg-sonidos-rareza.js"></script>
+<script src="rpg-particulas-loot.js"></script>
+<script src="rpg-filtros-coleccion.js"></script>
+<script src="rpg-forja.js"></script>
+<script src="rpg-set-bonus.js"></script>
+<script src="rpg-encantamiento.js"></script>
+-->
+
+  <!-- FIX NAV -->
+  <script>
+    (function () {
+      "use strict";
+      function toggleNavMenu(force) {
+        var btn = document.getElementById("nav-hamburger");
+        var nav = document.getElementById("main-nav-links");
+        if (!nav) return;
+        var isOpen = force !== undefined ? force : !nav.classList.contains("mobile-open");
+        nav.classList.toggle("mobile-open", isOpen);
+        if (btn) {
+          btn.classList.toggle("active", isOpen);
+          btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        }
+      }
+      window.toggleNavMenu = toggleNavMenu;
+
+      var hamburgerBtn = document.getElementById("nav-hamburger");
+      if (hamburgerBtn) {
+        hamburgerBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleNavMenu();
+        });
+      }
+
+      function activarVista(v) {
+        if (window.AlbumApp?.modules?.router?.mostrarVista) {
+          window.AlbumApp.modules.router.mostrarVista(v);
+        } else {
+          document.querySelectorAll("[data-view]").forEach(function (el) {
+            el.classList.toggle("active", el.dataset.view === v);
+          });
+          document.querySelectorAll("[data-view-link]").forEach(function (el) {
+            el.classList.toggle("active", el.dataset.viewLink === v);
+          });
+          document.getElementById("user-dropdown")?.classList.remove("open");
+          document.getElementById("user-info")?.classList.remove("open");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          window.dispatchEvent(new CustomEvent("sunad:view-change", { detail: { view: v } }));
+        }
+      }
+      window.activarVista = activarVista;
+
+      function navegarHacia(v) {
+        if (!v) return;
+        activarVista(v);
+        if (location.hash !== "#" + v) {
+          location.hash = v;
+        } else {
+          window.dispatchEvent(new Event("hashchange"));
+        }
+        setTimeout(function () {
+          toggleNavMenu(false);
+          document.getElementById("user-dropdown")?.classList.remove("open");
+          document.getElementById("user-info")?.classList.remove("open");
+        }, 80);
+      }
+      window.navegarHacia = navegarHacia;
+
+      // Cerrar al hacer clic fuera del menú
+      var cerrarNavSiTocaFuera = function (e) {
+        var nav = document.getElementById("main-nav-links");
+        var btn = document.getElementById("nav-hamburger");
+        if (nav && nav.classList.contains("mobile-open")) {
+          if (!nav.contains(e.target) && (!btn || !btn.contains(e.target))) {
+            toggleNavMenu(false);
+          }
+        }
+      };
+      document.addEventListener("click", cerrarNavSiTocaFuera);
+
+      // Manejador centralizado y directo para [data-view-link]
+      var onLinkTrigger = function (e) {
+        var link = e.target.closest("[data-view-link]");
+        if (!link) return;
+        if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+        var v = link.dataset.viewLink;
+        if (!v) return;
+        e.preventDefault();
+        e.stopPropagation();
+        navegarHacia(v);
+      };
+
+      document.addEventListener("click", onLinkTrigger, true);
+
+      // ===== FIX TÁCTIL DEFINITIVO =====
+      // Busca el elemento del menú bajo el dedo con elementsFromPoint (ignora capas
+      // invisibles que tapen el menú) y ejecuta la acción en el mismo touchend.
+      var tStart = null, ignorarClickHasta = 0;
+      function menusAbiertos() {
+        var nav = document.getElementById("main-nav-links");
+        var dd = document.getElementById("user-dropdown");
+        return (nav && nav.classList.contains("mobile-open")) || (dd && dd.classList.contains("open"));
+      }
+      function itemBajoDedo(x, y) {
+        var els = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [document.elementFromPoint(x, y)];
+        for (var i = 0; i < els.length; i++) {
+          var el = els[i];
+          if (!el || !el.closest) continue;
+          var it = el.closest("#main-nav-links [data-view-link], #main-nav-links [data-action], #user-dropdown [data-view-link], #user-dropdown [data-action]");
+          if (it) return it;
+        }
+        return null;
+      }
+      function forzarVista(v) {
+        var destino = document.querySelector('[data-view="' + v + '"]');
+        if (!destino) return;
+        if (!destino.classList.contains("active")) {
+          document.querySelectorAll("[data-view]").forEach(function (el) { el.classList.toggle("active", el === destino); });
+          document.querySelectorAll("[data-view-link]").forEach(function (el) { el.classList.toggle("active", el.dataset.viewLink === v); });
+        }
+      }
+      window.addEventListener("touchstart", function (e) {
+        if (!menusAbiertos() || !e.touches[0]) { tStart = null; return; }
+        tStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }, { capture: true, passive: true });
+      window.addEventListener("touchend", function (e) {
+        if (!tStart || !e.changedTouches[0]) return;
+        var t = e.changedTouches[0];
+        var movido = Math.abs(t.clientX - tStart.x) > 12 || Math.abs(t.clientY - tStart.y) > 12;
+        tStart = null;
+        if (movido) return;
+        var it = itemBajoDedo(t.clientX, t.clientY);
+        if (!it) return;
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+        ignorarClickHasta = Date.now() + 700;
+        if (it.dataset.viewLink) {
+          var v = it.dataset.viewLink;
+          navegarHacia(v);
+          setTimeout(function () { forzarVista(v); }, 150);
+        } else if (it.dataset.action === "descargar" || it.dataset.action === "descargar-directo") {
+          toggleNavMenu(false);
+          document.getElementById("user-dropdown")?.classList.remove("open");
+          document.getElementById("user-info")?.classList.remove("open");
+          if (typeof window.abrirDescarga === "function") window.abrirDescarga();
+          else if (typeof window.descargarApkDirecta === "function") window.descargarApkDirecta();
+        } else {
+          it.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+        }
+      }, { capture: true, passive: false });
+      // Bloquear el click "fantasma" posterior al touchend (evita que cierre/reabra menús)
+      window.addEventListener("click", function (e) {
+        if (Date.now() < ignorarClickHasta && e.isTrusted) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+        }
+      }, true);
+
+      function init() {
+        var h = (location.hash || "").replace(/^#/, "").trim();
+        if (!h) return;
+        if (document.querySelector('[data-view="' + h + '"]')) activarVista(h);
+      }
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+      else setTimeout(init, 50);
+    })();
+  </script>
+
+  <!-- LIMPIEZA -->
+  <script>
+    (function () {
+      "use strict";
+      const MOD = ".modal,.offline-overlay,.tienda-overlay,.amistad-overlay,.minijuego-overlay,.mascota-modal,.rpg-loot-modal,.loot-cofre-modal,.ml-modal,.rpg-rl-recompensa,.ml-video-box";
+      function limpiar() {
+        document.querySelectorAll("button,a").forEach(el => {
+          const t = (el.textContent || "").trim();
+          if (t !== "Cerrar" && t !== "Cerrar ×" && t !== "Cerrar ✕") return;
+          if (el.closest(MOD)) return;
+          const s = getComputedStyle(el), p = el.parentElement, ps = p ? getComputedStyle(p) : null;
+          if (s.position === "fixed" || s.position === "absolute" || (ps && (ps.position === "fixed" || ps.position === "absolute")) || el.closest("body > *")) {
+            el.style.setProperty("display", "none", "important");
+            el.dataset.cerrarHuerfano = "1";
+            console.warn("[limpieza] Botón 'Cerrar' huérfano ocultado:", el);
+          }
+        });
+      }
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => { limpiar(); setTimeout(limpiar, 800); setTimeout(limpiar, 2500); });
+      else { limpiar(); setTimeout(limpiar, 800); setTimeout(limpiar, 2500); }
+      window.addEventListener("hashchange", () => setTimeout(limpiar, 400));
+      setInterval(() => {
+        const h = [...document.querySelectorAll("body button")].some(b => (b.textContent || "").trim() === "Cerrar" && !b.closest(MOD) && getComputedStyle(b).position === "fixed");
+        if (h) limpiar();
+      }, 3000);
+      window._limpiarBotonesHuerfanos = limpiar;
+    })();
+  </script>
+
+  <!-- FIX POLAROID & GESTOS RESPONSIVE (TAP ABRIR / LONG-PRESS MENSAJE / SWIPE FULLSCREEN) -->
+  <script>
+    (function () {
+      "use strict";
+
+      // --- NAVEGACIÓN ENTRE FOTOS EN FULLSCREEN ---
+      function obtenerPolaroidFullscreen() {
+        const fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+        return fsEl && fsEl.classList.contains("polaroid") ? fsEl : null;
+      }
+
+      function cambiarFotoFullscreen(direccion) {
+        const actual = obtenerPolaroidFullscreen();
+        if (!actual) return;
+        const grid = document.getElementById("album-grid");
+        if (!grid) return;
+        const polaroids = Array.from(grid.querySelectorAll(".polaroid:not([data-capsula-activa='true'])"));
+        if (polaroids.length <= 1) return;
+
+        const idx = polaroids.indexOf(actual);
+        if (idx === -1) return;
+
+        let nuevoIdx = idx + direccion;
+        if (nuevoIdx < 0) nuevoIdx = polaroids.length - 1;
+        else if (nuevoIdx >= polaroids.length) nuevoIdx = 0;
+
+        const siguiente = polaroids[nuevoIdx];
+        if (!siguiente || siguiente === actual) return;
+
+        // Asegurar que la imagen siguiente esté cargada
+        if (siguiente.dataset.fotoPath) {
+          const img = siguiente.querySelector(".polaroid-visual img");
+          if (img && (!img.src || img.src.includes("data:image/svg") || img.src === window.location.href)) {
+            try {
+              window.AlbumApp?.modules?.fotos?.cargarFotoVisible?.(siguiente);
+            } catch (_) { }
+          }
+        }
+
+        // Animación suave de transición
+        const outCls = direccion > 0 ? "fs-slide-left-out" : "fs-slide-right-out";
+        const inCls = direccion > 0 ? "fs-slide-left-in" : "fs-slide-right-in";
+
+        actual.classList.add(outCls);
+        setTimeout(() => {
+          actual.classList.remove(outCls);
+          const btnFull = siguiente.querySelector(".polaroid-fullscreen");
+          const api = siguiente.requestFullscreen || siguiente.webkitRequestFullscreen || siguiente.msRequestFullscreen;
+          if (api) {
+            api.call(siguiente).catch(() => { });
+          }
+          siguiente.classList.add(inCls);
+          actualizarControlesFullscreen(siguiente, nuevoIdx, polaroids.length);
+          setTimeout(() => siguiente.classList.remove(inCls), 280);
+        }, 120);
+      }
+
+      function actualizarControlesFullscreen(pol, idx, total) {
+        if (!pol) return;
+        // Eliminar controles previos si los hubiere
+        pol.querySelectorAll(".polaroid-nav-arrow, .polaroid-counter-badge").forEach(el => el.remove());
+
+        if (total <= 1) return;
+
+        // Flecha Anterior (Izquierda)
+        const btnPrev = document.createElement("button");
+        btnPrev.type = "button";
+        btnPrev.className = "polaroid-nav-arrow nav-prev";
+        btnPrev.setAttribute("aria-label", "Foto anterior");
+        btnPrev.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>`;
+        btnPrev.addEventListener("click", e => {
+          e.preventDefault(); e.stopPropagation();
+          cambiarFotoFullscreen(-1);
+        });
+
+        // Flecha Siguiente (Derecha)
+        const btnNext = document.createElement("button");
+        btnNext.type = "button";
+        btnNext.className = "polaroid-nav-arrow nav-next";
+        btnNext.setAttribute("aria-label", "Foto siguiente");
+        btnNext.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>`;
+        btnNext.addEventListener("click", e => {
+          e.preventDefault(); e.stopPropagation();
+          cambiarFotoFullscreen(1);
+        });
+
+        // Badge indicador: ej. "3 / 12"
+        const badge = document.createElement("div");
+        badge.className = "polaroid-counter-badge";
+        badge.textContent = `${idx + 1} / ${total}`;
+
+        pol.append(btnPrev, btnNext, badge);
+      }
+
+      // Evento de entrada/salida a fullscreen
+      const onFullscreenChange = () => {
+        const pol = obtenerPolaroidFullscreen();
+        if (pol) {
+          const grid = document.getElementById("album-grid");
+          const polaroids = grid ? Array.from(grid.querySelectorAll(".polaroid:not([data-capsula-activa='true'])")) : [];
+          const idx = polaroids.indexOf(pol);
+          actualizarControlesFullscreen(pol, idx >= 0 ? idx : 0, polaroids.length);
+        } else {
+          document.querySelectorAll(".polaroid-nav-arrow, .polaroid-counter-badge").forEach(el => el.remove());
+        }
+      };
+      document.addEventListener("fullscreenchange", onFullscreenChange);
+      document.addEventListener("webkitfullscreenchange", onFullscreenChange);
+
+      // Navegación con teclado en Fullscreen (Flecha Izq / Der)
+      document.addEventListener("keydown", function (e) {
+        if (!obtenerPolaroidFullscreen()) return;
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          cambiarFotoFullscreen(-1);
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          cambiarFotoFullscreen(1);
+        }
+      });
+
+      // --- GESTIÓN DE CLICKS EN BOTONES DE POLAROID ---
+      document.addEventListener("click", function (e) {
+        const pol = e.target.closest(".polaroid");
+        if (!pol) return;
+        if (e.target.closest("button")) return;
+        if (document.fullscreenElement === pol) return;
+        const r = pol.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        const enZona = (bx, by, w = 36, h = 36) => x >= bx && x <= bx + w && y >= by && y <= by + h;
+        // Delete (arriba a la derecha)
+        if (enZona(r.width - 44, 4)) { e.preventDefault(); pol.querySelector(".polaroid-delete")?.click(); }
+        // Edit (arriba a la izquierda)
+        else if (enZona(4, 4)) { e.preventDefault(); pol.querySelector(".polaroid-edit")?.click(); }
+        // Fullscreen (arriba a la derecha, al lado de delete)
+        else if (enZona(r.width - 80, 4)) { e.preventDefault(); pol.querySelector(".polaroid-fullscreen")?.click(); }
+        // Cápsula (abajo a la izquierda, sin ningún solape)
+        else if (enZona(4, r.height - 44)) { e.preventDefault(); pol.querySelector(".polaroid-capsula")?.click(); }
+      }, true);
+
+      // --- GESTOS TÁCTILES: SWIPE EN FULLSCREEN & TAP/LONG-PRESS EN RESPONSIVE ---
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchStartTime = 0;
+      let longPressTimer = null;
+      let targetPolaroid = null;
+      let fueLongPress = false;
+      let touchMoved = false;
+      let esFullscreenGesture = false;
+
+      const limpiarLongPress = () => {
+        if (longPressTimer) {
+          clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+        if (targetPolaroid) {
+          targetPolaroid.classList.remove("presionando");
+        }
+      };
+
+      document.addEventListener("touchstart", function (e) {
+        const fsPol = obtenerPolaroidFullscreen();
+        if (fsPol) {
+          // Gesto táctil dentro de pantalla completa (Swipe para cambiar fotos)
+          if (e.target.closest("button")) return;
+          esFullscreenGesture = true;
+          const touch = e.touches[0];
+          touchStartX = touch.clientX;
+          touchStartY = touch.clientY;
+          touchStartTime = Date.now();
+          touchMoved = false;
+          return;
+        }
+
+        esFullscreenGesture = false;
+        if (window.innerWidth > 768) return;
+        const pol = e.target.closest(".polaroid");
+        if (!pol) return;
+        if (e.target.closest("button")) return;
+
+        targetPolaroid = pol;
+        fueLongPress = false;
+        touchMoved = false;
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchStartTime = Date.now();
+
+        pol.classList.add("presionando");
+
+        // Temporizador para detectar Long-Press (dejar presionado)
+        longPressTimer = setTimeout(() => {
+          if (touchMoved || !targetPolaroid) return;
+          fueLongPress = true;
+          try {
+            if (navigator.vibrate) navigator.vibrate(40);
+          } catch (_) { }
+
+          // Alternar o activar la nota de la foto
+          targetPolaroid.classList.toggle("nota-activa");
+          targetPolaroid.classList.remove("presionando");
+        }, 420);
+      }, { passive: true });
+
+      document.addEventListener("touchmove", function (e) {
+        if (esFullscreenGesture) {
+          touchMoved = true;
+          return;
+        }
+        if (!targetPolaroid || touchMoved) return;
+        const touch = e.touches[0];
+        const dx = Math.abs(touch.clientX - touchStartX);
+        const dy = Math.abs(touch.clientY - touchStartY);
+        if (dx > 10 || dy > 10) {
+          touchMoved = true;
+          limpiarLongPress();
+        }
+      }, { passive: true });
+
+      document.addEventListener("touchend", function (e) {
+        if (esFullscreenGesture) {
+          const fsPol = obtenerPolaroidFullscreen();
+          esFullscreenGesture = false;
+          if (!fsPol) return;
+          const changedTouch = e.changedTouches ? e.changedTouches[0] : null;
+          if (!changedTouch) return;
+
+          const dx = changedTouch.clientX - touchStartX;
+          const dy = changedTouch.clientY - touchStartY;
+          const dur = Date.now() - touchStartTime;
+
+          // Detección de Swipe Horizontal:
+          // Movimiento de al menos 40px en X, más horizontal que vertical, y en menos de 600ms
+          if (Math.abs(dx) >= 40 && Math.abs(dx) > Math.abs(dy) * 1.2 && dur < 650) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (dx < 0) {
+              // Deslizó hacia la izquierda -> Siguiente foto
+              cambiarFotoFullscreen(1);
+            } else {
+              // Deslizó hacia la derecha -> Foto anterior
+              cambiarFotoFullscreen(-1);
+            }
+          }
+          return;
+        }
+
+        if (!targetPolaroid) return;
+        const pol = targetPolaroid;
+        const duration = Date.now() - touchStartTime;
+        limpiarLongPress();
+
+        if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+          targetPolaroid = null;
+          return;
+        }
+
+        // Si fue un toque corto (Tap) sin desplazamiento y sin ser long-press
+        if (!touchMoved && !fueLongPress && duration < 380) {
+          // Si el toque fue cerca de las zonas de botones superiores o dentro de los márgenes de controles, no abrir fullscreen aquí
+          const r = pol.getBoundingClientRect();
+          const changedTouch = e.changedTouches ? e.changedTouches[0] : null;
+          if (changedTouch) {
+            const x = changedTouch.clientX - r.left;
+            const y = changedTouch.clientY - r.top;
+            const esZonaBotonSuperior = y <= 56 && (x <= 90 || x >= r.width - 90);
+            if (esZonaBotonSuperior) {
+              if (x >= r.width - 50 && y <= 50) {
+                const btnDel = pol.querySelector(".polaroid-delete");
+                if (btnDel) btnDel.click();
+              }
+              targetPolaroid = null;
+              return;
+            }
+          }
+
+          // Es un tap normal sobre la foto en responsive: abrir fullscreen / visualizador
+          e.preventDefault();
+          const btnFull = pol.querySelector(".polaroid-fullscreen");
+          if (btnFull) {
+            btnFull.click();
+          } else {
+            pol.click();
+          }
+        }
+
+        targetPolaroid = null;
+      }, { passive: false });
+
+      document.addEventListener("touchcancel", function () {
+        limpiarLongPress();
+        targetPolaroid = null;
+        esFullscreenGesture = false;
+      }, { passive: true });
+    })();
+  </script>
+
+  <!-- DIAGNÓSTICO -->
+  <script>
+    setTimeout(() => {
+      console.log("%c🔍 DIAGNÓSTICO", "color:#ffd93d;font-weight:900;font-size:14px");
+      console.log("SPRITE_NAMES:", window.SPRITE_NAMES ? Object.keys(window.SPRITE_NAMES).length + " items" : "❌");
+      console.log("RpgLoot:", window.RpgLoot ? "✅" : "❌", "| POOL:", window.RpgLoot?.POOL?.length || 0);
+      console.log("RpgItems:", typeof window.RpgItems);
+      console.log("RpgLoadout:", typeof window.RpgLoadout);
+      console.log("Rpg:", typeof window.Rpg);
+    }, 2000);
+  </script>
+
+</body>
+
+</html>
