@@ -157,18 +157,126 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ---------- Datos ---------- */
   const MASCOTAS = {
-    mapache:{nombre:"Mapache",imagen:"img/mapache.webp",sonido:"chitter",favorita:"pizza"},
-    girasol:{nombre:"Girasol",imagen:"img/mascota-girasol.webp",sonido:"twinkle",favorita:"agua"},
-    gatito:{nombre:"Siamesa",imagen:"img/siamesa.webp",sonido:"meow",favorita:"pescado"},
-    "gatito-negro":{nombre:"Armstrong",imagen:"img/gatito-negro.webp",sonido:"meow",favorita:"pescado"},
-    hamburguesa:{nombre:"Hamburguesa",imagen:"img/hamburguesa.webp",sonido:"crunch",favorita:"pizza"},
-    oveja:{nombre:"Oveja",imagen:"img/oveja.webp",sonido:"baa",favorita:"manzana"},
-    pollito:{nombre:"Pollito",imagen:"img/pollito.webp",sonido:"peep",favorita:"semillas"},
-    jirafa:{nombre:"Jirafa",imagen:"img/jirafa.webp",sonido:"blip",favorita:"manzana"},
-    unicornio:{nombre:"Unicornio",imagen:"img/unicornio.webp",sonido:"sparkle",favorita:"cupcake"},
-    conejo:{nombre:"Conejito",imagen:"img/conejito.webp",sonido:"hop",favorita:"zanahoria"},
-    "dragon-bebe":{nombre:"Dragón Bebé",imagen:"img/dragon-bebe.webp",sonido:"fireball",favorita:"carbon"},
-    "dragon-anciano":{nombre:"Dragón Anciano",imagen:"img/dragon-anciano.webp",sonido:"growl",favorita:"carbon"}
+    mapache: {
+      nombre: "Mapache",
+      imagen: "img/mapache.webp",
+      sonido: "chitter",
+      favorita: "pizza",
+      rol: "recolector",
+      rolLabel: "Recolector",
+      rolColor: "#f39c12",
+      pasiva: { nombre: "Ojo de Trapero", desc: "+15% SunCoins ganadas y mayor botín", stat: "oroBonus", val: 15 }
+    },
+    girasol: {
+      nombre: "Girasol",
+      imagen: "img/mascota-girasol.webp",
+      sonido: "twinkle",
+      favorita: "agua",
+      rol: "soporte",
+      rolLabel: "Soporte Solar",
+      rolColor: "#f1c40f",
+      pasiva: { nombre: "Fotosíntesis", desc: "Regenera +5 HP por turno en batalla", stat: "regenBonus", val: 5 }
+    },
+    gatito: {
+      nombre: "Siamesa",
+      imagen: "img/siamesa.webp",
+      sonido: "meow",
+      favorita: "pescado",
+      rol: "dps",
+      rolLabel: "DPS Crítico",
+      rolColor: "#e74c3c",
+      pasiva: { nombre: "Garra Sarcástica", desc: "+10% de probabilidad de golpe crítico", stat: "critBonus", val: 10 }
+    },
+    "gatito-negro": {
+      nombre: "Armstrong",
+      imagen: "img/gatito-negro.webp",
+      sonido: "meow",
+      favorita: "pescado",
+      rol: "agil",
+      rolLabel: "Evasivo",
+      rolColor: "#9b59b6",
+      pasiva: { nombre: "Sombra Nocturna", desc: "+8% de evasión en combates", stat: "esqBonus", val: 8 }
+    },
+    hamburguesa: {
+      nombre: "Hamburguesa",
+      imagen: "img/hamburguesa.webp",
+      sonido: "crunch",
+      favorita: "pizza",
+      rol: "tanque",
+      rolLabel: "Tanque Glotón",
+      rolColor: "#e67e22",
+      pasiva: { nombre: "Capa Extra Queso", desc: "+35 HP máximo de aventura", stat: "hp_max", val: 35 }
+    },
+    oveja: {
+      nombre: "Oveja",
+      imagen: "img/oveja.webp",
+      sonido: "baa",
+      favorita: "manzana",
+      rol: "soporte",
+      rolLabel: "Protectora",
+      rolColor: "#1abc9c",
+      pasiva: { nombre: "Manto de Lana", desc: "+6 de defensa y paz interior", stat: "def_fijo", val: 6 }
+    },
+    pollito: {
+      nombre: "Pollito",
+      imagen: "img/pollito.webp",
+      sonido: "peep",
+      favorita: "semillas",
+      rol: "agil",
+      rolLabel: "Velocista",
+      rolColor: "#f1c40f",
+      pasiva: { nombre: "Aleteo Precoz", desc: "+6 de velocidad y reflejos rápidos", stat: "velBonus", val: 6 }
+    },
+    jirafa: {
+      nombre: "Jirafa",
+      imagen: "img/jirafa.webp",
+      sonido: "blip",
+      favorita: "manzana",
+      rol: "soporte",
+      rolLabel: "Centinela",
+      rolColor: "#d35400",
+      pasiva: { nombre: "Vista Panorámica", desc: "+15% de experiencia en combate y minijuegos", stat: "xpBonus", val: 15 }
+    },
+    unicornio: {
+      nombre: "Unicornio",
+      imagen: "img/unicornio.webp",
+      sonido: "sparkle",
+      favorita: "cupcake",
+      rol: "magico",
+      rolLabel: "Arcano Sagrado",
+      rolColor: "#3498db",
+      pasiva: { nombre: "Cuerno Astral", desc: "+20% daño a jefes y aura sagrada", stat: "crit_jefe", val: 20 }
+    },
+    conejo: {
+      nombre: "Conejito",
+      imagen: "img/conejito.webp",
+      sonido: "hop",
+      favorita: "zanahoria",
+      rol: "dps",
+      rolLabel: "Salto Vorpal",
+      rolColor: "#2ecc71",
+      pasiva: { nombre: "Brinco Furtivo", desc: "+8% golpe crítico y +5 de ataque", stat: "atk_fijo", val: 5 }
+    },
+    "dragon-bebe": {
+      nombre: "Dragón Bebé",
+      imagen: "img/dragon-bebe.webp",
+      sonido: "fireball",
+      favorita: "carbon",
+      rol: "dps",
+      rolLabel: "Llama Naciente",
+      rolColor: "#e74c3c",
+      pasiva: { nombre: "Aliento Ígneo", desc: "+8 de ataque fijo y chispas de fuego", stat: "atk_fijo", val: 8 }
+    },
+    "dragon-anciano": {
+      nombre: "Dragón Anciano",
+      imagen: "img/dragon-anciano.webp",
+      sonido: "growl",
+      favorita: "carbon",
+      rol: "tanque",
+      rolLabel: "Soberano Ancestral",
+      rolColor: "#8e44ad",
+      pasiva: { nombre: "Escamas Milenarias", desc: "+10 defensa fija y +40 HP máximo", stat: "def_fijo", val: 10 }
+    }
   };
   const FRASES = {
     mapache:["¡Hola! Soy tu mapache","Ñam ñam...","¡Súbeme una foto!","¡Qué bonito todo!","Te acompaño siempre"],
@@ -340,8 +448,58 @@ document.addEventListener("DOMContentLoaded", () => {
     skinsC:u=>`mascota_skins_${u}`,
     skinsE:(u,m)=>`mascota_skins_eq_${u}_${m}`,
     amistad:u=>`mascota_amistad_${u}`,
-    cuidado:(u,m)=>`mascota_cuidado_${u}_${m}`
+    cuidado:(u,m)=>`mascota_cuidado_${u}_${m}`,
+    vinculo:(u,m)=>`sa_mascota_vinculo_${u}_${m}`
   };
+
+  /* ---------- Sistema de Vínculo de Amor (Jugador - Mascota) ---------- */
+  const NIVELES_VINCULO = [
+    { nivel: 1, min: 0,    max: 100,  titulo: "Recién Llegado", rango: "I",  icono: "sprout", bonoPct: 0,   desc: "Tu mascota aún te está conociendo." },
+    { nivel: 2, min: 101,  max: 350,  titulo: "Compañero Fiel", rango: "II", icono: "corazon", bonoPct: 15, desc: "Desbloquea la Pasiva de Aventura Rango I (+15% efecto)." },
+    { nivel: 3, min: 351,  max: 750,  titulo: "Buen Amigo",    rango: "III", icono: "estrella", bonoPct: 30, desc: "Pasiva Rango II (+30% efecto) y regalos diarios de SunCoins." },
+    { nivel: 4, min: 751,  max: 1400, titulo: "Mejor Amigo",   rango: "IV", icono: "corona",  bonoPct: 50, desc: "Pasiva Rango III (+50% efecto) y diálogos íntimos de cariño." },
+    { nivel: 5, min: 1401, max: 99999, titulo: "Alma Gemela",  rango: "V",  icono: "anillo",  bonoPct: 75, desc: "Pasiva al Máximo (+75% efecto) y Aura de Luz Sagrada dorada." }
+  ];
+
+  const getVinculoData = m => {
+    try {
+      const u = getUserId();
+      const xp = Math.max(0, Number(localStorage.getItem(KEY.vinculo(u, m)) || 0));
+      const niv = NIVELES_VINCULO.slice().reverse().find(n => xp >= n.min) || NIVELES_VINCULO[0];
+      const sig = NIVELES_VINCULO.find(n => n.nivel === niv.nivel + 1) || null;
+      const progreso = sig ? Math.min(100, Math.round(((xp - niv.min) / (sig.min - niv.min)) * 100)) : 100;
+      return { xp, nivel: niv.nivel, titulo: niv.titulo, rango: niv.rango, icono: niv.icono, bonoPct: niv.bonoPct, desc: niv.desc, siguiente: sig, progreso };
+    } catch {
+      return { xp: 0, nivel: 1, titulo: "Recién Llegado", rango: "I", icono: "sprout", bonoPct: 0, desc: "Tu mascota aún te está conociendo.", siguiente: NIVELES_VINCULO[1], progreso: 0 };
+    }
+  };
+
+  const subirVinculo = (m, d, motivo = "") => {
+    try {
+      if (!m || d <= 0) return;
+      const u = getUserId();
+      const prev = getVinculoData(m);
+      const nuevaXp = Math.max(0, prev.xp + Math.round(d));
+      localStorage.setItem(KEY.vinculo(u, m), String(nuevaXp));
+      const nuevo = getVinculoData(m);
+      if (nuevo.nivel > prev.nivel) {
+        snd("fanfarria");
+        notifMascota(`¡Vínculo Nivel ${nuevo.nivel}!`, `${MASCOTAS[m]?.nombre || "Tu mascota"} es ahora tu ${nuevo.titulo}`);
+        lanzarCorazones?.(12);
+        try { window._sumarAmorPareja?.(20, `Vínculo de ${MASCOTAS[m]?.nombre || "mascota"} subió de nivel`); } catch {}
+      } else if (motivo) {
+        // Notificación suave opcional
+      }
+      window.dispatchEvent(new CustomEvent("sunad:vinculo-cambiado", { detail: { mascota: m, xp: nuevaXp, nivel: nuevo.nivel } }));
+      window.dispatchEvent(new Event("sunad:progress"));
+      return nuevo;
+    } catch (e) {
+      console.warn("subirVinculo:", e);
+    }
+  };
+  window._getVinculoData = getVinculoData;
+  window._subirVinculo = subirVinculo;
+  window._NIVELES_VINCULO = NIVELES_VINCULO;
   const statsDef = () => ({ hambre:80, felicidad:100, energia:100, ultimaActualizacion:Date.now(), durmiendo:false });
   const cargarStats = m => {
     try {
@@ -533,6 +691,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const kXp = `sa_experiencia_extra_${u}`;
       const actualXp = Math.max(0, Number(localStorage.getItem(kXp)) || 0);
       localStorage.setItem(kXp, String(actualXp + xpPremio));
+
+      // Sumar Amor XP a la mascota activa por jugar juntos
+      const mActual = localStorage.getItem("mascota_actual") || "mapache";
+      subirVinculo(mActual, Math.max(5, Math.round(m * 0.5) + 3), "Minijuego en equipo");
     } catch {}
     if (window.decirMascota) window.decirMascota(mot || `+${m}`, 2500);
     window.dispatchEvent(new Event("sunad:progress"));
@@ -605,6 +767,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!m || !statsM) return;
         const av = $("mm-avatar-img"); if (av) { av.src = m.imagen; av.alt = m.nombre; }
         const nom = $("mm-nombre-txt"); if (nom) nom.textContent = m.nombre;
+        const rolBadge = $("mm-rol-badge");
+        if (rolBadge) {
+          rolBadge.textContent = m.rolLabel || "Compañero";
+          rolBadge.style.backgroundColor = m.rolColor ? `${m.rolColor}26` : "rgba(255,217,61,0.15)";
+          rolBadge.style.borderColor = m.rolColor || "rgba(255,217,61,0.4)";
+          rolBadge.style.color = m.rolColor || "var(--accent)";
+        }
         const est = $("mm-estado");
         if (est) {
           let estado = "Tranquila";
@@ -615,6 +784,27 @@ document.addEventListener("DOMContentLoaded", () => {
           else if (statsM.energia < 25) estado = "Cansada";
           est.textContent = estado;
         }
+
+        /* Actualizar Vínculo de Amor */
+        const vd = getVinculoData(mascotaActual);
+        const nivTxt = $("mm-vinculo-nivel-txt");
+        if (nivTxt) nivTxt.textContent = `Nivel ${vd.nivel} · ${vd.titulo}`;
+        const descTxt = $("mm-vinculo-desc-txt");
+        if (descTxt) descTxt.textContent = vd.desc;
+        const xpTxt = $("mm-vinculo-xp-txt");
+        if (xpTxt) xpTxt.textContent = vd.siguiente ? `${vd.xp} / ${vd.siguiente.min} Amor XP` : `${vd.xp} Amor XP (Máximo)`;
+        const fill = $("mm-vinculo-fill");
+        if (fill) fill.style.width = `${vd.progreso}%`;
+
+        /* Actualizar Habilidad Pasiva */
+        const pNom = $("mm-pasiva-nombre");
+        if (pNom) pNom.textContent = m.pasiva ? `${m.pasiva.nombre} (Rango ${vd.rango})` : "Compañero Leal";
+        const pDesc = $("mm-pasiva-desc");
+        if (pDesc) {
+          const bonoStr = vd.bonoPct > 0 ? ` [Potenciado +${vd.bonoPct}% por Vínculo]` : "";
+          pDesc.textContent = (m.pasiva ? m.pasiva.desc : "Te acompaña con alegría y lealtad.") + bonoStr;
+        }
+
         const mon = $("mm-monedas"); if (mon) mon.textContent = getMonedas();
         const hp = Math.round(statsM.hambre), fp = Math.round(statsM.felicidad), ep = Math.round(statsM.energia);
         const hv = $("mm-stat-hambre-val"), fv = $("mm-stat-felicidad-val"), ev = $("mm-stat-energia-val");
@@ -633,6 +823,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const meta = MASCOTAS[mascotaActual];
         mascota.classList.toggle("dormida", !!statsM.durmiendo);
         mascota.classList.toggle("hambrienta", statsM.hambre < 25 && !statsM.durmiendo);
+        const vd = getVinculoData(mascotaActual);
+        mascota.classList.toggle("vinculo-alma-gemela", vd.nivel >= 5);
         if (statsM.durmiendo && meta.imagenDormida) setMascotaImg(mascotaImg, meta.imagenDormida, meta.nombre, meta.imagen);
         else setMascotaImg(mascotaImg, meta.imagen, meta.nombre);
         let z = qs(".mascota-zzz-cont", mascota);
@@ -709,19 +901,36 @@ document.addEventListener("DOMContentLoaded", () => {
         const ok = desbloqueada(id);
         const comprable = esComprable(id);
         const d = DESBLOQUEO[id];
+        const mData = MASCOTAS[id];
+        const vd = getVinculoData(id);
         const item = document.createElement("button");
         item.type = "button";
         item.className = "mm-cambiar-item" + (id === mascotaActual ? " activa" : "") + (!ok ? " bloqueada" : "") + (comprable ? " comprable" : "");
-        item.innerHTML = `<img alt=""><span class="mm-cambiar-info"></span>`;
+        item.innerHTML = `
+          <div class="mm-cambiar-thumb-wrap">
+            <img alt="">
+            ${ok ? `<span class="mm-cambiar-vinculo-tag">Nv.${vd.nivel}</span>` : ''}
+          </div>
+          <div class="mm-cambiar-info-col">
+            <div class="mm-cambiar-top-row">
+              <strong class="mm-cambiar-nombre">${mData.nombre}</strong>
+              <span class="mm-cambiar-rol-tag" style="color:${mData.rolColor||'var(--accent)'}">${mData.rolLabel||''}</span>
+            </div>
+            <span class="mm-cambiar-pasiva-mini">${mData.pasiva?.nombre || 'Compañero'}</span>
+            <span class="mm-cambiar-sub-txt"></span>
+          </div>`;
         const im = item.querySelector("img");
         im.onerror = () => { im.onerror = null; im.src = "img/girasol-loading.png"; };
-        im.src = MASCOTAS[id].imagen;
-        const info = item.querySelector(".mm-cambiar-info");
+        im.src = mData.imagen;
+        const subTxt = item.querySelector(".mm-cambiar-sub-txt");
         if (comprable && d) {
-          info.textContent = `${d.precio} 🪙`;
-          item.title = `Comprar ${MASCOTAS[id].nombre} (nivel ${d.reqNivel})`;
+          subTxt.innerHTML = `<span class="mm-cambiar-precio">${d.precio} 🪙</span> · Requiere Nivel ${d.reqNivel}`;
+          item.title = `Adoptar ${mData.nombre} (${d.precio} SunCoins)`;
+        } else if (ok) {
+          subTxt.textContent = id === mascotaActual ? "★ Equipada actualmente" : `${vd.titulo} · ${vd.xp} Amor XP`;
+          item.title = `Equipar a ${mData.nombre}`;
         } else {
-          item.title = MASCOTAS[id].nombre;
+          subTxt.textContent = "🔒 Aún bloqueada";
         }
         if (ok && id !== mascotaActual && !comprable) {
           item.addEventListener("click", () => {
@@ -733,7 +942,7 @@ document.addEventListener("DOMContentLoaded", () => {
             visual();
             actualizarModalMascota();
             renderInv(); renderCuidado(); renderCambiarMascota();
-            decirMascota(`¡Hola! Ahora soy ${MASCOTAS[mascotaActual].nombre}`);
+            decirMascota(`¡Hola! Ahora te acompaña ${MASCOTAS[mascotaActual].nombre}`);
             window.dispatchEvent(new Event("sunad:mascota-cambiada"));
           });
         } else if (comprable) {
@@ -755,7 +964,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const b = 20 + c.racha * 2;
           setMonedas(getMonedas() + b);
           setNumLS(`sa_cuidado_racha_${getUserId()}`, c.racha);
-          notifMascota(`+${b}`, `¡Cuidado diario completado! Racha: ${c.racha} días`);
+          subirVinculo(mascotaActual, 25, "¡Cuidado diario completo!");
+          notifMascota(`+${b} 🪙`, `¡Cuidado diario completado! Racha: ${c.racha} días (+25 Amor XP)`);
           if (statsM) { statsM.felicidad = clamp(statsM.felicidad + 15); guardarStats(mascotaActual, statsM); }
           decirMascota(`¡${c.racha} días seguidos cuidándome!`);
         }
@@ -776,6 +986,7 @@ document.addEventListener("DOMContentLoaded", () => {
         guardarStats(mascotaActual, statsM);
         marcarTarea("mimar");
         subirAmistadTodas(1);
+        subirVinculo(mascotaActual, 8, "Mimos");
         actualizarModalMascota();
         renderCuidado();
         visual();
@@ -849,10 +1060,11 @@ document.addEventListener("DOMContentLoaded", () => {
         guardarStats(mascotaActual, statsM);
         marcarTarea("alimentar");
         subirAmistadTodas(1);
+        subirVinculo(mascotaActual, fav ? 10 : 4, fav ? "Comida favorita" : "Snack");
         snd("comer");
         lanzarCorazones(fav ? 8 : 3);
         decirMascota(randomDe(fav ? ["¡PIZZA! ¡Mi favorita!", "¡Ñam ñam!", "¡Eres el mejor!"] : ["¡Gracias por la comida!", "Ñam ñam...", "¡Qué rico!"]));
-        if (fav) { setMonedas(getMonedas() + 3); notifMascota("+3", "¡Comida favorita!"); }
+        if (fav) { setMonedas(getMonedas() + 3); notifMascota("+3 🪙", "¡Comida favorita! (+10 Amor XP)"); }
         actualizarModalMascota();
         renderInv(); renderCuidado(); visual();
         window.dispatchEvent(new CustomEvent("sunad:mascota-accion", { detail: { tipo: "alimentar", id, mascota: mascotaActual } }));
@@ -1054,6 +1266,8 @@ document.addEventListener("DOMContentLoaded", () => {
         p.hidden = !activa;
       });
       if (target === "inventario") renderInv?.();
+      else if (target === "cuidado") renderCuidado?.();
+      else if (target === "cambiar") renderCambiarMascota?.();
     };
 
     document.addEventListener("click", e => {
@@ -1822,6 +2036,20 @@ sprite.style.opacity = "0.25";
       const SL = { ...TIENDA_ITEMS.cabeza, ...TIENDA_ITEMS.cuello, ...TIENDA_ITEMS.ojos, ...TIENDA_ITEMS.fondos, ...TIENDA_ITEMS.efectos };
       const activos = [];
       Object.values(eq).forEach(id => { const s = SL[id]; if (s && s.bonus) activos.push(s.bonus); });
+
+      // Pasiva de la Mascota Activa potenciada por el Vínculo de Amor
+      const petMeta = MASCOTAS[mascotaActual];
+      if (petMeta && petMeta.pasiva) {
+        const vd = getVinculoData(mascotaActual);
+        const factor = 1 + (vd.bonoPct / 100);
+        const valorEfectivo = Math.round(petMeta.pasiva.val * factor);
+        activos.push({
+          tipo: petMeta.pasiva.stat,
+          val: valorEfectivo,
+          desc: `${petMeta.pasiva.nombre} (Vínculo Nv.${vd.nivel}): +${valorEfectivo}`
+        });
+      }
+
       return activos;
     } catch { return []; }
   }

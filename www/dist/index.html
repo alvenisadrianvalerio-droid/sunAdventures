@@ -1534,15 +1534,47 @@ Artista - Canción
       <button class="mascota-modal-close" data-close-mascota aria-label="Cerrar">×</button>
       <div class="mm-header">
         <div class="mm-avatar"><img id="mm-avatar-img" src="" alt=""></div>
-        <div class="mm-header-info"><span class="mm-nombre" id="mm-nombre-txt">—</span><span class="mm-estado"
-            id="mm-estado">—</span></div>
+        <div class="mm-header-info">
+          <div class="mm-header-top-row">
+            <span class="mm-nombre" id="mm-nombre-txt">—</span>
+            <span class="mm-rol-badge" id="mm-rol-badge">Soporte</span>
+          </div>
+          <span class="mm-estado" id="mm-estado">—</span>
+        </div>
       </div>
+
+      <!-- Vínculo de Amor Banner -->
+      <div class="mm-vinculo-card" id="mm-vinculo-card">
+        <div class="mm-vinculo-header">
+          <div class="mm-vinculo-info">
+            <span class="mm-vinculo-icono" data-icono="corazon"></span>
+            <div>
+              <div class="mm-vinculo-titulo">Vínculo: <strong id="mm-vinculo-nivel-txt">Nivel 1 · Recién Llegado</strong></div>
+              <div class="mm-vinculo-sub" id="mm-vinculo-desc-txt">Tu mascota aún te está conociendo.</div>
+            </div>
+          </div>
+          <span class="mm-vinculo-xp" id="mm-vinculo-xp-txt">0 XP</span>
+        </div>
+        <div class="mm-vinculo-track">
+          <span class="mm-vinculo-fill" id="mm-vinculo-fill" style="width:0%"></span>
+        </div>
+        <div class="mm-pasiva-box" id="mm-pasiva-box">
+          <span class="mm-pasiva-badge">Habilidad Pasiva</span>
+          <div class="mm-pasiva-cuerpo">
+            <strong id="mm-pasiva-nombre">—</strong>
+            <span id="mm-pasiva-desc">—</span>
+          </div>
+        </div>
+      </div>
+
       <div class="mm-tabs" role="tablist">
         <button type="button" class="mm-tab active" data-mm-tab="estado">Estado</button>
-        <button type="button" class="mm-tab" data-mm-tab="inventario">Inventario</button>
-        <button type="button" class="mm-tab" data-mm-tab="cuidado">Cuidado</button>
-        <button type="button" class="mm-tab" data-mm-tab="acciones">Más</button>
+        <button type="button" class="mm-tab" data-mm-tab="cuidado">Cuidados</button>
+        <button type="button" class="mm-tab" data-mm-tab="inventario">Dieta & Snacks</button>
+        <button type="button" class="mm-tab" data-mm-tab="cambiar">Compañeros</button>
       </div>
+
+      <!-- PANEL ESTADO -->
       <div class="mm-panel active" data-mm-panel="estado">
         <div class="mm-monedero"><span class="mm-monedero-icon" data-icono="moneda"></span><span
             class="mm-monedero-label">SunCoins</span><span class="mm-monedero-valor" id="mm-monedas">0</span></div>
@@ -1566,31 +1598,40 @@ Artista - Canción
             </div>
           </div>
         </div>
-      </div>
-      <div class="mm-panel" data-mm-panel="inventario" hidden>
-        <div class="mm-seccion-titulo"><span>Inventario</span><span class="mm-seccion-hint">Arrastra a la mascota</span>
-        </div>
-        <div class="mascota-inventario" id="mm-inventario"></div>
-      </div>
-      <div class="mm-panel" data-mm-panel="cuidado" hidden>
-        <div class="cuidado-diario" id="mm-cuidado-diario"></div>
-      </div>
-      <div class="mm-panel" data-mm-panel="acciones" hidden>
-        <div class="mm-acciones">
+        <div class="mm-acciones-rapidas">
           <button type="button" class="mm-accion mm-accion-mimos" data-accion="mimos"><span class="mm-accion-icono"
-              data-icono="mimar"></span><span>Mimos</span><span class="mascota-accion-progreso"
+              data-icono="mimar"></span><span>Dar Mimos (+8 Amor XP)</span><span class="mascota-accion-progreso"
               data-progreso="mimos"></span></button>
           <button type="button" class="mm-accion mm-accion-dormir" data-accion="dormir"><span class="mm-accion-icono"
               data-icono-dormir></span><span data-txt-dormir>Dormir</span><span class="mascota-accion-progreso"
               data-progreso="dormir"></span></button>
         </div>
-        <button type="button" class="mm-accion mm-accion-jugar" data-accion="jugar"><span class="mm-accion-icono"
-            data-icono="jugar"></span><span>Jugar — Atrapa el girasol</span></button>
-        <div class="mm-acciones-extra"><button type="button" class="mm-accion-sec" data-accion="amistad"><span
-              class="mm-accion-icono" data-icono="corazon"></span><span>Amistades</span></button></div>
-        <div class="mm-cambiar"><label class="mm-cambiar-label">Cambiar mascota:</label>
-          <div class="mm-cambiar-lista" id="mm-cambiar-lista"></div>
+      </div>
+
+      <!-- PANEL CUIDADOS -->
+      <div class="mm-panel" data-mm-panel="cuidado" hidden>
+        <div class="cuidado-diario" id="mm-cuidado-diario"></div>
+        <div class="mm-actividades-box" style="margin-top:0.8rem;">
+          <button type="button" class="mm-accion mm-accion-jugar" data-accion="jugar"><span class="mm-accion-icono"
+              data-icono="jugar"></span><span>Jugar — Atrapa el girasol (+15 Amor XP)</span></button>
+          <button type="button" class="mm-accion mm-accion-sec" data-accion="amistad" style="margin-top:0.5rem;"><span
+              class="mm-accion-icono" data-icono="corazon"></span><span>Ver Vínculo con otras Mascotas</span></button>
         </div>
+      </div>
+
+      <!-- PANEL DIETA & SNACKS -->
+      <div class="mm-panel" data-mm-panel="inventario" hidden>
+        <div class="mm-seccion-titulo">
+          <span>Dieta & Snacks</span>
+          <span class="mm-seccion-hint">Toca o arrastra para alimentar (+Amor XP)</span>
+        </div>
+        <div class="mascota-inventario" id="mm-inventario"></div>
+      </div>
+
+      <!-- PANEL CAMBIAR / ADOPCIÓN -->
+      <div class="mm-panel" data-mm-panel="cambiar" hidden>
+        <div class="mm-seccion-titulo"><span>Mis Compañeros & Adopción</span><span class="mm-seccion-hint">Equipa a tu fiel amigo</span></div>
+        <div class="mm-cambiar-lista" id="mm-cambiar-lista"></div>
       </div>
     </div>
   </div>

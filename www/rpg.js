@@ -2645,6 +2645,11 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       localStorage.setItem(kXp, String(actualXp + xpGanado));
       window.dispatchEvent(new Event("sunad:progress"));
     } catch { }
+    try {
+      const petAct = localStorage.getItem("mascota_actual") || "mapache";
+      const amorG = eraJefe ? 12 : 4;
+      window._subirVinculo?.(petAct, amorG, eraJefe ? "Jefe derrotado en equipo" : "Victoria de Aventura");
+    } catch { }
     try { notifMascota?.("¡Victoria!", "+" + mon + " monedas · +" + xp + " XP"); } catch { }
     guardar(state);
     $("rpg-batalla")?.classList.add("ganada");

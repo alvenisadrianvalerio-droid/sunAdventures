@@ -240,8 +240,17 @@
       xpRoguelike = (runsTotal * 5) + (maxPiso * 10) + (vicTotal * 80) + (bossesTotal * 25);
     } catch {}
 
+    // Vínculo acumulado con las mascotas (cada nivel de amor otorga experiencia)
+    let xpVinculoMascotas = 0;
+    try {
+      MASCOTAS_LISTA.forEach(m => {
+        const vinculoRaw = Number(_getMemoryItem(`sa_mascota_vinculo_${u}_${m}`) || 0);
+        xpVinculoMascotas += Math.round(vinculoRaw * 0.15);
+      });
+    } catch {}
+
     const extra = Math.max(0, Number(_getMemoryItem(`sa_experiencia_extra_${u}`)) || 0);
-    return extra + xpMinijuegos + xpAventura + xpRoguelike;
+    return extra + xpMinijuegos + xpAventura + xpRoguelike + xpVinculoMascotas;
   };
 
   // Cálculo de Experiencia de Pareja (fotos conjuntas, notas de amor, visitas consecutivas y cariño mutuo)
