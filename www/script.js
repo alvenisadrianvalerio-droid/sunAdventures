@@ -1082,8 +1082,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (window._mascotaIntervals) window._mascotaIntervals.forEach(clearInterval);
     window._mascotaIntervals = [
-      setInterval(() => { try { if (!mascotaBurbuja.classList.contains("visible")) decirMascota(randomDe(FRASES[mascotaActual])); } catch {} }, 45000),
-      setInterval(() => { try { decaer(statsM); guardarStats(mascotaActual, statsM); actualizarModalMascota(); visual(); } catch {} }, 60000)
+      setInterval(() => {
+        try {
+          if (document.hidden) return;
+          if (!mascotaBurbuja.classList.contains("visible")) decirMascota(randomDe(FRASES[mascotaActual]));
+        } catch {}
+      }, 45000),
+      setInterval(() => {
+        try {
+          if (document.hidden) return;
+          decaer(statsM);
+          guardarStats(mascotaActual, statsM);
+          actualizarModalMascota();
+          visual();
+        } catch {}
+      }, 60000)
     ];
   }
 
@@ -1865,10 +1878,11 @@ sprite.style.opacity = "0.25";
     setNumLS(`sa_tienda_compras_${u}`, numLS(`sa_tienda_compras_${u}`) + 1);
   });
   setInterval(() => {
+    if (document.hidden) return;
     const u = getUserId();
     const actual = getMonedas();
     if (actual > numLS(`sa_monedas_max_${u}`)) setNumLS(`sa_monedas_max_${u}`, actual);
-  }, 5000);
+  }, 15000);
 
   Object.entries(SKINS).forEach(([id, s]) => {
     if (s.icono && !ICONO[s.icono]) console.warn(`[Skin] ${id}: icono "${s.icono}" no existe en ICONO`);

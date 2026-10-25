@@ -202,41 +202,80 @@
     }
   }
 
-  /* Render progresivo con Lazy Loading en scroll para máxima optimización */
+  /* Render progresivo con Lazy Loading en scroll y reconciliación sin parpadeo */
   async function render() {
     if (!grid) return;
     if (renderEnCurso) { renderPendiente = true; return; }
     renderEnCurso = true;
     try {
-      if (fotos.length === 0) { grid.innerHTML = ""; empty?.classList.remove("hidden"); return; }
+      if (fotos.length === 0) {
+        grid.innerHTML = "";
+        empty?.classList.remove("hidden");
+        renderEnCurso = false;
+        return;
+      }
       empty?.classList.add("hidden");
-      
-      grid.innerHTML = "";
-      const obs = obtenerObserverLazy();
-      if (obs) obs.disconnect();
 
-      // Renderizado por lotes (chunked) para evitar picos de CPU y caídas de FPS con cientos de fotos
+      const obs = obtenerObserverLazy();
+
+      // Mapa de elementos polaroid existentes en el DOM para preservarlos sin parpadeo
+      const existentes = new Map();
+      grid.querySelectorAll(".polaroid").forEach(el => {
+        const id = el.dataset.fotoId;
+        if (id) existentes.set(id, el);
+      });
+
+      // Si el modo de selección cambió o el DOM fue manipulado externamente, limpiar
+      const targetIds = new Set(fotos.map(f => f.id));
+      // Eliminar elementos que ya no existen en el array de fotos
+      existentes.forEach((el, id) => {
+        if (!targetIds.has(id)) {
+          if (obs) obs.unobserve(el);
+          el.remove();
+        }
+      });
+
+      // Renderizado por lotes (chunked) manteniendo orden y reutilizando nodos sin parpadeo
       const BATCH_SIZE = 36;
       let indiceActual = 0;
 
       function renderSiguienteLote() {
         if (!grid || !renderEnCurso) return;
         const fin = Math.min(indiceActual + BATCH_SIZE, fotos.length);
-        const frag = document.createDocumentFragment();
 
         for (let i = indiceActual; i < fin; i++) {
-          const el = crearPolaroid(fotos[i], null);
-          if (el) {
-            frag.appendChild(el);
-            if (obs) {
+          const foto = fotos[i];
+          const actualEnPos = grid.children[i];
+          let el = existentes.get(foto.id);
+
+          if (!el) {
+            // Elemento nuevo: crearlo y observarlo
+            el = crearPolaroid(foto, null);
+            if (el) {
+              if (actualEnPos) {
+                grid.insertBefore(el, actualEnPos);
+              } else {
+                grid.appendChild(el);
+              }
+              existentes.set(foto.id, el);
+              if (obs) {
+                obs.observe(el);
+              } else {
+                cargarFotoVisible(el);
+              }
+            }
+          } else {
+            // Elemento ya existente: si la posición cambió por ordenamiento, moverlo sin recrear el nodo <img>
+            if (actualEnPos !== el) {
+              grid.insertBefore(el, actualEnPos || null);
+            }
+            // Asegurar que si aún no ha cargado y no está en observer, se observe
+            if (el.dataset.fotoCargada !== "true" && obs) {
               obs.observe(el);
-            } else {
-              cargarFotoVisible(el);
             }
           }
         }
 
-        grid.appendChild(frag);
         indiceActual = fin;
 
         if (indiceActual < fotos.length) {
@@ -253,7 +292,7 @@
       renderSiguienteLote();
 
       if (document.querySelector("[data-view].active")?.dataset.view === "mapa") renderMapa();
-      return; // El ciclo de render continuará de forma asíncrona no bloqueante
+      return;
     } catch (err) {
       console.warn("render:", err);
       renderEnCurso = false;

@@ -474,12 +474,13 @@
     if (typeof window._actualizarModalMascota === "function") { try { window._actualizarModalMascota(); } catch { } }
   }
 
+  let _progressTimer = null;
   window.addEventListener("sunad:progress", () => {
-    if (_progressT) { _progressPend = true; return; }
-    _progressT = requestAnimationFrame(() => {
-      _progressT = null; _ejecutarProgress();
-      if (_progressPend) { _progressPend = false; window.dispatchEvent(new Event("sunad:progress")); }
-    });
+    if (_progressTimer) return;
+    _progressTimer = setTimeout(() => {
+      _progressTimer = null;
+      requestAnimationFrame(_ejecutarProgress);
+    }, 150);
   });
 
   document.addEventListener("visibilitychange", () => {
