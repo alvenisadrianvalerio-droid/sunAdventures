@@ -1359,13 +1359,14 @@ body.light .burbuja::after {
   display: block;
   width: clamp(80px, 12vw, 200px);
   height: auto;
+  image-rendering: pixelated;
   animation: float 3s ease-in-out infinite;
-  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .35));
-  will-change: transform
+  filter: drop-shadow(0 8px 20px rgba(251, 191, 36, .35)) drop-shadow(0 4px 10px rgba(0, 0, 0, .4));
+  will-change: transform;
 }
 
 body.light .girasol {
-  filter: drop-shadow(0 8px 14px var(--shadow))
+  filter: drop-shadow(0 8px 18px rgba(245, 158, 11, .3)) drop-shadow(0 4px 10px rgba(0, 0, 0, .15));
 }
 
 @keyframes float {
