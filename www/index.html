@@ -1581,10 +1581,22 @@ Artista - Canción
       </div>
 
       <div class="mm-tabs" role="tablist">
-        <button type="button" class="mm-tab active" data-mm-tab="estado">Estado</button>
-        <button type="button" class="mm-tab" data-mm-tab="cuidado">Cuidados</button>
-        <button type="button" class="mm-tab" data-mm-tab="inventario">Dieta & Snacks</button>
-        <button type="button" class="mm-tab" data-mm-tab="cambiar">Compañeros</button>
+        <button type="button" class="mm-tab active" data-mm-tab="estado">
+          <span class="mm-tab-icon" data-icono="chispas"></span>
+          <span>Estado</span>
+        </button>
+        <button type="button" class="mm-tab" data-mm-tab="cuidado">
+          <span class="mm-tab-icon" data-icono="corazonManos"></span>
+          <span>Cuidados</span>
+        </button>
+        <button type="button" class="mm-tab" data-mm-tab="inventario">
+          <span class="mm-tab-icon" data-icono="cuenco"></span>
+          <span>Dieta</span>
+        </button>
+        <button type="button" class="mm-tab" data-mm-tab="cambiar">
+          <span class="mm-tab-icon" data-icono="huellaCorazon"></span>
+          <span>Amigos</span>
+        </button>
       </div>
 
       <!-- PANEL ESTADO -->
@@ -1624,11 +1636,27 @@ Artista - Canción
       <!-- PANEL CUIDADOS -->
       <div class="mm-panel" data-mm-panel="cuidado" hidden>
         <div class="cuidado-diario" id="mm-cuidado-diario"></div>
-        <div class="mm-actividades-box" style="margin-top:0.8rem;">
-          <button type="button" class="mm-accion mm-accion-jugar" data-accion="jugar"><span class="mm-accion-icono"
-              data-icono="jugar"></span><span>Jugar — Atrapa el girasol (+15 Amor XP)</span></button>
-          <button type="button" class="mm-accion mm-accion-sec" data-accion="amistad" style="margin-top:0.5rem;"><span
-              class="mm-accion-icono" data-icono="corazon"></span><span>Ver Vínculo con otras Mascotas</span></button>
+        <div class="mm-actividades-box">
+          <button type="button" class="mm-actividad-card mm-actividad-jugar" data-accion="jugar">
+            <div class="mm-actividad-icon-wrap" data-icono="jugar"></div>
+            <div class="mm-actividad-body">
+              <div class="mm-actividad-tit-row">
+                <strong>Atrapa el girasol</strong>
+                <span class="mm-actividad-badge">+15 Amor XP</span>
+              </div>
+              <p>Minijuego ágil para entrenar reflejos y subir la felicidad de tu mascota.</p>
+            </div>
+          </button>
+          <button type="button" class="mm-actividad-card mm-actividad-amistad" data-accion="amistad">
+            <div class="mm-actividad-icon-wrap" data-icono="corazonAlas"></div>
+            <div class="mm-actividad-body">
+              <div class="mm-actividad-tit-row">
+                <strong>Vínculo entre Mascotas</strong>
+                <span class="mm-actividad-badge amistad">Compañerismo</span>
+              </div>
+              <p>Revisa la amistad mutua entre todas tus mascotas adoptadas.</p>
+            </div>
+          </button>
         </div>
       </div>
 

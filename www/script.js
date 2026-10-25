@@ -845,6 +845,13 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.style.overflow = "hidden";
       actualizarModalMascota();
       renderInv(); renderCuidado(); renderCambiarMascota();
+      if (typeof window.hidratarIconos === "function") window.hidratarIconos(m);
+      else {
+        m.querySelectorAll("[data-icono]").forEach(el => {
+          const k = el.dataset.icono;
+          if (window.ICONO?.[k] && !el.querySelector("svg")) el.innerHTML = window.ICONO[k];
+        });
+      }
       window.dispatchEvent(new Event("sunad:mascota-cambiada"));
     };
     window.cerrarMascotaModal = () => {
@@ -886,11 +893,43 @@ document.addEventListener("DOMContentLoaded", () => {
       const c = $("mm-cuidado-diario"); if (!c) return;
       const cu = cargarCuidado(mascotaActual);
       const t = [
-        { id:"alimentar", icono:ICONO.manzana, txt:"Alimentar" },
-        { id:"jugar",     icono:ICONO.jugar,   txt:"Jugar" },
-        { id:"mimar",     icono:ICONO.mimar,   txt:"Mimar" }
+        { id: "alimentar", iconoKey: "cuenco", txt: "Alimentar", sub: "+4 Amor XP", color: "#f39c12" },
+        { id: "jugar",     iconoKey: "jugar",  txt: "Jugar",     sub: "+15 Amor XP", color: "#3498db" },
+        { id: "mimar",     iconoKey: "mimar",  txt: "Mimar",     sub: "+8 Amor XP", color: "#e74c3c" }
       ];
-      c.innerHTML = `<div class="cuidado-diario-titulo"><span>Cuidado diario</span><span class="cuidado-diario-racha">${cu.racha || 0} ${cu.racha === 1 ? "día" : "días"}</span></div><div class="cuidado-diario-tareas">${t.map(x => `<div class="cuidado-tarea ${cu.tareas.includes(x.id) ? "hecha" : ""}"><span class="cuidado-tarea-emoji">${x.icono || ""}</span><span class="cuidado-tarea-txt">${x.txt}</span>${cu.tareas.includes(x.id) ? '<span class="cuidado-tarea-check">✓</span>' : ''}</div>`).join("")}</div>`;
+      c.innerHTML = `
+        <div class="cuidado-diario-titulo">
+          <div class="cuidado-diario-tit-left">
+            <span class="cuidado-tit-icon" data-icono="corazonManos"></span>
+            <span>Rutina de Cuidado Diario</span>
+          </div>
+          <span class="cuidado-diario-racha">🔥 ${cu.racha || 0} ${cu.racha === 1 ? "día seguido" : "días seguidos"}</span>
+        </div>
+        <div class="cuidado-diario-tareas">
+          ${t.map(x => {
+            const hecha = cu.tareas.includes(x.id);
+            const iconSvg = ICONO[x.iconoKey] || "";
+            return `
+              <div class="cuidado-tarea ${hecha ? "hecha" : ""}" data-tarea="${x.id}">
+                <div class="cuidado-tarea-icon-wrap" style="color:${x.color}">
+                  ${iconSvg}
+                </div>
+                <strong class="cuidado-tarea-txt">${x.txt}</strong>
+                <span class="cuidado-tarea-sub">${hecha ? "¡Listo hoy!" : x.sub}</span>
+                ${hecha ? '<span class="cuidado-tarea-check">✓</span>' : ''}
+              </div>`;
+          }).join("")}
+        </div>
+        <div class="cuidado-diario-premio-hint">
+          <span>🎁 Completa los 3 para ganar <strong>+${20 + (cu.racha || 0) * 2} 🪙</strong> y <strong>+25 Amor XP</strong></span>
+        </div>`;
+      if (typeof window.hidratarIconos === "function") window.hidratarIconos(c);
+      else {
+        c.querySelectorAll("[data-icono]").forEach(el => {
+          const k = el.dataset.icono;
+          if (window.ICONO?.[k] && !el.querySelector("svg")) el.innerHTML = window.ICONO[k];
+        });
+      }
     }
     window._renderCuidado = renderCuidado;
 
