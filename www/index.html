@@ -38,7 +38,7 @@
   <link rel="stylesheet" href="capsula-tiempo.css?v=1" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="pareja-chat.css?v=1" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="diccionario.css?v=5" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="recetas.css?v=7">
+  <link rel="stylesheet" href="recetas.css?v=8">
   <style>
     svg {
       max-width: 100%;
@@ -56,6 +56,63 @@
 
     #loading-screen:not(.active) {
       display: none !important
+    }
+
+    /* Fallback crítico para el panel y modos de Recetas */
+    .recetas-despensa-box.hidden,
+    .recetas-search-box.hidden {
+      display: none !important;
+    }
+
+    .recetas-modos-nav {
+      display: flex;
+      gap: 0.6rem;
+      background: rgba(14, 18, 30, 0.7);
+      padding: 0.35rem;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 0.8rem;
+    }
+
+    .recetas-modo-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.1rem;
+      border-radius: 12px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: rgba(255, 255, 255, 0.75);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.22s ease;
+    }
+
+    .recetas-modo-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .recetas-modo-btn.active {
+      background: linear-gradient(135deg, rgba(255, 159, 61, 0.22), rgba(245, 158, 11, 0.15));
+      border-color: rgba(255, 159, 61, 0.45);
+      color: #ffb86c;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+    }
+
+    .recetas-modo-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff9f3d, #e11d48);
+      color: #fff;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
     }
 
     .loading-flower {

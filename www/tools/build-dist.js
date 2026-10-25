@@ -171,7 +171,7 @@ async function build() {
   let prodHtml = html;
 
   // Reemplazar todos los <link rel="stylesheet"> locales por el bundle único minificado
-  const firstCssRegex = /<link rel="stylesheet" href="leaflet\.css">[\s\S]*?<link rel="stylesheet" href="recetas\.css\?v=5">/;
+  const firstCssRegex = /<link rel="stylesheet" href="leaflet\.css"[^>]*>[\s\S]*?<link rel="stylesheet" href="recetas\.css(?:\?[^"]*)?">/;
   prodHtml = prodHtml.replace(firstCssRegex, `<link rel="stylesheet" href="assets/app.bundle.min.css">`);
 
   // Reemplazar los 52 scripts sueltos por los 6 chunks organizados

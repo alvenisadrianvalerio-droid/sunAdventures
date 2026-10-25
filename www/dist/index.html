@@ -24,6 +24,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="img/girasol.webp" type="image/webp" fetchpriority="high">
   <link rel="stylesheet" href="assets/app.bundle.min.css">
   <style>
     svg {
@@ -42,6 +43,63 @@
 
     #loading-screen:not(.active) {
       display: none !important
+    }
+
+    /* Fallback crítico para el panel y modos de Recetas */
+    .recetas-despensa-box.hidden,
+    .recetas-search-box.hidden {
+      display: none !important;
+    }
+
+    .recetas-modos-nav {
+      display: flex;
+      gap: 0.6rem;
+      background: rgba(14, 18, 30, 0.7);
+      padding: 0.35rem;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 0.8rem;
+    }
+
+    .recetas-modo-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.1rem;
+      border-radius: 12px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: rgba(255, 255, 255, 0.75);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.22s ease;
+    }
+
+    .recetas-modo-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .recetas-modo-btn.active {
+      background: linear-gradient(135deg, rgba(255, 159, 61, 0.22), rgba(245, 158, 11, 0.15));
+      border-color: rgba(255, 159, 61, 0.45);
+      color: #ffb86c;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+    }
+
+    .recetas-modo-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff9f3d, #e11d48);
+      color: #fff;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
     }
 
     .loading-flower {
@@ -715,22 +773,31 @@
   <section id="finanzas" class="finanzas-section view" data-view="finanzas">
     <div class="finanzas-shell">
       <header class="finanzas-header">
-        <div>
-          <p class="finanzas-kicker">Cuidemos lo que construimos</p>
-          <h1>Finanzas</h1>
-          <p class="finanzas-intro">Tus gastos, acuerdos y metas en un solo lugar.</p>
+        <div class="finanzas-brand-wrap">
+          <div class="finanzas-brand-avatar">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          </div>
+          <div>
+            <div class="finanzas-brand-title">
+              <h1>FinControl</h1>
+              <span class="fincontrol-badge outline">Gestión Financiera</span>
+            </div>
+            <p class="finanzas-intro">Resumen en tiempo real de ingresos, gastos, acuerdos y liquidez.</p>
+          </div>
         </div>
-        <label class="finanzas-currency"><span>Moneda</span><select id="finanzas-moneda"
-            aria-label="Moneda de visualización">
-            <option value="EUR">EUR · Euro</option>
-            <option value="USD">USD · Dólar</option>
-            <option value="MXN">MXN · Peso mexicano</option>
-            <option value="ARS">ARS · Peso argentino</option>
-            <option value="COP">COP · Peso colombiano</option>
-            <option value="CLP">CLP · Peso chileno</option>
-            <option value="PEN">PEN · Sol</option>
-            <option value="VES">VES · Bolívar venezolano</option>
-          </select></label>
+        <div class="finanzas-header-controls">
+          <label class="finanzas-currency"><span>Moneda Global</span><select id="finanzas-moneda"
+              aria-label="Moneda de visualización">
+              <option value="VES">VES · Bolívar venezolano</option>
+              <option value="USD">USD · Dólar americano</option>
+              <option value="EUR">EUR · Euro</option>
+              <option value="COP">COP · Peso colombiano</option>
+              <option value="ARS">ARS · Peso argentino</option>
+              <option value="MXN">MXN · Peso mexicano</option>
+              <option value="CLP">CLP · Peso chileno</option>
+              <option value="PEN">PEN · Sol peruano</option>
+            </select></label>
+        </div>
       </header>
       <p id="finanzas-error" class="finanzas-alert" role="status" aria-live="polite" hidden></p>
       <div id="finanzas-login" class="finanzas-login" hidden><span class="finanzas-login-icon"
@@ -821,10 +888,15 @@
         </nav>
         <section id="finanzas-quote-card" class="finanzas-quote-card" hidden>
           <div class="finanzas-quote-heading">
-            <div><span class="finanzas-eyebrow">MERCADO DE DIVISAS</span>
-              <h2 id="finanzas-quote-title">Precio frente al dólar</h2>
-            </div><span id="finanzas-quote-updated" class="finanzas-quote-updated" aria-live="polite">Consultando
-              cotización…</span>
+            <div>
+              <div class="fincontrol-rates-header-title">
+                <span class="finanzas-eyebrow">MERCADO DE DIVISAS</span>
+                <span class="fincontrol-badge success"><span class="finanzas-pulse-dot"></span>En Vivo</span>
+              </div>
+              <h2 id="finanzas-quote-title">Tasas de Cambio en Bolívares (VES)</h2>
+              <p class="fincontrol-rates-subtitle">Cotizaciones en tiempo real de USD (BCV & Paralelo), USDT (Binance P2P) y EURO.</p>
+            </div>
+            <span id="finanzas-quote-updated" class="finanzas-quote-updated" aria-live="polite">Consultando cotización…</span>
           </div>
           <div id="finanzas-quote-values" class="finanzas-quote-values" aria-live="polite"></div>
           <div id="finanzas-quote-chart" class="finanzas-quote-chart" role="img"
@@ -854,27 +926,867 @@
               aria-live="polite"></small>
           </form>
         </section>
-        <nav class="finanzas-scopes" aria-label="Ámbito de finanzas">
-          <button type="button" class="finanzas-scope active" data-finanzas-scope="personal"
-            aria-pressed="true">Personal</button>
-          <button type="button" class="finanzas-scope" data-finanzas-scope="pareja"
-            aria-pressed="false">Compartidas</button>
-        </nav>
-        <div class="finanzas-toolbar"><label><span>Período</span><input id="finanzas-periodo"
-              type="month"></label><button id="finanzas-recargar" class="btn-secondary"
-            type="button">Actualizar</button></div>
+        <div class="finanzas-toolbar-row">
+          <nav class="finanzas-scopes" aria-label="Ámbito de finanzas">
+            <button type="button" class="finanzas-scope active" data-finanzas-scope="personal"
+              aria-pressed="true">Personal</button>
+            <button type="button" class="finanzas-scope" data-finanzas-scope="pareja"
+              aria-pressed="false">Compartidas</button>
+          </nav>
+          <div class="finanzas-toolbar"><label><span>Período</span><input id="finanzas-periodo"
+                type="month"></label><button id="finanzas-recargar" class="btn-secondary"
+              type="button">Actualizar</button></div>
+        </div>
         <main id="finanzas-panel" class="finanzas-panel"></main>
       </div>
     </div>
   </section>
 
-    <!-- Bundles Minificados (Code Splitting por Secciones) -->
-  <script src="assets/vendor-core.bundle.min.js"></script>
-  <script src="assets/view-logros.bundle.min.js"></script>
-  <script src="assets/view-album-social.bundle.min.js"></script>
-  <script src="assets/view-utilidades.bundle.min.js"></script>
-  <script src="assets/view-rpg.bundle.min.js"></script>
-  <script src="assets/view-app-extras.bundle.min.js"></script>
+  <!-- ============================================================
+       VISTA DICCIONARIO
+       ============================================================ -->
+  <section id="diccionario" class="diccionario-section view" data-view="diccionario">
+    <div class="diccionario-container">
+      <header class="diccionario-header">
+        <span class="diccionario-badge">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+          Herramienta de Consulta
+        </span>
+        <h1 class="diccionario-title">Diccionario</h1>
+        <p class="diccionario-desc">Escribe cualquier palabra para descubrir su significado, etimología y definiciones.
+        </p>
+      </header>
+
+      <div class="diccionario-search-box">
+        <form id="diccionario-form" class="diccionario-form" autocomplete="off">
+          <span class="diccionario-search-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </span>
+          <input type="text" id="diccionario-input" class="diccionario-input"
+            placeholder="Escribe una palabra o kanji/hangul (ej. 野菜, 사랑, amor, flower)..." maxlength="60" required>
+          <button type="submit" class="diccionario-btn-submit">
+            <span>Buscar</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <div class="diccionario-historial">
+        <div class="diccionario-historial-head">
+          <span>Búsquedas recientes</span>
+          <button type="button" id="diccionario-borrar-historial" class="diccionario-btn-limpiar">Limpiar
+            historial</button>
+        </div>
+        <div id="diccionario-historial-chips" class="diccionario-historial-chips">
+          <!-- Chips dinámicos -->
+        </div>
+      </div>
+
+      <main id="diccionario-resultado" class="diccionario-resultado">
+        <div class="dic-empty">
+          <div class="dic-empty-icon">📖</div>
+          <h3>Explora el significado de las palabras</h3>
+          <p>Escribe cualquier término arriba o haz clic en una de las palabras del historial para ver su definición.
+          </p>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       VISTA RECETARIO MÁGICO
+       ============================================================ -->
+  <section id="recetas" class="recetas-section view" data-view="recetas">
+    <div class="recetas-container">
+      <header class="recetas-header">
+        <span class="recetas-badge">
+          <span class="ui-icon" data-icono="comida"></span>
+          <span>Cocina Internacional</span>
+        </span>
+        <h1 class="recetas-title">Recetario Mágico</h1>
+        <p class="recetas-desc">Encuentra recetas exquisitas de todo el mundo con ingredientes traducidos y preparación
+          guiada paso a paso.</p>
+      </header>
+
+      <!-- Modos de Búsqueda: Búsqueda General vs Mis Ingredientes (Despensa) -->
+      <div class="recetas-modos-nav">
+        <button type="button" class="recetas-modo-btn active" id="recetas-modo-general" data-recetas-modo="general">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span>Buscar por Nombre o Plato</span>
+        </button>
+        <button type="button" class="recetas-modo-btn" id="recetas-modo-despensa" data-recetas-modo="despensa">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span>Cocinar con lo que tengo (Ingredientes)</span>
+          <span class="recetas-modo-badge">¡Nuevo!</span>
+        </button>
+      </div>
+
+      <div class="recetas-search-box" id="recetas-box-general">
+        <form id="recetas-form" class="recetas-form" autocomplete="off">
+          <span class="recetas-search-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </span>
+          <input type="text" id="recetas-input" class="recetas-input"
+            placeholder="Busca un plato o categoría (ej. pasta carbonara, ramen, sushi, curry, pizza)..." maxlength="60">
+          <button type="submit" class="recetas-btn-submit">
+            <span>Buscar</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+          <button type="button" id="recetas-btn-sorpresa" class="recetas-btn-sorpresa"
+            title="Elegir una receta al azar">
+            <svg class="receta-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+              stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="3" />
+              <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+              <circle cx="16" cy="16" r="1.5" fill="currentColor" />
+              <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+              <circle cx="16" cy="8" r="1.5" fill="currentColor" />
+              <circle cx="8" cy="16" r="1.5" fill="currentColor" />
+            </svg>
+            <span>¡Sorpréndeme!</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Panel de Cocinar con mis Ingredientes (Despensa) -->
+      <div class="recetas-despensa-box hidden" id="recetas-box-despensa">
+        <div class="recetas-despensa-header">
+          <div class="recetas-despensa-info">
+            <h3 class="recetas-despensa-titulo">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+              <span>Ingresa qué ingredientes tienes en casa</span>
+            </h3>
+            <p class="recetas-despensa-sub">Te mostraremos recetas que puedes preparar con ellos y qué ingredientes adicionales te faltarían.</p>
+          </div>
+          <button type="button" id="recetas-despensa-limpiar" class="recetas-despensa-btn-limpiar" title="Quitar todos los ingredientes">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span>Limpiar</span>
+          </button>
+        </div>
+
+        <!-- Formulario para agregar ingrediente -->
+        <form id="recetas-ingrediente-form" class="recetas-ingrediente-form" autocomplete="off">
+          <div class="recetas-ingrediente-input-wrap">
+            <span class="recetas-ingrediente-input-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </span>
+            <input type="text" id="recetas-ingrediente-input" class="recetas-ingrediente-input"
+              placeholder="Escribe un ingrediente (ej. huevo, pollo, arroz, tomate, ajo, queso, papa)..." maxlength="40">
+          </div>
+          <button type="submit" class="recetas-ingrediente-btn-add">
+            <span>Agregar</span>
+          </button>
+          <button type="button" id="recetas-despensa-buscar-btn" class="recetas-btn-submit">
+            <span>Buscar Recetas</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </form>
+
+        <!-- Tags de ingredientes agregados -->
+        <div class="recetas-tags-container" id="recetas-tags-container">
+          <span class="recetas-tags-placeholder" id="recetas-tags-placeholder">Aún no has agregado ingredientes. Escribe arriba o toca los atajos rápidos de abajo.</span>
+        </div>
+
+        <!-- Atajos rápidos populares para agregar con 1 clic -->
+        <div class="recetas-despensa-sugerencias">
+          <span class="recetas-sugerencias-label">Sugerencias rápidas:</span>
+          <div class="recetas-sugerencias-chips" id="recetas-sugerencias-chips">
+            <button type="button" class="receta-sug-chip" data-ing="Pollo">+ Pollo</button>
+            <button type="button" class="receta-sug-chip" data-ing="Huevo">+ Huevo</button>
+            <button type="button" class="receta-sug-chip" data-ing="Arroz">+ Arroz</button>
+            <button type="button" class="receta-sug-chip" data-ing="Tomate">+ Tomate</button>
+            <button type="button" class="receta-sug-chip" data-ing="Cebolla">+ Cebolla</button>
+            <button type="button" class="receta-sug-chip" data-ing="Ajo">+ Ajo</button>
+            <button type="button" class="receta-sug-chip" data-ing="Queso">+ Queso</button>
+            <button type="button" class="receta-sug-chip" data-ing="Pasta">+ Pasta</button>
+            <button type="button" class="receta-sug-chip" data-ing="Carne de Res">+ Carne</button>
+            <button type="button" class="receta-sug-chip" data-ing="Papas">+ Papa</button>
+            <button type="button" class="receta-sug-chip" data-ing="Leche">+ Leche</button>
+            <button type="button" class="receta-sug-chip" data-ing="Zanahoria">+ Zanahoria</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categorías rápidas con Iconos SVG -->
+      <div class="recetas-categorias">
+        <button type="button" class="receta-cat-chip active" data-cat-chip="Asian">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12c0 5 4 9 9 9s9-4 9-9H3z" />
+            <path d="M19 4L8 12M21 7l-9 8" />
+          </svg>
+          <span>Asiática</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Japanese">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="12" r="4" fill="currentColor" />
+          </svg>
+          <span>Japonesa</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Chinese">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6.4-4.8-6.4 4.8 2.4-7.2-6-4.8h7.6z" />
+          </svg>
+          <span>China</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Chicken">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M15.5 13a4.5 4.5 0 0 0-4.5-4.5 4.5 4.5 0 0 0-4.5 4.5c0 2 1.5 3.5 3.5 4l-4 4a1.5 1.5 0 0 0 2 2l4-4c.5 2 2 3.5 4 3.5a4.5 4.5 0 0 0 4.5-4.5 4.5 4.5 0 0 0-5-5z" />
+          </svg>
+          <span>Pollo</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Pasta">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 13h18c0 4-3.5 8-9 8s-9-4-9-8z" />
+            <path d="M12 5v5M8 6c0 2.5 1 4 1 4M16 6c0 2.5-1 4-1 4" />
+          </svg>
+          <span>Pastas</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Beef">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5c0 3 2 6 6 7l2 3h2l2-3c4-1 6-4 6-7z" />
+            <circle cx="8.5" cy="10" r="1.5" fill="currentColor" />
+          </svg>
+          <span>Carne</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Seafood">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12c4-6 12-6 16 0-4 6-12 6-16 0z" />
+            <circle cx="16" cy="12" r="1" fill="currentColor" />
+            <path d="M2 10l2 2-2 2M20 12l2-2v4l-2-2z" />
+          </svg>
+          <span>Mariscos</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Dessert">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 20h18v-6l-9-4-9 4v6z" />
+            <path d="M3 14c3 0 3 2 6 2s3-2 6-2 3 2 6 2" />
+            <circle cx="12" cy="7" r="2" fill="currentColor" />
+          </svg>
+          <span>Postres</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Vegetarian">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21a9 9 0 0 0 9-9c0-5-4-9-9-9S3 7 3 12a9 9 0 0 0 9 9z" />
+            <path d="M12 3v18M3 12c4.5-1 9 1 18 0" />
+          </svg>
+          <span>Vegetariano</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Breakfast">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="14" rx="9" ry="6" />
+            <ellipse cx="12" cy="10" rx="7.5" ry="4.5" />
+            <ellipse cx="12" cy="7" rx="6" ry="3" />
+          </svg>
+          <span>Desayunos</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Starter">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 14c0-5 3.5-9 8-9s8 4 8 9H4z" />
+            <path d="M4 14c1 1.5 2 2 4 2s3-1 4-1 2 1 4 1 3-.5 4-2" />
+          </svg>
+          <span>Entradas</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Pork">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5c0 3 2 6 6 7l2 3h2l2-3c4-1 6-4 6-7z" />
+            <circle cx="8.5" cy="10" r="1.5" fill="currentColor" />
+          </svg>
+          <span>Cerdo</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Vegan">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21a9 9 0 0 0 9-9c0-5-4-9-9-9S3 7 3 12a9 9 0 0 0 9 9z" />
+            <path d="M12 3v18M3 12c4.5-1 9 1 18 0" />
+          </svg>
+          <span>Vegano</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Lamb">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5c0 3 2 6 6 7l2 3h2l2-3c4-1 6-4 6-7z" />
+          </svg>
+          <span>Cordero</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Miscellaneous">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+            <path d="M7 2v20" />
+            <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" />
+          </svg>
+          <span>Variados</span>
+        </button>
+      </div>
+
+      <!-- Contador y Grilla de Recetas -->
+      <div class="recetas-info-bar">
+        <span id="recetas-contador" class="recetas-contador">Explorando recetas del mundo</span>
+      </div>
+
+      <div id="recetas-grid" class="recetas-grid">
+        <!-- Render dinámico -->
+      </div>
+
+      <!-- Paginación / Cargar Más Recetas -->
+      <div id="recetas-paginacion" class="recetas-paginacion hidden">
+        <button type="button" id="recetas-btn-mas" class="recetas-btn-mas">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          <span id="recetas-btn-mas-text">Cargar más recetas</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL DETALLE DE RECETA -->
+  <div id="receta-modal" class="receta-modal hidden" aria-modal="true" role="dialog">
+    <div class="receta-modal-content">
+      <button type="button" id="receta-modal-cerrar" class="receta-modal-cerrar" aria-label="Cerrar receta">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+      <div id="receta-modal-body">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL NOTA -->
+  <div id="nota-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-nota-modal></div>
+    <div class="modal-content nota-modal-content">
+      <h3 id="nota-modal-title" class="modal-title">Nueva notita</h3>
+      <form id="nota-form" class="modal-form">
+        <div class="nota-editor-layout">
+          <div class="nota-editor-fields">
+            <label class="form-field"><span class="form-label">Título (opcional)</span><input type="text"
+                id="nota-titulo" maxlength="50" placeholder="Un titulito..."></label>
+            <label class="form-field"><span class="form-label">Notita</span><textarea id="nota-contenido" rows="4"
+                maxlength="300" placeholder="Escribe algo bonito..." required></textarea></label>
+            <div class="form-field"><span class="form-label">Color</span>
+              <div class="color-picker">
+                <button type="button" class="color-option color-amarillo activo" data-color="amarillo"></button>
+                <button type="button" class="color-option color-rosa" data-color="rosa"></button>
+                <button type="button" class="color-option color-lila" data-color="lila"></button>
+                <button type="button" class="color-option color-menta" data-color="menta"></button>
+                <button type="button" class="color-option color-cielo" data-color="cielo"></button>
+              </div>
+            </div>
+          </div>
+          <div class="nota-preview-column"><span class="form-label">Vista previa</span>
+            <div id="nota-preview" class="nota-preview" hidden></div>
+          </div>
+        </div>
+        <div class="modal-actions"><button type="button" class="btn-secondary" data-close-nota-modal>Mejor
+            luego</button><button type="submit" class="btn-primary">Guardar notita</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL PAREJA DEDICADO -->
+  <div id="pareja-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-pareja></div>
+    <div class="modal-content pareja-modal-content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;">
+        <h3 class="modal-title" style="margin:0;color:#ff6ba8;display:inline-flex;align-items:center;gap:.5rem;">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="#ff6ba8" aria-hidden="true"
+            style="vertical-align:middle;">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+          </svg>
+          <span>Mi Pareja</span>
+        </h3>
+        <button type="button" class="btn-secondary" data-close-pareja
+          style="padding:.3rem .6rem;border-radius:50%;line-height:1;">✕</button>
+      </div>
+
+      <div id="pareja-estado-container"></div>
+
+      <h4 class="friends-subtitle" style="margin-top:.8rem;color:#ff6ba8;">Vincular desde tu grupo o amigos</h4>
+      <div id="pareja-candidatos-lista" class="friend-list"></div>
+
+      <h4 class="friends-subtitle" style="margin-top:.8rem;">O buscar por nombre de usuario</h4>
+      <form id="pareja-search-form" class="friend-search-form">
+        <input id="pareja-search-input" type="text" maxlength="20" placeholder="Nombre de tu pareja" autocomplete="off">
+        <button type="submit" class="btn-pareja">Buscar</button>
+      </form>
+      <div id="pareja-search-results" class="friend-list"></div>
+
+      <div class="modal-actions" style="margin-top:1.2rem;">
+        <button type="button" class="btn-secondary" data-close-pareja>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL AMIGOS Y GRUPO -->
+  <div id="friends-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-friends></div>
+    <div class="modal-content friends-modal-content">
+      <h3 class="modal-title">Mi Grupo de Aventuras 👥</h3>
+      <p id="friends-group-name" class="friends-group-name"></p>
+      <form id="friend-search-form" class="friend-search-form"><input id="friend-search-input" type="text"
+          maxlength="20" placeholder="Buscar por nombre" autocomplete="off"><button type="submit"
+          class="btn-primary">Buscar</button></form>
+      <div id="friend-search-results" class="friend-list"></div>
+      <h4 class="friends-subtitle">Miembros</h4>
+      <div id="group-members-list" class="friend-list"></div>
+      <h4 class="friends-subtitle">Invitaciones recibidas</h4>
+      <div id="group-invites-list" class="friend-list"></div>
+      <div class="modal-actions"><button type="button" class="btn-secondary" data-close-friends>Cerrar</button></div>
+    </div>
+  </div>
+
+  <!-- MODAL AJUSTES -->
+  <div id="settings-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-settings></div>
+    <div class="modal-content settings-modal-content">
+      <h3 class="modal-title">Ajustes</h3>
+      <label class="settings-select"><span><strong>Idioma</strong><small>Elige el idioma de la
+            aplicación.</small></span>
+        <select id="settings-language">
+          <option value="es">Español</option>
+          <option value="en">English</option>
+          <option value="pt">Português</option>
+          <option value="zh">中文</option>
+          <option value="ja">日本語</option>
+          <option value="ko">한국어</option>
+          <option value="it">Italiano</option>
+          <option value="fr">Français</option>
+        </select>
+      </label>
+      <label class="settings-toggle"><input id="toggle-animaciones" type="checkbox"><span><strong>Desactivar
+            animaciones</strong><small>Reduce los movimientos y efectos visuales.</small></span></label>
+      <label class="settings-volume"><span><strong>Volumen de la aplicación</strong><output
+            id="settings-volume-value">65%</output></span><input id="settings-volume" type="range" min="0" max="1"
+          step="0.01" value="0.65"></label>
+      <label class="settings-toggle"><input id="toggle-censura" type="checkbox"><span><strong>Censurar malas
+            palabras</strong><small>Revisa los mensajes antes de guardarlos.</small></span></label>
+      <p class="settings-note">La revisión solo se aplica a mensajes nuevos.</p>
+      <div class="modal-actions"><button type="button" class="btn-secondary" data-close-settings>Cerrar</button></div>
+    </div>
+  </div>
+
+  <!-- MODAL LOGIN -->
+  <div id="auth-modal" class="modal auth-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-auth></div>
+    <div class="auth-card">
+      <div class="auth-tape"></div>
+      <button class="auth-close" data-close-auth aria-label="Cerrar">×</button>
+      <div class="auth-flower" data-icono="girasol"></div>
+      <h2 id="auth-title" class="auth-title">Bienvenido</h2>
+      <p id="auth-subtitle" class="auth-subtitle">Inicia sesión para ver el álbum</p>
+      <form id="auth-form" class="auth-form">
+        <label class="auth-field"><span class="auth-label">Usuario</span><input type="text" id="auth-username"
+            placeholder="tu usuario" autocomplete="username" minlength="3" maxlength="20" required></label>
+        <label class="auth-field"><span class="auth-label">Contraseña</span>
+          <div class="auth-password-wrap"><input type="password" id="auth-password" placeholder="Mínimo 6 caracteres"
+              autocomplete="current-password" minlength="6"><button type="button" class="auth-password-toggle"
+              data-toggle-pass="auth-password" aria-label="Mostrar contraseña"><span data-icono="globo"></span></button>
+          </div>
+        </label>
+        <label class="auth-field" id="confirm-password-field" style="display:none"><span class="auth-label">Repite la
+            contraseña</span>
+          <div class="auth-password-wrap"><input type="password" id="auth-password-confirm"
+              placeholder="Repite tu contraseña" minlength="6"><button type="button" class="auth-password-toggle"
+              data-toggle-pass="auth-password-confirm" aria-label="Mostrar contraseña"><span
+                data-icono="globo"></span></button></div>
+        </label>
+        <label class="auth-remember"><input type="checkbox" id="auth-recordar"><span>Recordar mi usuario</span></label>
+        <p id="auth-error" class="auth-error" style="display:none"></p>
+        <button type="submit" id="auth-submit" class="btn-auth-submit">Entrar</button>
+      </form>
+      <p class="auth-forgot"><a href="#" id="auth-forgot-link">¿Olvidaste tu contraseña?</a></p>
+      <p class="auth-toggle"><span id="auth-toggle-text">¿Aún no tienes cuenta?</span><button type="button"
+          id="auth-toggle-btn" class="auth-link">Crear cuenta</button></p>
+    </div>
+  </div>
+
+  <!-- MODAL FOTO -->
+  <div id="photo-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-content photo-modal-content">
+      <h3 id="modal-title" class="modal-title">Nuevo recuerdo</h3>
+      <form id="photo-form" class="modal-form">
+        <div class="photo-editor-layout">
+          <div class="photo-editor-fields">
+            <label class="form-field"><span class="form-label">La foto</span><input type="file" id="input-photo"
+                accept="image/*" required></label>
+            <label class="form-field"><span class="form-label">¿Cuándo fue?</span><input type="date"
+                id="input-date"></label>
+            <label class="form-field"><span class="form-label">¿Qué quieres recordar?</span><textarea id="input-note"
+                rows="3" maxlength="200" placeholder="Cuéntame algo bonito..."></textarea></label>
+            <label class="form-field form-location-field"><span class="form-label">Ubicación (opcional)</span><button
+                type="button" id="btn-photo-location" class="btn-secondary">Usar mi ubicación</button><small
+                id="photo-location-status" class="photo-location-status">No se guardará hasta que tú lo
+                elijas.</small><input type="hidden" id="input-lat"><input type="hidden" id="input-lng"></label>
+          </div>
+          <div class="photo-preview-column"><span class="form-label">Vista previa</span>
+            <div id="photo-preview" class="photo-preview"></div>
+            <p id="photo-preview-info" class="photo-preview-info" hidden></p>
+          </div>
+        </div>
+        <div class="modal-actions"><button type="button" class="btn-secondary" data-close-modal>Mejor
+            luego</button><button type="submit" class="btn-primary">Guardar recuerdo</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CANCIONES PANELES -->
+  <div class="cancion-panel" data-panel="pegar">
+    <div class="cancion-pegar">
+      <p class="cancion-pegar-hint">Pega tu lista o carga un archivo (.txt, .csv, .m3u):</p>
+      <pre class="cancion-pegar-ejemplos">Canción - Artista
+Artista - Canción
+1. Canción - Artista</pre>
+      <div class="cancion-pegar-cargar"><input type="file" id="cancion-pegar-archivo"
+          accept=".txt,.csv,.m3u,.m3u8,text/plain" multiple hidden><button type="button" id="btn-cargar-archivo"
+          class="btn-secondary">Cargar archivo(s)</button></div>
+      <textarea id="cancion-pegar-texto" class="cancion-pegar-textarea" placeholder="Pega aquí tus canciones..."
+        rows="8"></textarea>
+      <div class="cancion-pegar-opciones"><span class="form-label" style="margin:0">Orden:</span><label><input
+            type="radio" name="pegar-orden" value="titulo-artista" checked> Título - Artista</label><label><input
+            type="radio" name="pegar-orden" value="artista-titulo"> Artista - Título</label></div>
+      <div id="cancion-pegar-preview" class="cancion-pegar-preview"></div>
+      <button type="button" id="btn-importar-canciones" class="btn-primary">Importar todas</button>
+    </div>
+  </div>
+
+  <div class="cancion-panel" data-panel="subir">
+    <div class="cancion-subir">
+      <p class="cancion-pegar-hint">Sube tus canciones (MP3, MP4, M4A, WAV, OGG, FLAC...).</p>
+      <div class="cancion-subir-dropzone" id="cancion-subir-dropzone">
+        <div class="cancion-subir-icon" data-icono="musica"></div>
+        <p class="cancion-subir-text">Arrastra aquí tus archivos</p>
+        <input type="file" id="cancion-subir-archivo" accept="audio/*,video/mp4,.mp3,.mp4,.m4a,.wav,.ogg,.flac,.aac"
+          multiple hidden>
+        <button type="button" id="btn-seleccionar-archivos" class="btn-secondary">Seleccionar archivos</button>
+      </div>
+      <div id="cancion-subir-lista" class="cancion-subir-lista"></div>
+      <button type="button" id="btn-subir-canciones" class="btn-primary" disabled>Subir todas</button>
+    </div>
+  </div>
+
+  <div class="modal-actions" style="margin-top:1rem"><button type="button" class="btn-secondary"
+      data-close-canciones-modal>Cerrar</button></div>
+
+  <!-- MODAL MASCOTA -->
+  <div id="mascota-modal" class="modal mascota-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-mascota></div>
+    <div class="mascota-modal-content">
+      <button class="mascota-modal-close" data-close-mascota aria-label="Cerrar">×</button>
+      <div class="mm-header">
+        <div class="mm-avatar"><img id="mm-avatar-img" src="" alt=""></div>
+        <div class="mm-header-info"><span class="mm-nombre" id="mm-nombre-txt">—</span><span class="mm-estado"
+            id="mm-estado">—</span></div>
+      </div>
+      <div class="mm-tabs" role="tablist">
+        <button type="button" class="mm-tab active" data-mm-tab="estado">Estado</button>
+        <button type="button" class="mm-tab" data-mm-tab="inventario">Inventario</button>
+        <button type="button" class="mm-tab" data-mm-tab="cuidado">Cuidado</button>
+        <button type="button" class="mm-tab" data-mm-tab="acciones">Más</button>
+      </div>
+      <div class="mm-panel active" data-mm-panel="estado">
+        <div class="mm-monedero"><span class="mm-monedero-icon" data-icono="moneda"></span><span
+            class="mm-monedero-label">SunCoins</span><span class="mm-monedero-valor" id="mm-monedas">0</span></div>
+        <div class="mm-stats">
+          <div class="mm-stat"><span class="mm-stat-emoji" data-icono="manzana"></span>
+            <div class="mm-stat-body">
+              <div class="mm-stat-top"><span>Hambre</span><span id="mm-stat-hambre-val">0%</span></div>
+              <div class="mm-stat-barra hambre"><span id="mm-stat-hambre"></span></div>
+            </div>
+          </div>
+          <div class="mm-stat"><span class="mm-stat-emoji" data-icono="corazon"></span>
+            <div class="mm-stat-body">
+              <div class="mm-stat-top"><span>Felicidad</span><span id="mm-stat-felicidad-val">0%</span></div>
+              <div class="mm-stat-barra felicidad"><span id="mm-stat-felicidad"></span></div>
+            </div>
+          </div>
+          <div class="mm-stat"><span class="mm-stat-emoji" data-icono="rayo"></span>
+            <div class="mm-stat-body">
+              <div class="mm-stat-top"><span>Energía</span><span id="mm-stat-energia-val">0%</span></div>
+              <div class="mm-stat-barra energia"><span id="mm-stat-energia"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mm-panel" data-mm-panel="inventario" hidden>
+        <div class="mm-seccion-titulo"><span>Inventario</span><span class="mm-seccion-hint">Arrastra a la mascota</span>
+        </div>
+        <div class="mascota-inventario" id="mm-inventario"></div>
+      </div>
+      <div class="mm-panel" data-mm-panel="cuidado" hidden>
+        <div class="cuidado-diario" id="mm-cuidado-diario"></div>
+      </div>
+      <div class="mm-panel" data-mm-panel="acciones" hidden>
+        <div class="mm-acciones">
+          <button type="button" class="mm-accion mm-accion-mimos" data-accion="mimos"><span class="mm-accion-icono"
+              data-icono="mimar"></span><span>Mimos</span><span class="mascota-accion-progreso"
+              data-progreso="mimos"></span></button>
+          <button type="button" class="mm-accion mm-accion-dormir" data-accion="dormir"><span class="mm-accion-icono"
+              data-icono-dormir></span><span data-txt-dormir>Dormir</span><span class="mascota-accion-progreso"
+              data-progreso="dormir"></span></button>
+        </div>
+        <button type="button" class="mm-accion mm-accion-jugar" data-accion="jugar"><span class="mm-accion-icono"
+            data-icono="jugar"></span><span>Jugar — Atrapa el girasol</span></button>
+        <div class="mm-acciones-extra"><button type="button" class="mm-accion-sec" data-accion="amistad"><span
+              class="mm-accion-icono" data-icono="corazon"></span><span>Amistades</span></button></div>
+        <div class="mm-cambiar"><label class="mm-cambiar-label">Cambiar mascota:</label>
+          <div class="mm-cambiar-lista" id="mm-cambiar-lista"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PERFIL -->
+  <div id="perfil-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-perfil></div>
+    <div class="modal-content perfil-modal-content">
+      <h3 class="modal-title">Mi perfil</h3>
+      <div class="perfil-editor">
+        <div class="perfil-avatar-grande">
+          <img id="perfil-avatar-preview" src="" alt="" style="display:none">
+          <span class="perfil-avatar-fallback" data-icono="persona"></span>
+          <button type="button" class="perfil-avatar-cambiar" id="perfil-avatar-btn" title="Cambiar foto"><span
+              data-icono="camara"></span></button>
+          <input type="file" id="perfil-avatar-input" accept="image/*" hidden>
+        </div>
+        <label class="form-field" style="width:100%"><span class="form-label">Nombre de usuario</span><input type="text"
+            id="perfil-username" maxlength="20" placeholder="tu_nombre"></label>
+        <div class="perfil-stats">
+          <div class="perfil-stat"><strong id="perfil-stat-fotos">0</strong><span>Fotos</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-notas">0</strong><span>Notas</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-canciones">0</strong><span>Canciones</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-logros">0</strong><span>Logros</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-xp">0</strong><span class="perfil-stat-label"><img
+                class="xp-icon" src="img/items%20de%20aventura/estrella.webp" alt="XP" width="14" height="14" loading="lazy" decoding="async">XP</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-mon">0</strong><span class="perfil-stat-label"><img
+                class="coin-icon" src="img/items%20de%20aventura/icon.webp" alt="SunCoins" width="14" height="14" loading="lazy" decoding="async">SunCoins</span></div>
+        </div>
+        <div class="modal-actions" style="width:100%"><button type="button" class="btn-secondary"
+            data-close-perfil>Cancelar</button><button type="button" class="btn-primary" id="perfil-guardar">Guardar
+            cambios</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer" style="display:none !important;" aria-hidden="true"></footer>
+
+  <!-- LOADING -->
+  <div id="loading-screen" class="loading-screen" aria-hidden="true">
+    <div class="loading-content">
+      <div class="loading-flower"><img src="img/girasol-loading.webp" alt="Cargando..." width="80" height="80" fetchpriority="high" decoding="async"></div>
+      <p id="loading-text" class="loading-text">Entrando...</p>
+    </div>
+  </div>
+
+  <!-- PLAYER -->
+  <div id="player-bar" class="player-bar" aria-hidden="true">
+    <button id="player-close" class="player-close" title="Cerrar">×</button>
+    <div class="player-info">
+      <div class="player-cover"><span id="player-cover-icon" data-icono="musica"></span></div>
+      <div class="player-meta"><span class="player-title" id="player-bar-title">—</span><span class="player-artist"
+          id="player-bar-artist"></span></div>
+    </div>
+    <div class="player-controls">
+      <button id="player-shuffle" class="player-btn-sm" title="Aleatorio">⤨</button>
+      <button id="player-prev" class="player-btn" title="Anterior">⏮</button>
+      <button id="player-play" class="player-btn player-btn-play" title="Reproducir">▶</button>
+      <button id="player-next" class="player-btn" title="Siguiente">⏭</button>
+      <button id="player-repeat" class="player-btn-sm" title="Repetir">↻</button>
+    </div>
+    <div id="provider-player" class="provider-player" hidden></div>
+    <div class="player-progress"><span class="player-time" id="player-current">0:00</span><input type="range"
+        id="player-seek" class="player-seek" min="0" max="100" value="0" step="0.1"><span class="player-time"
+        id="player-duration">0:00</span></div>
+    <div class="player-volume"><button id="player-volume-btn" class="player-btn-sm" title="Silenciar">♪</button><input
+        type="range" id="player-volume" class="player-volume-slider" min="0" max="1" step="0.01" value="0.65"></div>
+    <audio id="global-audio" preload="metadata"></audio>
+  </div>
+
+  <!-- MASCOTA FLOTANTE -->
+  <div class="mascota-wrapper" id="mascota-wrapper">
+    <div class="mascota" id="mascota" role="img" aria-label="Tu mascota"><img class="mascota-img" id="mascota-img"
+        src="img/mapache.webp" alt="Mapache" width="96" height="96" decoding="async">
+      <div class="mascota-burbuja" id="mascota-burbuja" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <!-- TIENDA -->
+  <button id="shop-bubble" class="shop-bubble" type="button" aria-label="Abrir tienda"><img class="shop-bubble-icon"
+      src="img/items%20de%20aventura/tienda.webp" alt="Tienda" width="28" height="28" decoding="async"><span class="shop-bubble-text">Tienda</span></button>
+
+  <!-- MODAL RECUPERAR -->
+  <div id="recuperar-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-recuperar></div>
+    <div class="modal-content recuperar-content">
+      <button class="recuperar-close" data-close-recuperar aria-label="Cerrar">×</button>
+      <div class="recuperar-flower" data-icono="girasol"></div>
+      <div class="recuperar-paso active" data-paso="1">
+        <h3 class="recuperar-title">Recuperar contraseña</h3>
+        <p class="recuperar-sub">Escribe tu nombre de usuario y te generaremos un código.</p>
+        <label class="form-field"><span class="form-label">Usuario</span><input type="text" id="recuperar-usuario"
+            placeholder="tu usuario" maxlength="20" autocomplete="username"></label>
+        <p class="recuperar-error" id="recuperar-error-1"></p>
+        <div class="modal-actions"><button type="button" class="btn-secondary"
+            data-close-recuperar>Cancelar</button><button type="button" class="btn-primary" id="recuperar-btn-1">Generar
+            código</button></div>
+      </div>
+      <div class="recuperar-paso" data-paso="2">
+        <h3 class="recuperar-title">Introduce el código</h3>
+        <p class="recuperar-sub">Escribe el código de 6 dígitos.</p>
+        <label class="form-field"><span class="form-label">Código</span><input type="text" id="recuperar-codigo"
+            placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code"></label>
+        <p class="recuperar-error" id="recuperar-error-2"></p>
+        <div class="modal-actions"><button type="button" class="btn-secondary"
+            id="recuperar-volver-1">Atrás</button><button type="button" class="btn-primary"
+            id="recuperar-btn-2">Continuar</button></div>
+      </div>
+      <div class="recuperar-paso" data-paso="3">
+        <h3 class="recuperar-title">Nueva contraseña</h3>
+        <p class="recuperar-sub">Elige una contraseña segura (mínimo 6 caracteres).</p>
+        <label class="form-field"><span class="form-label">Nueva contraseña</span>
+          <div class="auth-password-wrap"><input type="password" id="recuperar-pass1" placeholder="Mínimo 6 caracteres"
+              minlength="6"><button type="button" class="auth-password-toggle" data-toggle-pass="recuperar-pass1"
+              aria-label="Mostrar contraseña"><span data-icono="globo"></span></button></div>
+        </label>
+        <label class="form-field"><span class="form-label">Repite la contraseña</span>
+          <div class="auth-password-wrap"><input type="password" id="recuperar-pass2" placeholder="Repite la contraseña"
+              minlength="6"><button type="button" class="auth-password-toggle" data-toggle-pass="recuperar-pass2"
+              aria-label="Mostrar contraseña"><span data-icono="globo"></span></button></div>
+        </label>
+        <p class="recuperar-error" id="recuperar-error-3"></p>
+        <div class="modal-actions"><button type="button" class="btn-secondary"
+            id="recuperar-volver-2">Atrás</button><button type="button" class="btn-primary" id="recuperar-btn-3">Cambiar
+            contraseña</button></div>
+      </div>
+      <div class="recuperar-paso" data-paso="ok">
+        <div class="recuperar-ok-icon" data-icono="ok"></div>
+        <h3 class="recuperar-title">¡Listo!</h3>
+        <p class="recuperar-sub">Tu contraseña se ha actualizado.</p>
+        <div class="modal-actions"><button type="button" class="btn-primary" data-close-recuperar>Entendido</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+     SCRIPTS — ORDEN CRÍTICO
+     1) Librerías externas
+     2) sprites-names ANTES que rpg-items-dinamicos
+     3) rpg-loot ANTES que rpg-items-dinamicos
+     4) rpg-items-dinamicos
+     5) rpg-loadout
+     6) rpg.js
+     ============================================================ -->
+  <script src="supabase.js"></script>
+  <script src="leaflet.js"></script>
+  <script src="icons-emojis.js"></script>
+  <script src="ds.js"></script>
+  <script src="offline.js"></script>
+  <script src="sun-modal.js"></script>
+  <script src="preferences.js?v=2"></script>
+  <script src="sprites-config.js"></script>
+  <script src="sprites-names.js?v=2"></script>
+  <script src="src/modules/album-core.js"></script>
+  <script src="src/modules/album-grupo.js"></script>
+  <script src="src/modules/album-logros.js?v=2"></script>
+  <script src="src/modules/album-fotos.js?v=2"></script>
+  <script src="src/modules/album-chat.js?v=13"></script>
+  <script src="src/modules/album-notas.js"></script>
+  <script src="src/modules/album-auth.js"></script>
+  <script src="diccionario.js?v=5"></script>
+  <script src="recetas.js?v=9"></script>
+  <script src="src/modules/album-router.js"></script>
+  <script src="album.js?v=121"></script>
+
+  <!-- RPG — Orden crítico (cargados con defer para no bloquear el hilo de renderizado inicial) -->
+  <script src="rpg-loot.js?v=8" defer></script>
+  <script src="rpg-items-dinamicos.js?v=8" defer></script>
+  <script src="rpg-loadout.js?v=8" defer></script>
+  <script src="rpg-data.js?v=1" defer></script>
+  <script src="rpg.js?v=20" defer></script>
+  <script src="rpg-postgame.js?v=1" defer></script>
+  <script src="rpg-habilidades.js" defer></script>
+  <script src="rpg-minimap.js" defer></script>
+  <script src="rpg-canvas.js" defer></script>
+  <script src="rpg-roguelike.js?v=5" defer></script>
+
+  <!-- Resto de la app -->
+  <script src="tienda.js" defer></script>
+  <script src="script.js" defer></script>
+  <script src="perfil.js" defer></script>
+  <script src="logros-extra.js" defer></script>
+  <script src="juegos.js" defer></script>
+  <script src="desafios-diarios.js" defer></script>
+  <script src="mejoras.js" defer></script>
+  <script src="efectos.js" defer></script>
+  <script src="parches-v2.js" defer></script>
+  <script src="watch-party.js" defer></script>
+  <script src="parches-v3.js" defer></script>
+  <script src="youtube-spotify-metadata.js" defer></script>
+  <script src="player-extras.js?v=1" defer></script>
+  <script src="finanzas.js?v=11" defer></script>
+  <script src="capsula-tiempo.js?v=1" defer></script>
+  <script src="pareja-sistema.js?v=1" defer></script>
 
   <!-- FEATURES EXTRA RPG (descomenta cuando confirmes que la base funciona) -->
   <!--
