@@ -421,6 +421,166 @@ if (!window._extraVistas.includes("recetas")) {
     return [];
   }
 
+  // Diccionario básico de ingredientes comunes (Español -> Inglés TheMealDB)
+  const DICCIONARIO_INGREDIENTES_ES_EN = {
+    "pollo": "chicken", "pechuga de pollo": "chicken breast", "muslo de pollo": "chicken thighs",
+    "huevo": "egg", "huevos": "eggs",
+    "arroz": "rice", "arroz jazmin": "jasmine rice", "arroz basmati": "basmati rice",
+    "carne": "beef", "carne de res": "beef", "res": "beef", "ternera": "beef",
+    "cerdo": "pork", "tocino": "bacon", "panceta": "bacon", "jamon": "ham",
+    "tomate": "tomato", "tomates": "tomatoes",
+    "cebolla": "onion", "cebollas": "onions", "cebolla morada": "red onion", "cebollin": "spring onions",
+    "ajo": "garlic", "dientes de ajo": "garlic",
+    "papa": "potatoes", "papas": "potatoes", "patata": "potatoes", "patatas": "potatoes",
+    "zanahoria": "carrots", "zanahorias": "carrots",
+    "queso": "cheese", "queso parmesano": "parmesan", "queso mozzarella": "mozzarella",
+    "pasta": "pasta", "espagueti": "spaghetti", "fideos": "noodles",
+    "leche": "milk", "mantequilla": "butter", "crema": "cream",
+    "harina": "flour", "azucar": "sugar", "sal": "salt", "pimienta": "pepper",
+    "aceite": "olive oil", "aceite de oliva": "olive oil", "aceite de sesamo": "sesame oil",
+    "limon": "lemon", "lima": "lime",
+    "pescado": "salmon", "salmon": "salmon", "atun": "tuna", "camaron": "prawns", "camarones": "prawns", "mariscos": "seafood",
+    "champinon": "mushrooms", "champinones": "mushrooms", "setas": "mushrooms",
+    "espinaca": "spinach", "espinacas": "spinach",
+    "salsa de soja": "soy sauce", "soja": "soy sauce", "soya": "soy sauce",
+    "jengibre": "ginger", "aguacate": "avocado", "palta": "avocado",
+    "pan": "bread", "chocolate": "chocolate", "vainilla": "vanilla",
+    "chile": "chilli", "picante": "chilli"
+  };
+
+  // Normalizar cadena para comparación flexible (sin acentos ni mayúsculas)
+  function normalizarTexto(txt) {
+    return (txt || "")
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+  }
+
+  // Traducir o normalizar ingrediente ingresado a término de búsqueda en TheMealDB
+  async function normalizarIngredienteABusqueda(ingrediente) {
+    const raw = normalizarTexto(ingrediente);
+    if (!raw) return "";
+    if (DICCIONARIO_INGREDIENTES_ES_EN[raw]) {
+      return DICCIONARIO_INGREDIENTES_ES_EN[raw];
+    }
+    for (const [es, en] of Object.entries(DICCIONARIO_INGREDIENTES_ES_EN)) {
+      if (raw.includes(es) || es.includes(raw)) return en;
+    }
+    try {
+      const en = await traducir(raw, "es", "en");
+      return normalizarTexto(en);
+    } catch {
+      return raw;
+    }
+  }
+
+  // Buscar recetas a partir de una lista de ingredientes que el usuario tiene en casa
+  async function buscarRecetasPorIngredientes(listaIngredientesUsuario) {
+    if (!listaIngredientesUsuario || !listaIngredientesUsuario.length) return [];
+
+    const normUsuario = listaIngredientesUsuario.map(i => normalizarTexto(i)).filter(Boolean);
+    if (!normUsuario.length) return [];
+
+    // Mapear cada ingrediente a su equivalente en inglés
+    const terminosBusqueda = await Promise.all(normUsuario.map(i => normalizarIngredienteABusqueda(i)));
+    const terminosUnicos = Array.from(new Set(terminosBusqueda.filter(Boolean)));
+
+    const mapaCandidatos = new Map();
+
+    // 1. Integrar recetas asiáticas locales que contengan alguno de los ingredientes del usuario
+    RECETAS_ASIATICAS_EXTRA.forEach(m => {
+      const ingsMeal = extraerIngredientes(m).map(i => normalizarTexto(i.nombre));
+      const tieneAlguno = normUsuario.some(u => ingsMeal.some(im => im.includes(u) || u.includes(im)));
+      if (tieneAlguno) {
+        mapaCandidatos.set(m.idMeal, m);
+      }
+    });
+
+    // 2. Consultar en TheMealDB por cada ingrediente principal en paralelo (con límite para cuidar red)
+    const topTerminos = terminosUnicos.slice(0, 5);
+    const peticiones = topTerminos.map(t =>
+      fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(t.replace(/\s+/g, "_"))}`)
+        .then(r => r.ok ? r.json() : {})
+        .catch(() => ({}))
+    );
+
+    const resultados = await Promise.all(peticiones);
+    resultados.forEach(res => {
+      (res.meals || []).forEach(m => {
+        if (!mapaCandidatos.has(m.idMeal)) {
+          mapaCandidatos.set(m.idMeal, m);
+        }
+      });
+    });
+
+    // 3. Tomar candidatos y enriquecer con su detalle completo (hasta 30 recetas para fluidez óptima)
+    const listaCandidatos = Array.from(mapaCandidatos.values()).slice(0, 30);
+    const recetasDetalladas = await Promise.all(
+      listaCandidatos.map(async m => {
+        if (m.strInstructions && m.strIngredient1) return m; // Ya tiene detalle
+        const detalle = await obtenerDetalle(m.idMeal);
+        return detalle || m;
+      })
+    );
+
+    // 4. Analizar coincidencia de ingredientes: los que tengo vs los que me faltarían
+    const evaluadas = [];
+
+    for (const meal of recetasDetalladas) {
+      if (!meal) continue;
+      const ingredientesReceta = extraerIngredientes(meal);
+      if (!ingredientesReceta.length) continue;
+
+      const tengo = [];
+      const faltan = [];
+
+      ingredientesReceta.forEach(ing => {
+        const ingNorm = normalizarTexto(ing.nombre);
+        // Comprobar coincidencia con cualquiera de los ingredientes del usuario (español o inglés)
+        const coincide = normUsuario.some(u => ingNorm.includes(u) || u.includes(ingNorm)) ||
+                         terminosUnicos.some(t => ingNorm.includes(t) || t.includes(ingNorm));
+
+        if (coincide) {
+          tengo.push(ing.nombre);
+        } else {
+          faltan.push(ing.nombre);
+        }
+      });
+
+      // Si tiene al menos 1 ingrediente de los que pidió, calcular ratio y puntaje
+      if (tengo.length > 0) {
+        const total = ingredientesReceta.length;
+        const pct = Math.round((tengo.length / total) * 100);
+
+        evaluadas.push({
+          ...meal,
+          _pantryMatch: {
+            tengo,
+            faltan,
+            total,
+            pct
+          }
+        });
+      }
+    }
+
+    // 5. Ordenar por:
+    // a) Mayor cantidad de ingredientes que tengo
+    // b) Mayor porcentaje de completitud
+    evaluadas.sort((a, b) => {
+      const pmA = a._pantryMatch;
+      const pmB = b._pantryMatch;
+      if (pmB.tengo.length !== pmA.tengo.length) {
+        return pmB.tengo.length - pmA.tengo.length;
+      }
+      return pmB.pct - pmA.pct;
+    });
+
+    return evaluadas;
+  }
+
   // Receta aleatoria (incluye recetas de TheMealDB y recetas asiáticas)
   async function recetaAleatoria() {
     try {
@@ -501,6 +661,39 @@ if (!window._extraVistas.includes("recetas")) {
   // Plantilla HTML de tarjeta optimizada con dimensiones explícitas y decode async sin alterar calidad
   function generarTarjetaHTML(m) {
     const imgUrl = m.strMealThumb || "";
+    
+    // Si viene de búsqueda por despensa/ingredientes, generar badge de match y desglose
+    let pantryHtml = "";
+    if (m._pantryMatch) {
+      const pm = m._pantryMatch;
+      const esTotal = pm.pct >= 85;
+      const clasePill = esTotal ? "total" : "parcial";
+      const claseBarra = esTotal ? "" : "parcial";
+      
+      const tengoStr = pm.tengo.length ? pm.tengo.slice(0, 4).join(", ") + (pm.tengo.length > 4 ? ` +${pm.tengo.length - 4}` : "") : "";
+      const faltanStr = pm.faltan.length ? pm.faltan.slice(0, 3).join(", ") + (pm.faltan.length > 3 ? ` +${pm.faltan.length - 3}` : "") : "";
+
+      pantryHtml = `
+        <div class="receta-despensa-badge-container">
+          <div class="receta-despensa-match-row">
+            <span class="receta-despensa-match-pill ${clasePill}">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>Tienes ${pm.tengo.length} de ${pm.total} ingredientes (${pm.pct}%)</span>
+            </span>
+          </div>
+          <div class="receta-despensa-barra">
+            <div class="receta-despensa-barra-fill ${claseBarra}" style="width: ${Math.max(12, pm.pct)}%;"></div>
+          </div>
+          <div class="receta-despensa-desglose">
+            ${tengoStr ? `<div>Tus ingredientes: <strong>${tengoStr}</strong></div>` : ""}
+            ${faltanStr ? `<div><span class="receta-despensa-extra-label">+ Ingredientes extra:</span> <strong>${faltanStr}</strong></div>` : "<div><strong>¡Tienes todos los ingredientes!</strong></div>"}
+          </div>
+        </div>
+      `;
+    }
+
     return `
       <article class="receta-card" data-ver-receta="${m.idMeal}">
         <div class="receta-img-wrap">
@@ -523,6 +716,7 @@ if (!window._extraVistas.includes("recetas")) {
         <div class="receta-body">
           <h3 class="receta-titulo" data-traducir-titulo="${m.idMeal}">${m.strMeal}</h3>
           <p class="receta-titulo-orig">Original: ${m.strMeal}</p>
+          ${pantryHtml}
           <div class="receta-meta-preview">
             <span class="receta-meta-item">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true">
@@ -925,6 +1119,150 @@ if (!window._extraVistas.includes("recetas")) {
       });
     });
 
+    // Estado de la Despensa de Ingredientes
+    const ingredientesDespensa = new Set();
+
+    function renderizarTagsDespensa() {
+      const container = $("recetas-tags-container");
+      const placeholder = $("recetas-tags-placeholder");
+      if (!container) return;
+
+      if (ingredientesDespensa.size === 0) {
+        container.innerHTML = `<span class="recetas-tags-placeholder" id="recetas-tags-placeholder">Aún no has agregado ingredientes. Escribe arriba o toca los atajos rápidos de abajo.</span>`;
+        return;
+      }
+
+      const tagsHtml = Array.from(ingredientesDespensa).map(ing => `
+        <span class="receta-tag-ingrediente" data-ing-tag="${ing}">
+          <span>${ing}</span>
+          <button type="button" class="receta-tag-ingrediente-remove" data-remove-ing="${ing}" aria-label="Eliminar ${ing}">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </span>
+      `).join("");
+
+      container.innerHTML = tagsHtml;
+
+      // Listeners para eliminar tags
+      container.querySelectorAll("[data-remove-ing]").forEach(btn => {
+        btn.addEventListener("click", e => {
+          e.stopPropagation();
+          const toRemove = btn.dataset.removeIng;
+          ingredientesDespensa.delete(toRemove);
+          renderizarTagsDespensa();
+        });
+      });
+    }
+
+    function agregarIngredienteDespensa(nombre) {
+      const limpio = (nombre || "").trim();
+      if (!limpio || limpio.length < 2) return;
+      const capitalizado = limpio.charAt(0).toUpperCase() + limpio.slice(1).toLowerCase();
+      ingredientesDespensa.add(capitalizado);
+      renderizarTagsDespensa();
+    }
+
+    async function ejecutarBusquedaDespensa() {
+      if (ingredientesDespensa.size === 0) {
+        if (grid) {
+          grid.innerHTML = `
+            <div class="receta-vacio">
+              <div style="font-size: 2.8rem; margin-bottom: 0.5rem;" aria-hidden="true">🧺</div>
+              <h3>Ingresa al menos 1 ingrediente</h3>
+              <p>Escribe qué tienes en casa (ej. pollo, arroz, huevo, tomate) o pulsa sobre las sugerencias rápidas.</p>
+            </div>
+          `;
+          actualizarBarraRecetas(0, 0, "Mis Ingredientes");
+        }
+        return;
+      }
+
+      const lista = Array.from(ingredientesDespensa);
+      if (grid) {
+        grid.innerHTML = `
+          <div class="receta-loading">
+            <div class="receta-spinner"></div>
+            <p>Buscando recetas mágicas con <strong>${lista.join(", ")}</strong>...</p>
+          </div>
+        `;
+      }
+
+      const resultados = await buscarRecetasPorIngredientes(lista);
+      renderRecetas(resultados, "recetas-grid", `Ingredientes (${lista.join(", ")})`);
+    }
+
+    // Toggle de Modos: General vs Despensa
+    const btnModoGeneral = $("recetas-modo-general");
+    const btnModoDespensa = $("recetas-modo-despensa");
+    const boxGeneral = $("recetas-box-general");
+    const boxDespensa = $("recetas-box-despensa");
+
+    btnModoGeneral?.addEventListener("click", () => {
+      btnModoGeneral.classList.add("active");
+      btnModoDespensa?.classList.remove("active");
+      boxGeneral?.classList.remove("hidden");
+      boxDespensa?.classList.add("hidden");
+    });
+
+    btnModoDespensa?.addEventListener("click", () => {
+      btnModoDespensa.classList.add("active");
+      btnModoGeneral?.classList.remove("active");
+      boxDespensa?.classList.remove("hidden");
+      boxGeneral?.classList.add("hidden");
+      $("recetas-ingrediente-input")?.focus();
+    });
+
+    // Formulario de agregar ingrediente
+    const ingForm = $("recetas-ingrediente-form");
+    const ingInput = $("recetas-ingrediente-input");
+    ingForm?.addEventListener("submit", e => {
+      e.preventDefault();
+      const val = ingInput?.value.trim();
+      if (val) {
+        agregarIngredienteDespensa(val);
+        ingInput.value = "";
+      }
+    });
+
+    // Botón de buscar recetas por despensa
+    $("recetas-despensa-buscar-btn")?.addEventListener("click", () => {
+      // Si el input tiene algo sin enviar, agregarlo primero
+      if (ingInput?.value.trim()) {
+        agregarIngredienteDespensa(ingInput.value.trim());
+        ingInput.value = "";
+      }
+      ejecutarBusquedaDespensa();
+    });
+
+    // Botón limpiar despensa
+    $("recetas-despensa-limpiar")?.addEventListener("click", () => {
+      ingredientesDespensa.clear();
+      renderizarTagsDespensa();
+      if (grid) {
+        grid.innerHTML = `
+          <div class="receta-vacio">
+            <div style="font-size: 2.8rem; margin-bottom: 0.5rem;" aria-hidden="true">🧺</div>
+            <h3>Despensa lista</h3>
+            <p>Agrega ingredientes para encontrar recetas que puedes cocinar ahora mismo.</p>
+          </div>
+        `;
+        actualizarBarraRecetas(0, 0, "Mis Ingredientes");
+      }
+    });
+
+    // Chips de sugerencias rápidas
+    document.querySelectorAll(".receta-sug-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const ing = chip.dataset.ing;
+        if (ing) {
+          agregarIngredienteDespensa(ing);
+        }
+      });
+    });
+
     // Delegación de clics eficiente en contenedor
     document.addEventListener("click", e => {
       const card = e.target.closest("[data-ver-receta]");
@@ -953,5 +1291,5 @@ if (!window._extraVistas.includes("recetas")) {
     initRecetas();
   }
 
-  window.SunRecetas = { buscarRecetas, recetaAleatoria, abrirModalReceta };
+  window.SunRecetas = { buscarRecetas, buscarRecetasPorIngredientes, recetaAleatoria, abrirModalReceta };
 })();

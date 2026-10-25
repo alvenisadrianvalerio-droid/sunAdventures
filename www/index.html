@@ -976,7 +976,27 @@
           guiada paso a paso.</p>
       </header>
 
-      <div class="recetas-search-box">
+      <!-- Modos de Búsqueda: Búsqueda General vs Mis Ingredientes (Despensa) -->
+      <div class="recetas-modos-nav">
+        <button type="button" class="recetas-modo-btn active" id="recetas-modo-general" data-recetas-modo="general">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span>Buscar por Nombre o Plato</span>
+        </button>
+        <button type="button" class="recetas-modo-btn" id="recetas-modo-despensa" data-recetas-modo="despensa">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span>Cocinar con lo que tengo (Ingredientes)</span>
+          <span class="recetas-modo-badge">¡Nuevo!</span>
+        </button>
+      </div>
+
+      <div class="recetas-search-box" id="recetas-box-general">
         <form id="recetas-form" class="recetas-form" autocomplete="off">
           <span class="recetas-search-icon">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -986,7 +1006,7 @@
             </svg>
           </span>
           <input type="text" id="recetas-input" class="recetas-input"
-            placeholder="Busca un plato o ingrediente (ej. pasta, pollo, chocolate, pizza)..." maxlength="60">
+            placeholder="Busca un plato o categoría (ej. pasta carbonara, ramen, sushi, curry, pizza)..." maxlength="60">
           <button type="submit" class="recetas-btn-submit">
             <span>Buscar</span>
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -1009,6 +1029,76 @@
             <span>¡Sorpréndeme!</span>
           </button>
         </form>
+      </div>
+
+      <!-- Panel de Cocinar con mis Ingredientes (Despensa) -->
+      <div class="recetas-despensa-box hidden" id="recetas-box-despensa">
+        <div class="recetas-despensa-header">
+          <div class="recetas-despensa-info">
+            <h3 class="recetas-despensa-titulo">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+              <span>Ingresa qué ingredientes tienes en casa</span>
+            </h3>
+            <p class="recetas-despensa-sub">Te mostraremos recetas que puedes preparar con ellos y qué ingredientes adicionales te faltarían.</p>
+          </div>
+          <button type="button" id="recetas-despensa-limpiar" class="recetas-despensa-btn-limpiar" title="Quitar todos los ingredientes">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span>Limpiar</span>
+          </button>
+        </div>
+
+        <!-- Formulario para agregar ingrediente -->
+        <form id="recetas-ingrediente-form" class="recetas-ingrediente-form" autocomplete="off">
+          <div class="recetas-ingrediente-input-wrap">
+            <span class="recetas-ingrediente-input-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </span>
+            <input type="text" id="recetas-ingrediente-input" class="recetas-ingrediente-input"
+              placeholder="Escribe un ingrediente (ej. huevo, pollo, arroz, tomate, ajo, queso, papa)..." maxlength="40">
+          </div>
+          <button type="submit" class="recetas-ingrediente-btn-add">
+            <span>Agregar</span>
+          </button>
+          <button type="button" id="recetas-despensa-buscar-btn" class="recetas-btn-submit">
+            <span>Buscar Recetas</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </form>
+
+        <!-- Tags de ingredientes agregados -->
+        <div class="recetas-tags-container" id="recetas-tags-container">
+          <span class="recetas-tags-placeholder" id="recetas-tags-placeholder">Aún no has agregado ingredientes. Escribe arriba o toca los atajos rápidos de abajo.</span>
+        </div>
+
+        <!-- Atajos rápidos populares para agregar con 1 clic -->
+        <div class="recetas-despensa-sugerencias">
+          <span class="recetas-sugerencias-label">Sugerencias rápidas:</span>
+          <div class="recetas-sugerencias-chips" id="recetas-sugerencias-chips">
+            <button type="button" class="receta-sug-chip" data-ing="Pollo">+ Pollo</button>
+            <button type="button" class="receta-sug-chip" data-ing="Huevo">+ Huevo</button>
+            <button type="button" class="receta-sug-chip" data-ing="Arroz">+ Arroz</button>
+            <button type="button" class="receta-sug-chip" data-ing="Tomate">+ Tomate</button>
+            <button type="button" class="receta-sug-chip" data-ing="Cebolla">+ Cebolla</button>
+            <button type="button" class="receta-sug-chip" data-ing="Ajo">+ Ajo</button>
+            <button type="button" class="receta-sug-chip" data-ing="Queso">+ Queso</button>
+            <button type="button" class="receta-sug-chip" data-ing="Pasta">+ Pasta</button>
+            <button type="button" class="receta-sug-chip" data-ing="Carne de Res">+ Carne</button>
+            <button type="button" class="receta-sug-chip" data-ing="Papas">+ Papa</button>
+            <button type="button" class="receta-sug-chip" data-ing="Leche">+ Leche</button>
+            <button type="button" class="receta-sug-chip" data-ing="Zanahoria">+ Zanahoria</button>
+          </div>
+        </div>
       </div>
 
       <!-- Categorías rápidas con Iconos SVG -->
