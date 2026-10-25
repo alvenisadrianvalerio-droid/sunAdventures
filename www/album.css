@@ -10615,4 +10615,326 @@ body:has(.modal.active) .shop-bubble {
 @keyframes fsSlideRightIn {
   from { opacity: 0; transform: translateX(-40px); }
   to { opacity: 1; transform: translateX(0); }
-}
+}
+
+/* ============================================================
+   REDISEÑO DASHBOARD: BRAND & CUADRÍCULA ILUSTRADA
+   ============================================================ */
+.lobby-brand-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.lobby-brand-img {
+  max-width: 340px;
+  width: 90%;
+  height: auto;
+  filter: drop-shadow(0 8px 20px rgba(245, 166, 35, 0.22));
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lobby-brand-img:hover {
+  transform: scale(1.03) rotate(-1deg);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin: 1.8rem 0 2rem;
+  width: 100%;
+}
+
+.dashboard-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card, rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text, #fff);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+  will-change: transform;
+}
+
+body.light .dashboard-card {
+  background: #ffffff;
+  border-color: rgba(220, 185, 140, 0.45);
+  box-shadow: 0 4px 16px rgba(110, 70, 30, 0.08);
+}
+
+.dashboard-card:hover,
+.dashboard-card:focus-visible {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(245, 166, 35, 0.22);
+  border-color: #f5a623;
+  outline: none;
+}
+
+.dashboard-card-media {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: rgba(245, 166, 35, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.dashboard-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.dashboard-card:hover .dashboard-card-img {
+  transform: scale(1.05);
+}
+
+.dashboard-card-info {
+  padding: 0.9rem 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dashboard-card-title {
+  font-family: var(--font-display, 'Quicksand', sans-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text, #fff);
+}
+
+body.light .dashboard-card-title {
+  color: #3b2314;
+}
+
+.dashboard-card-sub {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  line-height: 1.35;
+}
+
+/* Responsividad Dashboard */
+@media (max-width: 1100px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
+  }
+  .dashboard-card-info {
+    padding: 0.75rem 0.8rem 0.9rem;
+  }
+  .dashboard-card-title {
+    font-size: 0.92rem;
+  }
+  .dashboard-card-sub {
+    font-size: 0.74rem;
+  }
+}
+
+@media (max-width: 440px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+  .lobby-brand-img {
+    max-width: 260px;
+  }
+}
+
+/* ============================================================
+   REDISEÑO MASCOTAS: PANEL REFUGIO / HOGAR
+   ============================================================ */
+.mascotas-hogar-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  background: var(--bg-card, rgba(255, 255, 255, 0.04));
+  border: 1.5px solid rgba(245, 166, 35, 0.35);
+  border-radius: 22px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.2rem 0 1.6rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+body.light .mascotas-hogar-panel {
+  background: #ffffff;
+  border-color: rgba(245, 166, 35, 0.5);
+  box-shadow: 0 8px 24px rgba(138, 83, 45, 0.08);
+}
+
+.mascotas-hogar-main {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex: 1;
+}
+
+.mascotas-hogar-avatar-wrap {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  padding: 4px;
+  background: linear-gradient(135deg, #ffd152, #f5a623);
+  box-shadow: 0 4px 14px rgba(245, 166, 35, 0.35);
+}
+
+.mascotas-hogar-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  background: #2b1f14;
+}
+
+.mascotas-hogar-badge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: #8a532d;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 2px solid #fff;
+  letter-spacing: 0.5px;
+}
+
+.mascotas-hogar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.mascotas-hogar-top {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.mascotas-hogar-nombre {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text, #fff);
+}
+
+body.light .mascotas-hogar-nombre {
+  color: #3b2314;
+}
+
+.mascotas-hogar-titulo-vinculo {
+  font-size: 0.8rem;
+  color: #f5a623;
+  font-weight: 700;
+  background: rgba(245, 166, 35, 0.12);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.mascotas-hogar-frase {
+  margin: 0;
+  font-size: 0.88rem;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+.mascotas-hogar-barra-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.2rem;
+  max-width: 420px;
+}
+
+.mascotas-hogar-barra-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+body.light .mascotas-hogar-barra-track {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.mascotas-hogar-barra-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #f5a623, #ff6ba8);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.mascotas-hogar-barra-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.mascotas-hogar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.btn-hogar-accion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.15rem;
+  background: linear-gradient(135deg, #ffd152, #f5a623);
+  color: #3e210e;
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-hogar-accion:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 166, 35, 0.35);
+}
+
+.btn-hogar-evolucion {
+  background: linear-gradient(135deg, #ff7675, #d63031);
+  color: #fff;
+  animation: pulse 1.8s infinite;
+}
+
+@media (max-width: 720px) {
+  .mascotas-hogar-panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .mascotas-hogar-actions {
+    flex-direction: row;
+  }
+  .btn-hogar-accion {
+    flex: 1;
+    justify-content: center;
+  }
+}
+

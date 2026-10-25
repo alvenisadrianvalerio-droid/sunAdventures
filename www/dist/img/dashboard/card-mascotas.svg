@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="roofGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7675"/>
+      <stop offset="100%" stop-color="#D63031"/>
+    </linearGradient>
+    <linearGradient id="woodGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFEAA7"/>
+      <stop offset="100%" stop-color="#FDCB6E"/>
+    </linearGradient>
+    <radialGradient id="pawGlow" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#FFF275"/>
+      <stop offset="100%" stop-color="#E17055"/>
+    </radialGradient>
+    <filter id="houseShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="7" stdDeviation="5" flood-color="#000" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+
+  <!-- Pet House -->
+  <g filter="url(#houseShadow)">
+    <!-- Base House Box -->
+    <rect x="36" y="68" width="88" height="68" rx="8" fill="url(#woodGrad)" stroke="#E17055" stroke-width="2.5"/>
+    <!-- Wood planks lines -->
+    <line x1="36" y1="88" x2="124" y2="88" stroke="#E17055" stroke-width="1.2" opacity="0.4"/>
+    <line x1="36" y1="110" x2="124" y2="110" stroke="#E17055" stroke-width="1.2" opacity="0.4"/>
+    
+    <!-- Arch Doorway -->
+    <path d="M60 136 V96 C60 85 100 85 100 96 V136 Z" fill="#2D3436"/>
+    
+    <!-- Roof with overhang -->
+    <polygon points="80,18 20,68 140,68" fill="url(#roofGrad)" stroke="#B71540" stroke-width="2.5"/>
+    <!-- Roof trim ridge -->
+    <path d="M80 18 L20 68 L28 73 L80 29 L132 73 L140 68 Z" fill="#FFB8B8" opacity="0.4"/>
+
+    <!-- Glowing Heart-Paw over the door -->
+    <g transform="translate(80, 50) scale(0.9)">
+      <circle cx="0" cy="0" r="13" fill="#FFFFFF" opacity="0.9"/>
+      <!-- Paw pads -->
+      <circle cx="-5" cy="-4" r="2.2" fill="#E84393"/>
+      <circle cx="0" cy="-6" r="2.2" fill="#E84393"/>
+      <circle cx="5" cy="-4" r="2.2" fill="#E84393"/>
+      <!-- Main heart pad -->
+      <path d="M-4 1 C-6 -2 -1 -3 0 -1 C1 -3 6 -2 4 1 C2 4 0 6 0 6 C0 6 -2 4 -4 1 Z" fill="#E84393"/>
+    </g>
+
+    <!-- Warm food bowl outside -->
+    <g transform="translate(112, 122)">
+      <ellipse cx="0" cy="10" rx="14" ry="5" fill="#E17055"/>
+      <ellipse cx="0" cy="8" rx="13" ry="4" fill="#FFEAA7"/>
+      <!-- Food inside -->
+      <circle cx="-3" cy="7" r="2" fill="#6C5CE7"/>
+      <circle cx="3" cy="8" r="2" fill="#F39C12"/>
+    </g>
+  </g>
+</svg>

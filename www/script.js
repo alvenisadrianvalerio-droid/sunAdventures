@@ -1690,7 +1690,104 @@ sprite.style.opacity = "0.25";
   /* ============================================================
      GRID MASCOTAS
      ============================================================ */
+  function actualizarHogarMascota() {
+    const act = localStorage.getItem("mascota_actual") || "mapache";
+    const info = MASCOTAS[act] || MASCOTAS.mapache;
+    const vData = getVinculoData(act);
+    const u = getUserId();
+
+    const imgEl = $("hogar-mascota-img");
+    const nombreEl = $("hogar-mascota-nombre");
+    const badgeVinculoEl = $("hogar-mascota-badge-vinculo");
+    const tituloVinculoEl = $("hogar-mascota-titulo-vinculo");
+    const fraseEl = $("hogar-mascota-frase");
+    const fillEl = $("hogar-mascota-barra-fill");
+    const xpTextoEl = $("hogar-mascota-xp-texto");
+    const bonoTextoEl = $("hogar-mascota-bono-texto");
+    const btnCuidado = $("btn-hogar-abrir-cuidado");
+    const btnEvolucion = $("btn-hogar-evolucionar");
+
+    if (imgEl && info) {
+      imgEl.src = info.imagen;
+      imgEl.alt = info.nombre;
+    }
+    if (nombreEl && info) nombreEl.textContent = info.nombre;
+    if (badgeVinculoEl) badgeVinculoEl.textContent = `Rango ${vData.rango}`;
+    if (tituloVinculoEl) tituloVinculoEl.textContent = vData.titulo;
+
+    const FRASES_MASCOTA = {
+      mapache: "¡Listo para cualquier aventura a tu lado!",
+      girasol: "Brillando siempre para alegrarte el día.",
+      gatito: "Ronroneando de felicidad cada vez que vienes.",
+      "gatito-negro": "Tu amuleto leal de buena suerte en cada paso.",
+      hamburguesa: "¡El bocado más crujiente y tierno del mundo!",
+      pollito: "Pío pío, ¡siguiendo tus huellas a donde vayas!",
+      oveja: "Suave, tranquila y siempre acompañándote con calma.",
+      conejo: "¡Saltando de emoción por nuestros logros juntos!",
+      jirafa: "Mirando alto hacia nuestro hermoso futuro.",
+      unicornio: "Esparciendo chispas de magia en cada rincón.",
+      "dragon-bebe": "Pequeño pero con un fuego ardiente de lealtad.",
+      "dragon-anciano": "Guardián legendario de nuestro amor infinito."
+    };
+    if (fraseEl) fraseEl.textContent = `"${FRASES_MASCOTA[act] || '¡Siempre a tu lado!'}"`;
+
+    if (fillEl) fillEl.style.width = `${vData.progreso}%`;
+    if (xpTextoEl) {
+      if (vData.siguiente) {
+        xpTextoEl.textContent = `${vData.xp} / ${vData.siguiente.min} XP Vínculo`;
+      } else {
+        xpTextoEl.textContent = `${vData.xp} XP · ¡Vínculo Supremo!`;
+      }
+    }
+    if (bonoTextoEl) bonoTextoEl.textContent = `+${vData.bonoPct}% Efecto Pasivo`;
+
+    if (btnCuidado && !btnCuidado.dataset.bound) {
+      btnCuidado.dataset.bound = "true";
+      btnCuidado.addEventListener("click", () => {
+        const modal = $("mascota-cuidado-modal");
+        if (modal) {
+          modal.classList.add("active");
+          modal.hidden = false;
+          window._actualizarModalCuidado?.();
+        } else {
+          try { notifMascota(info.nombre, "¡Te mira con infinito amor y felicidad!"); snd("pop"); } catch {}
+        }
+      });
+    }
+
+    // Regla de evolución del Dragón Bebé a Anciano:
+    // Requiere tener Dragon Bebé activo o adquirido, y haber alcanzado Vínculo Nivel >= 5
+    if (btnEvolucion) {
+      const tieneBebe = getMascotasCompradas().includes("dragon-bebe") || act === "dragon-bebe";
+      const yaTieneAnciano = getMascotasCompradas().includes("dragon-anciano");
+      const vinculoBebe = getVinculoData("dragon-bebe");
+      const puedeEvolucionar = tieneBebe && !yaTieneAnciano && vinculoBebe.nivel >= 5;
+
+      if (puedeEvolucionar) {
+        btnEvolucion.style.display = "inline-flex";
+        if (!btnEvolucion.dataset.bound) {
+          btnEvolucion.dataset.bound = "true";
+          btnEvolucion.addEventListener("click", () => {
+            const compradas = getMascotasCompradas();
+            if (!compradas.includes("dragon-anciano")) {
+              compradas.push("dragon-anciano");
+              setMascotasCompradas(compradas);
+              localStorage.setItem("mascota_actual", "dragon-anciano");
+              notifMascota("¡EVOLUCIÓN LEGENDARIA!", "¡Tu Dragón Bebé ha madurado al Dragón Anciano!");
+              try { snd("fanfarria") || snd("compra"); } catch {}
+              renderGrid();
+              window.dispatchEvent(new Event("sunad:progress"));
+            }
+          });
+        }
+      } else {
+        btnEvolucion.style.display = "none";
+      }
+    }
+  }
+
   function renderGrid() {
+    actualizarHogarMascota();
     const g = $("mascotas-grid"), e = $("mascotas-empty");
     if (!g) return;
     const act = localStorage.getItem("mascota_actual") || "mapache";
@@ -1725,9 +1822,18 @@ sprite.style.opacity = "0.25";
       }
       else {
         p.textContent = "Mascota adquirida";
-        b.textContent = "✓ Adquirida";
-        b.classList.add("activo");
-        b.disabled = true;
+        b.textContent = (id === act) ? "✓ En Compañía" : "Acompañarme";
+        if (id === act) b.classList.add("activo");
+        b.disabled = (id === act);
+        if (id !== act) {
+          b.addEventListener("click", () => {
+            localStorage.setItem("mascota_actual", id);
+            notifMascota("Nuevo compañero", `Ahora te acompaña ${info.nombre}`);
+            try { snd("pop"); } catch {}
+            renderGrid();
+            window.dispatchEvent(new Event("sunad:progress"));
+          });
+        }
       }
       c.append(im, h, p, b);
       g.appendChild(c);

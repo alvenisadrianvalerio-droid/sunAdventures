@@ -1,4 +1,4 @@
-const CACHE_NAME = "sunad-v236";
+const CACHE_NAME = "sunad-v237";
 const ASSETS_ESTATICOS = [
   "./", "./index.html", "./styles.css", "./album.css", "./juegos.css",
   "./rpg.css", "./rpg-loot.css", "./temas.css", "./finanzas.css", "./capsula-tiempo.css", "./pareja-chat.css", "./diccionario.css", "./recetas.css",
@@ -12,6 +12,19 @@ const ASSETS_ESTATICOS = [
   "./rpg-roguelike.js", "./desafios-diarios.js", "./mejoras.js", "./parches-v2.js", "./parches-v3.js", "./pareja-sistema.js",
   "./manifest.json", "./img/girasol-loading.png", "./img/girasol-loading.webp",
   "./img/girasol.webp", "./img/mapache.webp", "./img/receta-mochi-matcha.jpg",
+  "./img/dashboard/brand-four-sunflowers.svg",
+  "./img/dashboard/card-album.svg",
+  "./img/dashboard/card-notas.svg",
+  "./img/dashboard/card-mascotas.svg",
+  "./img/dashboard/card-recetas.svg",
+  "./img/dashboard/card-aventura.svg",
+  "./img/dashboard/card-roguelike.svg",
+  "./img/dashboard/card-minijuegos.svg",
+  "./img/dashboard/card-finanzas.svg",
+  "./img/dashboard/card-diccionario.svg",
+  "./img/dashboard/card-musica.svg",
+  "./img/dashboard/card-calendario.svg",
+  "./img/dashboard/card-logros.svg",
   "./img/items%20de%20aventura/icon.png", "./img/items%20de%20aventura/icon.webp",
   "./img/items%20de%20aventura/estrella.png", "./img/items%20de%20aventura/estrella.webp",
   "./img/items%20de%20aventura/corona.png", "./img/items%20de%20aventura/corona.webp",

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFEAA7"/>
+      <stop offset="100%" stop-color="#DFE6E9"/>
+    </linearGradient>
+    <linearGradient id="lensGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0984E3"/>
+      <stop offset="50%" stop-color="#2D3436"/>
+      <stop offset="100%" stop-color="#1E272E"/>
+    </linearGradient>
+    <radialGradient id="flashGrad" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#FFF275"/>
+      <stop offset="100%" stop-color="#F39C12"/>
+    </radialGradient>
+    <filter id="cardShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Polaroid photo sliding out from camera bottom -->
+  <g transform="translate(42, 75) rotate(-6)" filter="url(#cardShadow)">
+    <rect x="0" y="0" width="76" height="72" rx="4" fill="#FFFFFF"/>
+    <rect x="6" y="6" width="64" height="48" rx="2" fill="#74B9FF"/>
+    <!-- Photo scene: sun & hill -->
+    <circle cx="54" cy="18" r="7" fill="#FFEAA7"/>
+    <path d="M6 46 Q24 28 42 42 T70 38 L70 54 L6 54 Z" fill="#55EFC4"/>
+    <!-- Heart sticker on polaroid -->
+    <path d="M38 60 C38 58 41 57 42.5 58.5 C44 57 47 58 47 60 C47 62.5 42.5 64.5 42.5 64.5 C42.5 64.5 38 62.5 38 60 Z" fill="#FF7675"/>
+  </g>
+
+  <!-- Camera Body -->
+  <g filter="url(#cardShadow)">
+    <!-- Main vintage casing -->
+    <rect x="22" y="38" width="116" height="82" rx="18" fill="url(#bodyGrad)" stroke="#B2BEC3" stroke-width="2"/>
+    <!-- Leather / color wrap stripe -->
+    <path d="M22 64 Q80 62 138 64 L138 100 Q80 102 22 100 Z" fill="#FF7675"/>
+    <!-- Top viewfinder hump & shutter -->
+    <rect x="42" y="28" width="28" height="12" rx="3" fill="#636E72"/>
+    <circle cx="112" cy="33" r="7" fill="#E17055"/>
+    <!-- Flash window -->
+    <rect x="30" y="44" width="20" height="15" rx="4" fill="url(#flashGrad)" stroke="#D63031" stroke-width="1.5"/>
+    <!-- Big Vintage Lens -->
+    <circle cx="80" cy="80" r="32" fill="#2D3436" stroke="#FFEAA7" stroke-width="3"/>
+    <circle cx="80" cy="80" r="26" fill="url(#lensGrad)"/>
+    <circle cx="80" cy="80" r="18" fill="#1E272E"/>
+    <!-- Glass Reflections -->
+    <ellipse cx="73" cy="73" rx="7" ry="4" fill="#FFFFFF" opacity="0.6" transform="rotate(-30 73 73)"/>
+    <circle cx="87" cy="87" r="3" fill="#FFFFFF" opacity="0.4"/>
+  </g>
+</svg>
