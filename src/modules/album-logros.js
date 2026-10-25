@@ -123,16 +123,26 @@
     return wrapper;
   };
 
-  const NIVEL_A_ICONO = { sprout: "raiz", heart: "corazon", flame: "fuego", sparkle: "estrella", sunflower: "girasol" };
-  const NIVELES_EXPERIENCIA = [
-    { minimo: 0, nombre: "Novatos", icono: "sprout", siguiente: 100, siguienteNombre: "Enamorados", siguienteIcono: "heart" },
-    { minimo: 100, nombre: "Enamorados", icono: "heart", siguiente: 500, siguienteNombre: "Compañeros de vida", siguienteIcono: "flame" },
-    { minimo: 500, nombre: "Compañeros de vida", icono: "flame", siguiente: 1000, siguienteNombre: "Almas gemelas", siguienteIcono: "sparkle" },
-    { minimo: 1000, nombre: "Almas gemelas", icono: "sparkle", siguiente: 5000, siguienteNombre: "Leyendas", siguienteIcono: "sunflower" },
-    { minimo: 5000, nombre: "Leyendas", icono: "sunflower", siguiente: null, siguienteNombre: "Máximo nivel", siguienteIcono: null }
+  // 1. Escala Individual: Rangos de Aventurero / Explorador Solitario
+  const NIVEL_INDIVIDUAL_A_ICONO = { sprout: "raiz", brújula: "mapa", sword: "espada", shield: "estrella", sunflower: "girasol" };
+  const NIVELES_INDIVIDUALES = [
+    { minimo: 0, nombre: "Explorador Novato", icono: "sprout", siguiente: 100, siguienteNombre: "Aventurero Intrépido", siguienteIcono: "brújula" },
+    { minimo: 100, nombre: "Aventurero Intrépido", icono: "brújula", siguiente: 500, siguienteNombre: "Caballero del Sol", siguienteIcono: "sword" },
+    { minimo: 500, nombre: "Caballero del Sol", icono: "sword", siguiente: 1500, siguienteNombre: "Héroe Legendario", siguienteIcono: "shield" },
+    { minimo: 1500, nombre: "Héroe Legendario", icono: "shield", siguiente: 5000, siguienteNombre: "Guardián Supremo", siguienteIcono: "sunflower" },
+    { minimo: 5000, nombre: "Guardián Supremo", icono: "sunflower", siguiente: null, siguienteNombre: "Máximo Nivel", siguienteIcono: null }
   ];
 
-  /* Función global para otorgar XP directamente a la barra de nivel */
+  // 2. Escala de Pareja: Rangos de Vínculo Afectivo y Amor Mutuo
+  const NIVELES_PAREJA = [
+    { minimo: 0, nombre: "Primeras Miradas", icono: "🌱", siguiente: 100, siguienteNombre: "Enamorados", siguienteIcono: "💖" },
+    { minimo: 100, nombre: "Enamorados", icono: "💖", siguiente: 400, siguienteNombre: "Compañeros de Vida", siguienteIcono: "🔥" },
+    { minimo: 400, nombre: "Compañeros de Vida", icono: "🔥", siguiente: 1000, siguienteNombre: "Almas Gemelas", siguienteIcono: "✨" },
+    { minimo: 1000, nombre: "Almas Gemelas", icono: "✨", siguiente: 3000, siguienteNombre: "Amor Eterno", siguienteIcono: "💍" },
+    { minimo: 3000, nombre: "Amor Eterno", icono: "💍", siguiente: null, siguienteNombre: "Vínculo Infinito", siguienteIcono: null }
+  ];
+
+  /* Función global para otorgar XP directamente a la barra de nivel individual */
   window._sumarExperienciaGlobal = (cantidad = 0, motivo = "") => {
     try {
       if (!cantidad || cantidad <= 0) return;
@@ -144,24 +154,37 @@
       renderExperiencia();
       window.dispatchEvent(new Event("sunad:progress"));
       if (motivo) {
-        try { window._TiendaAPI?.notifMascota?.("¡+XP de Nivel!", `+${Math.round(cantidad)} XP · ${motivo}`); } catch {}
+        try { window._TiendaAPI?.notifMascota?.("¡+XP Individual!", `+${Math.round(cantidad)} XP · ${motivo}`); } catch {}
       }
     } catch (err) { console.warn("sumarExperienciaGlobal:", err); }
   };
 
+  /* Función global para otorgar Amor XP a la barra de pareja */
+  window._sumarAmorPareja = (cantidad = 0, motivo = "") => {
+    try {
+      if (!cantidad || cantidad <= 0) return;
+      const u = getUserIdSafe();
+      const k = `sa_amor_pareja_${u}`;
+      const actual = Math.max(0, Number(localStorage.getItem(k)) || 0);
+      const nuevo = actual + Math.round(cantidad);
+      localStorage.setItem(k, String(nuevo));
+      renderExperiencia();
+      window.dispatchEvent(new Event("sunad:progress"));
+      if (motivo) {
+        try { window._TiendaAPI?.notifMascota?.("¡+Amor XP!", `+${Math.round(cantidad)} Amor XP · ${motivo}`); } catch {}
+      }
+    } catch (err) { console.warn("sumarAmorPareja:", err); }
+  };
+
+  // Cálculo de XP Individual (hazañas, juegos, aventuras y récords personales)
   const calcularExperiencia = () => {
     const u = getUserIdSafe();
-    const fCount = (window.AlbumApp.modules.fotos?.getFotos() || []).length;
-    const nCount = (window.AlbumApp.modules.notas?.getNotas() || []).length;
-    const base = fCount * 10 + nCount * 5 + visitasConsecutivas * 20;
-
-    // 1. Minijuegos jugados
     const minijuegosCount = Math.max(0, Number(_getMemoryItem(`sa_minijuegos_jugados_${u}`)) || 0);
-    const xpMinijuegos = minijuegosCount * 5; // 5 XP por partida
+    const xpMinijuegos = minijuegosCount * 5; // 5 XP por minijuego
 
     const MASCOTAS_LISTA = ["mapache","girasol","gatito","gatito-negro","hamburguesa","oveja","pollito","jirafa","unicornio","conejo","dragon-bebe","dragon-anciano"];
 
-    // 2. Modo Aventura (RPG clásico): enemigos y zonas (agregado de todas las mascotas + legacy)
+    // Modo Aventura (RPG clásico)
     let xpAventura = 0;
     try {
       let enemigosTotal = 0;
@@ -184,7 +207,7 @@
       xpAventura = (enemigosTotal * 2) + (zonasTodas.size * 15) + (jefesTodos.size * 35);
     } catch {}
 
-    // 3. Modo Roguelike: runs, mejor piso, victorias y jefes (agregado de todas las mascotas + legacy)
+    // Modo Roguelike
     let xpRoguelike = 0;
     try {
       let runsTotal = 0;
@@ -210,7 +233,19 @@
     } catch {}
 
     const extra = Math.max(0, Number(_getMemoryItem(`sa_experiencia_extra_${u}`)) || 0);
-    return base + extra + xpMinijuegos + xpAventura + xpRoguelike;
+    return extra + xpMinijuegos + xpAventura + xpRoguelike;
+  };
+
+  // Cálculo de Experiencia de Pareja (fotos conjuntas, notas de amor, visitas consecutivas y cariño mutuo)
+  const calcularExperienciaPareja = () => {
+    const u = getUserIdSafe();
+    const fCount = (window.AlbumApp.modules.fotos?.getFotos() || []).length;
+    const nCount = (window.AlbumApp.modules.notas?.getNotas() || []).length;
+    const baseAmor = fCount * 15 + nCount * 10 + visitasConsecutivas * 25;
+
+    // Amor acumulado enviado / recibido
+    const extraAmor = Math.max(0, Number(_getMemoryItem(`sa_amor_pareja_${u}`)) || 0);
+    return baseAmor + extraAmor;
   };
 
   const hidratarIconosEn = root => {
@@ -223,31 +258,76 @@
 
   function renderExperiencia() {
     try {
-      const xp = calcularExperiencia();
-      const nivel = [...NIVELES_EXPERIENCIA].reverse().find(i => xp >= i.minimo) || NIVELES_EXPERIENCIA[0];
+      // 1. Render Nivel Individual
+      const xpInd = calcularExperiencia();
+      const nivelInd = [...NIVELES_INDIVIDUALES].reverse().find(i => xpInd >= i.minimo) || NIVELES_INDIVIDUALES[0];
       if (experienciaTitulo) {
-        const iconoKey = NIVEL_A_ICONO[nivel.icono] || "raiz";
-        experienciaTitulo.innerHTML = `${nivel.nombre} <span class="ui-icon" data-icono="${iconoKey}"></span>`;
+        const iconoKey = NIVEL_INDIVIDUAL_A_ICONO[nivelInd.icono] || "raiz";
+        experienciaTitulo.innerHTML = `${nivelInd.nombre} <span class="ui-icon" data-icono="${iconoKey}"></span>`;
         hidratarIconosEn(experienciaTitulo);
       }
-      if (experienciaXp) experienciaXp.textContent = `${xp} XP`;
-      if (nivel.siguiente) {
-        const pct = ((xp - nivel.minimo) / (nivel.siguiente - nivel.minimo)) * 100;
-        if (experienciaProgreso) experienciaProgreso.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+      if (experienciaXp) experienciaXp.textContent = `${xpInd} XP`;
+      if (nivelInd.siguiente) {
+        const pctInd = ((xpInd - nivelInd.minimo) / (nivelInd.siguiente - nivelInd.minimo)) * 100;
+        if (experienciaProgreso) experienciaProgreso.style.width = `${Math.min(100, Math.max(0, pctInd))}%`;
         if (experienciaSiguiente) {
-          const sigIconoKey = NIVEL_A_ICONO[nivel.siguienteIcono] || "raiz";
-          experienciaSiguiente.innerHTML = `${Math.max(0, nivel.siguiente - xp)} XP para ${nivel.siguienteNombre} <span class="ui-icon" data-icono="${sigIconoKey}"></span>`;
+          const sigIconoKey = NIVEL_INDIVIDUAL_A_ICONO[nivelInd.siguienteIcono] || "raiz";
+          experienciaSiguiente.innerHTML = `${Math.max(0, nivelInd.siguiente - xpInd)} XP para ${nivelInd.siguienteNombre} <span class="ui-icon" data-icono="${sigIconoKey}"></span>`;
           hidratarIconosEn(experienciaSiguiente);
         }
       } else {
         if (experienciaProgreso) experienciaProgreso.style.width = "100%";
         if (experienciaSiguiente) {
-          experienciaSiguiente.innerHTML = `Nivel máximo alcanzado <span class="ui-icon" data-icono="girasol"></span>`;
+          experienciaSiguiente.innerHTML = `Máximo rango individual alcanzado <span class="ui-icon" data-icono="girasol"></span>`;
           hidratarIconosEn(experienciaSiguiente);
         }
       }
-      window._experienciaActual = xp;
-      window._nivelActual = NIVELES_EXPERIENCIA.findIndex(n => n.nombre === nivel.nombre) + 1;
+
+      // 2. Render Nivel de Pareja
+      const parejaTituloEl = $("pareja-exp-titulo");
+      const parejaTotalEl = $("pareja-exp-total");
+      const parejaProgresoEl = $("pareja-exp-progreso");
+      const parejaSiguienteEl = $("pareja-exp-siguiente");
+      const parejaBtnAmor = $("btn-pareja-dar-amor");
+
+      const xpPar = calcularExperienciaPareja();
+      const nivelPar = [...NIVELES_PAREJA].reverse().find(i => xpPar >= i.minimo) || NIVELES_PAREJA[0];
+
+      if (parejaTituloEl) {
+        parejaTituloEl.innerHTML = `${nivelPar.nombre} <span style="display:inline-block;margin-left:4px;">${nivelPar.icono}</span>`;
+      }
+      if (parejaTotalEl) {
+        parejaTotalEl.textContent = `${xpPar} Amor XP`;
+      }
+      if (nivelPar.siguiente) {
+        const pctPar = ((xpPar - nivelPar.minimo) / (nivelPar.siguiente - nivelPar.minimo)) * 100;
+        if (parejaProgresoEl) parejaProgresoEl.style.width = `${Math.min(100, Math.max(0, pctPar))}%`;
+        if (parejaSiguienteEl) {
+          parejaSiguienteEl.textContent = `${Math.max(0, nivelPar.siguiente - xpPar)} Amor XP para ${nivelPar.siguienteNombre} ${nivelPar.siguienteIcono || ''}`;
+        }
+      } else {
+        if (parejaProgresoEl) parejaProgresoEl.style.width = "100%";
+        if (parejaSiguienteEl) {
+          parejaSiguienteEl.textContent = `Vínculo máximo eterno alcanzado 💍✨`;
+        }
+      }
+
+      // Botón interactivo "Enviar amor"
+      if (parejaBtnAmor && !parejaBtnAmor.dataset.bound) {
+        parejaBtnAmor.dataset.bound = "true";
+        parejaBtnAmor.addEventListener("click", e => {
+          e.preventDefault();
+          window._sumarAmorPareja(15, "Caricia de amor enviada a tu pareja");
+          try { window._snd?.("pop"); } catch {}
+          parejaBtnAmor.style.transform = "scale(1.2)";
+          setTimeout(() => { parejaBtnAmor.style.transform = ""; }, 200);
+        });
+      }
+
+      window._experienciaActual = xpInd;
+      window._experienciaParejaActual = xpPar;
+      window._nivelActual = NIVELES_INDIVIDUALES.findIndex(n => n.nombre === nivelInd.nombre) + 1;
+      window._nivelParejaActual = NIVELES_PAREJA.findIndex(n => n.nombre === nivelPar.nombre) + 1;
     } catch (err) { console.error("renderExperiencia:", err); }
   }
 
