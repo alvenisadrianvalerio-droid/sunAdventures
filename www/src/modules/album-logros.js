@@ -15,6 +15,24 @@
 
   let visitasConsecutivas = 0;
 
+  /* Cache en memoria por ciclo de render para eliminar lecturas sincrónicas a localStorage */
+  let _lsMemoryCache = null;
+  const _getMemoryItem = (k) => {
+    if (_lsMemoryCache && _lsMemoryCache.has(k)) return _lsMemoryCache.get(k);
+    try {
+      const v = localStorage.getItem(k);
+      if (_lsMemoryCache) _lsMemoryCache.set(k, v);
+      return v;
+    } catch { return null; }
+  };
+  const _getMemoryJSON = (k, fallback = null) => {
+    const raw = _getMemoryItem(k);
+    if (!raw) return fallback;
+    try { return JSON.parse(raw); } catch { return fallback; }
+  };
+  window._sunadGetLogrosLS = _getMemoryItem;
+  window._sunadGetLogrosJSON = _getMemoryJSON;
+
   const IMAGENES_MASCOTA = {
     mapache: "img/mapache.webp", girasol: "img/mascota-girasol.webp", gatito: "img/siamesa.webp",
     "gatito-negro": "img/gatito-negro.webp", hamburguesa: "img/hamburguesa.webp", oveja: "img/oveja.webp",
@@ -29,7 +47,7 @@
     { id: "racha", icono: SVG.fire, nombre: "Racha de 30 días", descripcion: "Abre la app 30 días seguidos", meta: 30, medir: () => visitasConsecutivas },
     { id: "trotamundos", tipo: "grupo", icono: SVG.globe, nombre: "Trotamundos", descripcion: "Guarda 10 fotos con ubicación", meta: 10, medir: () => (window.AlbumApp.modules.fotos?.getFotos() || []).filter(f => f.lat != null && f.lng != null).length },
     { id: "racha-365", icono: SVG.calendar, nombre: "Un año de nosotros", descripcion: "Abre la app 365 días seguidos", meta: 365, medir: () => visitasConsecutivas },
-    { id: "todos-los-logros", tipo: "grupo", icono: SVG.crown, nombre: "Leyenda absoluta", descripcion: "Completa todos los demás logros", meta: 1, esFinal: true, medir: () => LOGROS.filter(l => !l.esFinal).every(l => l.medir() >= l.meta) ? 1 : 0 }
+    { id: "todos-los-logros", tipo: "grupo", icono: SVG.crown, nombre: "Leyenda absoluta", descripcion: "Completa todos los demás logros", meta: 1, esFinal: true, medir: () => 0 }
   ];
 
   const MASCOTAS_LOGROS = [
@@ -51,8 +69,8 @@
     const sprite = IMAGENES_MASCOTA[m.id];
     const nombreCorto = m.nombre.replace(/^(el|la) /, "");
     LOGROS.push(
-      { id: `mascota-${m.id}`, sprites: [sprite], icono: m.icono, nombre: `Conoce a ${m.nombre}`, descripcion: `Interactúa con ${m.nombre} por primera vez`, meta: 1, medir: () => JSON.parse(localStorage.getItem(`mascotas_conocidas_${getUserIdSafe()}`) || "[]").includes(m.id) ? 1 : 0 },
-      { id: `clics-${m.id}`, sprites: [sprite], icono: SVG.tap, nombre: `Fan de ${nombreCorto}`, descripcion: `Dale 100 clics a ${nombreCorto}`, meta: 100, medir: () => Number(localStorage.getItem(`mascota_clicks_${getUserIdSafe()}_${m.id}`) || 0) }
+      { id: `mascota-${m.id}`, sprites: [sprite], icono: m.icono, nombre: `Conoce a ${m.nombre}`, descripcion: `Interactúa con ${m.nombre} por primera vez`, meta: 1, medir: () => (_getMemoryJSON(`mascotas_conocidas_${getUserIdSafe()}`, [])).includes(m.id) ? 1 : 0 },
+      { id: `clics-${m.id}`, sprites: [sprite], icono: SVG.tap, nombre: `Fan de ${nombreCorto}`, descripcion: `Dale 100 clics a ${nombreCorto}`, meta: 100, medir: () => Number(_getMemoryItem(`mascota_clicks_${getUserIdSafe()}_${m.id}`) || 0) }
     );
   });
 
@@ -138,7 +156,7 @@
     const base = fCount * 10 + nCount * 5 + visitasConsecutivas * 20;
 
     // 1. Minijuegos jugados
-    const minijuegosCount = Math.max(0, Number(localStorage.getItem(`sa_minijuegos_jugados_${u}`)) || 0);
+    const minijuegosCount = Math.max(0, Number(_getMemoryItem(`sa_minijuegos_jugados_${u}`)) || 0);
     const xpMinijuegos = minijuegosCount * 5; // 5 XP por partida
 
     const MASCOTAS_LISTA = ["mapache","girasol","gatito","gatito-negro","hamburguesa","oveja","pollito","jirafa","unicornio","conejo","dragon-bebe","dragon-anciano"];
@@ -160,8 +178,8 @@
         } catch {}
       };
 
-      parseRpg(localStorage.getItem(`sa_rpg_${u}`));
-      MASCOTAS_LISTA.forEach(m => parseRpg(localStorage.getItem(`sa_rpg_${u}_${m}`)));
+      parseRpg(_getMemoryItem(`sa_rpg_${u}`));
+      MASCOTAS_LISTA.forEach(m => parseRpg(_getMemoryItem(`sa_rpg_${u}_${m}`)));
 
       xpAventura = (enemigosTotal * 2) + (zonasTodas.size * 15) + (jefesTodos.size * 35);
     } catch {}
@@ -185,13 +203,13 @@
         } catch {}
       };
 
-      parseRl(localStorage.getItem(`sa_rl_meta_${u}`));
-      MASCOTAS_LISTA.forEach(m => parseRl(localStorage.getItem(`sa_rl_meta_${u}_${m}`)));
+      parseRl(_getMemoryItem(`sa_rl_meta_${u}`));
+      MASCOTAS_LISTA.forEach(m => parseRl(_getMemoryItem(`sa_rl_meta_${u}_${m}`)));
 
       xpRoguelike = (runsTotal * 5) + (maxPiso * 10) + (vicTotal * 80) + (bossesTotal * 25);
     } catch {}
 
-    const extra = Math.max(0, Number(localStorage.getItem(`sa_experiencia_extra_${u}`)) || 0);
+    const extra = Math.max(0, Number(_getMemoryItem(`sa_experiencia_extra_${u}`)) || 0);
     return base + extra + xpMinijuegos + xpAventura + xpRoguelike;
   };
 
@@ -321,6 +339,7 @@
   function renderLogros({ notificar = false } = {}) {
     try {
       if (!logrosPersonalesGrid || !logrosGrupoGrid) return;
+      _lsMemoryCache = new Map();
       const cacheLS = new Map();
       const getLS = k => { if (cacheLS.has(k)) return cacheLS.get(k); const v = JSON.parse(localStorage.getItem(k) || "{}"); cacheLS.set(k, v); return v; };
       const grupoActivo = window.AlbumApp.modules.grupo?.getGrupoActivo();
@@ -338,7 +357,12 @@
         let total = 0, cambio = false;
         logros.forEach(logro => {
           try {
-            const progreso = Math.min(logro.medir(), logro.meta);
+            let progreso = 0;
+            if (logro.esFinal) {
+              progreso = (total >= (LOGROS.length - 1)) ? 1 : 0;
+            } else {
+              progreso = Math.min(logro.medir(), logro.meta);
+            }
             const desbloqueado = progreso >= logro.meta;
             if (desbloqueado) {
               if (notificar && !desbloqueados[logro.id]) notificarLogro(logro);
@@ -375,11 +399,15 @@
 
       renderExperiencia();
       window._logrosDesbloqueados = {
-        ...JSON.parse(localStorage.getItem(`sunad_logros_grupo_${grupoActivo?.id || "local"}`) || "{}"),
-        ...JSON.parse(localStorage.getItem(`sunad_logros_${getUserIdSafe()}`) || "{}")
+        ..._getMemoryJSON(`sunad_logros_grupo_${grupoActivo?.id || "local"}`, {}),
+        ..._getMemoryJSON(`sunad_logros_${getUserIdSafe()}`, {})
       };
       if (typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
-    } catch (err) { console.error("renderLogros:", err); }
+    } catch (err) {
+      console.error("renderLogros:", err);
+    } finally {
+      _lsMemoryCache = null;
+    }
   }
 
   function aplicarFiltroActivo() {

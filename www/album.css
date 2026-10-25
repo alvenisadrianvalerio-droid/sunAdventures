@@ -5933,6 +5933,8 @@ body.light .logros-categoria::after {
   transition: transform .28s cubic-bezier(.34, 1.56, .64, 1), box-shadow .28s ease, border-color .28s ease, filter .28s ease, opacity .28s ease;
   overflow: hidden;
   backdrop-filter: blur(10px);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 116px;
 }
 
 .logro-card::before {

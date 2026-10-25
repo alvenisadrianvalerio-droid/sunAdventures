@@ -79,13 +79,13 @@
   meta:1,
   medir:()=> {
     try {
-      const u = window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local";
-      const log = JSON.parse(localStorage.getItem(`sa_rpg_jefes_mascota_${u}`) || "{}");
+      const u = window._getUserIdSafe?.() || _getExtraLS("sunad_uid") || "local";
+      const log = _getExtraJSON(`sa_rpg_jefes_mascota_${u}`, {});
       if ((log.conejo || []).length >= 9) return 1;
-      const stConejo = JSON.parse(localStorage.getItem(`sa_rpg_${u}_conejo`) || "{}");
+      const stConejo = _getExtraJSON(`sa_rpg_${u}_conejo`, {});
       if ((stConejo.jefesDerrotados || []).length >= 9) return 1;
-      const st = JSON.parse(localStorage.getItem(`sa_rpg_${u}`) || "{}");
-      const mascota = localStorage.getItem("mascota_actual");
+      const st = _getExtraJSON(`sa_rpg_${u}`, {});
+      const mascota = _getExtraLS("mascota_actual");
       return (mascota === "conejo" && (st.jefesDerrotados || []).length >= 9) ? 1 : 0;
     } catch { return 0; }
   }
@@ -99,21 +99,33 @@
   medir:()=> {
     try {
       const u = window._getUserIdSafe?.() || "local";
-      const log = JSON.parse(localStorage.getItem(`sa_rpg_jefes_mascota_${u}`) || "{}");
+      const log = _getExtraJSON(`sa_rpg_jefes_mascota_${u}`, {});
       return Object.values(log).filter(arr => (arr||[]).length >= 9).length;
     } catch { return 0; }
   }
 }
   ];
 
+  const _getExtraLS = (k) => {
+    if (typeof window._sunadGetLogrosLS === "function") return window._sunadGetLogrosLS(k);
+    try { return localStorage.getItem(k); } catch { return null; }
+  };
+  const _getExtraJSON = (k, fallback = null) => {
+    if (typeof window._sunadGetLogrosJSON === "function") return window._sunadGetLogrosJSON(k, fallback);
+    try {
+      const raw = localStorage.getItem(k);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch { return fallback; }
+  };
+
   function numLS(clave) {
-    const u = window._getUserIdSafe?.() || localStorage.getItem("sunad_uid") || "local";
-    return Number(localStorage.getItem(`sa_${clave}_${u}`) || 0);
+    const u = window._getUserIdSafe?.() || _getExtraLS("sunad_uid") || "local";
+    return Number(_getExtraLS(`sa_${clave}_${u}`) || 0);
   }
   function mascotasAmistadMax() {
     try {
       const u = window._getUserIdSafe?.() || "local";
-      const obj = JSON.parse(localStorage.getItem(`mascota_amistad_${u}`) || "{}");
+      const obj = _getExtraJSON(`mascota_amistad_${u}`, {});
       return Object.values(obj).some(v => v >= 100) ? 1 : 0;
     } catch { return 0; }
   }
@@ -139,9 +151,9 @@
   function rpgState() {
     try {
       const u = window._getUserIdSafe?.() || "local";
-      const actualPet = localStorage.getItem("mascota_actual") || "mapache";
+      const actualPet = _getExtraLS("mascota_actual") || "mapache";
       const keyPet = `sa_rpg_${u}_${actualPet}`;
-      const stActual = JSON.parse(localStorage.getItem(keyPet) || localStorage.getItem(`sa_rpg_${u}`) || "{}");
+      const stActual = _getExtraJSON(keyPet) || _getExtraJSON(`sa_rpg_${u}`) || {};
 
       // También agregamos estadísticas globales de todas las mascotas
       let enemigosDerrotadosTotal = 0;
@@ -151,9 +163,8 @@
 
       LISTA_MASCOTAS.forEach(m => {
         try {
-          const raw = localStorage.getItem(`sa_rpg_${u}_${m}`);
-          if (raw) {
-            const data = JSON.parse(raw);
+          const data = _getExtraJSON(`sa_rpg_${u}_${m}`);
+          if (data) {
             enemigosDerrotadosTotal += Number(data.enemigosDerrotados || 0);
             if (Number(data.nivel || 1) > maxNivel) maxNivel = Number(data.nivel);
             (data.jefesDerrotados || []).forEach(j => todosJefes.add(j));
@@ -164,9 +175,8 @@
 
       // Incluir también los datos legacy si no estaban en las mascotas
       try {
-        const rawLeg = localStorage.getItem(`sa_rpg_${u}`);
-        if (rawLeg) {
-          const dLeg = JSON.parse(rawLeg);
+        const dLeg = _getExtraJSON(`sa_rpg_${u}`);
+        if (dLeg) {
           enemigosDerrotadosTotal = Math.max(enemigosDerrotadosTotal, Number(dLeg.enemigosDerrotados || 0));
           if (Number(dLeg.nivel || 1) > maxNivel) maxNivel = Number(dLeg.nivel);
           (dLeg.jefesDerrotados || []).forEach(j => todosJefes.add(j));
@@ -189,7 +199,6 @@
   function lootStats() {
     try {
       const u = window._getUserIdSafe?.() || "local";
-      const actualPet = localStorage.getItem("mascota_actual") || "mapache";
 
       // Combinar loot de todas las mascotas y legacy
       const combinedLoot = {};
@@ -215,17 +224,17 @@
 
       // Legacy
       procesarLootYStats(
-        localStorage.getItem(`sa_rpg_loot_${u}`),
-        localStorage.getItem(`sa_rpg_stats_${u}`),
-        localStorage.getItem(`sa_rpg_cofres_${u}`)
+        _getExtraJSON(`sa_rpg_loot_${u}`),
+        _getExtraJSON(`sa_rpg_stats_${u}`),
+        _getExtraLS(`sa_rpg_cofres_${u}`)
       );
 
       // Por mascota
       LISTA_MASCOTAS.forEach(m => {
         procesarLootYStats(
-          localStorage.getItem(`sa_rpg_loot_${u}_${m}`),
-          localStorage.getItem(`sa_rpg_stats_${u}_${m}`),
-          localStorage.getItem(`sa_rpg_cofres_${u}_${m}`)
+          _getExtraJSON(`sa_rpg_loot_${u}_${m}`),
+          _getExtraJSON(`sa_rpg_stats_${u}_${m}`),
+          _getExtraLS(`sa_rpg_cofres_${u}_${m}`)
         );
       });
 
@@ -252,23 +261,23 @@
       let totalVictorias = 0;
       let totalBosses = 0;
 
-      const procesarMeta = (raw) => {
-        if (!raw) return;
+      const procesarMeta = (d) => {
+        if (!d) return;
         try {
-          const d = typeof raw === "string" ? JSON.parse(raw) : raw;
           totalRuns += Number(d.runs || 0);
           if (Number(d.mejorPiso || 0) > maxPiso) maxPiso = Number(d.mejorPiso || 0);
           totalVictorias += Number(d.victorias || 0);
-          totalBosses += Number(d.bossesDerrotados || 0);
+          bossesDerrotadosTotal = Number(d.bossesDerrotados || 0);
+          totalBosses += bossesDerrotadosTotal;
         } catch {}
       };
 
       // Legacy
-      procesarMeta(localStorage.getItem(`sa_rl_meta_${u}`));
+      procesarMeta(_getExtraJSON(`sa_rl_meta_${u}`));
 
       // Por mascota
       LISTA_MASCOTAS.forEach(m => {
-        procesarMeta(localStorage.getItem(`sa_rl_meta_${u}_${m}`));
+        procesarMeta(_getExtraJSON(`sa_rl_meta_${u}_${m}`));
       });
 
       return {
