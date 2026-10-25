@@ -384,12 +384,20 @@
           <!-- Tarjeta 2: Nivel de Pareja (Vínculo de Amor) -->
           <div class="experiencia-card experiencia-card-pareja" id="experiencia-card-pareja">
             <div class="experiencia-badge-tipo exp-badge-pareja">
-              <span class="pareja-corazon-icono">💖</span> Nivel de Pareja
+              <span class="pareja-corazon-icono-svg" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              </span> Nivel de Pareja
             </div>
             <div class="experiencia-topline">
               <span id="pareja-exp-titulo" class="exp-titulo-principal">Conexión Naciente</span>
               <strong class="experiencia-xp-total exp-total-pareja">
-                <span class="xp-corazon-icon">💕</span>
+                <span class="xp-corazon-svg" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                </span>
                 <span id="pareja-exp-total">0 Amor XP</span>
               </strong>
             </div>
@@ -397,7 +405,17 @@
             <div class="pareja-exp-footer">
               <small id="pareja-exp-siguiente">100 Amor XP para Primeras Miradas.</small>
               <button type="button" class="btn-pareja-subir-amor" id="btn-pareja-dar-amor" title="Enviar amor a tu pareja (+15 Amor XP)">
-                <span>Enviar amor</span> <span class="heart-pulse">❤️</span>
+                <span class="btn-amor-icon-wrap" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                  </svg>
+                </span>
+                <span class="btn-amor-texto">Enviar amor</span>
+                <span class="btn-amor-sparkle" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor">
+                    <path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z"/>
+                  </svg>
+                </span>
               </button>
             </div>
           </div>

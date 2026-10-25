@@ -133,13 +133,21 @@
     { minimo: 5000, nombre: "Guardián Supremo", icono: "sunflower", siguiente: null, siguienteNombre: "Máximo Nivel", siguienteIcono: null }
   ];
 
-  // 2. Escala de Pareja: Rangos de Vínculo Afectivo y Amor Mutuo
+  // 2. Escala de Pareja: Rangos de Vínculo Afectivo y Amor Mutuo con iconos SVG dedicados
+  const SVG_PAREJA = {
+    brote: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="svg-pareja-icono"><path d="M12 3a9 9 0 0 0-9 9c0 3.87 2.45 7.17 5.9 8.44.07-.46.15-1.02.15-1.44 0-1.87-.75-3.32-2.18-4.14 2.87-.14 5.13-2.51 5.13-5.36 0-.3-.03-.59-.08-.88 1.48 1.25 3.08 1.88 4.79 1.88.5 0 1-.06 1.47-.17-.18 2.88 1.95 5.37 4.82 5.67-1.43.82-2.18 2.27-2.18 4.14 0 .42.08.98.15 1.44A9.006 9.006 0 0 0 21 12a9 9 0 0 0-9-9z"/></svg>`,
+    corazon: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="svg-pareja-icono"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
+    fuego: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="svg-pareja-icono"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM12 20c-3.31 0-6-2.69-6-6 0-1.53.5-3.05 1.4-4.22.18 2.07 1.88 3.72 3.97 3.72 2.21 0 4-1.79 4-4 0-.31-.04-.61-.1-.9 1.7 1.3 2.73 3.32 2.73 5.4 0 3.31-2.69 6-6 6z"/></svg>`,
+    destello: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="svg-pareja-icono"><path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z"/></svg>`,
+    anillo: `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="svg-pareja-icono"><path d="M12 2a4 4 0 0 0-4 4c0 1.95 1.4 3.58 3.25 3.93A7.002 7.002 0 0 0 5 17c0 3.87 3.13 7 7 7s7-3.13 7-7a7.002 7.002 0 0 0-6.25-7.07C14.6 9.58 16 7.95 16 6a4 4 0 0 0-4-4zm0 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 8c2.76 0 5 2.24 5 5s-2.24 5-5 5-5-2.24-5-5 2.24-5 5-5z"/></svg>`
+  };
+
   const NIVELES_PAREJA = [
-    { minimo: 0, nombre: "Primeras Miradas", icono: "🌱", siguiente: 100, siguienteNombre: "Enamorados", siguienteIcono: "💖" },
-    { minimo: 100, nombre: "Enamorados", icono: "💖", siguiente: 400, siguienteNombre: "Compañeros de Vida", siguienteIcono: "🔥" },
-    { minimo: 400, nombre: "Compañeros de Vida", icono: "🔥", siguiente: 1000, siguienteNombre: "Almas Gemelas", siguienteIcono: "✨" },
-    { minimo: 1000, nombre: "Almas Gemelas", icono: "✨", siguiente: 3000, siguienteNombre: "Amor Eterno", siguienteIcono: "💍" },
-    { minimo: 3000, nombre: "Amor Eterno", icono: "💍", siguiente: null, siguienteNombre: "Vínculo Infinito", siguienteIcono: null }
+    { minimo: 0, nombre: "Primeras Miradas", iconoSvg: SVG_PAREJA.brote, siguiente: 100, siguienteNombre: "Enamorados", siguienteIconoSvg: SVG_PAREJA.corazon },
+    { minimo: 100, nombre: "Enamorados", iconoSvg: SVG_PAREJA.corazon, siguiente: 400, siguienteNombre: "Compañeros de Vida", siguienteIconoSvg: SVG_PAREJA.fuego },
+    { minimo: 400, nombre: "Compañeros de Vida", iconoSvg: SVG_PAREJA.fuego, siguiente: 1000, siguienteNombre: "Almas Gemelas", siguienteIconoSvg: SVG_PAREJA.destello },
+    { minimo: 1000, nombre: "Almas Gemelas", iconoSvg: SVG_PAREJA.destello, siguiente: 3000, siguienteNombre: "Amor Eterno", siguienteIconoSvg: SVG_PAREJA.anillo },
+    { minimo: 3000, nombre: "Amor Eterno", iconoSvg: SVG_PAREJA.anillo, siguiente: null, siguienteNombre: "Vínculo Infinito", siguienteIconoSvg: null }
   ];
 
   /* Función global para otorgar XP directamente a la barra de nivel individual */
@@ -294,21 +302,22 @@
       const nivelPar = [...NIVELES_PAREJA].reverse().find(i => xpPar >= i.minimo) || NIVELES_PAREJA[0];
 
       if (parejaTituloEl) {
-        parejaTituloEl.innerHTML = `${nivelPar.nombre} <span style="display:inline-block;margin-left:4px;">${nivelPar.icono}</span>`;
+        parejaTituloEl.innerHTML = `${nivelPar.nombre} <span class="pareja-titulo-svg-wrap">${nivelPar.iconoSvg}</span>`;
       }
       if (parejaTotalEl) {
-        parejaTotalEl.textContent = `${xpPar} Amor XP`;
+        parejaTotalEl.innerHTML = `<span class="xp-corazon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span> <span>${xpPar} Amor XP</span>`;
       }
       if (nivelPar.siguiente) {
         const pctPar = ((xpPar - nivelPar.minimo) / (nivelPar.siguiente - nivelPar.minimo)) * 100;
         if (parejaProgresoEl) parejaProgresoEl.style.width = `${Math.min(100, Math.max(0, pctPar))}%`;
         if (parejaSiguienteEl) {
-          parejaSiguienteEl.textContent = `${Math.max(0, nivelPar.siguiente - xpPar)} Amor XP para ${nivelPar.siguienteNombre} ${nivelPar.siguienteIcono || ''}`;
+          const sigIcono = nivelPar.siguienteIconoSvg ? `<span class="pareja-sig-svg-wrap">${nivelPar.siguienteIconoSvg}</span>` : "";
+          parejaSiguienteEl.innerHTML = `${Math.max(0, nivelPar.siguiente - xpPar)} Amor XP para ${nivelPar.siguienteNombre} ${sigIcono}`;
         }
       } else {
         if (parejaProgresoEl) parejaProgresoEl.style.width = "100%";
         if (parejaSiguienteEl) {
-          parejaSiguienteEl.textContent = `Vínculo máximo eterno alcanzado 💍✨`;
+          parejaSiguienteEl.innerHTML = `Vínculo máximo eterno alcanzado <span class="pareja-sig-svg-wrap">${SVG_PAREJA.anillo}</span>`;
         }
       }
 
