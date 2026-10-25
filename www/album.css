@@ -829,7 +829,9 @@ body.light .album-seleccion-bar {
   overflow: hidden;
   position: relative;
   transition: transform .2s, border-color .2s, box-shadow .2s;
-  min-height: 200px
+  min-height: 200px;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 200px;
 }
 
 body.light .mascota-card {
