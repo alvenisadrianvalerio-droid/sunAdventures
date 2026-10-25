@@ -24,16 +24,19 @@
     let ultimoDisparo = 0;
     const generarChispas = (cx, cy) => {
       const ahora = Date.now();
-      if (ahora - ultimoDisparo < 120) return;
+      const esGamaBaja = document.documentElement.classList.contains("gama-baja") || window.IS_LOW_END_DEVICE;
+      const cooldown = esGamaBaja ? 200 : 120;
+      if (ahora - ultimoDisparo < cooldown) return;
       ultimoDisparo = ahora;
 
-      for (let i = 0; i < 16; i++) {
+      const numParticulas = esGamaBaja ? 8 : 16;
+      for (let i = 0; i < numParticulas; i++) {
         const p = document.createElement("span");
         p.className = "fx-particle fx-chispa";
         p.style.left = cx + "px";
         p.style.top = cy + "px";
         const a = Math.random() * Math.PI * 2;
-        const d = 40 + Math.random() * 85;
+        const d = (esGamaBaja ? 30 : 40) + Math.random() * (esGamaBaja ? 50 : 85);
         p.style.setProperty("--dx", (Math.cos(a) * d) + "px");
         p.style.setProperty("--dy", (Math.sin(a) * d) + "px");
         p.style.animationDelay = (i * 10) + "ms";
@@ -71,6 +74,8 @@
     };
   }
   function efectoCorazones() {
+    const esGamaBaja = document.documentElement.classList.contains("gama-baja") || window.IS_LOW_END_DEVICE;
+    const cadencia = esGamaBaja ? 950 : 500;
     intervalo = setInterval(() => {
       const m = document.getElementById("mascota");
       if (!m || document.hidden) return;
@@ -81,10 +86,12 @@
       p.style.setProperty("--dx", ((Math.random() - 0.5) * 80) + "px");
       document.body.appendChild(p);
       setTimeout(() => p.remove(), 2400);
-    }, 500);
+    }, cadencia);
   }
 
   function efectoEstrellas() {
+    const esGamaBaja = document.documentElement.classList.contains("gama-baja") || window.IS_LOW_END_DEVICE;
+    const cadencia = esGamaBaja ? 750 : 380;
     intervalo = setInterval(() => {
       if (document.hidden) return;
       const p = crear("estrella");
@@ -94,7 +101,7 @@
       p.style.animationDuration = dur + "ms";
       document.body.appendChild(p);
       setTimeout(() => p.remove(), dur + 100);
-    }, 380);
+    }, cadencia);
   }
 
   function aplicar() {

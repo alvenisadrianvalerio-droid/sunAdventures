@@ -125,7 +125,7 @@
     } catch (err) { console.warn("obtenerUrlFirmada:", err); return null; }
   }
 
-  function redimensionarImagen(file, maxSize = 1600) {
+  function redimensionarImagen(file, maxSize = 1200, calidad = 0.75) {
     return new Promise((resolve, reject) => {
       try {
         const reader = new FileReader();
@@ -134,11 +134,24 @@
           img.onload = () => {
             try {
               let { width, height } = img;
-              if (width > height && width > maxSize) { height = Math.round((height * maxSize) / width); width = maxSize; }
-              else if (height > maxSize) { width = Math.round((width * maxSize) / height); height = maxSize; }
-              const c = document.createElement("canvas"); c.width = width; c.height = height;
-              c.getContext("2d").drawImage(img, 0, 0, width, height);
-              c.toBlob(b => b ? resolve(b) : reject(new Error("toBlob")), "image/jpeg", 0.85);
+              if (width > height && width > maxSize) {
+                height = Math.round((height * maxSize) / width);
+                width = maxSize;
+              } else if (height > maxSize) {
+                width = Math.round((width * maxSize) / height);
+                height = maxSize;
+              }
+              const c = document.createElement("canvas");
+              c.width = width;
+              c.height = height;
+              const ctx = c.getContext("2d");
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = "high";
+              ctx.drawImage(img, 0, 0, width, height);
+
+              // Probar soporte nativo de toBlob webp con fallback a jpeg
+              const mime = c.toDataURL("image/webp").startsWith("data:image/webp") ? "image/webp" : "image/jpeg";
+              c.toBlob(b => b ? resolve(b) : reject(new Error("toBlob falló")), mime, calidad);
             } catch (err) { reject(err); }
           };
           img.onerror = reject; img.src = e.target.result;
@@ -329,6 +342,8 @@
 
       const img = document.createElement("img");
       img.decoding = "async";
+      img.width = 300;
+      img.height = 300;
       if (url) {
         asignarUrlImagen(img, foto.path, url);
       } else {
@@ -505,9 +520,10 @@
       if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Subiendo..."; }
       mostrarLoading("Guardando recuerdo...");
       try {
-        const blob = await redimensionarImagen(file, 1600);
-        const filePath = `fotos/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`;
-        const { error: upErr } = await supabase.storage.from(BUCKET_NAME).upload(filePath, blob, { contentType: "image/jpeg" });
+        const blob = await redimensionarImagen(file, 1200, 0.75);
+        const ext = blob.type === "image/webp" ? "webp" : "jpg";
+        const filePath = `fotos/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error: upErr } = await supabase.storage.from(BUCKET_NAME).upload(filePath, blob, { contentType: blob.type || "image/jpeg" });
         if (upErr) throw upErr;
         const nueva = await añadirFotoTabla(filePath, fecha, nota, parseCoord(inputLat?.value), parseCoord(inputLng?.value));
         fotos.unshift({ id: nueva.id, path: nueva.path, fecha: nueva.fecha, nota: nueva.nota, lat: nueva.lat, lng: nueva.lng });
@@ -540,9 +556,10 @@
       let ultimoError = null;
       for (let intento = 0; intento <= retries; intento++) {
         try {
-          const blob = await redimensionarImagen(img, 1600);
-          const filePath = `fotos/${Date.now()}-${Math.random().toString(36).slice(2, 9)}.jpg`;
-          const { error: upErr } = await supabase.storage.from(BUCKET_NAME).upload(filePath, blob, { contentType: "image/jpeg" });
+          const blob = await redimensionarImagen(img, 1200, 0.75);
+          const ext = blob.type === "image/webp" ? "webp" : "jpg";
+          const filePath = `fotos/${Date.now()}-${Math.random().toString(36).slice(2, 9)}.${ext}`;
+          const { error: upErr } = await supabase.storage.from(BUCKET_NAME).upload(filePath, blob, { contentType: blob.type || "image/jpeg" });
           if (upErr) throw upErr;
           const nueva = await añadirFotoTabla(filePath, hoy, null, null, null);
           return { id: nueva.id, path: nueva.path, fecha: nueva.fecha, nota: nueva.nota, lat: nueva.lat, lng: nueva.lng, lugar: nueva.lugar, grupo_id: nueva.grupo_id };

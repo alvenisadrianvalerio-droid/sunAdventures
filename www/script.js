@@ -157,18 +157,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ---------- Datos ---------- */
   const MASCOTAS = {
-    mapache:{nombre:"Mapache",imagen:"img/mapache.png",sonido:"chitter",favorita:"pizza"},
-    girasol:{nombre:"Girasol",imagen:"img/mascota-girasol.png",sonido:"twinkle",favorita:"agua"},
-    gatito:{nombre:"Siamesa",imagen:"img/siamesa.png",sonido:"meow",favorita:"pescado"},
-    "gatito-negro":{nombre:"Armstrong",imagen:"img/gatito-negro.png",sonido:"meow",favorita:"pescado"},
-    hamburguesa:{nombre:"Hamburguesa",imagen:"img/hamburguesa.png",sonido:"crunch",favorita:"pizza"},
-    oveja:{nombre:"Oveja",imagen:"img/oveja.png",sonido:"baa",favorita:"manzana"},
-    pollito:{nombre:"Pollito",imagen:"img/pollito.png",sonido:"peep",favorita:"semillas"},
-    jirafa:{nombre:"Jirafa",imagen:"img/jirafa.png",sonido:"blip",favorita:"manzana"},
-    unicornio:{nombre:"Unicornio",imagen:"img/unicornio.png",sonido:"sparkle",favorita:"cupcake"},
-    conejo:{nombre:"Conejito",imagen:"img/conejito.png",sonido:"hop",favorita:"zanahoria"},
-    "dragon-bebe":{nombre:"Dragón Bebé",imagen:"img/dragon-bebe.png",sonido:"fireball",favorita:"carbon"},
-    "dragon-anciano":{nombre:"Dragón Anciano",imagen:"img/dragon-anciano.png",sonido:"growl",favorita:"carbon"}
+    mapache:{nombre:"Mapache",imagen:"img/mapache.webp",sonido:"chitter",favorita:"pizza"},
+    girasol:{nombre:"Girasol",imagen:"img/mascota-girasol.webp",sonido:"twinkle",favorita:"agua"},
+    gatito:{nombre:"Siamesa",imagen:"img/siamesa.webp",sonido:"meow",favorita:"pescado"},
+    "gatito-negro":{nombre:"Armstrong",imagen:"img/gatito-negro.webp",sonido:"meow",favorita:"pescado"},
+    hamburguesa:{nombre:"Hamburguesa",imagen:"img/hamburguesa.webp",sonido:"crunch",favorita:"pizza"},
+    oveja:{nombre:"Oveja",imagen:"img/oveja.webp",sonido:"baa",favorita:"manzana"},
+    pollito:{nombre:"Pollito",imagen:"img/pollito.webp",sonido:"peep",favorita:"semillas"},
+    jirafa:{nombre:"Jirafa",imagen:"img/jirafa.webp",sonido:"blip",favorita:"manzana"},
+    unicornio:{nombre:"Unicornio",imagen:"img/unicornio.webp",sonido:"sparkle",favorita:"cupcake"},
+    conejo:{nombre:"Conejito",imagen:"img/conejito.webp",sonido:"hop",favorita:"zanahoria"},
+    "dragon-bebe":{nombre:"Dragón Bebé",imagen:"img/dragon-bebe.webp",sonido:"fireball",favorita:"carbon"},
+    "dragon-anciano":{nombre:"Dragón Anciano",imagen:"img/dragon-anciano.webp",sonido:"growl",favorita:"carbon"}
   };
   const FRASES = {
     mapache:["¡Hola! Soy tu mapache","Ñam ñam...","¡Súbeme una foto!","¡Qué bonito todo!","Te acompaño siempre"],

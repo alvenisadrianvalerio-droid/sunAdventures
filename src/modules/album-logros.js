@@ -16,10 +16,10 @@
   let visitasConsecutivas = 0;
 
   const IMAGENES_MASCOTA = {
-    mapache: "img/mapache.png", girasol: "img/mascota-girasol.png", gatito: "img/siamesa.png",
-    "gatito-negro": "img/gatito-negro.png", hamburguesa: "img/hamburguesa.png", oveja: "img/oveja.png",
-    pollito: "img/pollito.png", jirafa: "img/jirafa.png", unicornio: "img/unicornio.png",
-    conejo: "img/conejito.png", "dragon-bebe": "img/dragon-bebe.png", "dragon-anciano": "img/dragon-anciano.png"
+    mapache: "img/mapache.webp", girasol: "img/mascota-girasol.webp", gatito: "img/siamesa.webp",
+    "gatito-negro": "img/gatito-negro.webp", hamburguesa: "img/hamburguesa.webp", oveja: "img/oveja.webp",
+    pollito: "img/pollito.webp", jirafa: "img/jirafa.webp", unicornio: "img/unicornio.webp",
+    conejo: "img/conejito.webp", "dragon-bebe": "img/dragon-bebe.webp", "dragon-anciano": "img/dragon-anciano.webp"
   };
 
   const LOGROS = [
@@ -61,7 +61,7 @@
   let logroToastTimeout = null;
   const notificarLogro = logro => {
     if (!logroToast) return;
-    const spriteHTML = logro.sprites?.[0] ? `<img src="${logro.sprites[0]}" alt="" class="logro-toast-sprite">` : "";
+    const spriteHTML = logro.sprites?.[0] ? `<img src="${logro.sprites[0]}" alt="${logro.nombre || ''}" class="logro-toast-sprite" width="36" height="36" decoding="async">` : "";
     const iconoHTML = `<span class="logro-toast-icon-svg">${logro.icono}</span>`;
     logroToast.innerHTML = `<span class="logro-toast-visual">${spriteHTML}${iconoHTML}</span><span class="logro-toast-copy"><strong>Logro desbloqueado</strong><span>${logro.nombre}</span></span>`;
     logroToast.classList.add("visible");
@@ -76,7 +76,12 @@
       const sw = document.createElement("span");
       sw.className = "logro-icono-sprite";
       const img = document.createElement("img");
-      img.src = logro.sprites[0]; img.alt = ""; img.loading = "lazy";
+      img.src = logro.sprites[0];
+      img.alt = logro.nombre || "Logro";
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.width = 44;
+      img.height = 44;
       sw.appendChild(img); wrapper.appendChild(sw);
     }
     const svgWrap = document.createElement("span");

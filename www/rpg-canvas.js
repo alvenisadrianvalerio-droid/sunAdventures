@@ -138,7 +138,8 @@ shieldBurst:  { sheet:'loot2', col:2, row:4, w:70, h:70, tint:'#a684f0', pulse:t
     _resize() {
       const p = this.canvas.parentElement;
       if (!p) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const esGamaBaja = document.documentElement.classList.contains("gama-baja") || window.IS_LOW_END_DEVICE;
+      const dpr = esGamaBaja ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       const w = p.clientWidth, h = p.clientHeight;
       this.canvas.width  = w * dpr;
       this.canvas.height = h * dpr;
@@ -159,8 +160,10 @@ shieldBurst:  { sheet:'loot2', col:2, row:4, w:70, h:70, tint:'#a684f0', pulse:t
     }
     burst(fxKey, x, y, count = 10, opts = {}) {
       const fx = FX[fxKey] || FX.hit;
-      for (let i = 0; i < count; i++) {
-        const a = (i / count) * Math.PI * 2 + rnd(-0.4, 0.4);
+      const esGamaBaja = document.documentElement.classList.contains("gama-baja") || window.IS_LOW_END_DEVICE;
+      const total = esGamaBaja ? Math.min(count, 5) : count;
+      for (let i = 0; i < total; i++) {
+        const a = (i / total) * Math.PI * 2 + rnd(-0.4, 0.4);
         const d = rnd(50, 110);
         this.particles.push({
           kind:'burst', fx, x, y,
