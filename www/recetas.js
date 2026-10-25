@@ -120,7 +120,169 @@ if (!window._extraVistas.includes("recetas")) {
     }
   }
 
-  // Buscar recetas con caché
+  // Recetas asiáticas e internacionales artesanales completas y de alta calidad
+  const RECETAS_ASIATICAS_EXTRA = [
+    {
+      idMeal: "asian_ramen_tonkotsu",
+      strMeal: "Tonkotsu Ramen Tradicional",
+      strCategory: "Pork",
+      strArea: "Japanese",
+      strMealThumb: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&auto=format&fit=crop&q=80",
+      strInstructions: "1. Hervir los fideos ramen frescos en agua hirviendo durante 2 minutos hasta que estén al dente y escurrir.\n2. En un tazón hondo, mezclar el caldo concentrado de huesos de cerdo (tonkotsu caliente), la base de salsa tare de soya y un chorrito de aceite de ajo tostado y sésamo.\n3. Incorporar los fideos al caldo caliente doblando suavemente.\n4. Coronar con rebanadas de panceta de cerdo chashu marinada, medio huevo ajitsuke marinado a baja temperatura con yema cremosa, brotes de bambú sazonados (menma) y cebollín fresco picado.\n5. Agregar un alga nori crujiente en el lateral y servir humeante al instante.",
+      strIngredient1: "Fideos Ramen Frescos", strMeasure1: "200g",
+      strIngredient2: "Caldo Tonkotsu de Cerdo", strMeasure2: "450ml",
+      strIngredient3: "Panceta de Cerdo Chashu", strMeasure3: "3 rebanadas",
+      strIngredient4: "Huevo Ajitsuke Marinado", strMeasure4: "1 unidad",
+      strIngredient5: "Cebollín fresco", strMeasure5: "2 cdas picadas",
+      strIngredient6: "Brotes de Bambú (Menma)", strMeasure6: "30g",
+      strIngredient7: "Alga Nori", strMeasure7: "1 lámina",
+      strIngredient8: "Aceite de Sésamo y Ajo", strMeasure8: "1 cdta"
+    },
+    {
+      idMeal: "asian_sushi_salmon_nigiri",
+      strMeal: "Nigiri & Maki Sushi Variado",
+      strCategory: "Seafood",
+      strArea: "Japanese",
+      strMealThumb: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&auto=format&fit=crop&q=80",
+      strInstructions: "1. Lavar el arroz de grano corto japonés hasta que el agua salga clara y cocinarlo al vapor.\n2. Enfriar el arroz suavemente mientras se abanica mezclando con vinagre de arroz sazonado con azúcar y sal marina (shari).\n3. Cortar el lomo de salmón fresco calidad sashimi y atún rojo en láminas oblicuas uniformes de 5mm.\n4. Formar pequeñas porciones cilíndricas de arroz con las manos humedecidas, colocar un toque sutil de wasabi y montar el pescado presionando delicadamente.\n5. Para los makis, colocar arroz sobre media hoja de alga nori, rellenar con aguacate y salmón, enrollar con la esterilla de bambú (makisu) y cortar en 6 bocados.\n6. Degustar con salsa de soya japonesa y jengibre encurtido (gari).",
+      strIngredient1: "Arroz de Sushi Japonés", strMeasure1: "300g",
+      strIngredient2: "Salmón Fresco Sashimi", strMeasure2: "180g",
+      strIngredient3: "Atún Rojo", strMeasure3: "150g",
+      strIngredient4: "Vinagre de Arroz", strMeasure4: "3 cdas",
+      strIngredient5: "Alga Nori", strMeasure5: "3 láminas",
+      strIngredient6: "Aguacate Maduro", strMeasure6: "1 unidad",
+      strIngredient7: "Wasabi & Salsa de Soya", strMeasure7: "Al gusto",
+      strIngredient8: "Jengibre Gari Encurtido", strMeasure8: "30g"
+    },
+    {
+      idMeal: "asian_gyozas_artesanales",
+      strMeal: "Gyozas Crujientes al Sartén",
+      strCategory: "Pork",
+      strArea: "Japanese",
+      strMealThumb: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?w=600&auto=format&fit=crop&q=80",
+      strInstructions: "1. En un bowl, mezclar la carne molida de cerdo con repollo finamente picado y escurrido, ajo rallado, jengibre fresco, salsa de soya, aceite de sésamo y una pizca de sal.\n2. Colocar una cucharadita de relleno en el centro de cada disco de masa para gyoza.\n3. Humedecer los bordes con agua y doblar pellizcando hacia un lado formando 5 a 6 pliegues tradicionales (pleats) para sellar herméticamente.\n4. Calentar aceite vegetal en una sartén antiadherente a fuego medio y dorar la base de las empanadillas durante 2 minutos hasta que estén bien doradas y crujientes.\n5. Verter 60ml de agua caliente en la sartén, tapar de inmediato y cocinar al vapor durante 4 minutos.\n6. Destapar para evaporar el líquido restante, rociar unas gotas de aceite de sésamo para un dorado final y servir con dip de salsa de soya y vinagre de arroz.",
+      strIngredient1: "Carne Molida de Cerdo", strMeasure1: "250g",
+      strIngredient2: "Discos de Masa para Gyoza", strMeasure2: "20 unidades",
+      strIngredient3: "Repollo Col China", strMeasure3: "150g picado",
+      strIngredient4: "Ajo y Jengibre Rallados", strMeasure4: "1 cda de cada uno",
+      strIngredient5: "Salsa de Soya", strMeasure5: "1.5 cdas",
+      strIngredient6: "Aceite de Sésamo Tostado", strMeasure6: "1 cda",
+      strIngredient7: "Cebollino", strMeasure7: "2 cdas picadas"
+    },
+    {
+      idMeal: "asian_korean_bibimbap",
+      strMeal: "Bibimbap Coreano en Tazón de Piedra",
+      strCategory: "Beef",
+      strArea: "Korean",
+      strMealThumb: "https://images.unsplash.com/photo-1553163147-622ab57be1c7?w=600&auto=format&fit=crop&q=80",
+      strInstructions: "1. Saltear individualmente en aceite de sésamo las verduras: espinacas marinadas (namul), zanahorias en juliana fina, calabacín y setas shiitake sazonadas con ajo y sal.\n2. Saltear la carne de res marinada en soya, azúcar morena, ajo y aceite de sésamo hasta caramelizar.\n3. En un tazón de piedra caliente (dolsot) o tazón amplio, untar aceite de sésamo en el fondo y colocar una cama generosa de arroz blanco al vapor.\n4. Distribuir las verduras salteadas y la carne en secciones coloridas sobre el arroz.\n5. Colocar en el centro un huevo frito con la yema tierna.\n6. Servir con salsa gochujang dulce-picante (gochujang, miel, aceite de sésamo y agua) y mezclar vigorosamente todo el tazón antes de comer.",
+      strIngredient1: "Arroz Blanco Cocido", strMeasure1: "2 tazas",
+      strIngredient2: "Carne de Res Marinada", strMeasure2: "180g",
+      strIngredient3: "Espinacas Frescas", strMeasure3: "100g",
+      strIngredient4: "Zanahoria & Calabacín", strMeasure4: "1 taza en juliana",
+      strIngredient5: "Setas Shiitake", strMeasure5: "80g en láminas",
+      strIngredient6: "Pasta Gochujang", strMeasure6: "2 cdas",
+      strIngredient7: "Huevo", strMeasure7: "1 unidad",
+      strIngredient8: "Semillas de Sésamo Tostadas", strMeasure8: "1 cdta"
+    },
+    {
+      idMeal: "asian_pad_thai_shrimp",
+      strMeal: "Pad Thai Tradicional con Camarones",
+      strCategory: "Seafood",
+      strArea: "Thai",
+      strMealThumb: "https://images.unsplash.com/photo-1559847844-5315695dadae?w=600&auto=format&fit=crop&q=80",
+      strInstructions: "1. Remojar los fideos planos de arroz en agua tibia durante 20 minutos hasta que estén flexibles.\n2. En un wok a fuego alto con aceite, dorar los camarones durante 2 minutos y reservar.\n3. Saltear dados de tofu firme con ajo picado y chalota.\n4. Empujar los ingredientes a un lado del wok, cascar un huevo y revolver rápidamente hasta cuajar.\n5. Añadir los fideos de arroz escurridos y la salsa Pad Thai casera (pasta de tamarindo, salsa de pescado, azúcar de palma y un toque de chile).\n6. Saltear a fuego vivo integrando todo durante 2 minutos; incorporar brotes de soya y cebollino chino.\n7. Servir caliente espolvoreado con cacahuates tostados triturados y cuartos de lima fresca.",
+      strIngredient1: "Fideos Planos de Arroz", strMeasure1: "200g",
+      strIngredient2: "Camarones Limpios", strMeasure2: "12 unidades",
+      strIngredient3: "Tofu Firme", strMeasure3: "100g en cubos",
+      strIngredient4: "Pasta de Tamarindo", strMeasure4: "2 cdas",
+      strIngredient5: "Salsa de Pescado", strMeasure5: "2 cdas",
+      strIngredient6: "Huevo", strMeasure6: "2 unidades",
+      strIngredient7: "Brotes de Soya (Frijol Mungo)", strMeasure7: "1 taza",
+      strIngredient8: "Cacahuates Tostados Picados", strMeasure8: "3 cdas",
+      strIngredient9: "Lima", strMeasure9: "1 unidad"
+    },
+    {
+      idMeal: "asian_kimchi_jjigae",
+      strMeal: "Kimchi Jjigae Estofado Picante",
+      strCategory: "Pork",
+      strArea: "Korean",
+      strMealThumb: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=600&auto=format&fit=crop&q=80",
+      strInstructions: "1. En una cazuela de barro, saltear panceta de cerdo en trozos con kimchi fermentado y cebolla durante 5 minutos en aceite de sésamo.\n2. Añadir caldo de anchoas o caldo de verduras, salsa gochujang, polvo de chile coreano (gochugaru), ajo picado y un chorrito de jugo de kimchi.\n3. Llevar a ebullición a fuego alto, luego bajar a fuego medio y cocinar a fuego lento durante 15 minutos para que los sabores se concentren.\n4. Agregar rebanadas gruesas de tofu suave y cebollín en rodajas por encima.\n5. Cocinar 5 minutos más hasta que el tofu absorba el caldo picante.\n6. Servir hirviendo en la mesa acompañado de un bol de arroz blanco recién hecho.",
+      strIngredient1: "Kimchi Bien Fermentado", strMeasure1: "300g",
+      strIngredient2: "Panceta de Cerdo", strMeasure2: "200g",
+      strIngredient3: "Tofu Suave", strMeasure3: "250g en rebanadas",
+      strIngredient4: "Caldo de Verduras o Anchoas", strMeasure4: "500ml",
+      strIngredient5: "Chile Coreano Gochugaru", strMeasure5: "1.5 cdas",
+      strIngredient6: "Pasta Gochujang", strMeasure6: "1 cda",
+      strIngredient7: "Ajo Picado", strMeasure7: "1 cda",
+      strIngredient8: "Cebollín fresco", strMeasure8: "2 tallos"
+    },
+    {
+      idMeal: "asian_chicken_katsu_curry",
+      strMeal: "Pollo Katsu Curry Japonés",
+      strCategory: "Chicken",
+      strArea: "Japanese",
+      strMealThumb: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=600&auto=format&fit=crop&q=80",
+      strInstructions: "1. En una cacerola, dorar cebolla en juliana hasta caramelizar. Agregar zanahorias y papas en cubos con 600ml de agua o caldo, y cocinar hasta tiernas.\n2. Retirar del fuego, disolver los cubos de curry japonés roux, volver al fuego bajo y espesar durante 5 minutos removiendo constantemente.\n3. Golpear las pechugas de pollo suavemente para emparejar el grosor, sazonar con sal y pimienta.\n4. Pasar el pollo por harina, huevo batido y empanizar abundantemente con panko japonés crujiente.\n5. Freír en abundante aceite a 175°C durante 4 a 5 minutos por lado hasta obtener un dorado dorado perfecto y crujiente. Escurrir y cortar en tiras gruesas.\n6. Servir en un plato amplio con una porción de arroz blanco, colocar el pollo crujiente al lado y bañar con el curry caliente.",
+      strIngredient1: "Pechuga de Pollo", strMeasure1: "2 filetes gruesos",
+      strIngredient2: "Pan Rallado Japonés Panko", strMeasure2: "1.5 tazas",
+      strIngredient3: "Cubos de Curry Japonés Roux", strMeasure3: "3 cubos (75g)",
+      strIngredient4: "Papas y Zanahorias", strMeasure4: "2 de cada una",
+      strIngredient5: "Cebolla Amarilla", strMeasure5: "1 grande",
+      strIngredient6: "Arroz Blanco Cocido", strMeasure6: "2 porciones",
+      strIngredient7: "Huevo y Harina", strMeasure7: "Para empanizar",
+      strIngredient8: "Aceite para freír", strMeasure8: "Cantidad necesaria"
+    },
+    {
+      idMeal: "asian_tom_yum_goong",
+      strMeal: "Sopa Tailandesa Tom Yum Goong",
+      strCategory: "Seafood",
+      strArea: "Thai",
+      strMealThumb: "https://images.unsplash.com/photo-1548943487-a2e4e43b4853?w=600&auto=format&fit=crop&q=80",
+      strInstructions: "1. En una olla, calentar caldo de pollo o camarón e infusionar con tallos de limoncillo (lemongrass) machacados, rodajas de galanga fresca y hojas de lima kaffir rotas durante 6 minutos.\n2. Agregar pasta de chile tailandés (nam prik pao) y setas ostra o champiñones.\n3. Incorporar los camarones limpios y cocinar a fuego medio durante 3 minutos hasta que tomen color rosado.\n4. Retirar del fuego y sazonar inmediatamente con zumo de lima recién exprimido, salsa de pescado y chiles tailandeses triturados al gusto.\n5. Decorar con hojas de cilantro fresco y servir bien caliente con su inigualable equilibrio cítrico, aromático y picante.",
+      strIngredient1: "Camarones Frescos", strMeasure1: "300g",
+      strIngredient2: "Caldo de Pollo o Camarón", strMeasure2: "700ml",
+      strIngredient3: "Limoncillo (Lemongrass)", strMeasure3: "2 tallos",
+      strIngredient4: "Galanga o Jengibre", strMeasure4: "4 rodajas",
+      strIngredient5: "Hojas de Lima Kaffir", strMeasure5: "4 hojas",
+      strIngredient6: "Salsa de Pescado", strMeasure6: "2 cdas",
+      strIngredient7: "Zumo de Lima", strMeasure7: "3 cdas",
+      strIngredient8: "Champiñones o Setas Ostra", strMeasure8: "120g",
+      strIngredient9: "Cilantro Fresco", strMeasure9: "Un manojo"
+    },
+    {
+      idMeal: "asian_dim_sum_baozi",
+      strMeal: "Baozi Panecillos Chinos al Vapor",
+      strCategory: "Pork",
+      strArea: "Chinese",
+      strMealThumb: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=600&auto=format&fit=crop&q=80",
+      strInstructions: "1. Preparar la masa suave de levadura con harina de trigo, agua tibia, levadura seca y una pizca de azúcar; amasar 10 minutos y dejar fermentar 1 hora.\n2. Mezclar el relleno con carne picada de cerdo, cebollín chino, salsa de ostras, salsa de soya, aceite de sésamo y jengibre.\n3. Dividir la masa en bolitas, aplanar en discos dejando el centro más grueso que los bordes.\n4. Colocar una cucharada de relleno en el centro y sellar haciendo pliegues circulares hacia arriba pellizcando la cúspide.\n5. Colocar cada bao sobre un cuadrito de papel vegetal en la vaporera de bambú.\n6. Cocinar al vapor a fuego alto con agua hirviendo durante 15 minutos sin abrir la tapa.\n7. Dejar reposar 2 minutos antes de destapar y disfrutar tiernos, esponjosos y jugosos.",
+      strIngredient1: "Harina de Trigo Suave", strMeasure1: "350g",
+      strIngredient2: "Levadura Seca", strMeasure2: "5g",
+      strIngredient3: "Carne Picada de Cerdo", strMeasure3: "250g",
+      strIngredient4: "Salsa de Ostras", strMeasure4: "1.5 cdas",
+      strIngredient5: "Salsa de Soya", strMeasure5: "1 cda",
+      strIngredient6: "Aceite de Sésamo", strMeasure6: "1 cdta",
+      strIngredient7: "Jengibre y Cebollino", strMeasure7: "2 cdas picadas"
+    },
+    {
+      idMeal: "asian_matcha_mochi",
+      strMeal: "Mochi Artesanal de Té Matcha",
+      strCategory: "Dessert",
+      strArea: "Japanese",
+      strMealThumb: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=600&auto=format&fit=crop&q=80",
+      strInstructions: "1. En un bowl resistente al calor, mezclar harina de arroz glutinoso (mochiko o shiratamako), azúcar, polvo de té verde matcha puro y agua hasta obtener una masa homogénea y sedosa.\n2. Cubrir con film plástico y cocinar en microondas durante 2 minutos a potencia media, remover con espátula mojada y cocinar 1 minuto más hasta que quede brillante y elástica.\n3. Espolvorear abundante fécula de maíz (maicena) en una superficie limpia y volcar la masa caliente.\n4. Extender con un rodillo espolvoreado y dejar enfriar ligeramente.\n5. Cortar círculos, rellenar el centro con bolitas de pasta dulce de judía roja (anko) o fresa fresca, y cerrar uniendo los extremos pellizcando firmemente.\n6. Espolvorear un toque de polvo de matcha por encima y servir a temperatura ambiente.",
+      strIngredient1: "Harina de Arroz Glutinoso (Mochiko)", strMeasure1: "150g",
+      strIngredient2: "Polvo de Té Verde Matcha", strMeasure2: "1.5 cdas",
+      strIngredient3: "Azúcar", strMeasure3: "60g",
+      strIngredient4: "Agua", strMeasure4: "180ml",
+      strIngredient5: "Pasta de Judía Roja Dulce (Anko)", strMeasure5: "150g",
+      strIngredient6: "Fécula de Maíz (Maicena)", strMeasure6: "Para espolvorear"
+    }
+  ];
+
+  // Buscar recetas con caché (con soporte extendido para recetas asiáticas del mundo)
   async function buscarRecetas(query) {
     const q = (query || "").trim();
     if (!q) return [];
@@ -135,19 +297,52 @@ if (!window._extraVistas.includes("recetas")) {
 
     try {
       const qClean = qEn.toLowerCase();
-      const [resNombre, resIngrediente, resCategoria] = await Promise.all([
+      const qOrig = q.toLowerCase();
+
+      // Consultas paralelas en TheMealDB (búsqueda por nombre, ingrediente, categoría y área)
+      const promesas = [
         fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(qClean)}`).then(r => r.ok ? r.json() : {}).catch(() => ({})),
         fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(qClean.replace(/\s+/g, "_"))}`).then(r => r.ok ? r.json() : {}).catch(() => ({})),
-        fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${encodeURIComponent(qClean)}`).then(r => r.ok ? r.json() : {}).catch(() => ({}))
-      ]);
+        fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${encodeURIComponent(qClean)}`).then(r => r.ok ? r.json() : {}).catch(() => ({})),
+        fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${encodeURIComponent(qClean)}`).then(r => r.ok ? r.json() : {}).catch(() => ({}))
+      ];
 
+      // Si busca asiático u oriental, expandir automáticamente con cocinas asiáticas clave
+      if (qOrig.includes("asiat") || qOrig.includes("asian") || qOrig.includes("orient") || qOrig.includes("japon") || qOrig.includes("chin") || qOrig.includes("corean") || qOrig.includes("thai")) {
+        const areasExtra = ["Japanese", "Chinese", "Thai", "Vietnamese", "Filipino", "Malaysian"];
+        areasExtra.forEach(a => {
+          promesas.push(
+            fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${a}`).then(r => r.ok ? r.json() : {}).catch(() => ({}))
+          );
+        });
+      }
+
+      const resultados = await Promise.all(promesas);
       const mapa = new Map();
-      (resNombre.meals || []).forEach(m => mapa.set(m.idMeal, m));
-      (resIngrediente.meals || []).forEach(m => {
-        if (!mapa.has(m.idMeal)) mapa.set(m.idMeal, m);
+
+      // Integrar recetas asiáticas locales que coincidan con la búsqueda
+      RECETAS_ASIATICAS_EXTRA.forEach(m => {
+        const textoMatch = `${m.strMeal} ${m.strCategory} ${m.strArea} ${m.strInstructions}`.toLowerCase();
+        if (
+          qOrig.includes("asiat") || qOrig.includes("asian") || qOrig.includes("orient") ||
+          textoMatch.includes(qOrig) || textoMatch.includes(qClean) ||
+          (qOrig.includes("ramen") && m.strMeal.toLowerCase().includes("ramen")) ||
+          (qOrig.includes("sushi") && m.strMeal.toLowerCase().includes("sushi")) ||
+          (qOrig.includes("gyoza") && m.strMeal.toLowerCase().includes("gyoza")) ||
+          (qOrig.includes("arroz") && textoMatch.includes("arroz")) ||
+          (qOrig.includes("pollo") && m.strCategory.toLowerCase().includes("chicken")) ||
+          (qOrig.includes("carne") && m.strCategory.toLowerCase().includes("beef")) ||
+          (qOrig.includes("marisco") && m.strCategory.toLowerCase().includes("seafood"))
+        ) {
+          mapa.set(m.idMeal, m);
+        }
       });
-      (resCategoria.meals || []).forEach(m => {
-        if (!mapa.has(m.idMeal)) mapa.set(m.idMeal, { ...m, strCategory: m.strCategory || qClean });
+
+      // Integrar resultados remotos de TheMealDB
+      resultados.forEach(res => {
+        (res.meals || []).forEach(m => {
+          if (!mapa.has(m.idMeal)) mapa.set(m.idMeal, m);
+        });
       });
 
       const meals = Array.from(mapa.values());
@@ -159,29 +354,80 @@ if (!window._extraVistas.includes("recetas")) {
     return [];
   }
 
-  // Filtrar por categoría
+  // Filtrar por categoría o región (soporta categorías estándar y cocinas asiáticas completas)
   async function buscarPorCategoria(cat) {
     const cacheKey = `cat_${cat}`;
     if (cacheRecetas.has(cacheKey)) return cacheRecetas.get(cacheKey);
 
     try {
+      const mapa = new Map();
+
+      // Caso especial: Categoría Asiática General
+      if (cat === "Asian" || cat === "Asiática") {
+        // Añadir todas nuestras recetas asiáticas artesanales destacadas
+        RECETAS_ASIATICAS_EXTRA.forEach(m => mapa.set(m.idMeal, m));
+
+        // Consultar múltiples regiones asiáticas en TheMealDB en paralelo
+        const areas = ["Japanese", "Chinese", "Thai", "Vietnamese", "Filipino", "Malaysian"];
+        const resAreas = await Promise.all(
+          areas.map(a => fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${a}`).then(r => r.ok ? r.json() : {}).catch(() => ({})))
+        );
+        resAreas.forEach((data, idx) => {
+          (data.meals || []).forEach(m => {
+            if (!mapa.has(m.idMeal)) {
+              mapa.set(m.idMeal, { ...m, strArea: areas[idx] });
+            }
+          });
+        });
+
+        const meals = Array.from(mapa.values());
+        cacheRecetas.set(cacheKey, meals);
+        return meals;
+      }
+
+      // Caso especial: Regiones específicas (Japanese, Chinese, etc.)
+      if (["Japanese", "Chinese", "Thai", "Vietnamese", "Korean"].includes(cat)) {
+        RECETAS_ASIATICAS_EXTRA.filter(m => m.strArea === cat).forEach(m => mapa.set(m.idMeal, m));
+        const url = `https://www.themealdb.com/api/json/v1/1/filter.php?a=${encodeURIComponent(cat)}`;
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          (data.meals || []).forEach(m => {
+            if (!mapa.has(m.idMeal)) mapa.set(m.idMeal, { ...m, strArea: cat });
+          });
+        }
+        const meals = Array.from(mapa.values());
+        cacheRecetas.set(cacheKey, meals);
+        return meals;
+      }
+
+      // Categorías estándar por ingrediente/estilo
+      RECETAS_ASIATICAS_EXTRA.filter(m => m.strCategory === cat).forEach(m => mapa.set(m.idMeal, m));
       const url = `https://www.themealdb.com/api/json/v1/1/filter.php?c=${encodeURIComponent(cat)}`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
-        const meals = (data.meals || []).map(m => ({ ...m, strCategory: cat }));
-        cacheRecetas.set(cacheKey, meals);
-        return meals;
+        (data.meals || []).forEach(m => {
+          if (!mapa.has(m.idMeal)) mapa.set(m.idMeal, { ...m, strCategory: cat });
+        });
       }
+
+      const meals = Array.from(mapa.values());
+      cacheRecetas.set(cacheKey, meals);
+      return meals;
     } catch (e) {
       console.warn("[Recetas] Error por categoría:", e);
     }
     return [];
   }
 
-  // Receta aleatoria
+  // Receta aleatoria (incluye recetas de TheMealDB y recetas asiáticas)
   async function recetaAleatoria() {
     try {
+      if (Math.random() > 0.4 && RECETAS_ASIATICAS_EXTRA.length) {
+        const idx = Math.floor(Math.random() * RECETAS_ASIATICAS_EXTRA.length);
+        return RECETAS_ASIATICAS_EXTRA[idx];
+      }
       const url = "https://www.themealdb.com/api/json/v1/1/random.php";
       const res = await fetch(url);
       if (res.ok) {
@@ -196,6 +442,10 @@ if (!window._extraVistas.includes("recetas")) {
 
   // Obtener detalle completo de receta por ID
   async function obtenerDetalle(idMeal) {
+    // Si es una receta artesanal local, retornarla directamente
+    const local = RECETAS_ASIATICAS_EXTRA.find(m => m.idMeal === idMeal);
+    if (local) return local;
+
     const cacheKey = `detail_${idMeal}`;
     if (cacheRecetas.has(cacheKey)) return cacheRecetas.get(cacheKey);
 
@@ -609,23 +859,12 @@ if (!window._extraVistas.includes("recetas")) {
       cargarMasRecetas();
     });
 
-    // Carga inicial destacada
-    const IDS_INICIALES_DESTACADOS = ["52850", "52765", "52818"];
-    let iniciales = await buscarPorCategoria("Chicken");
-    if (iniciales && iniciales.length) {
-      const top3 = [];
-      const resto = [];
-      iniciales.forEach(m => {
-        if (IDS_INICIALES_DESTACADOS.includes(m.idMeal)) {
-          top3.push(m);
-        } else {
-          resto.push(m);
-        }
-      });
-      top3.sort((a, b) => IDS_INICIALES_DESTACADOS.indexOf(a.idMeal) - IDS_INICIALES_DESTACADOS.indexOf(b.idMeal));
-      iniciales = [...top3, ...resto];
+    // Carga inicial destacada con Cocina Asiática e Internacional
+    let iniciales = await buscarPorCategoria("Asian");
+    if (!iniciales || !iniciales.length) {
+      iniciales = await buscarPorCategoria("Chicken");
     }
-    renderRecetas(iniciales, "recetas-grid", "Pollo");
+    renderRecetas(iniciales, "recetas-grid", "Cocina Asiática");
 
     // Formulario de búsqueda con debounce
     let debounceTimer = null;
