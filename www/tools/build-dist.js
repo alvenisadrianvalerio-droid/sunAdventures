@@ -52,6 +52,7 @@ const CHUNKS = {
     'src/modules/album-fotos.js',
     'src/modules/album-chat.js',
     'src/modules/album-notas.js',
+    'src/modules/album-eventos.js',
     'pareja-sistema.js'
   ],
   // Módulo de recetario y diccionario

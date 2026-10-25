@@ -1463,6 +1463,119 @@
     </div>
   </section>
 
+  <!-- ============================================================
+       VISTA CALENDARIO ESPECIAL (Fechas, Aniversarios y Recuerdos)
+       ============================================================ -->
+  <section id="calendario" class="calendario-section view" data-view="calendario">
+    <div class="calendario-header">
+      <h2 class="calendario-title">Calendario Especial</h2>
+      <p class="calendario-subtitle">Nuestras fechas importantes, aniversarios y recuerdos para celebrar siempre.</p>
+    </div>
+
+    <div class="calendario-actions">
+      <button id="btn-add-evento" class="btn-primary" type="button">
+        <span>+</span> Añadir fecha especial
+      </button>
+      <button id="btn-notif-permiso" class="btn-secondary" type="button" style="display:none;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        Activar recordatorios
+      </button>
+    </div>
+
+    <!-- Contenedor Cuadrícula de Calendario -->
+    <div class="calendario-wrapper">
+      <div class="calendario-toolbar">
+        <button id="cal-prev" class="cal-nav-btn" type="button" aria-label="Mes anterior">‹</button>
+        <span id="cal-mes-actual" class="cal-mes-actual">Mes Año</span>
+        <button id="cal-next" class="cal-nav-btn" type="button" aria-label="Mes siguiente">›</button>
+      </div>
+
+      <div class="cal-dias-semana" aria-hidden="true">
+        <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+      </div>
+
+      <div id="cal-grid" class="cal-grid"></div>
+    </div>
+
+    <!-- Próximas Fechas -->
+    <div class="calendario-proximos-card">
+      <h3 class="cal-seccion-titulo">
+        <span>Próximas Fechas</span>
+        <small class="cal-seccion-sub">Cuenta regresiva de nuestros aniversarios e hitos</small>
+      </h3>
+      <div id="cal-proximos" class="cal-proximos-lista"></div>
+      <div id="cal-proximos-vacio" class="cal-proximos-vacio">
+        <p>No hay fechas programadas próximamente.</p>
+        <p class="cal-vacio-hint">Haz clic en <strong>+ Añadir fecha especial</strong> o en cualquier día del calendario para agendar una.</p>
+      </div>
+    </div>
+
+    <div id="calendario-empty" class="calendario-empty hidden">
+      <p>Aún no tienes fechas agregadas.</p>
+      <p class="calendario-empty-hint">Guarda cumpleaños, aniversarios y momentos que quieras recordar juntos.</p>
+    </div>
+  </section>
+
+  <!-- MODAL FECHA / EVENTO -->
+  <div id="evento-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-evento-modal></div>
+    <div class="modal-content evento-modal-content">
+      <h3 id="evento-modal-title" class="modal-title">Fecha especial</h3>
+      <form id="evento-form" class="modal-form">
+        <label class="form-field">
+          <span class="form-label">¿Qué celebramos?</span>
+          <input type="text" id="evento-titulo" maxlength="60" placeholder="Ej. Nuestro Aniversario, Cumpleaños..." required>
+        </label>
+        
+        <label class="form-field">
+          <span class="form-label">¿Cuándo es?</span>
+          <input type="date" id="evento-fecha" required>
+        </label>
+
+        <label class="form-field">
+          <span class="form-label">Detalles o dedicatoria (opcional)</span>
+          <textarea id="evento-descripcion" rows="2" maxlength="200" placeholder="Ej. Cena romántica, regalo sorpresa..."></textarea>
+        </label>
+
+        <div class="form-field">
+          <span class="form-label">Color del recordatorio</span>
+          <div class="color-picker">
+            <button type="button" class="color-option color-amarillo activo" data-color="amarillo" aria-label="Color amarillo"></button>
+            <button type="button" class="color-option color-rosa" data-color="rosa" aria-label="Color rosa"></button>
+            <button type="button" class="color-option color-lila" data-color="lila" aria-label="Color lila"></button>
+            <button type="button" class="color-option color-menta" data-color="menta" aria-label="Color menta"></button>
+            <button type="button" class="color-option color-cielo" data-color="cielo" aria-label="Color cielo"></button>
+          </div>
+        </div>
+
+        <div class="evento-opciones-grid">
+          <label class="form-field">
+            <span class="form-label">Recordarme con:</span>
+            <select id="evento-recordatorio">
+              <option value="0">El mismo día</option>
+              <option value="1" selected>1 día de anticipación</option>
+              <option value="3">3 días de anticipación</option>
+              <option value="7">1 semana de anticipación</option>
+            </select>
+          </label>
+
+          <label class="form-field-checkbox">
+            <input type="checkbox" id="evento-recurrente" checked>
+            <span><strong>Repetir cada año</strong> (Aniversarios y cumpleaños)</span>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close-evento-modal>Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar fecha</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL DETALLE DE RECETA -->
   <div id="receta-modal" class="receta-modal hidden" aria-modal="true" role="dialog">
     <div class="receta-modal-content">
@@ -1992,6 +2105,7 @@ Artista - Canción
   <script src="src/modules/album-chat.js?v=13"></script>
   <script src="src/modules/album-notas.js"></script>
   <script src="src/modules/album-auth.js"></script>
+  <script src="src/modules/album-eventos.js?v=1"></script>
   <script src="diccionario.js?v=5"></script>
   <script src="recetas.js?v=10"></script>
   <script src="src/modules/album-router.js"></script>

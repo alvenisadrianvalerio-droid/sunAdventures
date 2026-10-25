@@ -44,6 +44,8 @@
         window.AlbumApp.modules.logros?.renderExperiencia();
       } else if (nombre === "mascotas" && typeof window._renderMascotasGrid === "function") {
         window._renderMascotasGrid();
+      } else if (nombre === "calendario") {
+        window.AlbumApp.modules.eventos?.renderCalendario?.();
       }
       
       // Notificar ciclo de vida SPA para que módulos secundarios liberen memoria/pausen animaciones
