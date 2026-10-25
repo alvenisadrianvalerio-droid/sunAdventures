@@ -1615,6 +1615,19 @@ Artista - Canción
         var nav = document.getElementById("main-nav-links");
         if (!nav) return;
         var isOpen = force !== undefined ? force : !nav.classList.contains("mobile-open");
+        
+        // Optimización compositor: will-change temporal
+        nav.classList.add("is-animating");
+        var onEnd = function () {
+          nav.classList.remove("is-animating");
+          nav.removeEventListener("transitionend", onEnd);
+        };
+        nav.addEventListener("transitionend", onEnd);
+        setTimeout(function () {
+          nav.classList.remove("is-animating");
+          nav.removeEventListener("transitionend", onEnd);
+        }, 260);
+
         nav.classList.toggle("mobile-open", isOpen);
         if (btn) {
           btn.classList.toggle("active", isOpen);

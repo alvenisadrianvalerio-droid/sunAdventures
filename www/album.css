@@ -9013,14 +9013,17 @@ body.light .perfil-stat {
     width: min(280px, 86%);
     z-index: 100;
     transform: translateX(-105%);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
-    background: var(--card-bg, #1a1a20);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .35);
+    background: #141722;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .chat-sidebar.mobile-open {
     transform: translateX(0);
+  }
+
+  .chat-sidebar.is-animating {
+    will-change: transform;
   }
 
   .logros-resumen {

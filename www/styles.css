@@ -1896,19 +1896,18 @@ body.light .download-option:hover {
     top: 58px;
     left: 0;
     right: 0;
-    background: rgba(11, 12, 18, 0.96);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 217, 61, 0.2);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+    background: #0d0f18;
+    border-bottom: 1px solid rgba(255, 217, 61, 0.25);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     flex-direction: column;
     align-items: stretch;
     gap: .4rem;
     padding: .9rem 1.1rem 1.2rem;
     transform: translateY(-120%);
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.25s;
     z-index: 9999;
     touch-action: pan-y;
   }
@@ -1916,13 +1915,18 @@ body.light .download-option:hover {
   .nav-links.mobile-open {
     transform: translateY(0);
     opacity: 1;
+    visibility: visible;
     pointer-events: auto !important;
   }
 
+  .nav-links.is-animating {
+    will-change: transform, opacity;
+  }
+
   body.light .nav-links {
-    background: rgba(255, 248, 235, 0.96);
+    background: #fff8eb;
     border-bottom: 1px solid rgba(139, 90, 20, 0.2);
-    box-shadow: 0 16px 36px rgba(139, 90, 20, 0.15);
+    box-shadow: 0 8px 20px rgba(139, 90, 20, 0.12);
   }
 
   .nav-link {

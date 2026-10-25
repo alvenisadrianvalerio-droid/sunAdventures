@@ -317,19 +317,19 @@
     }
   };
 
-  userDropdown?.querySelectorAll("[data-action]").forEach(item => {
-    item.addEventListener("click", e => {
+  // Delegación de eventos en un único listener para todo el dropdown
+  userDropdown?.addEventListener("click", e => {
+    const actionItem = e.target.closest("[data-action]");
+    if (actionItem && userDropdown.contains(actionItem)) {
       e.preventDefault();
       e.stopPropagation();
-      ejecutarAccionDropdown(item, e);
-    });
-  });
-
-  // Enlaces de vistas (Mapa, Logros, Notitas, Playlists)
-  userDropdown?.querySelectorAll("a.user-dropdown-item").forEach(link => {
-    link.addEventListener("click", () => {
-      setTimeout(() => { cerrarMenuPerfil(); }, 120);
-    });
+      ejecutarAccionDropdown(actionItem, e);
+      return;
+    }
+    const navLink = e.target.closest("a.user-dropdown-item");
+    if (navLink && userDropdown.contains(navLink)) {
+      cerrarMenuPerfil();
+    }
   });
 
   window.AlbumApp.modules.auth = {

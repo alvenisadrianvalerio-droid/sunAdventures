@@ -348,12 +348,31 @@
   const btnToggleSidebar = $("chat-btn-toggle-sidebar");
   btnToggleSidebar?.addEventListener("click", e => {
     e.stopPropagation();
-    $("chat-sidebar")?.classList.toggle("mobile-open");
+    const sidebar = $("chat-sidebar");
+    if (!sidebar) return;
+    sidebar.classList.add("is-animating");
+    const onEnd = () => {
+      sidebar.classList.remove("is-animating");
+      sidebar.removeEventListener("transitionend", onEnd);
+    };
+    sidebar.addEventListener("transitionend", onEnd);
+    setTimeout(onEnd, 260);
+    sidebar.classList.toggle("mobile-open");
   });
 
   // Cerrar sidebar móvil al tocar el área de mensajes
   chatMessages?.addEventListener("click", () => {
-    $("chat-sidebar")?.classList.remove("mobile-open");
+    const sidebar = $("chat-sidebar");
+    if (sidebar && sidebar.classList.contains("mobile-open")) {
+      sidebar.classList.add("is-animating");
+      const onEnd = () => {
+        sidebar.classList.remove("is-animating");
+        sidebar.removeEventListener("transitionend", onEnd);
+      };
+      sidebar.addEventListener("transitionend", onEnd);
+      setTimeout(onEnd, 260);
+      sidebar.classList.remove("mobile-open");
+    }
   });
 
   // Suscripción en tiempo real siempre activa para detectar nuevos mensajes y mostrar punto rojo
