@@ -453,6 +453,33 @@ if (!window._extraVistas.includes("recetas")) {
     "chicken stock": "Caldo de pollo", "beef stock": "Caldo de res", "vegetable stock": "Caldo de verduras"
   };
 
+  // Diccionario inverso (Español -> Inglés TheMealDB)
+  const DICCIONARIO_INGREDIENTES_ES_EN = {
+    "pollo": "chicken", "pechuga de pollo": "chicken breast", "muslo de pollo": "chicken thighs",
+    "huevo": "egg", "huevos": "eggs",
+    "arroz": "rice", "arroz jazmin": "jasmine rice", "arroz basmati": "basmati rice",
+    "carne": "beef", "carne de res": "beef", "res": "beef", "ternera": "beef",
+    "cerdo": "pork", "tocino": "bacon", "panceta": "bacon", "jamon": "ham",
+    "tomate": "tomato", "tomates": "tomatoes",
+    "cebolla": "onion", "cebollas": "onions", "cebolla morada": "red onion", "cebollin": "spring onions",
+    "ajo": "garlic", "dientes de ajo": "garlic",
+    "papa": "potatoes", "papas": "potatoes", "patata": "potatoes", "patatas": "potatoes",
+    "zanahoria": "carrots", "zanahorias": "carrots",
+    "queso": "cheese", "queso parmesano": "parmesan", "queso mozzarella": "mozzarella",
+    "pasta": "pasta", "espagueti": "spaghetti", "fideos": "noodles",
+    "leche": "milk", "mantequilla": "butter", "crema": "cream",
+    "harina": "flour", "azucar": "sugar", "sal": "salt", "pimienta": "pepper",
+    "aceite": "olive oil", "aceite de oliva": "olive oil", "aceite de sesamo": "sesame oil",
+    "agua": "water", "limon": "lemon", "lima": "lime",
+    "pescado": "salmon", "salmon": "salmon", "atun": "tuna", "camaron": "prawns", "camarones": "prawns", "mariscos": "seafood",
+    "champinon": "mushrooms", "champinones": "mushrooms", "setas": "mushrooms",
+    "espinaca": "spinach", "espinacas": "spinach",
+    "salsa de soja": "soy sauce", "soja": "soy sauce", "soya": "soy sauce",
+    "jengibre": "ginger", "aguacate": "avocado", "palta": "avocado",
+    "pan": "bread", "chocolate": "chocolate", "vainilla": "vanilla",
+    "chile": "chilli", "picante": "chilli"
+  };
+
   // Traducir nombre de ingrediente de inglés a español (diccionario primero, luego traductor automático)
   async function traducirIngrediente(ingNombre) {
     if (!ingNombre) return "";
