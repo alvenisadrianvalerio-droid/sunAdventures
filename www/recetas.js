@@ -421,32 +421,64 @@ if (!window._extraVistas.includes("recetas")) {
     return [];
   }
 
-  // Diccionario básico de ingredientes comunes (Español -> Inglés TheMealDB)
-  const DICCIONARIO_INGREDIENTES_ES_EN = {
-    "pollo": "chicken", "pechuga de pollo": "chicken breast", "muslo de pollo": "chicken thighs",
-    "huevo": "egg", "huevos": "eggs",
-    "arroz": "rice", "arroz jazmin": "jasmine rice", "arroz basmati": "basmati rice",
-    "carne": "beef", "carne de res": "beef", "res": "beef", "ternera": "beef",
-    "cerdo": "pork", "tocino": "bacon", "panceta": "bacon", "jamon": "ham",
-    "tomate": "tomato", "tomates": "tomatoes",
-    "cebolla": "onion", "cebollas": "onions", "cebolla morada": "red onion", "cebollin": "spring onions",
-    "ajo": "garlic", "dientes de ajo": "garlic",
-    "papa": "potatoes", "papas": "potatoes", "patata": "potatoes", "patatas": "potatoes",
-    "zanahoria": "carrots", "zanahorias": "carrots",
-    "queso": "cheese", "queso parmesano": "parmesan", "queso mozzarella": "mozzarella",
-    "pasta": "pasta", "espagueti": "spaghetti", "fideos": "noodles",
-    "leche": "milk", "mantequilla": "butter", "crema": "cream",
-    "harina": "flour", "azucar": "sugar", "sal": "salt", "pimienta": "pepper",
-    "aceite": "olive oil", "aceite de oliva": "olive oil", "aceite de sesamo": "sesame oil",
-    "limon": "lemon", "lima": "lime",
-    "pescado": "salmon", "salmon": "salmon", "atun": "tuna", "camaron": "prawns", "camarones": "prawns", "mariscos": "seafood",
-    "champinon": "mushrooms", "champinones": "mushrooms", "setas": "mushrooms",
-    "espinaca": "spinach", "espinacas": "spinach",
-    "salsa de soja": "soy sauce", "soja": "soy sauce", "soya": "soy sauce",
-    "jengibre": "ginger", "aguacate": "avocado", "palta": "avocado",
-    "pan": "bread", "chocolate": "chocolate", "vainilla": "vanilla",
-    "chile": "chilli", "picante": "chilli"
+  // Diccionario bidireccional rápido de ingredientes frecuentes (Inglés TheMealDB -> Español)
+  const DICCIONARIO_INGREDIENTES_EN_ES = {
+    "chicken": "Pollo", "chicken breast": "Pechuga de pollo", "chicken thighs": "Muslos de pollo",
+    "egg": "Huevo", "eggs": "Huevos",
+    "rice": "Arroz", "jasmine rice": "Arroz jazmín", "basmati rice": "Arroz basmatí",
+    "beef": "Carne de res", "minced beef": "Carne picada de res", "ground beef": "Carne molida de res",
+    "pork": "Cerdo", "pork chops": "Chuletas de cerdo", "bacon": "Tocino / Panceta", "ham": "Jamón",
+    "tomato": "Tomate", "tomatoes": "Tomates", "tomato puree": "Puré de tomate", "tomato paste": "Pasta de tomate", "tinned tomatoes": "Tomates enlatados",
+    "onion": "Cebolla", "onions": "Cebollas", "red onion": "Cebolla morada", "spring onions": "Cebollín / Cebolleta",
+    "garlic": "Ajo", "garlic clove": "Diente de ajo", "garlic cloves": "Dientes de ajo",
+    "potatoes": "Papas", "potato": "Papa",
+    "carrots": "Zanahorias", "carrot": "Zanahoria",
+    "cheese": "Queso", "parmesan": "Queso parmesano", "mozzarella": "Queso mozzarella", "cheddar cheese": "Queso cheddar",
+    "pasta": "Pasta", "spaghetti": "Espaguetis", "noodles": "Fideos",
+    "milk": "Leche", "butter": "Mantequilla", "cream": "Crema de leche / Nata", "heavy cream": "Crema espesa", "sour cream": "Crema agria",
+    "flour": "Harina", "plain flour": "Harina de trigo", "sugar": "Azúcar", "brown sugar": "Azúcar morena",
+    "salt": "Sal", "pepper": "Pimienta", "black pepper": "Pimienta negra",
+    "olive oil": "Aceite de oliva", "vegetable oil": "Aceite vegetal", "sesame oil": "Aceite de sésamo", "oil": "Aceite",
+    "water": "Agua", "warm water": "Agua tibia",
+    "lemon": "Limón", "lemon juice": "Jugo de limón", "lime": "Lima", "lime juice": "Jugo de lima",
+    "salmon": "Salmón", "tuna": "Atún", "prawns": "Camarones / Langostinos", "shrimp": "Camarones", "fish": "Pescado", "seafood": "Mariscos",
+    "mushrooms": "Champiñones / Setas", "mushroom": "Champiñón",
+    "spinach": "Espinacas", "lettuce": "Lechuga", "cucumber": "Pepino", "avocado": "Aguacate / Palta",
+    "soy sauce": "Salsa de soja", "dark soy sauce": "Salsa de soja oscura", "light soy sauce": "Salsa de soja clara",
+    "ginger": "Jengibre", "ginger paste": "Pasta de jengibre", "garlic paste": "Pasta de ajo",
+    "coconut milk": "Leche de coco", "coconut cream": "Crema de coco",
+    "bread": "Pan", "breadcrumbs": "Pan rallado", "chocolate": "Chocolate", "vanilla": "Vainilla",
+    "chilli": "Chile / Picante", "chilli powder": "Chile en polvo", "paprika": "Pimentón dulce", "cumin": "Comino",
+    "coriander": "Cilantro", "parsley": "Perejil", "basil": "Albahaca", "oregano": "Orégano",
+    "chicken stock": "Caldo de pollo", "beef stock": "Caldo de res", "vegetable stock": "Caldo de verduras"
   };
+
+  // Traducir nombre de ingrediente de inglés a español (diccionario primero, luego traductor automático)
+  async function traducirIngrediente(ingNombre) {
+    if (!ingNombre) return "";
+    const limpio = ingNombre.trim();
+    const clave = limpio.toLowerCase();
+    
+    // 1. Coincidencia exacta en diccionario
+    if (DICCIONARIO_INGREDIENTES_EN_ES[clave]) {
+      return DICCIONARIO_INGREDIENTES_EN_ES[clave];
+    }
+    
+    // 2. Coincidencia por inclusión
+    for (const [en, es] of Object.entries(DICCIONARIO_INGREDIENTES_EN_ES)) {
+      if (clave === en || clave.includes(` ${en} `) || clave.startsWith(`${en} `) || clave.endsWith(` ${en}`)) {
+        return es;
+      }
+    }
+    
+    // 3. Traducción asíncrona con caché
+    try {
+      const tr = await traducir(limpio, "en", "es");
+      return tr || limpio;
+    } catch {
+      return limpio;
+    }
+  }
 
   // Normalizar cadena para comparación flexible (sin acentos ni mayúsculas)
   function normalizarTexto(txt) {
@@ -554,11 +586,17 @@ if (!window._extraVistas.includes("recetas")) {
         const total = ingredientesReceta.length;
         const pct = Math.round((tengo.length / total) * 100);
 
+        // Traducir los nombres de los ingredientes de la receta al español
+        const [tengoEs, faltanEs] = await Promise.all([
+          Promise.all(tengo.map(i => traducirIngrediente(i))),
+          Promise.all(faltan.map(i => traducirIngrediente(i)))
+        ]);
+
         evaluadas.push({
           ...meal,
           _pantryMatch: {
-            tengo,
-            faltan,
+            tengo: tengoEs,
+            faltan: faltanEs,
             total,
             pct
           }
