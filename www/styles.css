@@ -5310,18 +5310,18 @@ body.light .lobby-hero {
   }
 }
 
-/* Tarjeta individual */
+/* Tarjeta individual estilo Steam (horizontal / rectangular apaisada) */
 .dashboard-card {
   display: flex;
   flex-direction: column;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.05) 0%, rgba(18, 22, 34, 0.82) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  border-radius: 20px;
-  padding: 1.15rem 1rem 1.1rem;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.05) 0%, rgba(18, 22, 34, 0.88) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 0;
   text-decoration: none;
   color: var(--text);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s, border-color 0.25s, background 0.25s;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.26s, border-color 0.22s, background 0.22s;
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
@@ -5337,13 +5337,14 @@ body.light .lobby-hero {
   background: linear-gradient(90deg, transparent, var(--accent), transparent);
   opacity: 0;
   transition: opacity 0.25s;
+  z-index: 2;
 }
 
 .dashboard-card:hover {
-  transform: translateY(-4px) scale(1.015);
-  border-color: rgba(255, 217, 61, 0.45);
-  background: linear-gradient(160deg, rgba(255, 217, 61, 0.1) 0%, rgba(22, 27, 44, 0.95) 100%);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35), 0 0 20px rgba(255, 217, 61, 0.12);
+  transform: translateY(-4px) scale(1.02);
+  border-color: rgba(255, 217, 61, 0.55);
+  background: linear-gradient(165deg, rgba(255, 217, 61, 0.09) 0%, rgba(22, 27, 44, 0.98) 100%);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45), 0 0 24px rgba(255, 217, 61, 0.15);
 }
 
 .dashboard-card:hover::before {
@@ -5355,50 +5356,67 @@ body.light .lobby-hero {
 }
 
 body.light .dashboard-card {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 248, 235, 0.9) 100%);
-  border-color: rgba(139, 90, 20, 0.12);
-  box-shadow: 0 4px 14px rgba(139, 90, 20, 0.07);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 248, 235, 0.92) 100%);
+  border-color: rgba(139, 90, 20, 0.15);
+  box-shadow: 0 6px 18px rgba(139, 90, 20, 0.1);
 }
 
 body.light .dashboard-card:hover {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 1) 0%, rgba(255, 243, 212, 0.95) 100%);
-  border-color: rgba(212, 148, 30, 0.4);
-  box-shadow: 0 12px 26px rgba(139, 90, 20, 0.15);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 1) 0%, rgba(255, 243, 212, 0.98) 100%);
+  border-color: rgba(212, 148, 30, 0.5);
+  box-shadow: 0 14px 30px rgba(139, 90, 20, 0.18);
 }
 
+/* Banner de la imagen apaisado a lo largo (estilo Steam cápsula) */
 .dashboard-card-media {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100px;
   width: 100%;
-  margin-bottom: 0.85rem;
-  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  aspect-ratio: 16 / 9;
+  height: auto;
+  margin-bottom: 0;
+  padding: 0.85rem 1rem;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(0, 0, 0, 0.22) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s;
+}
+
+body.light .dashboard-card-media {
+  background: linear-gradient(180deg, rgba(255, 248, 235, 0.6) 0%, rgba(245, 235, 215, 0.4) 100%);
+  border-bottom-color: rgba(139, 90, 20, 0.08);
 }
 
 .dashboard-card:hover .dashboard-card-media {
-  transform: scale(1.08) translateY(-2px);
+  transform: scale(1.04);
 }
 
 .dashboard-card-img {
-  width: 90px;
-  height: 90px;
+  width: 100%;
+  height: 100%;
+  max-height: 95px;
   object-fit: contain;
-  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.28));
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
   pointer-events: none;
+  transition: filter 0.25s;
 }
 
 .dashboard-card-info {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  text-align: center;
-  align-items: center;
-  margin-top: auto;
+  gap: 0.25rem;
+  text-align: left;
+  align-items: flex-start;
+  padding: 0.85rem 1rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .dashboard-card-title {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: var(--text);
   line-height: 1.25;
@@ -5406,11 +5424,11 @@ body.light .dashboard-card:hover {
 }
 
 .dashboard-card-sub {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--text);
-  opacity: 0.7;
+  opacity: 0.68;
   line-height: 1.35;
-  max-width: 92%;
+  max-width: 100%;
 }
 
 @media (max-width: 768px) {
