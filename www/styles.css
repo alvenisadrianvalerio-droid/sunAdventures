@@ -5117,3 +5117,43 @@ body.light .player-close {
     margin-bottom: .6rem !important;
   }
 }
+
+/* ============================================================
+   BLOQUE F (Sub-bloque B): Optimización de renderizado y scroll fluido en escritorio
+   - content-visibility: auto en listas y tarjetas largas
+   - contain: layout paint para aislar repintados en scroll
+   - Desactivación de will-change permanente en idle
+   ============================================================ */
+@media (min-width: 769px) {
+  /* Contención estricta en elementos repetitivos pesados */
+  .receta-card,
+  .polaroid,
+  .polaroid-wrapper,
+  .logro-card,
+  .dicc-termino-card,
+  .capsula-card,
+  .rpg-zone-card,
+  .finanzas-tarjeta-resumen,
+  .finanzas-tx-item {
+    contain: layout paint;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 180px;
+  }
+
+  /* Grid y contenedores con aislamiento de layout */
+  .recetas-grid,
+  .dicc-grid,
+  .logros-grid,
+  .album-grid,
+  .capsula-grid,
+  .finanzas-lista-transacciones {
+    contain: layout style;
+  }
+
+  /* Los will-change solo se activan al hover/interacción para no agotar VRAM */
+  .girasol:not(:hover),
+  .loading-flower:not(:hover),
+  .nav-btn:not(:hover) {
+    will-change: auto !important;
+  }
+}
