@@ -485,148 +485,91 @@
           </div>
         </div>
 
-        <!-- Secciones Organizadas del Dashboard Ilustrado -->
-        <main class="dashboard-sections" aria-label="Secciones y Módulos de Four Sunflowers">
-          <!-- 1. Nuestro Rincón -->
-          <section class="dashboard-section" aria-labelledby="section-rincon">
-            <div class="dashboard-section-header">
-              <span class="dashboard-section-icon" aria-hidden="true">🌻</span>
-              <h2 class="dashboard-section-title" id="section-rincon">Nuestro Rincón</h2>
-              <span class="dashboard-section-desc">Memorias, sentimientos y nuestras mascotas</span>
-            </div>
-            <nav class="dashboard-grid" aria-label="Herramientas de Nuestro Rincón">
-              <a href="#album" class="dashboard-card" data-view-link="album">
-                <div class="dashboard-card-media">
-                  <img src="img/dashboard/card-album.svg" alt="" class="dashboard-card-img" width="400" height="320" loading="lazy" decoding="async">
-                </div>
-                <div class="dashboard-card-info">
-                  <strong class="dashboard-card-title">Álbum de Recuerdos</strong>
-                  <small class="dashboard-card-sub">Nuestras fotos y momentos inolvidables</small>
-                </div>
-              </a>
+        <!-- Nuevo Dashboard Visual: 11 Herramientas -->
+        <nav class="dashboard-visual-nav" aria-label="Herramientas y Aventuras de Four Sunflowers">
+          <!-- Fila 1: 6 Iconos (Álbum, Notas, Mascotas, Calendario, Aventura, Roguelike) -->
+          <div class="dashboard-row dashboard-row-1">
+            <a href="#album" class="dash-item" data-view-link="album" aria-label="Álbum de Recuerdos">
+              <div class="dash-item-card">
+                <img src="img/dashboard/card-album.svg" alt="Cámara Álbum" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
+              </div>
+              <span class="dash-item-label">Álbum</span>
+            </a>
 
-              <a href="#notas" class="dashboard-card" data-view-link="notas">
-                <div class="dashboard-card-media">
-                  <img src="img/dashboard/card-notas.svg" alt="" class="dashboard-card-img" width="400" height="320" loading="lazy" decoding="async">
-                </div>
-                <div class="dashboard-card-info">
-                  <strong class="dashboard-card-title">Notitas para Ti</strong>
-                  <small class="dashboard-card-sub">Pensamientos que quiero guardar</small>
-                </div>
-              </a>
+            <a href="#notas" class="dash-item" data-view-link="notas" aria-label="Notitas para Ti">
+              <div class="dash-item-card">
+                <img src="img/dashboard/card-notas.svg" alt="Libreta de Notas" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
+              </div>
+              <span class="dash-item-label">Notas</span>
+            </a>
 
-              <a href="#mascotas" class="dashboard-card" data-view-link="mascotas">
-                <div class="dashboard-card-media">
-                  <img src="img/dashboard/card-mascotas.svg" alt="" class="dashboard-card-img" width="400" height="320" loading="lazy" decoding="async">
-                </div>
-                <div class="dashboard-card-info">
-                  <strong class="dashboard-card-title">Nuestras Mascotas</strong>
-                  <small class="dashboard-card-sub">Refugio, cuidado y lealtad</small>
-                </div>
-              </a>
+            <a href="#mascotas" class="dash-item" data-view-link="mascotas" aria-label="Nuestras Mascotas">
+              <div class="dash-item-card">
+                <img src="img/dashboard/card-mascotas.svg" alt="Casita de Mascotas" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
+              </div>
+              <span class="dash-item-label">Mascotas</span>
+            </a>
 
-              <a href="#calendario" class="dashboard-card" data-view-link="calendario">
-                <div class="dashboard-card-media">
-                  <img src="img/dashboard/card-calendario.svg" alt="" class="dashboard-card-img" width="400" height="320" loading="lazy" decoding="async">
-                </div>
-                <div class="dashboard-card-info">
-                  <strong class="dashboard-card-title">Calendario Especial</strong>
-                  <small class="dashboard-card-sub">Fechas, aniversarios y recuerdos</small>
-                </div>
-              </a>
-            </nav>
-          </section>
+            <a href="#calendario" class="dash-item" data-view-link="calendario" aria-label="Calendario Especial">
+              <div class="dash-item-card">
+                <img src="img/dashboard/card-calendario.svg" alt="Calendario Especial" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
+              </div>
+              <span class="dash-item-label">Calendario</span>
+            </a>
 
-          <!-- 2. Aventuras & Juegos -->
-          <section class="dashboard-section" aria-labelledby="section-aventuras">
-            <div class="dashboard-section-header">
-              <span class="dashboard-section-icon" aria-hidden="true">⚔️</span>
-              <h2 class="dashboard-section-title" id="section-aventuras">Aventuras y Desafíos</h2>
-              <span class="dashboard-section-desc">Explora reinos, sube de nivel y colecciona trofeos</span>
-            </div>
-            <nav class="dashboard-grid" aria-label="Juegos y Aventuras">
-              <a href="#rpg" class="dashboard-card" data-view-link="rpg">
-                <div class="dashboard-card-media">
-                  <img src="img/dashboard/card-aventura.svg" alt="" class="dashboard-card-img" width="400" height="320" loading="lazy" decoding="async">
-                </div>
-                <div class="dashboard-card-info">
-                  <strong class="dashboard-card-title">Modo Aventura</strong>
-                  <small class="dashboard-card-sub">Explora reinos y vence jefes</small>
-                </div>
-              </a>
+            <a href="#rpg" class="dash-item" data-view-link="rpg" aria-label="Modo Aventura">
+              <div class="dash-item-card">
+                <img src="img/dashboard/card-aventura.svg" alt="Espada de Aventura" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
+              </div>
+              <span class="dash-item-label">Aventura</span>
+            </a>
 
-              <a href="#roguelike" class="dashboard-card" data-view-link="roguelike">
-                <div class="dashboard-card-media">
-                  <img src="img/dashboard/card-roguelike.svg" alt="" class="dashboard-card-img" width="400" height="320" loading="lazy" decoding="async">
-                </div>
-                <div class="dashboard-card-info">
-                  <strong class="dashboard-card-title">Falla Astral</strong>
-                  <small class="dashboard-card-sub">Expediciones Roguelike infinitas</small>
-                </div>
-              </a>
+            <a href="#roguelike" class="dash-item" data-view-link="roguelike" aria-label="Falla Astral Roguelike">
+              <div class="dash-item-card">
+                <img src="img/dashboard/card-roguelike.svg" alt="Portal Roguelike" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
+              </div>
+              <span class="dash-item-label">Falla Astral</span>
+            </a>
+          </div>
 
-              <a href="#minijuegos" class="dashboard-card" data-view-link="minijuegos">
-                <div class="dashboard-card-media">
-                  <img src="img/dashboard/card-minijuegos.svg" alt="" class="dashboard-card-img" width="400" height="320" loading="lazy" decoding="async">
-                </div>
-                <div class="dashboard-card-info">
-                  <strong class="dashboard-card-title">Minijuegos</strong>
-                  <small class="dashboard-card-sub">Girasol, memoria y adivinanzas</small>
-                </div>
-              </a>
+          <!-- Fila 2: 5 Iconos (Minijuegos, Logros, Recetario, Finanzas, Diccionario) -->
+          <div class="dashboard-row dashboard-row-2">
+            <a href="#minijuegos" class="dash-item" data-view-link="minijuegos" aria-label="Minijuegos">
+              <div class="dash-item-card">
+                <img src="img/dashboard/card-minijuegos.svg" alt="Mando Minijuegos" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
+              </div>
+              <span class="dash-item-label">Minijuegos</span>
+            </a>
 
-              <a href="#logros" class="dashboard-card" data-view-link="logros">
-                <div class="dashboard-card-media">
-                  <img src="img/dashboard/card-logros.svg" alt="" class="dashboard-card-img" width="400" height="320" loading="lazy" decoding="async">
-                </div>
-                <div class="dashboard-card-info">
-                  <strong class="dashboard-card-title">Salón de Logros</strong>
-                  <small class="dashboard-card-sub">Nuestros hitos y trofeos</small>
-                </div>
-              </a>
-            </nav>
-          </section>
+            <a href="#logros" class="dash-item" data-view-link="logros" aria-label="Salón de Logros">
+              <div class="dash-item-card">
+                <img src="img/dashboard/card-logros.svg" alt="Trofeo Logros" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
+              </div>
+              <span class="dash-item-label">Logros</span>
+            </a>
 
-          <!-- 3. Vida Compartida & Utilidades -->
-          <section class="dashboard-section" aria-labelledby="section-vida">
-            <div class="dashboard-section-header">
-              <span class="dashboard-section-icon" aria-hidden="true">✨</span>
-              <h2 class="dashboard-section-title" id="section-vida">Vida Compartida</h2>
-              <span class="dashboard-section-desc">Herramientas diarias para disfrutar juntos</span>
-            </div>
-            <nav class="dashboard-grid" aria-label="Herramientas del día a día">
-              <a href="#recetas" class="dashboard-card" data-view-link="recetas">
-                <div class="dashboard-card-media">
-                  <img src="img/dashboard/card-recetas.svg" alt="" class="dashboard-card-img" width="400" height="320" loading="lazy" decoding="async">
-                </div>
-                <div class="dashboard-card-info">
-                  <strong class="dashboard-card-title">Recetario Mágico</strong>
-                  <small class="dashboard-card-sub">Cocina con lo que tienes a mano</small>
-                </div>
-              </a>
+            <a href="#recetas" class="dash-item" data-view-link="recetas" aria-label="Recetario Mágico">
+              <div class="dash-item-card">
+                <img src="img/dashboard/card-recetas.svg" alt="Olla Recetario" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
+              </div>
+              <span class="dash-item-label">Recetas</span>
+            </a>
 
-              <a href="#finanzas" class="dashboard-card" data-view-link="finanzas">
-                <div class="dashboard-card-media">
-                  <img src="img/dashboard/card-finanzas.svg" alt="" class="dashboard-card-img" width="400" height="320" loading="lazy" decoding="async">
-                </div>
-                <div class="dashboard-card-info">
-                  <strong class="dashboard-card-title">Finanzas y Ahorro</strong>
-                  <small class="dashboard-card-sub">Presupuesto compartido y metas</small>
-                </div>
-              </a>
+            <a href="#finanzas" class="dash-item" data-view-link="finanzas" aria-label="Finanzas y Ahorro">
+              <div class="dash-item-card">
+                <img src="img/dashboard/card-finanzas.svg" alt="Alcancía Cerdito" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
+              </div>
+              <span class="dash-item-label">Finanzas</span>
+            </a>
 
-              <a href="#diccionario" class="dashboard-card" data-view-link="diccionario">
-                <div class="dashboard-card-media">
-                  <img src="img/dashboard/card-diccionario.svg" alt="" class="dashboard-card-img" width="400" height="320" loading="lazy" decoding="async">
-                </div>
-                <div class="dashboard-card-info">
-                  <strong class="dashboard-card-title">Diccionario</strong>
-                  <small class="dashboard-card-sub">Aprende nuevas palabras</small>
-                </div>
-              </a>
-            </nav>
-          </section>
-        </main>
+            <a href="#diccionario" class="dash-item" data-view-link="diccionario" aria-label="Diccionario">
+              <div class="dash-item-card">
+                <img src="img/dashboard/card-diccionario.svg" alt="Libro Diccionario" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
+              </div>
+              <span class="dash-item-label">Diccionario</span>
+            </a>
+          </div>
+        </nav>
       </div>
     </div>
     <audio id="pop" src="sounds/soundreality-pop-sound-423716.mp3" preload="auto"></audio>
