@@ -24,20 +24,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="leaflet.css">
-  <script src="https://js.puter.com/v2/"></script>
-  <link rel="stylesheet" href="styles.css?v=122">
+  <link rel="preload" as="image" href="img/girasol.webp" type="image/webp" fetchpriority="high">
+  <link rel="stylesheet" href="leaflet.css" media="print" onload="this.media='all'">
+  <script src="https://js.puter.com/v2/" defer></script>
+  <link rel="stylesheet" href="styles.css?v=123">
   <link rel="stylesheet" href="album.css?v=120">
-  <link rel="stylesheet" href="juegos.css?v=120">
-  <link rel="stylesheet" href="rpg.css?v=7">
-  <link rel="stylesheet" href="rpg-loot.css?v=4">
+  <link rel="stylesheet" href="juegos.css?v=120" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="rpg.css?v=7" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="rpg-loot.css?v=4" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="temas.css?v=1">
-  <link rel="stylesheet" href="finanzas.css?v=5">
-  <link rel="stylesheet" href="player-extras.css?v=1">
-  <link rel="stylesheet" href="capsula-tiempo.css?v=1">
-  <link rel="stylesheet" href="pareja-chat.css?v=1">
-  <link rel="stylesheet" href="diccionario.css?v=5">
-  <link rel="stylesheet" href="recetas.css?v=5">
+  <link rel="stylesheet" href="finanzas.css?v=9" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="player-extras.css?v=1" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="capsula-tiempo.css?v=1" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="pareja-chat.css?v=1" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="diccionario.css?v=5" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="recetas.css?v=5" media="print" onload="this.media='all'">
   <style>
     svg {
       max-width: 100%;
@@ -728,22 +729,31 @@
   <section id="finanzas" class="finanzas-section view" data-view="finanzas">
     <div class="finanzas-shell">
       <header class="finanzas-header">
-        <div>
-          <p class="finanzas-kicker">Cuidemos lo que construimos</p>
-          <h1>Finanzas</h1>
-          <p class="finanzas-intro">Tus gastos, acuerdos y metas en un solo lugar.</p>
+        <div class="finanzas-brand-wrap">
+          <div class="finanzas-brand-avatar">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          </div>
+          <div>
+            <div class="finanzas-brand-title">
+              <h1>FinControl</h1>
+              <span class="fincontrol-badge outline">Gestión Financiera</span>
+            </div>
+            <p class="finanzas-intro">Resumen en tiempo real de ingresos, gastos, acuerdos y liquidez.</p>
+          </div>
         </div>
-        <label class="finanzas-currency"><span>Moneda</span><select id="finanzas-moneda"
-            aria-label="Moneda de visualización">
-            <option value="EUR">EUR · Euro</option>
-            <option value="USD">USD · Dólar</option>
-            <option value="MXN">MXN · Peso mexicano</option>
-            <option value="ARS">ARS · Peso argentino</option>
-            <option value="COP">COP · Peso colombiano</option>
-            <option value="CLP">CLP · Peso chileno</option>
-            <option value="PEN">PEN · Sol</option>
-            <option value="VES">VES · Bolívar venezolano</option>
-          </select></label>
+        <div class="finanzas-header-controls">
+          <label class="finanzas-currency"><span>Moneda Global</span><select id="finanzas-moneda"
+              aria-label="Moneda de visualización">
+              <option value="VES">VES · Bolívar venezolano</option>
+              <option value="USD">USD · Dólar americano</option>
+              <option value="EUR">EUR · Euro</option>
+              <option value="COP">COP · Peso colombiano</option>
+              <option value="ARS">ARS · Peso argentino</option>
+              <option value="MXN">MXN · Peso mexicano</option>
+              <option value="CLP">CLP · Peso chileno</option>
+              <option value="PEN">PEN · Sol peruano</option>
+            </select></label>
+        </div>
       </header>
       <p id="finanzas-error" class="finanzas-alert" role="status" aria-live="polite" hidden></p>
       <div id="finanzas-login" class="finanzas-login" hidden><span class="finanzas-login-icon"
@@ -834,10 +844,15 @@
         </nav>
         <section id="finanzas-quote-card" class="finanzas-quote-card" hidden>
           <div class="finanzas-quote-heading">
-            <div><span class="finanzas-eyebrow">MERCADO DE DIVISAS</span>
-              <h2 id="finanzas-quote-title">Precio frente al dólar</h2>
-            </div><span id="finanzas-quote-updated" class="finanzas-quote-updated" aria-live="polite">Consultando
-              cotización…</span>
+            <div>
+              <div class="fincontrol-rates-header-title">
+                <span class="finanzas-eyebrow">MERCADO DE DIVISAS</span>
+                <span class="fincontrol-badge success"><span class="finanzas-pulse-dot"></span>En Vivo</span>
+              </div>
+              <h2 id="finanzas-quote-title">Tasas de Cambio en Bolívares (VES)</h2>
+              <p class="fincontrol-rates-subtitle">Cotizaciones en tiempo real de USD (BCV & Paralelo), USDT (Binance P2P) y EURO.</p>
+            </div>
+            <span id="finanzas-quote-updated" class="finanzas-quote-updated" aria-live="polite">Consultando cotización…</span>
           </div>
           <div id="finanzas-quote-values" class="finanzas-quote-values" aria-live="polite"></div>
           <div id="finanzas-quote-chart" class="finanzas-quote-chart" role="img"
@@ -867,15 +882,17 @@
               aria-live="polite"></small>
           </form>
         </section>
-        <nav class="finanzas-scopes" aria-label="Ámbito de finanzas">
-          <button type="button" class="finanzas-scope active" data-finanzas-scope="personal"
-            aria-pressed="true">Personal</button>
-          <button type="button" class="finanzas-scope" data-finanzas-scope="pareja"
-            aria-pressed="false">Compartidas</button>
-        </nav>
-        <div class="finanzas-toolbar"><label><span>Período</span><input id="finanzas-periodo"
-              type="month"></label><button id="finanzas-recargar" class="btn-secondary"
-            type="button">Actualizar</button></div>
+        <div class="finanzas-toolbar-row">
+          <nav class="finanzas-scopes" aria-label="Ámbito de finanzas">
+            <button type="button" class="finanzas-scope active" data-finanzas-scope="personal"
+              aria-pressed="true">Personal</button>
+            <button type="button" class="finanzas-scope" data-finanzas-scope="pareja"
+              aria-pressed="false">Compartidas</button>
+          </nav>
+          <div class="finanzas-toolbar"><label><span>Período</span><input id="finanzas-periodo"
+                type="month"></label><button id="finanzas-recargar" class="btn-secondary"
+              type="button">Actualizar</button></div>
+        </div>
         <main id="finanzas-panel" class="finanzas-panel"></main>
       </div>
     </div>
@@ -1594,7 +1611,7 @@ Artista - Canción
   <script src="sun-modal.js"></script>
   <script src="preferences.js?v=2"></script>
   <script src="sprites-config.js"></script>
-  <script src="sprites-names.js"></script>
+  <script src="sprites-names.js?v=2"></script>
   <script src="src/modules/album-core.js"></script>
   <script src="src/modules/album-grupo.js"></script>
   <script src="src/modules/album-logros.js?v=2"></script>
@@ -1607,35 +1624,35 @@ Artista - Canción
   <script src="src/modules/album-router.js"></script>
   <script src="album.js?v=121"></script>
 
-  <!-- RPG — Orden crítico -->
-  <script src="rpg-loot.js?v=8"></script>
-  <script src="rpg-items-dinamicos.js?v=8"></script>
-  <script src="rpg-loadout.js?v=8"></script>
-  <script src="rpg-data.js?v=1"></script>
-  <script src="rpg.js?v=20"></script>
-  <script src="rpg-postgame.js?v=1"></script>
-  <script src="rpg-habilidades.js"></script>
-  <script src="rpg-minimap.js"></script>
-  <script src="rpg-canvas.js"></script>
-  <script src="rpg-roguelike.js?v=5"></script>
+  <!-- RPG — Orden crítico (cargados con defer para no bloquear el hilo de renderizado inicial) -->
+  <script src="rpg-loot.js?v=8" defer></script>
+  <script src="rpg-items-dinamicos.js?v=8" defer></script>
+  <script src="rpg-loadout.js?v=8" defer></script>
+  <script src="rpg-data.js?v=1" defer></script>
+  <script src="rpg.js?v=20" defer></script>
+  <script src="rpg-postgame.js?v=1" defer></script>
+  <script src="rpg-habilidades.js" defer></script>
+  <script src="rpg-minimap.js" defer></script>
+  <script src="rpg-canvas.js" defer></script>
+  <script src="rpg-roguelike.js?v=5" defer></script>
 
   <!-- Resto de la app -->
-  <script src="tienda.js"></script>
-  <script src="script.js"></script>
-  <script src="perfil.js"></script>
-  <script src="logros-extra.js"></script>
-  <script src="juegos.js"></script>
-  <script src="desafios-diarios.js"></script>
-  <script src="mejoras.js"></script>
-  <script src="efectos.js"></script>
-  <script src="parches-v2.js"></script>
-  <script src="watch-party.js"></script>
-  <script src="parches-v3.js"></script>
-  <script src="youtube-spotify-metadata.js"></script>
-  <script src="player-extras.js?v=1"></script>
-  <script src="finanzas.js?v=8"></script>
-  <script src="capsula-tiempo.js?v=1"></script>
-  <script src="pareja-sistema.js?v=1"></script>
+  <script src="tienda.js" defer></script>
+  <script src="script.js" defer></script>
+  <script src="perfil.js" defer></script>
+  <script src="logros-extra.js" defer></script>
+  <script src="juegos.js" defer></script>
+  <script src="desafios-diarios.js" defer></script>
+  <script src="mejoras.js" defer></script>
+  <script src="efectos.js" defer></script>
+  <script src="parches-v2.js" defer></script>
+  <script src="watch-party.js" defer></script>
+  <script src="parches-v3.js" defer></script>
+  <script src="youtube-spotify-metadata.js" defer></script>
+  <script src="player-extras.js?v=1" defer></script>
+  <script src="finanzas.js?v=11" defer></script>
+  <script src="capsula-tiempo.js?v=1" defer></script>
+  <script src="pareja-sistema.js?v=1" defer></script>
 
   <!-- FEATURES EXTRA RPG (descomenta cuando confirmes que la base funciona) -->
   <!--
