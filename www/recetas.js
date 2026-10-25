@@ -34,27 +34,31 @@ if (!window._extraVistas.includes("recetas")) {
     "Goat": "Chivo"
   };
 
+  // Caché de SVGs para evitar recalcular strings
+  const SVG_ICONS = {
+    chicken: `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 13a4.5 4.5 0 0 0-4.5-4.5 4.5 4.5 0 0 0-4.5 4.5c0 2 1.5 3.5 3.5 4l-4 4a1.5 1.5 0 0 0 2 2l4-4c.5 2 2 3.5 4 3.5a4.5 4.5 0 0 0 4.5-4.5 4.5 4.5 0 0 0-5-5z"/></svg>`,
+    pasta: `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13h18c0 4-3.5 8-9 8s-9-4-9-8z"/><path d="M12 5v5M8 6c0 2.5 1 4 1 4M16 6c0 2.5-1 4-1 4"/></svg>`,
+    meat: `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 10a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5c0 3 2 6 6 7l2 3h2l2-3c4-1 6-4 6-7z"/><circle cx="8.5" cy="10" r="1.5" fill="currentColor"/></svg>`,
+    seafood: `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12c4-6 12-6 16 0-4 6-12 6-16 0z"/><circle cx="16" cy="12" r="1" fill="currentColor"/><path d="M2 10l2 2-2 2M20 12l2-2v4l-2-2z"/></svg>`,
+    dessert: `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18v-6l-9-4-9 4v6z"/><path d="M3 14c3 0 3 2 6 2s3-2 6-2 3 2 6 2"/><circle cx="12" cy="7" r="2" fill="currentColor"/></svg>`,
+    veg: `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21a9 9 0 0 0 9-9c0-5-4-9-9-9S3 7 3 12a9 9 0 0 0 9 9z"/><path d="M12 3v18M3 12c4.5-1 9 1 18 0"/></svg>`,
+    breakfast: `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="14" rx="9" ry="6"/><ellipse cx="12" cy="10" rx="7.5" ry="4.5"/><ellipse cx="12" cy="7" rx="6" ry="3"/></svg>`,
+    generic: `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>`
+  };
+
   function getCategoriaIcon(cat) {
     const c = (cat || "").toLowerCase();
-    if (c.includes("chicken") || c.includes("pollo")) {
-      return `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 13a4.5 4.5 0 0 0-4.5-4.5 4.5 4.5 0 0 0-4.5 4.5c0 2 1.5 3.5 3.5 4l-4 4a1.5 1.5 0 0 0 2 2l4-4c.5 2 2 3.5 4 3.5a4.5 4.5 0 0 0 4.5-4.5 4.5 4.5 0 0 0-5-5z"/></svg>`;
-    } else if (c.includes("pasta")) {
-      return `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h18c0 4-3.5 8-9 8s-9-4-9-8z"/><path d="M12 5v5M8 6c0 2.5 1 4 1 4M16 6c0 2.5-1 4-1 4"/></svg>`;
-    } else if (c.includes("beef") || c.includes("carne") || c.includes("pork") || c.includes("lamb")) {
-      return `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5c0 3 2 6 6 7l2 3h2l2-3c4-1 6-4 6-7z"/><circle cx="8.5" cy="10" r="1.5" fill="currentColor"/></svg>`;
-    } else if (c.includes("seafood") || c.includes("marisco")) {
-      return `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12c4-6 12-6 16 0-4 6-12 6-16 0z"/><circle cx="16" cy="12" r="1" fill="currentColor"/><path d="M2 10l2 2-2 2M20 12l2-2v4l-2-2z"/></svg>`;
-    } else if (c.includes("dessert") || c.includes("postre")) {
-      return `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18v-6l-9-4-9 4v6z"/><path d="M3 14c3 0 3 2 6 2s3-2 6-2 3 2 6 2"/><circle cx="12" cy="7" r="2" fill="currentColor"/></svg>`;
-    } else if (c.includes("veg")) {
-      return `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 0 0 9-9c0-5-4-9-9-9S3 7 3 12a9 9 0 0 0 9 9z"/><path d="M12 3v18M3 12c4.5-1 9 1 18 0"/></svg>`;
-    } else if (c.includes("breakfast") || c.includes("desayuno")) {
-      return `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="14" rx="9" ry="6"/><ellipse cx="12" cy="10" rx="7.5" ry="4.5"/><ellipse cx="12" cy="7" rx="6" ry="3"/></svg>`;
-    }
-    return `<svg class="receta-tag-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>`;
+    if (c.includes("chicken") || c.includes("pollo")) return SVG_ICONS.chicken;
+    if (c.includes("pasta")) return SVG_ICONS.pasta;
+    if (c.includes("beef") || c.includes("carne") || c.includes("pork") || c.includes("lamb")) return SVG_ICONS.meat;
+    if (c.includes("seafood") || c.includes("marisco")) return SVG_ICONS.seafood;
+    if (c.includes("dessert") || c.includes("postre")) return SVG_ICONS.dessert;
+    if (c.includes("veg")) return SVG_ICONS.veg;
+    if (c.includes("breakfast") || c.includes("desayuno")) return SVG_ICONS.breakfast;
+    return SVG_ICONS.generic;
   }
 
-  // Función de traducción
+  // Traducción eficiente con caché persistente y manejo de timeouts
   async function traducir(txt, sl = "auto", tl = "es") {
     if (!txt || typeof txt !== "string") return txt;
     const limpio = txt.trim();
@@ -63,8 +67,11 @@ if (!window._extraVistas.includes("recetas")) {
     if (cacheTraduccion.has(cacheKey)) return cacheTraduccion.get(cacheKey);
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
       const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURIComponent(limpio)}`;
-      const res = await fetch(url);
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const data = await res.json();
         const traducido = (data[0] || []).map(s => s[0]).join("").trim();
@@ -74,20 +81,20 @@ if (!window._extraVistas.includes("recetas")) {
         }
       }
     } catch (e) {
-      console.warn("[Recetas] Error traduciendo:", e);
+      // Si falla o da timeout, retornamos el texto original sin bloquear la interfaz
     }
     return limpio;
   }
 
-  // Estado de recetas activas para paginación progresiva
+  // Estado de recetas activas para paginación progresiva optimizada
   let listaRecetasActiva = [];
   let paginaRecetas = 1;
-  const TAM_PAGINA = 18;
+  const TAM_PAGINA = 12; // Tamaño óptimo para evitar sobrecarga del DOM en gama baja
+  let busquedaIdActual = 0;
 
   function actualizarBarraRecetas(totalVisible, totalGeneral, origen = "") {
     const contador = $("recetas-contador");
     const paginacion = $("recetas-paginacion");
-    const btnMas = $("recetas-btn-mas");
     const btnMasText = $("recetas-btn-mas-text");
 
     if (contador) {
@@ -113,7 +120,7 @@ if (!window._extraVistas.includes("recetas")) {
     }
   }
 
-  // Buscar recetas combinando nombre, ingredientes y categorías para máxima cobertura
+  // Buscar recetas con caché
   async function buscarRecetas(query) {
     const q = (query || "").trim();
     if (!q) return [];
@@ -128,7 +135,6 @@ if (!window._extraVistas.includes("recetas")) {
 
     try {
       const qClean = qEn.toLowerCase();
-      // Peticiones paralelas: búsqueda por nombre, filtro por ingrediente y filtro por categoría
       const [resNombre, resIngrediente, resCategoria] = await Promise.all([
         fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(qClean)}`).then(r => r.ok ? r.json() : {}).catch(() => ({})),
         fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(qClean.replace(/\s+/g, "_"))}`).then(r => r.ok ? r.json() : {}).catch(() => ({})),
@@ -226,10 +232,9 @@ if (!window._extraVistas.includes("recetas")) {
     return ings;
   }
 
-  // Dividir instrucciones en pasos limpios y comprensibles
+  // Dividir instrucciones en pasos limpios
   function dividirEnPasos(instrucciones) {
     if (!instrucciones) return [];
-    // Normalizar saltos y eliminar prefijos tipo Step 1:, 1., etc.
     const partes = instrucciones
       .split(/\r?\n+/)
       .map(p => p.trim())
@@ -239,18 +244,17 @@ if (!window._extraVistas.includes("recetas")) {
       return partes.map(p => p.replace(/^(step\s*\d+[:.]?|\d+[\.\)-]\s*)/i, "").trim());
     }
 
-    // Si viene en un solo bloque, separar por puntos seguidos de mayúscula
     const porPuntos = instrucciones.split(/\.\s+(?=[A-ZÁÉÍÓÚ])/).map(p => p.trim()).filter(p => p.length > 10);
     return porPuntos.length ? porPuntos : [instrucciones];
   }
 
+  // Plantilla HTML de tarjeta optimizada con dimensiones explícitas y decode async sin alterar calidad
   function generarTarjetaHTML(m) {
-    // Usar imagen full resolution original (sin /preview) para máxima nitidez y calidad
     const imgUrl = m.strMealThumb || "";
     return `
       <article class="receta-card" data-ver-receta="${m.idMeal}">
         <div class="receta-img-wrap">
-          <img class="receta-img" data-src="${imgUrl}" alt="${m.strMeal}" loading="lazy">
+          <img class="receta-img" data-src="${imgUrl}" alt="${m.strMeal}" width="360" height="200" decoding="async" fetchpriority="low">
           ${m.strCategory ? `
             <span class="receta-tag-categoria">
               ${getCategoriaIcon(m.strCategory)}
@@ -258,7 +262,7 @@ if (!window._extraVistas.includes("recetas")) {
             </span>` : ""}
           ${m.strArea ? `
             <span class="receta-tag-area">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="2" y1="12" x2="22" y2="12"/>
                 <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
@@ -271,22 +275,22 @@ if (!window._extraVistas.includes("recetas")) {
           <p class="receta-titulo-orig">Original: ${m.strMeal}</p>
           <div class="receta-meta-preview">
             <span class="receta-meta-item">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true">
                 <path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z"/>
               </svg>
               <span>Receta del mundo</span>
             </span>
             <span class="receta-meta-item">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
                 <circle cx="12" cy="12" r="10"/>
                 <polyline points="12 6 12 12 16 14"/>
               </svg>
               <span>Paso a paso</span>
             </span>
           </div>
-          <button type="button" class="receta-btn-ver" data-ver-receta="${m.idMeal}">
+          <button type="button" class="receta-btn-ver" data-ver-receta="${m.idMeal}" aria-label="Ver preparación de ${m.strMeal}">
             <span>Ver Preparación Paso a Paso</span>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>
           </button>
@@ -295,10 +299,13 @@ if (!window._extraVistas.includes("recetas")) {
     `;
   }
 
-  // Renderizar recetas con soporte de paginación por lotes
-  async function renderRecetas(meals, contId = "recetas-grid", origen = "") {
+  // Renderizar recetas optimizado para evitar jank en gama baja
+  function renderRecetas(meals, contId = "recetas-grid", origen = "") {
     const grid = $(contId);
     if (!grid) return;
+
+    busquedaIdActual++;
+    const currentRun = busquedaIdActual;
 
     listaRecetasActiva = meals || [];
     paginaRecetas = 1;
@@ -306,7 +313,7 @@ if (!window._extraVistas.includes("recetas")) {
     if (!listaRecetasActiva.length) {
       grid.innerHTML = `
         <div class="receta-vacio">
-          <div style="font-size: 2.8rem; margin-bottom: 0.5rem;">🍳</div>
+          <div style="font-size: 2.8rem; margin-bottom: 0.5rem;" aria-hidden="true">🍳</div>
           <h3>No encontramos recetas</h3>
           <p>Prueba buscando con otro ingrediente o plato (ej. pasta, pollo, chocolate, carne, pizza, arroz).</p>
         </div>
@@ -316,18 +323,25 @@ if (!window._extraVistas.includes("recetas")) {
     }
 
     const primerLote = listaRecetasActiva.slice(0, TAM_PAGINA);
-    grid.innerHTML = primerLote.map(m => generarTarjetaHTML(m)).join("");
+    
+    // Batch DOM update con template fragment
+    const template = document.createElement("template");
+    template.innerHTML = primerLote.map(m => generarTarjetaHTML(m)).join("");
+    
+    // Vaciamos e insertamos en un solo reflow
+    grid.innerHTML = "";
+    grid.appendChild(template.content);
 
     actualizarBarraRecetas(primerLote.length, listaRecetasActiva.length, origen);
 
-    // Activar lazy loading progresivo en scroll
+    // Conectar observador de imágenes de ultra alto rendimiento
     activarLazyLoadingImagenes(grid);
 
-    // Traducir los títulos de este primer lote
-    traducirTitulosLote(grid, primerLote);
+    // Traducir los títulos en segundo plano escalonadamente (non-blocking)
+    traducirTitulosEscalonado(grid, primerLote, currentRun);
   }
 
-  // Cargar más recetas en la grilla
+  // Cargar más recetas en la grilla sin congelar el hilo principal
   function cargarMasRecetas(contId = "recetas-grid") {
     const grid = $(contId);
     if (!grid || !listaRecetasActiva.length) return;
@@ -337,45 +351,49 @@ if (!window._extraVistas.includes("recetas")) {
     if (!siguienteLote.length) return;
 
     paginaRecetas++;
+    const currentRun = busquedaIdActual;
 
-    const divTemp = document.createElement("div");
-    divTemp.innerHTML = siguienteLote.map(m => generarTarjetaHTML(m)).join("");
-
-    const fragmento = document.createDocumentFragment();
-    while (divTemp.firstChild) {
-      fragmento.appendChild(divTemp.firstChild);
-    }
-    grid.appendChild(fragmento);
-
-    const totalVisible = Math.min(listaRecetasActiva.length, paginaRecetas * TAM_PAGINA);
-    actualizarBarraRecetas(totalVisible, listaRecetasActiva.length);
-
-    // Activar lazy loading para las nuevas imágenes insertadas
-    activarLazyLoadingImagenes(grid);
-
-    // Traducir títulos del lote cargado
-    traducirTitulosLote(grid, siguienteLote);
-  }
-
-  function traducirTitulosLote(contenedor, lote) {
-    lote.forEach(async m => {
-      const el = contenedor.querySelector(`[data-traducir-titulo="${m.idMeal}"]`);
-      if (el) {
-        const tr = await traducir(m.strMeal, "en", "es");
-        if (tr && tr !== m.strMeal) {
-          el.textContent = tr;
-        }
-      }
+    const template = document.createElement("template");
+    template.innerHTML = siguienteLote.map(m => generarTarjetaHTML(m)).join("");
+    
+    requestAnimationFrame(() => {
+      grid.appendChild(template.content);
+      const totalVisible = Math.min(listaRecetasActiva.length, paginaRecetas * TAM_PAGINA);
+      actualizarBarraRecetas(totalVisible, listaRecetasActiva.length);
+      activarLazyLoadingImagenes(grid);
+      traducirTitulosEscalonado(grid, siguienteLote, currentRun);
     });
   }
 
-  // Observador de intersección para cargar imágenes únicamente al llegar al scroll
+  // Traducción escalonada que no satura la red ni bloquea la CPU de teléfonos de gama baja
+  function traducirTitulosEscalonado(contenedor, lote, runId) {
+    let index = 0;
+    function procesarSiguiente() {
+      if (runId !== busquedaIdActual || index >= lote.length) return;
+      const m = lote[index++];
+      const el = contenedor.querySelector(`[data-traducir-titulo="${m.idMeal}"]`);
+      if (el) {
+        traducir(m.strMeal, "en", "es").then(tr => {
+          if (runId === busquedaIdActual && tr && tr !== m.strMeal) {
+            el.textContent = tr;
+          }
+        });
+      }
+      // Damos 60ms de respiro entre traducciones para mantener 60 FPS estables
+      if (index < lote.length) {
+        setTimeout(procesarSiguiente, 60);
+      }
+    }
+    setTimeout(procesarSiguiente, 40);
+  }
+
+  // Observador de intersección optimizado con decode() asíncrono y desvinculación inmediata
   let imgObserver = null;
   function activarLazyLoadingImagenes(contenedor) {
     const imagenes = contenedor.querySelectorAll("img.receta-img[data-src]");
 
     if (!("IntersectionObserver" in window)) {
-      // Fallback para navegadores antiguos
+      // Fallback
       imagenes.forEach(img => {
         img.src = img.dataset.src;
         img.classList.add("cargada");
@@ -390,22 +408,38 @@ if (!window._extraVistas.includes("recetas")) {
             const img = entry.target;
             const src = img.dataset.src;
             if (src) {
-              img.src = src;
-              img.onload = () => {
-                img.classList.add("cargada");
-                const wrap = img.closest(".receta-img-wrap");
-                if (wrap) wrap.style.animation = "none";
-              };
-              img.onerror = () => {
-                img.classList.add("cargada");
-              };
               img.removeAttribute("data-src");
+              observer.unobserve(img);
+
+              // Asignar src de alta resolución sin alterar nada de la URL ni compresión
+              img.src = src;
+
+              // decodificación asíncrona fuera del hilo de renderizado
+              if ("decode" in img) {
+                img.decode().then(() => {
+                  requestAnimationFrame(() => {
+                    img.classList.add("cargada");
+                    const wrap = img.closest(".receta-img-wrap");
+                    if (wrap) wrap.classList.add("loaded");
+                  });
+                }).catch(() => {
+                  // Fallback normal si decode arroja error menor
+                  img.classList.add("cargada");
+                  const wrap = img.closest(".receta-img-wrap");
+                  if (wrap) wrap.classList.add("loaded");
+                });
+              } else {
+                img.onload = () => {
+                  img.classList.add("cargada");
+                  const wrap = img.closest(".receta-img-wrap");
+                  if (wrap) wrap.classList.add("loaded");
+                };
+              }
             }
-            observer.unobserve(img);
           }
         });
       }, {
-        rootMargin: "200px 0px", // Precargar 200px antes de entrar en pantalla para fluidez total
+        rootMargin: "150px 0px", // Precarga inteligente justo antes del scroll
         threshold: 0.01
       });
     }
@@ -413,13 +447,15 @@ if (!window._extraVistas.includes("recetas")) {
     imagenes.forEach(img => imgObserver.observe(img));
   }
 
-  // Mostrar modal con detalle completo de receta
+  // Abrir modal con detalle completo de receta
   async function abrirModalReceta(idMeal) {
     const modal = $("receta-modal");
     const modalBody = $("receta-modal-body");
     if (!modal || !modalBody) return;
 
     modal.classList.remove("hidden");
+    document.body.classList.add("receta-modal-abierto");
+
     modalBody.innerHTML = `
       <div class="receta-loading" style="padding: 4rem 1rem;">
         <div class="receta-spinner"></div>
@@ -435,7 +471,7 @@ if (!window._extraVistas.includes("recetas")) {
 
     const ingredientes = extraerIngredientes(meal);
 
-    // Traducir título, instrucciones e ingredientes en paralelo
+    // Traducir en paralelo
     const [tituloEs, instruccionesEs, areaEs] = await Promise.all([
       traducir(meal.strMeal, "en", "es"),
       traducir(meal.strInstructions, "en", "es"),
@@ -447,11 +483,7 @@ if (!window._extraVistas.includes("recetas")) {
       ingredientes.map(async ing => {
         const nombreEs = await traducir(ing.nombre, "en", "es");
         const medidaEs = ing.medida ? await traducir(ing.medida, "en", "es") : "";
-        return {
-          ...ing,
-          nombreEs,
-          medidaEs
-        };
+        return { ...ing, nombreEs, medidaEs };
       })
     );
 
@@ -459,7 +491,7 @@ if (!window._extraVistas.includes("recetas")) {
 
     modalBody.innerHTML = `
       <div class="receta-detalle-head">
-        <img class="receta-detalle-img" src="${meal.strMealThumb}" alt="${tituloEs}">
+        <img class="receta-detalle-img" src="${meal.strMealThumb}" alt="${tituloEs}" width="190" height="190" decoding="async">
         <div class="receta-detalle-info">
           <h2 class="receta-detalle-title">${tituloEs}</h2>
           ${tituloEs !== meal.strMeal ? `<p class="receta-detalle-orig">Nombre original: ${meal.strMeal}</p>` : ""}
@@ -471,7 +503,7 @@ if (!window._extraVistas.includes("recetas")) {
               </span>` : ""}
             ${meal.strArea ? `
               <span class="receta-tag-pill area">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true">
                   <circle cx="12" cy="12" r="10"/>
                   <line x1="2" y1="12" x2="22" y2="12"/>
                   <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
@@ -479,7 +511,7 @@ if (!window._extraVistas.includes("recetas")) {
                 <span>Cocina ${areaEs || meal.strArea}</span>
               </span>` : ""}
             <span class="receta-tag-pill cat">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true">
                 <path d="M9 3h6v4l3 6a6 6 0 0 1-6 6 6 6 0 0 1-6-6l3-6V3z"/>
               </svg>
               <span>${ingsTraducidos.length} ingredientes</span>
@@ -490,29 +522,29 @@ if (!window._extraVistas.includes("recetas")) {
 
       <div class="receta-seccion-header">
         <h3 class="receta-seccion-titulo">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
             <path d="M3 13h18c0 4-3.5 8-9 8s-9-4-9-8z"/>
             <path d="M12 5v5M8 6c0 2.5 1 4 1 4M16 6c0 2.5-1 4-1 4"/>
           </svg>
           <span>Ingredientes Requeridos (${ingsTraducidos.length})</span>
         </h3>
-        <small style="color: rgba(255,255,255,0.5); font-size: 0.78rem;">Toca un ingrediente para tacharlo</small>
+        <small style="color: rgba(255,255,255,0.65); font-size: 0.78rem;">Toca un ingrediente para tacharlo</small>
       </div>
       <div class="receta-ingredientes-grid">
         ${ingsTraducidos.map((ing, i) => `
-          <div class="receta-ing-item" data-toggle-ing="${i}">
+          <button type="button" class="receta-ing-item" data-toggle-ing="${i}" aria-pressed="false">
             <span class="receta-ing-check">✓</span>
-            <div>
+            <div class="receta-ing-textos">
               <strong>${ing.medidaEs ? `${ing.medidaEs} de ` : ""}${ing.nombreEs}</strong>
               ${ing.nombreEs !== ing.nombre ? `<span class="receta-ing-orig">(${ing.medida ? `${ing.medida} ` : ""}${ing.nombre})</span>` : ""}
             </div>
-          </div>
+          </button>
         `).join("")}
       </div>
 
       <div class="receta-seccion-header" style="margin-top: 1.8rem;">
         <h3 class="receta-seccion-titulo">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14 2 14 8 20 8"/>
             <line x1="16" y1="13" x2="8" y2="13"/>
@@ -534,31 +566,35 @@ if (!window._extraVistas.includes("recetas")) {
       <div class="receta-acciones-footer">
         ${meal.strYoutube ? `
           <a href="${meal.strYoutube}" target="_blank" rel="noopener noreferrer" class="receta-btn-link">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
               <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
             </svg>
-            <span>Ver video tutorial en YouTube</span>
+            <span>Ver video en YouTube</span>
           </a>
         ` : ""}
         ${meal.strSource ? `
-          <a href="${meal.strSource}" target="_blank" rel="noopener noreferrer" class="receta-btn-link" style="background: rgba(255,255,255,0.06); color: #cbd5e1; border-color: rgba(255,255,255,0.15);">
+          <a href="${meal.strSource}" target="_blank" rel="noopener noreferrer" class="receta-btn-link receta-btn-link-secundario">
             <span>Fuente original de la receta ↗</span>
           </a>
         ` : ""}
       </div>
     `;
 
-    // Interacción con los ingredientes (tachado interactivo)
+    // Interacción con los ingredientes (toggle interactivo)
     modalBody.querySelectorAll("[data-toggle-ing]").forEach(item => {
       item.addEventListener("click", () => {
-        item.classList.toggle("marcado");
+        const isMarcado = item.classList.toggle("marcado");
+        item.setAttribute("aria-pressed", isMarcado ? "true" : "false");
       });
     });
   }
 
   function cerrarModalReceta() {
     const modal = $("receta-modal");
-    if (modal) modal.classList.add("hidden");
+    if (modal) {
+      modal.classList.add("hidden");
+      document.body.classList.remove("receta-modal-abierto");
+    }
   }
 
   // Inicialización de la vista
@@ -567,14 +603,13 @@ if (!window._extraVistas.includes("recetas")) {
     const input = $("recetas-input");
     const grid = $("recetas-grid");
     const btnSorpresa = $("recetas-btn-sorpresa");
-
     const btnMas = $("recetas-btn-mas");
+
     btnMas?.addEventListener("click", () => {
       cargarMasRecetas();
     });
 
-    // Búsqueda inicial por defecto con la categoría pollo (81 recetas disponibles)
-    // Priorizando las 3 recetas favoritas: Cuscús de Pollo, Cazuela de Enchiladas y Pollo Fajita Macarrones con Queso
+    // Carga inicial destacada
     const IDS_INICIALES_DESTACADOS = ["52850", "52765", "52818"];
     let iniciales = await buscarPorCategoria("Chicken");
     if (iniciales && iniciales.length) {
@@ -592,7 +627,8 @@ if (!window._extraVistas.includes("recetas")) {
     }
     renderRecetas(iniciales, "recetas-grid", "Pollo");
 
-    // Formulario de búsqueda
+    // Formulario de búsqueda con debounce
+    let debounceTimer = null;
     form?.addEventListener("submit", async e => {
       e.preventDefault();
       const val = input?.value.trim();
@@ -606,8 +642,11 @@ if (!window._extraVistas.includes("recetas")) {
           </div>
         `;
       }
-      const resultados = await buscarRecetas(val);
-      renderRecetas(resultados, "recetas-grid", `«${val}»`);
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(async () => {
+        const resultados = await buscarRecetas(val);
+        renderRecetas(resultados, "recetas-grid", `«${val}»`);
+      }, 150);
     });
 
     // Botón Sorpresa / Receta Aleatoria
@@ -647,7 +686,7 @@ if (!window._extraVistas.includes("recetas")) {
       });
     });
 
-    // Delegación de clics para abrir modal de receta (clic en tarjeta o botón)
+    // Delegación de clics eficiente en contenedor
     document.addEventListener("click", e => {
       const card = e.target.closest("[data-ver-receta]");
       if (card) {
