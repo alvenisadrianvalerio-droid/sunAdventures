@@ -1,4 +1,4 @@
-const CACHE_NAME = "sunad-v234";
+const CACHE_NAME = "sunad-v235";
 const ASSETS_ESTATICOS = [
   "./", "./index.html", "./styles.css", "./album.css", "./juegos.css",
   "./rpg.css", "./rpg-loot.css", "./temas.css", "./finanzas.css", "./capsula-tiempo.css", "./pareja-chat.css", "./diccionario.css", "./recetas.css",
@@ -11,7 +11,7 @@ const ASSETS_ESTATICOS = [
   "./rpg-canvas.js", "./rpg-habilidades.js", "./rpg-minimap.js",
   "./rpg-roguelike.js", "./desafios-diarios.js", "./mejoras.js", "./parches-v2.js", "./parches-v3.js", "./pareja-sistema.js",
   "./manifest.json", "./img/girasol-loading.png", "./img/girasol-loading.webp",
-  "./img/girasol.webp", "./img/mapache.webp",
+  "./img/girasol.webp", "./img/mapache.webp", "./img/receta-mochi-matcha.jpg",
   "./img/items%20de%20aventura/icon.png", "./img/items%20de%20aventura/icon.webp",
   "./img/items%20de%20aventura/estrella.png", "./img/items%20de%20aventura/estrella.webp",
   "./img/items%20de%20aventura/corona.png", "./img/items%20de%20aventura/corona.webp",
