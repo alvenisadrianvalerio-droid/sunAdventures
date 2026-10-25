@@ -136,6 +136,12 @@
     }
   });
 
-  // Pausar cuando la pestaña está oculta (ahorro de batería)
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) aplicar(); });
+  // Pausar cuando la pestaña está oculta (ahorro de batería y CPU de escritorio)
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      detener();
+    } else {
+      aplicar();
+    }
+  });
 })();
