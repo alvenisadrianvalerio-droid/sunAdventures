@@ -5247,34 +5247,34 @@ body.light .lobby-hero {
 .dashboard-sections {
   display: flex;
   flex-direction: column;
-  gap: 2.2rem;
+  gap: 1.25rem;
   width: 100%;
-  max-width: 1160px;
-  margin: 0.5rem auto 2rem;
+  max-width: 1100px;
+  margin: 0.25rem auto 1.5rem;
   box-sizing: border-box;
 }
 
 .dashboard-section {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.5rem;
   width: 100%;
 }
 
 .dashboard-section-header {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0 0.4rem;
+  gap: 0.5rem;
+  padding: 0 0.2rem;
 }
 
 .dashboard-section-icon {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   line-height: 1;
 }
 
 .dashboard-section-title {
-  font-size: 1.12rem;
+  font-size: 0.98rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   color: var(--text);
@@ -5282,46 +5282,44 @@ body.light .lobby-hero {
 }
 
 .dashboard-section-desc {
-  font-size: 0.8rem;
-  color: var(--text);
-  opacity: 0.6;
-  margin-left: auto;
-  font-weight: 500;
+  display: none !important;
 }
 
-/* Grid de Tarjetas */
+/* Grid de Tarjetas: más pegadas y compactas */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
+  gap: 0.65rem;
   width: 100%;
   box-sizing: border-box;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 960px) {
   .dashboard-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.55rem;
   }
 }
 
-@media (max-width: 580px) {
+@media (max-width: 480px) {
   .dashboard-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.45rem;
   }
 }
 
-/* Tarjeta individual estilo Steam (horizontal / rectangular apaisada) */
+/* Tarjeta individual compacta estilo Steam (horizontal / rectangular apaisada) */
 .dashboard-card {
   display: flex;
   flex-direction: column;
   background: linear-gradient(165deg, rgba(255, 255, 255, 0.05) 0%, rgba(18, 22, 34, 0.88) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
   padding: 0;
   text-decoration: none;
   color: var(--text);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
-  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.26s, border-color 0.22s, background 0.22s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s, border-color 0.2s, background 0.2s;
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
@@ -5333,18 +5331,18 @@ body.light .lobby-hero {
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
+  height: 2.5px;
   background: linear-gradient(90deg, transparent, var(--accent), transparent);
   opacity: 0;
-  transition: opacity 0.25s;
+  transition: opacity 0.2s;
   z-index: 2;
 }
 
 .dashboard-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  border-color: rgba(255, 217, 61, 0.55);
-  background: linear-gradient(165deg, rgba(255, 217, 61, 0.09) 0%, rgba(22, 27, 44, 0.98) 100%);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45), 0 0 24px rgba(255, 217, 61, 0.15);
+  transform: translateY(-2px) scale(1.015);
+  border-color: rgba(255, 217, 61, 0.5);
+  background: linear-gradient(165deg, rgba(255, 217, 61, 0.08) 0%, rgba(22, 27, 44, 0.98) 100%);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35), 0 0 16px rgba(255, 217, 61, 0.12);
 }
 
 .dashboard-card:hover::before {
@@ -5357,17 +5355,17 @@ body.light .lobby-hero {
 
 body.light .dashboard-card {
   background: linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 248, 235, 0.92) 100%);
-  border-color: rgba(139, 90, 20, 0.15);
-  box-shadow: 0 6px 18px rgba(139, 90, 20, 0.1);
+  border-color: rgba(139, 90, 20, 0.14);
+  box-shadow: 0 3px 10px rgba(139, 90, 20, 0.08);
 }
 
 body.light .dashboard-card:hover {
   background: linear-gradient(165deg, rgba(255, 255, 255, 1) 0%, rgba(255, 243, 212, 0.98) 100%);
-  border-color: rgba(212, 148, 30, 0.5);
-  box-shadow: 0 14px 30px rgba(139, 90, 20, 0.18);
+  border-color: rgba(212, 148, 30, 0.45);
+  box-shadow: 0 8px 18px rgba(139, 90, 20, 0.14);
 }
 
-/* Banner de la imagen apaisado a lo largo (estilo Steam cápsula) */
+/* Banner de la imagen más compacto y proporcionado */
 .dashboard-card-media {
   display: flex;
   align-items: center;
@@ -5376,59 +5374,54 @@ body.light .dashboard-card:hover {
   aspect-ratio: 16 / 9;
   height: auto;
   margin-bottom: 0;
-  padding: 0.85rem 1rem;
+  padding: 0.45rem 0.65rem;
   box-sizing: border-box;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(0, 0, 0, 0.22) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.2) 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   position: relative;
   overflow: hidden;
-  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s;
+  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 body.light .dashboard-card-media {
-  background: linear-gradient(180deg, rgba(255, 248, 235, 0.6) 0%, rgba(245, 235, 215, 0.4) 100%);
+  background: linear-gradient(180deg, rgba(255, 248, 235, 0.55) 0%, rgba(245, 235, 215, 0.35) 100%);
   border-bottom-color: rgba(139, 90, 20, 0.08);
 }
 
 .dashboard-card:hover .dashboard-card-media {
-  transform: scale(1.04);
+  transform: scale(1.03);
 }
 
 .dashboard-card-img {
   width: 100%;
   height: 100%;
-  max-height: 95px;
+  max-height: 68px;
   object-fit: contain;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
   pointer-events: none;
-  transition: filter 0.25s;
 }
 
 .dashboard-card-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  text-align: left;
-  align-items: flex-start;
-  padding: 0.85rem 1rem 1rem;
+  padding: 0.45rem 0.65rem 0.55rem;
   width: 100%;
   box-sizing: border-box;
 }
 
 .dashboard-card-title {
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-size: 0.82rem;
+  font-weight: 700;
   color: var(--text);
-  line-height: 1.25;
+  line-height: 1.2;
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dashboard-card-sub {
-  font-size: 0.76rem;
-  color: var(--text);
-  opacity: 0.68;
-  line-height: 1.35;
-  max-width: 100%;
+  display: none !important;
 }
 
 @media (max-width: 768px) {
