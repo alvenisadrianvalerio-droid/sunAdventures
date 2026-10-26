@@ -2315,5 +2315,134 @@ sprite.style.opacity = "0.25";
     });
   }
 
-  console.log("✅ script.js v5 cargado (getNivel hoisteada)");
+  /* ---------- Control de Falla Astral (Bloqueo condicional tras RPG) ---------- */
+  function actualizarEstadoFallaAstral() {
+    const btnFalla = $("dash-btn-falla");
+    const candado = $("dash-falla-candado");
+    if (!btnFalla) return;
+
+    let desbloqueado = false;
+    try {
+      if (typeof window.RpgPostGame?.esDesbloqueado === "function") {
+        desbloqueado = window.RpgPostGame.esDesbloqueado();
+      } else {
+        const u = getUserId();
+        const rRaw = localStorage.getItem(`sa_rpg_${u}`);
+        if (rRaw) {
+          const r = JSON.parse(rRaw);
+          desbloqueado = (r.jefesDerrotados && r.jefesDerrotados.includes("vacio-10")) ||
+                         (r.zonasConquistadas && r.zonasConquistadas.length >= 150);
+        }
+      }
+    } catch {}
+
+    btnFalla.classList.toggle("bento-tool-locked", !desbloqueado);
+    if (candado) candado.style.display = desbloqueado ? "none" : "flex";
+  }
+
+  const btnFalla = $("dash-btn-falla");
+  if (btnFalla) {
+    btnFalla.addEventListener("click", e => {
+      let desbloqueado = false;
+      try {
+        if (typeof window.RpgPostGame?.esDesbloqueado === "function") {
+          desbloqueado = window.RpgPostGame.esDesbloqueado();
+        }
+      } catch {}
+
+      if (!desbloqueado) {
+        e.preventDefault();
+        e.stopPropagation();
+        try { snd("golpe") || snd("pop"); } catch {}
+        if (window.SunModal?.alert) {
+          window.SunModal.alert({
+            title: "Falla Astral Bloqueada",
+            message: "La Falla Astral es una grieta multiversal mística. Debes <strong>derrotar al Kraken Abisal o completar las 150 zonas del Modo Aventura</strong> para abrirla.",
+            variant: "warning",
+            icon: "🔒",
+            confirmText: "Entendido"
+          });
+        } else {
+          alert("🔒 Debes completar el Modo Aventura para desbloquear la Falla Astral.");
+        }
+      } else {
+        // Si está desbloqueado, dirigir directamente a Roguelike o Post-Game
+        e.preventDefault();
+        location.hash = "#rpg";
+        setTimeout(() => {
+          if (window.RpgRoguelike?.abrir) {
+            window.RpgRoguelike.abrir();
+          } else {
+            document.querySelector('[data-rpg-tab="roguelike"]')?.click();
+          }
+        }, 150);
+      }
+    });
+  }
+
+  /* ---------- Hub Selector de Minijuegos en Dashboard ---------- */
+  const btnMinijuegosDash = $("dash-btn-minijuegos");
+  const modalMinijuegos = $("modal-minijuegos-hub");
+  const btnCerrarMinijuegos = $("btn-cerrar-modal-minijuegos");
+
+  function abrirModalMinijuegos(e) {
+    if (e) e.preventDefault();
+    if (!modalMinijuegos) {
+      location.hash = "#mascotas";
+      return;
+    }
+    modalMinijuegos.classList.add("active");
+    try { snd("pop"); } catch {}
+  }
+
+  function cerrarModalMinijuegos() {
+    if (!modalMinijuegos) return;
+    modalMinijuegos.classList.remove("active");
+    try { snd("pop"); } catch {}
+  }
+
+  if (btnMinijuegosDash) {
+    btnMinijuegosDash.addEventListener("click", abrirModalMinijuegos);
+  }
+
+  if (btnCerrarMinijuegos) {
+    btnCerrarMinijuegos.addEventListener("click", cerrarModalMinijuegos);
+  }
+
+  if (modalMinijuegos) {
+    const backdrop = modalMinijuegos.querySelector(".modal-backdrop");
+    backdrop?.addEventListener("click", cerrarModalMinijuegos);
+
+    modalMinijuegos.querySelectorAll("[data-launch-juego]").forEach(card => {
+      card.addEventListener("click", () => {
+        const juego = card.dataset.launchJuego;
+        cerrarModalMinijuegos();
+        try { snd("pop"); } catch {}
+
+        if (juego === "girasol" && typeof window.juegoGirasol === "function") {
+          window.juegoGirasol();
+        } else if (juego === "memoria" && typeof window.juegoMemoria === "function") {
+          window.juegoMemoria();
+        } else if (juego === "adivina" && typeof window.juegoAdivina === "function") {
+          window.juegoAdivina();
+        } else if (juego === "dados" && typeof window.JUEGO_FNS?.dados === "function") {
+          window.JUEGO_FNS.dados();
+        } else if (juego === "snake" && typeof window.juegoSnake === "function") {
+          window.juegoSnake();
+        } else {
+          // Fallback al botón de la vista de minijuegos si existe
+          const btn = document.querySelector(`.btn-minijuego[data-juego="${juego}"]`);
+          if (btn) btn.click();
+          else location.hash = "#mascotas";
+        }
+      });
+    });
+  }
+
+  window.actualizarEstadoFallaAstral = actualizarEstadoFallaAstral;
+  actualizarEstadoFallaAstral();
+  window.addEventListener("sunad:progress", actualizarEstadoFallaAstral);
+  window.addEventListener("sunad:user-ready", () => setTimeout(actualizarEstadoFallaAstral, 500));
+
+  console.log("✅ script.js v5 cargado (Falla Astral & Minijuegos interactivos)");
 });

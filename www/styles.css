@@ -6284,3 +6284,221 @@ body.light .bento-pareja {
 body.light .bento-reto-card {
   background: linear-gradient(180deg, rgba(56, 189, 248, 0.05) 0%, #ffffff 40%);
 }
+
+/* ============================================================
+   CANDADO SVG Y ESTADO BLOQUEADO EN BENTO TOOLS (FALLA ASTRAL)
+   ============================================================ */
+.bento-tool-item.bento-tool-locked {
+  opacity: 0.72;
+}
+
+.bento-tool-item.bento-tool-locked:hover {
+  opacity: 0.9;
+}
+
+.bento-tool-item.bento-tool-locked .bento-tool-img {
+  filter: grayscale(0.65) brightness(0.75);
+}
+
+.bento-lock-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ef4444, #991b1b);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  border: 2px solid #13151f;
+  z-index: 2;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.4, 1);
+}
+
+.bento-tool-item:hover .bento-lock-badge {
+  transform: scale(1.15) rotate(-6deg);
+}
+
+/* ============================================================
+   MODAL HUB SELECTOR DE MINIJUEGOS
+   ============================================================ */
+.modal-hub-overlay {
+  z-index: 1000;
+}
+
+.modal-hub-content {
+  background: #12141e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  width: 92%;
+  max-width: 540px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1.4rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  position: relative;
+  box-sizing: border-box;
+}
+
+body.light .modal-hub-content {
+  background: #ffffff;
+  border-color: rgba(139, 90, 20, 0.2);
+  box-shadow: 0 8px 24px rgba(139, 90, 20, 0.14);
+}
+
+.modal-hub-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.85rem;
+  margin-bottom: 0.95rem;
+}
+
+body.light .modal-hub-header {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.modal-hub-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modal-hub-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 217, 61, 0.14);
+  color: #ffd93d;
+  border: 1px solid rgba(255, 217, 61, 0.3);
+  flex-shrink: 0;
+}
+
+.modal-hub-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+body.light .modal-hub-title {
+  color: #0f172a;
+}
+
+.modal-hub-sub {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  display: block;
+  margin-top: 0.15rem;
+}
+
+body.light .modal-hub-sub {
+  color: #64748b;
+}
+
+.minijuegos-hub-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
+.minijuego-hub-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1rem;
+  background: #171926;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.4, 1);
+  font-family: inherit;
+  color: inherit;
+}
+
+body.light .minijuego-hub-card {
+  background: #faf7f2;
+  border-color: rgba(139, 90, 20, 0.14);
+}
+
+.minijuego-hub-card:hover {
+  background: #202336;
+  border-color: rgba(255, 217, 61, 0.4);
+  transform: translateX(4px);
+}
+
+body.light .minijuego-hub-card:hover {
+  background: #ffffff;
+  border-color: rgba(212, 148, 30, 0.4);
+  transform: translateX(4px);
+}
+
+.minijuego-hub-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.icon-girasol { color: #ffd93d; background: rgba(255, 217, 61, 0.15); }
+.icon-memoria { color: #38bdf8; background: rgba(56, 189, 248, 0.15); }
+.icon-adivina { color: #a855f7; background: rgba(168, 85, 247, 0.15); }
+.icon-dados { color: #f97316; background: rgba(249, 115, 22, 0.15); }
+.icon-snake { color: #22c55e; background: rgba(34, 197, 94, 0.15); }
+
+.minijuego-hub-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.minijuego-hub-nombre {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #f1f5f9;
+}
+
+body.light .minijuego-hub-nombre {
+  color: #1e293b;
+}
+
+.minijuego-hub-desc {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  margin-top: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.light .minijuego-hub-desc {
+  color: #64748b;
+}
+
+.minijuego-hub-arrow {
+  font-size: 1.15rem;
+  color: #64748b;
+  font-weight: 800;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.minijuego-hub-card:hover .minijuego-hub-arrow {
+  color: #ffd93d;
+  transform: translateX(3px);
+}

@@ -552,14 +552,17 @@
                 <span class="bento-tool-name">Aventura</span>
               </a>
 
-              <a href="#roguelike" class="bento-tool-item" data-view-link="roguelike" aria-label="Falla Astral Roguelike">
+              <a href="#roguelike" class="bento-tool-item" id="dash-btn-falla" data-view-link="roguelike" aria-label="Falla Astral Roguelike">
                 <div class="bento-tool-icon-wrap">
                   <img src="img/dashboard/card-roguelike.svg" alt="Portal Roguelike" class="bento-tool-img" width="160" height="160" fetchpriority="high" decoding="async">
+                  <div class="bento-lock-badge" id="dash-falla-candado" title="Bloqueado: Completa el Modo Aventura para desbloquear">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                  </div>
                 </div>
                 <span class="bento-tool-name">Falla Astral</span>
               </a>
 
-              <a href="#minijuegos" class="bento-tool-item" data-view-link="minijuegos" aria-label="Minijuegos">
+              <a href="#minijuegos" class="bento-tool-item" id="dash-btn-minijuegos" data-view-link="minijuegos" aria-label="Minijuegos">
                 <div class="bento-tool-icon-wrap">
                   <img src="img/dashboard/card-minijuegos.svg" alt="Mando Minijuegos" class="bento-tool-img" width="160" height="160" loading="lazy" decoding="async">
                 </div>
@@ -637,6 +640,82 @@
         <!-- Lista dinámica de rangos y beneficios -->
         <div class="modal-rangos-body" id="modal-rangos-lista">
           <!-- Inyectado dinámicamente por JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: HUB SELECTOR DE MINIJUEGOS -->
+    <div id="modal-minijuegos-hub" class="modal modal-hub-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-minijuegos-titulo">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content modal-hub-content">
+        <div class="modal-hub-header">
+          <div class="modal-hub-title-wrap">
+            <span class="modal-hub-icon-badge">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="3"></rect><path d="M6 12h4m-2-2v4m7-2h.01m3 0h.01"></path></svg>
+            </span>
+            <div>
+              <h2 id="modal-minijuegos-titulo" class="modal-hub-title">Sala de Minijuegos</h2>
+              <span class="modal-hub-sub">Elige un minijuego, diviértete y completa tu reto diario</span>
+            </div>
+          </div>
+          <button type="button" class="modal-rangos-close-btn" id="btn-cerrar-modal-minijuegos" aria-label="Cerrar selección de minijuegos">✕</button>
+        </div>
+
+        <div class="minijuegos-hub-grid">
+          <button type="button" class="minijuego-hub-card" data-launch-juego="girasol">
+            <div class="minijuego-hub-icon-wrap icon-girasol">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="4"/></svg>
+            </div>
+            <div class="minijuego-hub-info">
+              <strong class="minijuego-hub-nombre">Atrapa el Girasol</strong>
+              <span class="minijuego-hub-desc">Atrapa los girasoles cayendo a tiempo</span>
+            </div>
+            <span class="minijuego-hub-arrow">→</span>
+          </button>
+
+          <button type="button" class="minijuego-hub-card" data-launch-juego="memoria">
+            <div class="minijuego-hub-icon-wrap icon-memoria">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            </div>
+            <div class="minijuego-hub-info">
+              <strong class="minijuego-hub-nombre">Juego de Memoria</strong>
+              <span class="minijuego-hub-desc">Empareja las mascotas y pon a prueba tu mente</span>
+            </div>
+            <span class="minijuego-hub-arrow">→</span>
+          </button>
+
+          <button type="button" class="minijuego-hub-card" data-launch-juego="adivina">
+            <div class="minijuego-hub-icon-wrap icon-adivina">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            <div class="minijuego-hub-info">
+              <strong class="minijuego-hub-nombre">Adivina la Mascota</strong>
+              <span class="minijuego-hub-desc">Identifica al compañero misterioso</span>
+            </div>
+            <span class="minijuego-hub-arrow">→</span>
+          </button>
+
+          <button type="button" class="minijuego-hub-card" data-launch-juego="dados">
+            <div class="minijuego-hub-icon-wrap icon-dados">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8" cy="8" r="1.5" fill="currentColor"></circle><circle cx="16" cy="16" r="1.5" fill="currentColor"></circle><circle cx="12" cy="12" r="1.5" fill="currentColor"></circle><circle cx="16" cy="8" r="1.5" fill="currentColor"></circle><circle cx="8" cy="16" r="1.5" fill="currentColor"></circle></svg>
+            </div>
+            <div class="minijuego-hub-info">
+              <strong class="minijuego-hub-nombre">Dados Locos</strong>
+              <span class="minijuego-hub-desc">Lanza los dados y desafía tu suerte</span>
+            </div>
+            <span class="minijuego-hub-arrow">→</span>
+          </button>
+
+          <button type="button" class="minijuego-hub-card" data-launch-juego="snake">
+            <div class="minijuego-hub-icon-wrap icon-snake">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4v4a4 4 0 0 0 8 0V6a4 4 0 0 0-4-4z"></path><path d="M16 10v4a4 4 0 0 1-8 0v-4"></path><path d="M12 18v4"></path></svg>
+            </div>
+            <div class="minijuego-hub-info">
+              <strong class="minijuego-hub-nombre">Serpiente Clásica</strong>
+              <span class="minijuego-hub-desc">Come manzanas y bate tu récord</span>
+            </div>
+            <span class="minijuego-hub-arrow">→</span>
+          </button>
         </div>
       </div>
     </div>
