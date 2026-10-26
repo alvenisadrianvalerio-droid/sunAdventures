@@ -2125,29 +2125,120 @@
   <div id="settings-modal" class="modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-settings></div>
     <div class="modal-content settings-modal-content">
-      <h3 class="modal-title">Ajustes</h3>
-      <label class="settings-select"><span><strong>Idioma</strong><small>Elige el idioma de la
-            aplicación.</small></span>
-        <select id="settings-language">
-          <option value="es">Español</option>
-          <option value="en">English</option>
-          <option value="pt">Português</option>
-          <option value="zh">中文</option>
-          <option value="ja">日本語</option>
-          <option value="ko">한국어</option>
-          <option value="it">Italiano</option>
-          <option value="fr">Français</option>
-        </select>
-      </label>
-      <label class="settings-toggle"><input id="toggle-animaciones" type="checkbox"><span><strong>Desactivar
-            animaciones</strong><small>Reduce los movimientos y efectos visuales.</small></span></label>
-      <label class="settings-volume"><span><strong>Volumen de la aplicación</strong><output
-            id="settings-volume-value">65%</output></span><input id="settings-volume" type="range" min="0" max="1"
-          step="0.01" value="0.65"></label>
-      <label class="settings-toggle"><input id="toggle-censura" type="checkbox"><span><strong>Censurar malas
-            palabras</strong><small>Revisa los mensajes antes de guardarlos.</small></span></label>
-      <p class="settings-note">La revisión solo se aplica a mensajes nuevos.</p>
-      <div class="modal-actions"><button type="button" class="btn-secondary" data-close-settings>Cerrar</button></div>
+      <div class="settings-modal-header">
+        <div class="settings-modal-header-left">
+          <div class="settings-modal-badge-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title">Ajustes</h3>
+            <p class="settings-modal-subtitle">Personaliza tu experiencia en Four Sunflowers</p>
+          </div>
+        </div>
+        <button type="button" class="settings-modal-close" data-close-settings aria-label="Cerrar ajustes">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="settings-cards-stack">
+        <!-- ITEM 1: Idioma -->
+        <div class="settings-card-item">
+          <div class="settings-card-icon-wrap" style="--sc-color: #60a5fa;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+          </div>
+          <div class="settings-card-content">
+            <div class="settings-card-text">
+              <strong>Idioma de la aplicación</strong>
+              <small>Elige el idioma principal de textos y menús</small>
+            </div>
+            <div class="settings-select-wrapper">
+              <select id="settings-language" class="settings-modern-select">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+                <option value="pt">Português</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
+                <option value="ko">한국어</option>
+                <option value="it">Italiano</option>
+                <option value="fr">Français</option>
+              </select>
+              <span class="settings-select-arrow">▾</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ITEM 2: Animaciones -->
+        <div class="settings-card-item">
+          <div class="settings-card-icon-wrap" style="--sc-color: #f59e0b;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div class="settings-card-content">
+            <div class="settings-card-text">
+              <strong>Desactivar animaciones</strong>
+              <small>Reduce efectos visuales y optimiza rendimiento</small>
+            </div>
+            <label class="settings-switch" for="toggle-animaciones">
+              <input id="toggle-animaciones" type="checkbox">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- ITEM 3: Volumen -->
+        <div class="settings-card-item settings-card-vertical">
+          <div class="settings-card-top-row">
+            <div class="settings-card-icon-wrap" style="--sc-color: #34d399;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              </svg>
+            </div>
+            <div class="settings-card-text" style="flex:1;">
+              <strong>Volumen de la aplicación</strong>
+              <small>Música de ambiente y efectos de sonido</small>
+            </div>
+            <output id="settings-volume-value" class="settings-vol-badge">65%</output>
+          </div>
+          <div class="settings-slider-wrapper">
+            <input id="settings-volume" type="range" min="0" max="1" step="0.01" value="0.65" class="settings-range-slider" aria-label="Volumen general">
+          </div>
+        </div>
+
+        <!-- ITEM 4: Censura -->
+        <div class="settings-card-item">
+          <div class="settings-card-icon-wrap" style="--sc-color: #ec4899;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <div class="settings-card-content">
+            <div class="settings-card-text">
+              <strong>Filtro de palabras inapropiadas</strong>
+              <small>Revisa y suaviza los mensajes nuevos del chat</small>
+            </div>
+            <label class="settings-switch" for="toggle-censura">
+              <input id="toggle-censura" type="checkbox">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions settings-modal-actions">
+        <button type="button" class="btn-primary settings-btn-done" data-close-settings>
+          <span>Listo</span>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </button>
+      </div>
     </div>
   </div>
 
