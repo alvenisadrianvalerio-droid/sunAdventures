@@ -5457,6 +5457,11 @@ body.light .player-close {
    ============================================================ */
 .cozy-bento-lobby {
   display: flex;
+/* ============================================================
+   BENTO GRID COZY ADVENTURE (DISEÑO ARMONIOSO Y CÁLIDO)
+   ============================================================ */
+.cozy-bento-lobby {
+  display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
@@ -5468,19 +5473,26 @@ body.light .player-close {
 }
 
 .bento-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 0.85rem;
   width: 100%;
   flex: 1;
-  align-content: stretch;
+}
+
+/* FILA RESPONSIVE DE TARJETAS DE PROGRESO (Individual, Pareja, Reto) */
+.bento-cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.85rem;
+  width: 100%;
 }
 
 /* Base de todas las tarjetas Bento */
 .bento-card {
   background: #13151f;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
+  border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
   box-sizing: border-box;
   overflow: hidden;
@@ -5493,24 +5505,24 @@ body.light .bento-card {
   box-shadow: 0 4px 14px rgba(139, 90, 20, 0.08);
 }
 
-/* TARJETAS DE PROGRESO Y RETO DIARIO (3 columnas: 4 + 4 + 4 = 12) */
+/* TARJETAS DE PROGRESO Y RETO DIARIO (Estructura interna flexible y limpia) */
 .bento-progress-card {
-  grid-column: span 4;
-  padding: 0.95rem 1.25rem;
+  padding: 0.85rem 1.15rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 0.45rem;
+  gap: 0.4rem;
+  min-height: 124px;
 }
 
 .bento-reto-card {
-  grid-column: span 4;
-  padding: 0.95rem 1.25rem;
+  padding: 0.85rem 1.15rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 0.45rem;
+  gap: 0.4rem;
   border-top: 3px solid #38bdf8;
+  min-height: 124px;
 }
 
 .bento-badge-amber {
@@ -5523,7 +5535,7 @@ body.light .bento-card {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   font-weight: 800;
   color: #e2e8f0;
 }
@@ -5546,16 +5558,17 @@ body.light .bento-reto-recompensa {
 .bento-reto-title-left {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.15rem;
+  min-width: 0;
 }
 
 .bento-reto-icon-accent {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 11px;
   background: rgba(56, 189, 248, 0.12);
   border: 1px solid rgba(56, 189, 248, 0.25);
   box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
@@ -5563,29 +5576,30 @@ body.light .bento-reto-recompensa {
 }
 
 .bento-reto-icon-accent img {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
 }
 
 .bento-reto-conteo {
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 800;
   color: #38bdf8;
 }
 
+/* Barras de progreso consistentes */
 .bento-progress-card .experiencia-barra,
 .experiencia-barra-reto {
   height: 8px;
+  width: 100%;
+  max-width: 100%;
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 999px;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
-.experiencia-barra-reto {
-  background: rgba(255, 255, 255, 0.08);
-  position: relative;
-}
-
+body.light .bento-progress-card .experiencia-barra,
 body.light .experiencia-barra-reto {
   background: rgba(0, 0, 0, 0.08);
 }
@@ -5601,10 +5615,8 @@ body.light .experiencia-barra-reto {
 .bento-reto-desc {
   font-size: 0.74rem;
   color: #94a3b8;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 170px;
+  line-height: 1.3;
+  flex: 1 1 auto;
 }
 
 body.light .bento-reto-desc {
@@ -5614,9 +5626,9 @@ body.light .bento-reto-desc {
 .btn-bento-reclamar {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.8rem;
-  font-size: 0.74rem;
+  gap: 0.35rem;
+  padding: 0.26rem 0.75rem;
+  font-size: 0.72rem;
   font-weight: 800;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -5673,18 +5685,20 @@ body.light .btn-bento-reclamar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
 }
 
 .bento-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.72rem;
+  gap: 0.35rem;
+  font-size: 0.7rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 0.2rem 0.6rem;
-  border-radius: 8px;
+  letter-spacing: 0.05em;
+  padding: 0.18rem 0.55rem;
+  border-radius: 7px;
+  white-space: nowrap;
 }
 
 .bento-badge-gold {
@@ -5700,12 +5714,13 @@ body.light .btn-bento-reclamar {
 }
 
 .bento-xp-value {
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 800;
   color: #ffd93d;
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
 }
 
 .bento-xp-pink {
@@ -5713,7 +5728,7 @@ body.light .btn-bento-reclamar {
 }
 
 .bento-rank-name {
-  font-size: 1.05rem;
+  font-size: 0.98rem;
   font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.01em;
@@ -5729,10 +5744,10 @@ body.light .bento-rank-name {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   color: #94a3b8;
   font-weight: 600;
-  min-height: 26px;
+  min-height: 24px;
 }
 
 body.light .bento-card-footer {
@@ -5740,22 +5755,25 @@ body.light .bento-card-footer {
 }
 
 .bento-sig-text {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  line-height: 1.25;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 190px;
+  flex: 1 1 auto;
 }
 
 .btn-pareja-subir-amor {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
   background: linear-gradient(135deg, #ff6ba8, #f43f5e);
   color: #ffffff;
   border: none;
-  border-radius: 8px;
-  padding: 0.28rem 0.75rem;
-  font-size: 0.74rem;
+  border-radius: 7px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.72rem;
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
@@ -5778,15 +5796,15 @@ body.light .bento-card-footer {
    PANEL PROTAGONISTA: MÓDULOS DE AVENTURA (Aprovechamiento total)
    ============================================================ */
 .bento-modules-card {
-  grid-column: span 12;
+  width: 100%;
   flex: 1;
-  padding: 1.25rem 1.6rem 1.4rem;
+  padding: 1rem 1.4rem 1.2rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 1.1rem;
+  gap: 0.85rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45), 0 -1px 25px rgba(255, 217, 61, 0.05);
 }
 
@@ -5795,7 +5813,7 @@ body.light .bento-card-footer {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-  padding-bottom: 0.6rem;
+  padding-bottom: 0.5rem;
 }
 
 body.light .bento-card-title-row {
@@ -5804,7 +5822,7 @@ body.light .bento-card-title-row {
 
 .bento-section-title {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 0.98rem;
   font-weight: 800;
   color: #f1f5f9;
   letter-spacing: -0.01em;
@@ -5818,13 +5836,13 @@ body.light .bento-section-title {
 }
 
 .bento-section-count {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #ffd93d;
   background: rgba(255, 217, 61, 0.14);
-  padding: 0.2rem 0.65rem;
+  padding: 0.18rem 0.6rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 217, 61, 0.3);
 }
@@ -5835,11 +5853,11 @@ body.light .bento-section-count {
   border-color: rgba(180, 83, 9, 0.2);
 }
 
-/* Cuadrícula amplia y aireada: 6 columnas en Desktop */
+/* Cuadrícula amplia y responsiva (6 col en Desktop, auto-ajustable) */
 .bento-tools-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 1.25rem 0.85rem;
+  gap: 0.85rem 0.65rem;
   width: 100%;
   align-items: center;
   justify-items: center;
@@ -5852,29 +5870,29 @@ body.light .bento-section-count {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
+  gap: 0.4rem;
   text-decoration: none;
   background: transparent;
   border: none;
-  padding: 0.4rem 0.5rem;
+  padding: 0.35rem;
   cursor: pointer;
   font-family: inherit;
   outline: none;
   user-select: none;
   width: 100%;
   max-width: 140px;
-  border-radius: 16px;
+  border-radius: 14px;
   transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.4, 1);
 }
 
-/* Contenedor flotante transparente */
+/* Contenedor flotante transparente con clamp */
 .bento-tool-icon-wrap {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100px;
-  height: 100px;
+  width: clamp(64px, 7.5vw, 92px);
+  height: clamp(64px, 7.5vw, 92px);
   max-width: 100%;
   background: transparent;
   border: none;
@@ -5888,10 +5906,10 @@ body.light .bento-tool-icon-wrap {
   box-shadow: none;
 }
 
-/* Iconos 3D protagonistas a gran escala */
+/* Iconos 3D protagonistas con clamp */
 .bento-tool-img {
-  width: 86px;
-  height: 86px;
+  width: clamp(56px, 6.8vw, 82px);
+  height: clamp(56px, 6.8vw, 82px);
   object-fit: contain;
   filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55));
   transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.4, 1), filter 0.24s ease;
@@ -5900,7 +5918,7 @@ body.light .bento-tool-icon-wrap {
 
 /* Tipografía de alta legibilidad, blanco puro */
 .bento-tool-name {
-  font-size: 0.88rem;
+  font-size: clamp(0.74rem, 1vw, 0.85rem);
   font-weight: 800;
   color: #ffffff;
   letter-spacing: 0.01em;
@@ -5950,178 +5968,74 @@ body.light .bento-tool-name {
 /* ============================================================
    RESPONSIVE DESIGN (TABLET & CELULAR)
    ============================================================ */
-@media (max-width: 900px) {
-  .bento-progress-card,
-  .bento-reto-card {
-    grid-column: span 12;
+@media (max-width: 1024px) {
+  .bento-tools-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem 0.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .cozy-bento-lobby {
+    padding: 0 0.35rem;
   }
 
   .bento-tools-grid {
     grid-template-columns: repeat(4, 1fr);
+    gap: 0.65rem 0.5rem;
   }
 
-  .bento-hero {
-    padding: 1.2rem 1.4rem;
-  }
-
-  .bento-title {
-    font-size: 1.35rem;
-  }
-
-  .bento-hero-img {
-    max-width: 140px;
+  .bento-modules-card {
+    padding: 0.85rem 1rem 1rem;
+    gap: 0.65rem;
   }
 }
 
 @media (max-width: 600px) {
-  .bento-grid {
-    gap: 0.85rem;
-  }
-
-  .bento-hero {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.85rem;
-    padding: 1rem 1.15rem;
-  }
-
-  .bento-hero-brand {
-    align-self: center;
-  }
-
-  .bento-hero-img {
-    max-width: 130px;
-  }
-
   .bento-tools-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 1rem 0.65rem;
-  }
-
-  .bento-tool-icon-wrap {
-    width: 80px;
-    height: 80px;
-  }
-
-  .bento-tool-img {
-    width: 68px;
-    height: 68px;
-  }
-
-  .bento-tool-name {
-    font-size: 0.8rem;
-  }
-
-  .bento-card {
-    border-radius: 16px;
+    gap: 0.75rem 0.5rem;
   }
 
   .bento-progress-card,
   .bento-reto-card {
     padding: 0.75rem 0.85rem;
     gap: 0.35rem;
-  }
-
-  /* Barras de experiencia finas y discretas en responsive */
-  .bento-progress-card .experiencia-barra,
-  .experiencia-barra-reto {
-    height: 6px !important;
-    margin: 0.25rem 0 !important;
-    border-radius: 999px;
-  }
-
-  .bento-card-header {
-    flex-wrap: wrap;
-    gap: 0.35rem 0.5rem;
-    align-items: center;
-  }
-
-  .bento-header-left {
-    gap: 0.35rem;
-  }
-
-  .bento-badge {
-    white-space: nowrap;
-    font-size: 0.65rem;
-    padding: 0.15rem 0.45rem;
-  }
-
-  .bento-ver-mas-pill {
-    padding: 0.12rem 0.4rem;
-    font-size: 0.62rem;
-  }
-
-  .bento-xp-value {
-    font-size: 0.8rem;
-    margin-left: auto;
-  }
-
-  .bento-card-footer {
-    flex-wrap: wrap;
-    gap: 0.45rem;
-    align-items: center;
-  }
-
-  .bento-sig-text {
-    max-width: 100%;
-    white-space: normal;
-    line-height: 1.25;
-    flex: 1 1 180px;
-  }
-
-  .btn-pareja-subir-amor {
-    margin-left: auto;
-  }
-
-  .bento-reto-footer {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.4rem;
+    min-height: auto;
   }
 
   .bento-reto-desc {
-    max-width: 100%;
     white-space: normal;
-    line-height: 1.25;
+  }
+
+  .bento-sig-text {
+    white-space: normal;
+  }
+
+  .bento-reto-footer {
+    flex-wrap: wrap;
+    gap: 0.4rem;
   }
 
   .btn-bento-reclamar {
-    justify-content: center;
     width: 100%;
-    box-sizing: border-box;
-    padding: 0.35rem 0.65rem;
-  }
-
-  .bento-modules-card {
-    padding: 1rem 1.1rem;
+    justify-content: center;
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 375px) {
+  .bento-cards-row {
+    grid-template-columns: 1fr;
+  }
+
   .bento-tools-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.85rem 0.55rem;
-  }
-
-  .bento-tool-icon-wrap {
-    width: 72px;
-    height: 72px;
-  }
-
-  .bento-tool-img {
-    width: 60px;
-    height: 60px;
-  }
-
-  .bento-card-header {
-    flex-direction: row;
-    justify-content: space-between;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.55rem 0.35rem;
   }
 
   .btn-pareja-subir-amor {
-    width: 100%;
-    justify-content: center;
-    padding: 0.35rem 0.65rem;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.68rem;
   }
 }
 
