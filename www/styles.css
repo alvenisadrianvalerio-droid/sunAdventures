@@ -5620,6 +5620,7 @@ body.light .bento-section-count {
 }
 
 .bento-tool-icon-wrap {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
