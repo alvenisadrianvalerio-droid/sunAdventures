@@ -329,7 +329,7 @@ body.light .nav-brand-banner {
 }
 
 .nav-hamburger {
-  display: none;
+  display: none !important;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -2023,7 +2023,7 @@ body.light .download-option:hover {
 
 @media (max-width:768px) {
   .nav-hamburger {
-    display: flex;
+    display: none !important;
   }
 
   .nav-container {
@@ -5258,32 +5258,193 @@ body.light .player-close {
 
 /* ============================================================
 /* ============================================================
-   BENTO GRID COZY ADVENTURE (DISEÑO ARMONIOSO Y CÁLIDO)
+   DASHBOARD PREMIUM (2 COLUMNAS 65% / 35% · FONDOS SÓLIDOS #14151a)
    ============================================================ */
-.cozy-bento-lobby {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.dashboard-layout-container {
   width: 100%;
-  max-width: 1140px;
-  margin: 0 auto 1.5rem;
-  padding: 0 1rem;
+  max-width: 1320px;
+  margin: 0 auto 2rem;
+  padding: 0.75rem 1.25rem;
   box-sizing: border-box;
 }
 
-.bento-grid {
+.dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 0.75rem;
+  grid-template-columns: 65% calc(35% - 1.25rem);
+  gap: 1.25rem;
+  width: 100%;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.dashboard-col-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.dashboard-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+/* HERO BANNER COMPACTO */
+.dash-hero-banner {
+  background: linear-gradient(135deg, #181922 0%, #14151a 100%);
+  border: 1px solid rgba(255, 217, 61, 0.22);
+  border-radius: 16px;
+  padding: 1rem 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  position: relative;
+  overflow: hidden;
+}
+
+.dash-hero-banner::after {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(255, 217, 61, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.dash-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  z-index: 1;
+}
+
+.dash-hero-badge {
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: #ffd93d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dash-hero-title {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.dash-hero-sub {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.dash-hero-art {
+  flex-shrink: 0;
+  z-index: 1;
+  filter: drop-shadow(0 4px 10px rgba(255, 217, 61, 0.25));
+}
+
+.dash-hero-art img {
+  display: block;
+}
+
+/* FILA DE TARJETAS DE PROGRESO HUD */
+.dash-level-cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
   width: 100%;
 }
 
-/* Base de todas las tarjetas Bento */
+@media (max-width: 680px) {
+  .dash-level-cards-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* CARDS LATERALES (COLUMNA DERECHA) */
+.dash-side-card {
+  width: 100% !important;
+  grid-column: auto !important;
+}
+
+.dash-actividad-card {
+  padding: 0.85rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dash-misiones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.dash-mision-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.dash-mision-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateX(2px);
+}
+
+.dash-mision-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.dash-mision-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.dash-mision-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #f1f5f9;
+}
+
+.dash-mision-desc {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  line-height: 1.25;
+}
+
+/* Base de todas las tarjetas Bento: Fondo sólido #14151a sin blur */
 .bento-card {
-  background: #13151f;
+  background: #14151a;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
   box-sizing: border-box;
   overflow: hidden;
   position: relative;
