@@ -194,8 +194,11 @@
                 <strong class="modal-rango-nombre">${lvl.nombre}</strong>
                 <span class="modal-rango-req">${lvl.minimo === 0 ? "Inicial" : `${lvl.minimo} XP`}</span>
               </div>
-              <p class="modal-rango-beneficio">✨ <strong>Beneficio:</strong> ${lvl.beneficio}</p>
-              ${desbloqueado ? '<span class="modal-rango-status-pill pill-ok">✓ Desbloqueado</span>' : `<span class="modal-rango-status-pill pill-lock">🔒 Requiere ${lvl.minimo - xpInd} XP más</span>`}
+              <p class="modal-rango-beneficio">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="svg-inline-sparkle" aria-hidden="true"><path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z"/></svg>
+                <strong>Beneficio:</strong> ${lvl.beneficio}
+              </p>
+              ${desbloqueado ? '<span class="modal-rango-status-pill pill-ok"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg> Desbloqueado</span>' : `<span class="modal-rango-status-pill pill-lock"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg> Requiere ${lvl.minimo - xpInd} XP más</span>`}
             </div>
           `;
           hidratarIconosEn(item);
@@ -225,8 +228,11 @@
                 <strong class="modal-rango-nombre">${lvl.nombre}</strong>
                 <span class="modal-rango-req">${lvl.minimo === 0 ? "Inicial" : `${lvl.minimo} Amor XP`}</span>
               </div>
-              <p class="modal-rango-beneficio">💖 <strong>Beneficio:</strong> ${lvl.beneficio}</p>
-              ${desbloqueado ? '<span class="modal-rango-status-pill pill-ok">✓ Desbloqueado</span>' : `<span class="modal-rango-status-pill pill-lock">🔒 Requiere ${lvl.minimo - xpPar} Amor XP más</span>`}
+              <p class="modal-rango-beneficio">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="svg-inline-heart" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <strong>Beneficio:</strong> ${lvl.beneficio}
+              </p>
+              ${desbloqueado ? '<span class="modal-rango-status-pill pill-ok"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg> Desbloqueado</span>' : `<span class="modal-rango-status-pill pill-lock"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg> Requiere ${lvl.minimo - xpPar} Amor XP más</span>`}
             </div>
           `;
           listaEl.appendChild(item);
