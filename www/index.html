@@ -1609,26 +1609,87 @@
   <div id="evento-modal" class="modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-evento-modal></div>
     <div class="modal-content evento-modal-content">
-      <h3 id="evento-modal-title" class="modal-title">Fecha especial</h3>
-      <form id="evento-form" class="modal-form">
-        <label class="form-field">
-          <span class="form-label">¿Qué celebramos?</span>
-          <input type="text" id="evento-titulo" maxlength="60" placeholder="Ej. Nuestro Aniversario, Cumpleaños..." required>
-        </label>
+      <div class="evento-modal-header">
+        <div class="evento-modal-header-main">
+          <div class="evento-modal-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="4" ry="4"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+              <path d="M12 14.5l.01.01M9.5 17.5l.01.01M14.5 17.5l.01.01"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 id="evento-modal-title" class="evento-modal-title">Fecha especial</h3>
+            <p class="evento-modal-subtitle">Guarda un día inolvidable y programa su recordatorio</p>
+          </div>
+        </div>
+        <button type="button" class="evento-modal-close-btn" data-close-evento-modal aria-label="Cerrar ventana">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="evento-form" class="evento-form-modern">
+        <div class="evento-field-group">
+          <label class="evento-label" for="evento-titulo">
+            <span class="evento-label-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+              </svg>
+            </span>
+            ¿Qué celebramos?
+          </label>
+          <div class="evento-input-wrap">
+            <input type="text" id="evento-titulo" maxlength="60" placeholder="Ej. Cumpleaños de sunchisito, Nuestro Aniversario..." required autocomplete="off">
+          </div>
+        </div>
         
-        <label class="form-field">
-          <span class="form-label">¿Cuándo es?</span>
-          <input type="date" id="evento-fecha" required>
-        </label>
+        <div class="evento-field-group">
+          <label class="evento-label" for="evento-fecha">
+            <span class="evento-label-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </span>
+            ¿Cuándo es?
+          </label>
+          <div class="evento-input-wrap">
+            <input type="date" id="evento-fecha" required>
+          </div>
+        </div>
 
-        <label class="form-field">
-          <span class="form-label">Detalles o dedicatoria (opcional)</span>
-          <textarea id="evento-descripcion" rows="2" maxlength="200" placeholder="Ej. Cena romántica, regalo sorpresa..."></textarea>
-        </label>
+        <div class="evento-field-group">
+          <label class="evento-label" for="evento-descripcion">
+            <span class="evento-label-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </span>
+            Detalles o dedicatoria <span class="evento-label-opcional">(opcional)</span>
+          </label>
+          <div class="evento-input-wrap">
+            <textarea id="evento-descripcion" rows="2" maxlength="200" placeholder="Ej. Cena romántica, pastel favorito, regalo sorpresa..."></textarea>
+          </div>
+        </div>
 
-        <div class="form-field">
-          <span class="form-label">Color del recordatorio</span>
-          <div class="color-picker">
+        <div class="evento-field-group">
+          <label class="evento-label">
+            <span class="evento-label-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+              </svg>
+            </span>
+            Color del recordatorio
+          </label>
+          <div class="color-picker evento-color-picker">
             <button type="button" class="color-option color-amarillo activo" data-color="amarillo" aria-label="Color amarillo"></button>
             <button type="button" class="color-option color-rosa" data-color="rosa" aria-label="Color rosa"></button>
             <button type="button" class="color-option color-lila" data-color="lila" aria-label="Color lila"></button>
@@ -1637,26 +1698,58 @@
           </div>
         </div>
 
-        <div class="evento-opciones-grid">
-          <label class="form-field">
-            <span class="form-label">Recordarme con:</span>
-            <select id="evento-recordatorio">
-              <option value="0">El mismo día</option>
-              <option value="1" selected>1 día de anticipación</option>
-              <option value="3">3 días de anticipación</option>
-              <option value="7">1 semana de anticipación</option>
-            </select>
-          </label>
+        <div class="evento-opciones-card">
+          <div class="evento-field-subgroup">
+            <label class="evento-label" for="evento-recordatorio">
+              <span class="evento-label-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </span>
+              Recordarme con:
+            </label>
+            <div class="evento-select-wrap">
+              <select id="evento-recordatorio">
+                <option value="0">El mismo día</option>
+                <option value="1" selected>1 día de anticipación</option>
+                <option value="3">3 días de anticipación</option>
+                <option value="7">1 semana de anticipación</option>
+              </select>
+              <div class="evento-select-caret" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
 
-          <label class="form-field-checkbox">
-            <input type="checkbox" id="evento-recurrente" checked>
-            <span><strong>Repetir cada año</strong> (Aniversarios y cumpleaños)</span>
+          <label class="evento-checkbox-row" for="evento-recurrente">
+            <div class="evento-checkbox-wrapper">
+              <input type="checkbox" id="evento-recurrente" checked>
+              <span class="evento-custom-checkbox" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+            </div>
+            <div class="evento-checkbox-text">
+              <span class="evento-checkbox-title">Repetir cada año</span>
+              <span class="evento-checkbox-desc">Ideal para cumpleaños, aniversarios y fechas memorables</span>
+            </div>
           </label>
         </div>
 
-        <div class="modal-actions">
-          <button type="button" class="btn-secondary" data-close-evento-modal>Cancelar</button>
-          <button type="submit" class="btn-primary">Guardar fecha</button>
+        <div class="evento-modal-actions">
+          <button type="button" class="evento-btn-cancel" data-close-evento-modal>Cancelar</button>
+          <button type="submit" class="evento-btn-save">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            <span>Guardar fecha</span>
+          </button>
         </div>
       </form>
     </div>
