@@ -5295,13 +5295,140 @@ body.light .bento-card {
   box-shadow: 0 4px 12px rgba(139, 90, 20, 0.08);
 }
 
-/* TARJETAS DE PROGRESO COMPACTAS (Visibles sin necesidad de scroll) */
+/* TARJETAS DE PROGRESO Y RETO DIARIO (3 columnas compactas en PC: 4 + 4 + 4 = 12) */
 .bento-progress-card {
-  grid-column: span 6;
+  grid-column: span 4;
   padding: 0.65rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+}
+
+.bento-reto-card {
+  grid-column: span 4;
+  padding: 0.65rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border-top: 3px solid #38bdf8;
+}
+
+.bento-badge-amber {
+  background: rgba(56, 189, 248, 0.14);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.32);
+}
+
+.bento-reto-recompensa {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #e2e8f0;
+}
+
+body.light .bento-reto-recompensa {
+  color: #475569;
+}
+
+.bento-reto-recompensa img {
+  vertical-align: middle;
+}
+
+.bento-reto-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bento-reto-conteo {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #38bdf8;
+}
+
+.experiencia-barra-reto {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+body.light .experiencia-barra-reto {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.experiencia-barra-reto span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.bento-reto-desc {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 170px;
+}
+
+body.light .bento-reto-desc {
+  color: #64748b;
+}
+
+.btn-bento-reclamar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  cursor: not-allowed;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.4, 1);
+  white-space: nowrap;
+}
+
+body.light .btn-bento-reclamar {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #64748b;
+}
+
+/* Estado: Listo para reclamar premio */
+.btn-bento-reclamar.reclamable {
+  background: linear-gradient(135deg, #38bdf8, #2563eb);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.35);
+  animation: pulseReclamar 2s infinite;
+}
+
+.btn-bento-reclamar.reclamable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.5);
+}
+
+.btn-bento-reclamar.completado {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  cursor: default;
+}
+
+@keyframes pulseReclamar {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
 }
 
 .bento-individual {
@@ -5559,7 +5686,8 @@ body.light .bento-tool-item:focus-visible .bento-tool-icon-wrap {
    RESPONSIVE DESIGN (TABLET & CELULAR)
    ============================================================ */
 @media (max-width: 900px) {
-  .bento-progress-card {
+  .bento-progress-card,
+  .bento-reto-card {
     grid-column: span 12;
   }
 

@@ -423,7 +423,7 @@
       <div class="lobby-content cozy-bento-lobby">
         <div class="bento-grid">
 
-          <!-- BENTO 2: Progreso Individual (Span 6) -->
+          <!-- BENTO 1: Progreso Individual (Span 4) -->
           <div class="bento-card bento-progress-card bento-individual bento-card-clickable" id="card-progreso-individual" role="button" tabindex="0" title="Haz clic para ver todos los rangos y beneficios" aria-label="Ver todos los rangos individuales y beneficios">
             <div class="bento-card-header">
               <span class="bento-badge bento-badge-gold">
@@ -446,7 +446,7 @@
             </div>
           </div>
 
-          <!-- BENTO 3: Progreso de Pareja (Span 6) -->
+          <!-- BENTO 2: Progreso de Pareja (Span 4) -->
           <div class="bento-card bento-progress-card bento-pareja bento-card-clickable" id="experiencia-card-pareja" role="button" tabindex="0" title="Haz clic para ver todos los rangos y beneficios de amor" aria-label="Ver todos los rangos de pareja y beneficios">
             <div class="bento-card-header">
               <span class="bento-badge bento-badge-pink">
@@ -471,6 +471,36 @@
                   Enviar amor
                 </button>
               </div>
+            </div>
+          </div>
+
+          <!-- BENTO 3: Widget Reto Diario de Minijuegos (Span 4) -->
+          <div class="bento-card bento-reto-card" id="bento-reto-diario" aria-live="polite">
+            <div class="bento-card-header">
+              <span class="bento-badge bento-badge-amber">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Reto Diario
+              </span>
+              <span class="bento-reto-recompensa">
+                <img src="img/items%20de%20aventura/icon.webp" alt="SunCoins" width="14" height="14" loading="lazy" decoding="async">
+                <span>+20</span>
+                <img src="img/items%20de%20aventura/estrella.webp" alt="XP" width="14" height="14" loading="lazy" decoding="async">
+                <span>+25</span>
+              </span>
+            </div>
+            <div class="bento-reto-title-row">
+              <span class="bento-rank-name">Minijuegos del Día</span>
+              <span class="bento-reto-conteo" id="bento-reto-conteo">0/2</span>
+            </div>
+            <div class="experiencia-barra experiencia-barra-reto" role="progressbar" aria-valuemin="0" aria-valuemax="2" aria-valuenow="0">
+              <span id="bento-reto-progreso"></span>
+            </div>
+            <div class="bento-card-footer bento-reto-footer">
+              <span id="bento-reto-desc" class="bento-reto-desc">Prueba 2 minijuegos distintos para reclamar.</span>
+              <button type="button" class="btn-bento-reclamar" id="btn-bento-reto-reclamar" disabled>
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <span>0/2 Listo</span>
+              </button>
             </div>
           </div>
 
