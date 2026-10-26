@@ -5766,7 +5766,15 @@ body.light .bento-tool-item:focus-visible .bento-tool-icon-wrap {
   .bento-progress-card,
   .bento-reto-card {
     padding: 0.75rem 0.85rem;
-    gap: 0.45rem;
+    gap: 0.35rem;
+  }
+
+  /* Barras de experiencia finas y discretas en responsive */
+  .bento-progress-card .experiencia-barra,
+  .experiencia-barra-reto {
+    height: 4px !important;
+    margin: 0.25rem 0 !important;
+    border-radius: 999px;
   }
 
   .bento-card-header {
