@@ -525,9 +525,20 @@
           celda.appendChild(dots);
         }
 
-        // Al hacer clic: seleccionar el día, actualizar panel lateral / abrir bottom sheet
+        // Al hacer clic: seleccionar el día, actualizar panel lateral / abrir modal o bottom sheet
         celda.addEventListener("click", () => {
+          const eraMismoDia = (diaSeleccionadoISO === iso);
           seleccionarDia(iso);
+          // Si el usuario hace clic en el mismo día seleccionado, o en pantallas pequeñas, abrir modal rápido
+          if (eraMismoDia && evs.length === 0) {
+            abrirEventoModal(iso);
+          }
+        });
+
+        // Soporte de doble clic para crear evento instantáneo
+        celda.addEventListener("dblclick", () => {
+          seleccionarDia(iso);
+          abrirEventoModal(iso);
         });
 
         frag.appendChild(celda);
