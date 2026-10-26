@@ -362,7 +362,34 @@
         <img class="nav-brand-img" src="img/dashboard/brand-four-sunflowers.svg" alt="Four Sunflowers" width="168" height="48" fetchpriority="high" decoding="async">
       </a>
 
+      <!-- CENTRO: Título Dinámico (Breadcrumb) y Buscador Global -->
+      <div class="nav-center-wrap" id="nav-center-wrap">
+        <div class="nav-breadcrumb-pill" id="nav-breadcrumb-pill" title="Sección actual">
+          <span class="nav-breadcrumb-icon" id="nav-breadcrumb-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          </span>
+          <span class="nav-breadcrumb-text" id="nav-breadcrumb-text">Panel Principal</span>
+        </div>
+        <div class="nav-search-bar" id="nav-search-bar" role="search">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="nav-search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="nav-global-search" class="nav-search-input" placeholder="Buscar aventuras, notas o recetas..." aria-label="Buscar en Four Sunflowers" autocomplete="off">
+        </div>
+      </div>
+
       <div class="nav-actions">
+        <!-- Acciones Rápidas (Campana, Chat, Ajustes) -->
+        <div class="nav-quick-actions" id="nav-quick-actions">
+          <a href="#logros" class="nav-action-btn" data-view-link="logros" title="Salón de Logros y Recompensas" aria-label="Logros">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          </a>
+          <a href="#chat" class="nav-action-btn" data-view-link="chat" title="Chat y Mensajes Privados" aria-label="Chat">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          </a>
+          <button type="button" class="nav-action-btn" id="nav-btn-quick-settings" data-action="ajustes" title="Ajustes de la App" aria-label="Ajustes">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          </button>
+        </div>
+
         <button id="btn-open-login" class="btn-auth" aria-label="Entrar"><span class="btn-auth-icon"><img
               src="img/items%20de%20aventura/corona.webp" alt="" width="18" height="18" decoding="async"></span><span
             class="btn-auth-text">Entrar</span></button>
@@ -2694,10 +2721,76 @@ Artista - Canción
         }
       }, true);
 
+      // Sincronizar Breadcrumb dinámico con la vista actual
+      var NOMBRES_VISTAS = {
+        "inicio": "Panel Principal",
+        "album": "Álbum de Recuerdos",
+        "notas": "Notitas para Ti",
+        "mascotas": "Nuestras Mascotas",
+        "calendario": "Nuestro Calendario",
+        "rpg": "Modo Aventura RPG",
+        "roguelike": "Falla Astral Roguelike",
+        "minijuegos": "Salón de Minijuegos",
+        "logros": "Salón de Logros",
+        "recetas": "Recetario Mágico",
+        "finanzas": "Finanzas & Ahorro",
+        "diccionario": "Diccionario de Palabras",
+        "chat": "Chat Privado"
+      };
+
+      function actualizarBreadcrumb(v) {
+        var txt = document.getElementById("nav-breadcrumb-text");
+        if (txt) {
+          txt.textContent = NOMBRES_VISTAS[v] || (v ? v.charAt(0).toUpperCase() + v.slice(1) : "Panel Principal");
+        }
+      }
+
+      window.addEventListener("sunad:view-change", function (e) {
+        if (e.detail && e.detail.view) actualizarBreadcrumb(e.detail.view);
+      });
+
+      // Configurar Buscador Rápido del TopBar
+      function setupTopBarSearch() {
+        var input = document.getElementById("nav-global-search");
+        if (!input) return;
+        input.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            var q = (input.value || "").trim().toLowerCase();
+            if (!q) return;
+            var destinos = [
+              { term: "album", v: "album" }, { term: "foto", v: "album" }, { term: "recuerdo", v: "album" },
+              { term: "nota", v: "notas" }, { term: "carta", v: "notas" },
+              { term: "mascota", v: "mascotas" }, { term: "animal", v: "mascotas" },
+              { term: "calendario", v: "calendario" }, { term: "cita", v: "calendario" }, { term: "plan", v: "calendario" },
+              { term: "rpg", v: "rpg" }, { term: "aventura", v: "rpg" }, { term: "espada", v: "rpg" }, { term: "jefe", v: "rpg" },
+              { term: "falla", v: "roguelike" }, { term: "astral", v: "roguelike" }, { term: "roguelike", v: "roguelike" },
+              { term: "juego", v: "minijuegos" }, { term: "minijuego", v: "minijuegos" },
+              { term: "logro", v: "logros" }, { term: "trofeo", v: "logros" }, { term: "medalla", v: "logros" },
+              { term: "receta", v: "recetas" }, { term: "cocina", v: "recetas" }, { term: "comida", v: "recetas" },
+              { term: "finanza", v: "finanzas" }, { term: "ahorro", v: "finanzas" }, { term: "dinero", v: "finanzas" },
+              { term: "diccionario", v: "diccionario" }, { term: "palabra", v: "diccionario" },
+              { term: "chat", v: "chat" }, { term: "mensaje", v: "chat" },
+              { term: "inicio", v: "inicio" }, { term: "hub", v: "inicio" }, { term: "lobby", v: "inicio" }, { term: "panel", v: "inicio" }
+            ];
+            var hallado = destinos.find(function (d) { return q.includes(d.term); });
+            if (hallado) {
+              navegarHacia(hallado.v);
+              input.value = "";
+              input.blur();
+            }
+          }
+        });
+      }
+
       function init() {
         var h = (location.hash || "").replace(/^#/, "").trim();
-        if (!h) return;
-        if (document.querySelector('[data-view="' + h + '"]')) activarVista(h);
+        if (h && document.querySelector('[data-view="' + h + '"]')) {
+          activarVista(h);
+          actualizarBreadcrumb(h);
+        } else {
+          actualizarBreadcrumb("inicio");
+        }
+        setupTopBarSearch();
       }
       if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
       else setTimeout(init, 50);
