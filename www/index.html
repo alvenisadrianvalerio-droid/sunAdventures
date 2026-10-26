@@ -424,37 +424,47 @@
         <div class="bento-grid">
 
           <!-- BENTO 2: Progreso Individual (Span 6) -->
-          <div class="bento-card bento-progress-card bento-individual">
+          <div class="bento-card bento-progress-card bento-individual bento-card-clickable" id="card-progreso-individual" role="button" tabindex="0" title="Haz clic para ver todos los rangos y beneficios" aria-label="Ver todos los rangos individuales y beneficios">
             <div class="bento-card-header">
               <span class="bento-badge bento-badge-gold">
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2a5 5 0 100 10 5 5 0 000-10zm-7 18a7 7 0 0114 0H5z"/></svg>
                 Nivel Individual
               </span>
-              <strong class="bento-xp-value">⚡ <span id="experiencia-xp">0 XP</span></strong>
+              <strong class="bento-xp-value">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="svg-inline-xp"><path d="M7 2v11h3v9l7-12h-4l3-8z"/></svg>
+                <span id="experiencia-xp">0 XP</span>
+              </strong>
             </div>
             <div class="bento-rank-name" id="experiencia-titulo">Novatos</div>
             <div class="experiencia-barra"><span id="experiencia-progreso"></span></div>
             <div class="bento-card-footer">
               <span id="experiencia-siguiente">100 XP para Enamorados.</span>
+              <span class="bento-ver-mas-pill">Rangos 🔍</span>
             </div>
           </div>
 
           <!-- BENTO 3: Progreso de Pareja (Span 6) -->
-          <div class="bento-card bento-progress-card bento-pareja" id="experiencia-card-pareja">
+          <div class="bento-card bento-progress-card bento-pareja bento-card-clickable" id="experiencia-card-pareja" role="button" tabindex="0" title="Haz clic para ver todos los rangos y beneficios de amor" aria-label="Ver todos los rangos de pareja y beneficios">
             <div class="bento-card-header">
               <span class="bento-badge bento-badge-pink">
                 <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                 Vínculo de Amor
               </span>
-              <strong class="bento-xp-value bento-xp-pink">💖 <span id="pareja-exp-total">0 Amor XP</span></strong>
+              <strong class="bento-xp-value bento-xp-pink">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="svg-inline-xp"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <span id="pareja-exp-total">0 Amor XP</span>
+              </strong>
             </div>
             <div class="bento-rank-name" id="pareja-exp-titulo">Conexión Naciente</div>
             <div class="experiencia-barra experiencia-barra-pareja"><span id="pareja-exp-progreso"></span></div>
             <div class="bento-card-footer">
               <span id="pareja-exp-siguiente">100 Amor XP para Primeras Miradas.</span>
-              <button type="button" class="btn-pareja-subir-amor" id="btn-pareja-dar-amor" title="Enviar amor a tu pareja (+15 Amor XP)">
-                Enviar amor
-              </button>
+              <div class="bento-footer-actions">
+                <span class="bento-ver-mas-pill">Rangos 🔍</span>
+                <button type="button" class="btn-pareja-subir-amor" id="btn-pareja-dar-amor" title="Enviar amor a tu pareja (+15 Amor XP)">
+                  Enviar amor
+                </button>
+              </div>
             </div>
           </div>
 
@@ -553,6 +563,38 @@
         </div>
       </div>
     </div>
+    <!-- MODAL: RANGOS Y BENEFICIOS (NIVEL INDIVIDUAL Y PAREJA) -->
+    <div id="modal-rangos-beneficios" class="modal modal-rangos-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-rangos-titulo">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content modal-rangos-content">
+        <div class="modal-rangos-header">
+          <div class="modal-rangos-title-wrap">
+            <span class="modal-rangos-icon-badge" id="modal-rangos-tipo-icon">✨</span>
+            <div>
+              <h2 id="modal-rangos-titulo" class="modal-rangos-title">Rangos y Beneficios</h2>
+              <span id="modal-rangos-subtitulo" class="modal-rangos-sub">Descubre lo que desbloqueas al subir de nivel</span>
+            </div>
+          </div>
+          <button type="button" class="modal-rangos-close-btn" id="btn-cerrar-modal-rangos" aria-label="Cerrar modal">✕</button>
+        </div>
+
+        <!-- Tabs para alternar entre Rango Individual y Pareja -->
+        <div class="modal-rangos-tabs">
+          <button type="button" class="modal-rangos-tab active" id="tab-rangos-individual">
+            ⚡ Rango Individual
+          </button>
+          <button type="button" class="modal-rangos-tab" id="tab-rangos-pareja">
+            💖 Vínculo de Pareja
+          </button>
+        </div>
+
+        <!-- Lista dinámica de rangos y beneficios -->
+        <div class="modal-rangos-body" id="modal-rangos-lista">
+          <!-- Inyectado dinámicamente por JavaScript -->
+        </div>
+      </div>
+    </div>
+
     <audio id="pop" src="sounds/soundreality-pop-sound-423716.mp3" preload="auto"></audio>
   </section>
 

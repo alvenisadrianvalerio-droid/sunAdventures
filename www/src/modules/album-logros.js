@@ -126,11 +126,11 @@
   // 1. Escala Individual: Rangos de Aventurero / Explorador Solitario
   const NIVEL_INDIVIDUAL_A_ICONO = { sprout: "raiz", brújula: "mapa", sword: "espada", shield: "estrella", sunflower: "girasol" };
   const NIVELES_INDIVIDUALES = [
-    { minimo: 0, nombre: "Explorador Novato", icono: "sprout", siguiente: 100, siguienteNombre: "Aventurero Intrépido", siguienteIcono: "brújula" },
-    { minimo: 100, nombre: "Aventurero Intrépido", icono: "brújula", siguiente: 500, siguienteNombre: "Caballero del Sol", siguienteIcono: "sword" },
-    { minimo: 500, nombre: "Caballero del Sol", icono: "sword", siguiente: 1500, siguienteNombre: "Héroe Legendario", siguienteIcono: "shield" },
-    { minimo: 1500, nombre: "Héroe Legendario", icono: "shield", siguiente: 5000, siguienteNombre: "Guardián Supremo", siguienteIcono: "sunflower" },
-    { minimo: 5000, nombre: "Guardián Supremo", icono: "sunflower", siguiente: null, siguienteNombre: "Máximo Nivel", siguienteIcono: null }
+    { minimo: 0, nombre: "Explorador Novato", icono: "sprout", siguiente: 100, siguienteNombre: "Aventurero Intrépido", siguienteIcono: "brújula", beneficio: "Acceso básico a todas las herramientas del santuario y minijuegos." },
+    { minimo: 100, nombre: "Aventurero Intrépido", icono: "brújula", siguiente: 500, siguienteNombre: "Caballero del Sol", siguienteIcono: "sword", beneficio: "+5% de probabilidad de botín raro en cofres y +10 SunCoins diarios." },
+    { minimo: 500, nombre: "Caballero del Sol", icono: "sword", siguiente: 1500, siguienteNombre: "Héroe Legendario", siguienteIcono: "shield", beneficio: "+10% de daño físico en Aventura y acceso prioritario a recetas místicas." },
+    { minimo: 1500, nombre: "Héroe Legendario", icono: "shield", siguiente: 5000, siguienteNombre: "Guardián Supremo", siguienteIcono: "sunflower", beneficio: "+15% de defensa total, marco dorado exclusivo de explorador y +20 SunCoins diarios." },
+    { minimo: 5000, nombre: "Guardián Supremo", icono: "sunflower", siguiente: null, siguienteNombre: "Máximo Nivel", siguienteIcono: null, beneficio: "Aura solar suprema, acceso ilimitado a secretos arcanos y bonificación máxima en todos los modos." }
   ];
 
   // 2. Escala de Pareja: Rangos de Vínculo Afectivo y Amor Mutuo con iconos SVG dedicados
@@ -143,12 +143,171 @@
   };
 
   const NIVELES_PAREJA = [
-    { minimo: 0, nombre: "Primeras Miradas", iconoSvg: SVG_PAREJA.brote, siguiente: 100, siguienteNombre: "Enamorados", siguienteIconoSvg: SVG_PAREJA.corazon },
-    { minimo: 100, nombre: "Enamorados", iconoSvg: SVG_PAREJA.corazon, siguiente: 400, siguienteNombre: "Compañeros de Vida", siguienteIconoSvg: SVG_PAREJA.fuego },
-    { minimo: 400, nombre: "Compañeros de Vida", iconoSvg: SVG_PAREJA.fuego, siguiente: 1000, siguienteNombre: "Almas Gemelas", siguienteIconoSvg: SVG_PAREJA.destello },
-    { minimo: 1000, nombre: "Almas Gemelas", iconoSvg: SVG_PAREJA.destello, siguiente: 3000, siguienteNombre: "Amor Eterno", siguienteIconoSvg: SVG_PAREJA.anillo },
-    { minimo: 3000, nombre: "Amor Eterno", iconoSvg: SVG_PAREJA.anillo, siguiente: null, siguienteNombre: "Vínculo Infinito", siguienteIconoSvg: null }
+    { minimo: 0, nombre: "Primeras Miradas", iconoSvg: SVG_PAREJA.brote, siguiente: 100, siguienteNombre: "Enamorados", siguienteIconoSvg: SVG_PAREJA.corazon, beneficio: "Desbloquea el envío diario de caricias de amor y notas compartidas." },
+    { minimo: 100, nombre: "Enamorados", iconoSvg: SVG_PAREJA.corazon, siguiente: 400, siguienteNombre: "Compañeros de Vida", siguienteIconoSvg: SVG_PAREJA.fuego, beneficio: "Notificaciones de amor instantáneas y fondo romántico suave en el chat." },
+    { minimo: 400, nombre: "Compañeros de Vida", iconoSvg: SVG_PAREJA.fuego, siguiente: 1000, siguienteNombre: "Almas Gemelas", siguienteIconoSvg: SVG_PAREJA.destello, beneficio: "+25% de XP al enviar fotos conjuntas al álbum y stickers exclusivos." },
+    { minimo: 1000, nombre: "Almas Gemelas", iconoSvg: SVG_PAREJA.destello, siguiente: 3000, siguienteNombre: "Amor Eterno", siguienteIconoSvg: SVG_PAREJA.anillo, beneficio: "Desbloquea mini-recuerdos interactivos en el calendario y animación especial de fuegos artificiales." },
+    { minimo: 3000, nombre: "Amor Eterno", iconoSvg: SVG_PAREJA.anillo, siguiente: null, siguienteNombre: "Vínculo Infinito", siguienteIconoSvg: null, beneficio: "Anillo astral de pareja permanente, medalla de Amor Inmortal y efectos mágicos de corazones." }
   ];
+
+  /* Modal de Rangos y Beneficios */
+  function abrirModalRangos(tipoInicial = "individual") {
+    const modal = $("modal-rangos-beneficios");
+    if (!modal) return;
+
+    const btnCerrar = $("btn-cerrar-modal-rangos");
+    const tabInd = $("tab-rangos-individual");
+    const tabPar = $("tab-rangos-pareja");
+    const listaEl = $("modal-rangos-lista");
+    const iconBadge = $("modal-rangos-tipo-icon");
+    const tituloEl = $("modal-rangos-titulo");
+    const subtituloEl = $("modal-rangos-subtitulo");
+
+    let tabActual = tipoInicial;
+
+    function renderLista() {
+      if (!listaEl) return;
+      listaEl.innerHTML = "";
+
+      if (tabActual === "individual") {
+        if (iconBadge) iconBadge.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7 2v11h3v9l7-12h-4l3-8z"/></svg>`;
+        if (tituloEl) tituloEl.textContent = "Rangos de Explorador Individual";
+        if (subtituloEl) subtituloEl.textContent = "Gana XP jugando minijuegos, en Aventura y cuidando mascotas";
+        if (tabInd) tabInd.classList.add("active");
+        if (tabPar) tabPar.classList.remove("active");
+
+        const xpInd = calcularExperiencia();
+        NIVELES_INDIVIDUALES.forEach((lvl, idx) => {
+          const desbloqueado = xpInd >= lvl.minimo;
+          const esActual = desbloqueado && (!lvl.siguiente || xpInd < lvl.siguiente);
+          const iconoKey = NIVEL_INDIVIDUAL_A_ICONO[lvl.icono] || "raiz";
+
+          const item = document.createElement("div");
+          item.className = `modal-rango-item ${desbloqueado ? "desbloqueado" : "bloqueado"} ${esActual ? "rango-actual" : ""}`;
+          item.innerHTML = `
+            <div class="modal-rango-icono-col">
+              <span class="ui-icon" data-icono="${iconoKey}"></span>
+              ${esActual ? '<span class="modal-rango-actual-tag">ACTUAL</span>' : ""}
+            </div>
+            <div class="modal-rango-info-col">
+              <div class="modal-rango-top-row">
+                <strong class="modal-rango-nombre">${lvl.nombre}</strong>
+                <span class="modal-rango-req">${lvl.minimo === 0 ? "Inicial" : `${lvl.minimo} XP`}</span>
+              </div>
+              <p class="modal-rango-beneficio">✨ <strong>Beneficio:</strong> ${lvl.beneficio}</p>
+              ${desbloqueado ? '<span class="modal-rango-status-pill pill-ok">✓ Desbloqueado</span>' : `<span class="modal-rango-status-pill pill-lock">🔒 Requiere ${lvl.minimo - xpInd} XP más</span>`}
+            </div>
+          `;
+          hidratarIconosEn(item);
+          listaEl.appendChild(item);
+        });
+      } else {
+        if (iconBadge) iconBadge.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+        if (tituloEl) tituloEl.textContent = "Rangos de Vínculo de Pareja";
+        if (subtituloEl) subtituloEl.textContent = "Acumula Amor XP guardando fotos, notas y enviando caricias";
+        if (tabPar) tabPar.classList.add("active");
+        if (tabInd) tabInd.classList.remove("active");
+
+        const xpPar = calcularExperienciaPareja();
+        NIVELES_PAREJA.forEach((lvl, idx) => {
+          const desbloqueado = xpPar >= lvl.minimo;
+          const esActual = desbloqueado && (!lvl.siguiente || xpPar < lvl.siguiente);
+
+          const item = document.createElement("div");
+          item.className = `modal-rango-item item-pareja ${desbloqueado ? "desbloqueado" : "bloqueado"} ${esActual ? "rango-actual" : ""}`;
+          item.innerHTML = `
+            <div class="modal-rango-icono-col">
+              <span class="pareja-modal-svg">${lvl.iconoSvg}</span>
+              ${esActual ? '<span class="modal-rango-actual-tag tag-pink">ACTUAL</span>' : ""}
+            </div>
+            <div class="modal-rango-info-col">
+              <div class="modal-rango-top-row">
+                <strong class="modal-rango-nombre">${lvl.nombre}</strong>
+                <span class="modal-rango-req">${lvl.minimo === 0 ? "Inicial" : `${lvl.minimo} Amor XP`}</span>
+              </div>
+              <p class="modal-rango-beneficio">💖 <strong>Beneficio:</strong> ${lvl.beneficio}</p>
+              ${desbloqueado ? '<span class="modal-rango-status-pill pill-ok">✓ Desbloqueado</span>' : `<span class="modal-rango-status-pill pill-lock">🔒 Requiere ${lvl.minimo - xpPar} Amor XP más</span>`}
+            </div>
+          `;
+          listaEl.appendChild(item);
+        });
+      }
+    }
+
+    renderLista();
+
+    if (tabInd && !tabInd.dataset.bound) {
+      tabInd.dataset.bound = "true";
+      tabInd.addEventListener("click", () => {
+        tabActual = "individual";
+        renderLista();
+        try { window._snd?.("pop"); } catch {}
+      });
+    }
+
+    if (tabPar && !tabPar.dataset.bound) {
+      tabPar.dataset.bound = "true";
+      tabPar.addEventListener("click", () => {
+        tabActual = "pareja";
+        renderLista();
+        try { window._snd?.("pop"); } catch {}
+      });
+    }
+
+    const cerrar = () => {
+      modal.classList.remove("active");
+      try { window._snd?.("pop"); } catch {}
+    };
+
+    if (btnCerrar && !btnCerrar.dataset.bound) {
+      btnCerrar.dataset.bound = "true";
+      btnCerrar.addEventListener("click", cerrar);
+    }
+
+    const backdrop = modal.querySelector(".modal-backdrop");
+    if (backdrop && !backdrop.dataset.bound) {
+      backdrop.dataset.bound = "true";
+      backdrop.addEventListener("click", cerrar);
+    }
+
+    modal.classList.add("active");
+    try { window._snd?.("pop"); } catch {}
+  }
+
+  // Vincular eventos de clic a las tarjetas de nivel del lobby
+  function inicializarCardsExperiencia() {
+    const cardInd = $("card-progreso-individual");
+    if (cardInd && !cardInd.dataset.boundModal) {
+      cardInd.dataset.boundModal = "true";
+      const abrir = (e) => {
+        if (e.target.closest("button") || e.target.closest("a")) return;
+        abrirModalRangos("individual");
+      };
+      cardInd.addEventListener("click", abrir);
+      cardInd.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrir(e); }
+      });
+    }
+
+    const cardPar = $("experiencia-card-pareja");
+    if (cardPar && !cardPar.dataset.boundModal) {
+      cardPar.dataset.boundModal = "true";
+      const abrir = (e) => {
+        if (e.target.closest("button") || e.target.closest("a")) return;
+        abrirModalRangos("pareja");
+      };
+      cardPar.addEventListener("click", abrir);
+      cardPar.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrir(e); }
+      });
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", inicializarCardsExperiencia);
+  } else {
+    inicializarCardsExperiencia();
+  }
 
   /* Función global para otorgar XP directamente a la barra de nivel individual */
   window._sumarExperienciaGlobal = (cantidad = 0, motivo = "") => {
@@ -314,7 +473,7 @@
         parejaTituloEl.innerHTML = `${nivelPar.nombre} <span class="pareja-titulo-svg-wrap">${nivelPar.iconoSvg}</span>`;
       }
       if (parejaTotalEl) {
-        parejaTotalEl.innerHTML = `<span class="xp-corazon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span> <span>${xpPar} Amor XP</span>`;
+        parejaTotalEl.textContent = `${xpPar} Amor XP`;
       }
       if (nivelPar.siguiente) {
         const pctPar = ((xpPar - nivelPar.minimo) / (nivelPar.siguiente - nivelPar.minimo)) * 100;
