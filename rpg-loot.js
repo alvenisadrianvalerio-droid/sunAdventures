@@ -716,7 +716,7 @@
   }
 
   // Cerrar al tocar fuera o hacer scroll
-  document.addEventListener("scroll", ocultarTooltipItem, true);
+  document.addEventListener("scroll", ocultarTooltipItem, { passive: true, capture: true });
   document.addEventListener("pointerdown", e => {
     if (!e.target.closest(".rpg-coleccion-item") && !e.target.closest("#rpg-item-tooltip")) {
       ocultarTooltipItem();

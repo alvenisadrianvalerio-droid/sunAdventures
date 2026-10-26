@@ -53,14 +53,14 @@
   const MASCOTAS_LOGROS = [
     { id: "mapache", nombre: "el Mapache", icono: SVG.heart },
     { id: "girasol", nombre: "el Girasol", icono: SVG.sunflower },
-    { id: "gatito", nombre: "la Siamesa", icono: SVG.heart },
-    { id: "gatito-negro", nombre: "el Gato Negro", icono: SVG.heart },
-    { id: "hamburguesa", nombre: "Hamburguesa", icono: SVG.heart },
-    { id: "oveja", nombre: "la Oveja", icono: SVG.heart },
-    { id: "pollito", nombre: "el Pollito", icono: SVG.heart },
-    { id: "jirafa", nombre: "la Jirafa", icono: SVG.heart },
+    { id: "gatito", nombre: "la Siamesa", icono: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="7" cy="5" r="2.5"/><circle cx="17" cy="5" r="2.5"/><path d="M12 7c-4 0-7 2.5-7 6.5 0 3 2.5 5.5 7 5.5s7-2.5 7-5.5C19 9.5 16 7 12 7z"/><circle cx="9.5" cy="12.5" r="1.2" fill="#181c28"/><circle cx="14.5" cy="12.5" r="1.2" fill="#181c28"/></svg>' },
+    { id: "gatito-negro", nombre: "el Gato Negro", icono: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a9 9 0 0 0-9 9c0 3.8 2.3 7 5.7 8.3L8 21h8l-.7-1.7C18.7 18 21 14.8 21 11a9 9 0 0 0-9-9zm-4 7l2 3h-4l2-3zm8 0l2 3h-4l2-3z"/></svg>' },
+    { id: "hamburguesa", nombre: "Hamburguesa", icono: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11c0-4 4-7 9-7s9 3 9 7H3z"/><path d="M4 15h16"/><path d="M4 19h16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1z"/><circle cx="8" cy="7" r=".8" fill="currentColor"/><circle cx="12" cy="6" r=".8" fill="currentColor"/><circle cx="16" cy="7" r=".8" fill="currentColor"/></svg>' },
+    { id: "oveja", nombre: "la Oveja", icono: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6a3 3 0 1 1 6 0 3 3 0 1 1 3 3 3 3 0 1 1 0 6 3 3 0 1 1-3 3H9a3 3 0 1 1-3-3 3 3 0 1 1 0-6 3 3 0 1 1 3-3z"/><circle cx="10" cy="11" r="1" fill="currentColor"/><circle cx="14" cy="11" r="1" fill="currentColor"/></svg>' },
+    { id: "pollito", nombre: "el Pollito", icono: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="10" r="6"/><path d="M12 16c3 0 6 2 6 5H6c0-3 3-5 6-5z"/><path d="M12 10l-2 2h4l-2-2z" fill="currentColor"/><circle cx="10" cy="8.5" r=".8" fill="currentColor"/><circle cx="14" cy="8.5" r=".8" fill="currentColor"/></svg>' },
+    { id: "jirafa", nombre: "la Jirafa", icono: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21v-8l4-8h4l-2 5v11"/><path d="M11 5V2M15 5V2"/><circle cx="13" cy="7" r="1" fill="currentColor"/></svg>' },
     { id: "unicornio", nombre: "el Unicornio", icono: SVG.sparkle },
-    { id: "conejo", nombre: "el Conejito", icono: SVG.heart },
+    { id: "conejo", nombre: "el Conejito", icono: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2c-1 3 0 7 2 9M16 2c1 3 0 7-2 9"/><path d="M7 13a5 5 0 0 1 10 0c0 4-2 7-5 7s-5-3-5-7z"/><circle cx="10" cy="15" r=".8" fill="currentColor"/><circle cx="14" cy="15" r=".8" fill="currentColor"/></svg>' },
     { id: "dragon-bebe", nombre: "el Dragón Bebé", icono: SVG.fire },
     { id: "dragon-anciano", nombre: "el Dragón Anciano", icono: SVG.crown }
   ];
@@ -87,6 +87,96 @@
     logroToastTimeout = setTimeout(() => logroToast.classList.remove("visible"), 4500);
   };
 
+  // Iconografía temática SVG dedicada para cada categoría y logro
+  const ICONOS_TEMATICOS_LOGROS = {
+    // Grupo y sociales
+    "primeros-pasos": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="5"/><path d="M12 2l2.5 5 5 .5-4 3.5 1.5 5-5-3-5 3 1.5-5-4-3.5 5-.5z"/><path d="M8 22l4-3 4 3"/></svg>',
+    "fotografos": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+    "poetas": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>',
+    "trotamundos": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>',
+    "exploradores": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4l6 2 6-2v14l-6 2-6-2-6 2V6z"/><path d="M9 4v14M15 6v14"/><circle cx="12" cy="11" r="2" fill="currentColor"/></svg>',
+    "viajeros": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>',
+    "racha": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c0 3 3 4 3 8 0 1.5-1 3-3 3s-3-1.5-3-3c0-1 1-2 1-3 0-1-1-2-1-3 2 0 3-1 3-2z"/><path d="M11 19c-3 0-6-2-6-6 0-1 1-3 2-4 0 2 1 3 2 3 0-2 1-3 2-4-1 3 3 5 3 8 0 2-1 3-3 3z"/></svg>',
+    "racha-365": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M12 14l1.5 2 3-3" stroke-width="2.5"/></svg>',
+    "todos-los-logros": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18l-1.5-9-4.5 4L12 5 9 13 4.5 9 3 18z"/></svg>',
+    
+    // Chat
+    "primer-chat": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    "conversador": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',
+    "chat-1000": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.38 5.07L2 22l5.07-1.38C8.42 21.5 10.15 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>',
+
+    // Minijuegos
+    "primer-juego": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="15.5" r="1.5"/></svg>',
+    "jugador": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/></svg>',
+    "vicio": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="12 6 15 11 20 11 16 14 18 19 12 16 6 19 8 14 4 11 9 11 12 6" fill="currentColor"/></svg>',
+    "ganador": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4a2 2 0 0 1-2-2V6h4"/><path d="M18 9h2a2 2 0 0 0 2-2V6h-4"/><path d="M6 4h12v6a6 6 0 0 1-12 0z"/><path d="M12 16v4"/><path d="M8 20h8"/></svg>',
+    "invicto": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6 6 1-4.5 4.5 1 6L12 16l-5.5 3.5 1-6L3 9l6-1 3-6z"/></svg>',
+
+    // Tienda y Economía
+    "primera-compra": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+    "comprador": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+    "coleccionista": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
+    "ahorrador": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 6v12"/></svg>',
+    "rico": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 9l8 13 8-13z"/><path d="M12 2v20M4 9h16" stroke="rgba(255,255,255,.4)" stroke-width="1.2"/></svg>',
+
+    // Progreso y Niveles
+    "nivel-3": '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+    "nivel-5": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6.4-4.8-6.4 4.8 2.4-7.2-6-4.8h7.6z"/><circle cx="12" cy="12" r="2.5" fill="#12141e"/></svg>',
+    "cuidado-7": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><path d="M12 8v4l3 2"/></svg>',
+    "cuidado-30": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><polygon points="12 5 13 8 16 8 13.5 10 14.5 13 12 11.5 9.5 13 10.5 10 8 8 11 8 12 5" fill="#ffd93d"/></svg>',
+    "mejor-amigo": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><path d="M18 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1z" fill="#ffd93d"/></svg>',
+
+    // Música y Calendario
+    "primer-playlist": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+    "dj-pro": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3"/></svg>',
+    "coleccion-musical": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>',
+    "primer-evento": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M12 14v4M10 16h4"/></svg>',
+    "planificador": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><circle cx="8" cy="14" r="1" fill="currentColor"/><circle cx="12" cy="14" r="1" fill="currentColor"/><circle cx="16" cy="14" r="1" fill="currentColor"/><circle cx="8" cy="18" r="1" fill="currentColor"/><circle cx="12" cy="18" r="1" fill="currentColor"/><circle cx="16" cy="18" r="1" fill="currentColor"/></svg>',
+
+    // Aventura RPG: Combate y enemigos
+    "rpg-primer-paso": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/></svg>',
+    "rpg-cazador": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>',
+    "rpg-exterminador": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M9.5 17.5L21 6V3h-3L6.5 14.5"/><path d="M11 19l-6-6"/></svg>',
+    "rpg-genocida": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a9 9 0 0 0-9 9c0 3.2 1.7 6 4.3 7.5L7 21l3-1 2 1 2-1 3 1-.3-2.5C19.3 17 21 14.2 21 11a9 9 0 0 0-9-9zm-3.5 10c-.8 0-1.5-.7-1.5-1.5S7.7 9 8.5 9s1.5.7 1.5 1.5S9.3 12 8.5 12zm7 0c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5z"/></svg>',
+    "rpg-nivel-10": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 12 15 15 9"/></svg>',
+    "rpg-nivel-25": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 7v10M8 12h8"/></svg>',
+    "rpg-nivel-50": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6l1.5 3 3.5.5-2.5 2.5.5 3.5-3-1.5-3 1.5.5-3.5-2.5-2.5 3.5-.5L12 7z"/></svg>',
+    
+    // Jefes RPG
+    "rpg-jefes-1": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 4l2 3-3 1 2 4-5-2-2 6-2-6-5 2 2-4-3-1 2-3h12z"/><circle cx="12" cy="11" r="2" fill="currentColor"/></svg>',
+    "rpg-jefes-todos": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/></svg>',
+
+    // Botín y Cofres
+    "rpg-loot-10": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 2 18 2 22 7 12 22 2 7 6 2"/><line x1="2" y1="7" x2="22" y2="7"/></svg>',
+    "rpg-loot-40": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+    "rpg-loot-75": '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8 22 9 17 14 18 21 12 17 6 21 7 14 2 9 9 8 12 2"/><circle cx="12" cy="12" r="2" fill="#181c28"/></svg>',
+    "rpg-mitico": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 9l8 13 8-13z"/><path d="M12 2v20M4 9l8 4 8-4" stroke="rgba(255,255,255,.5)" stroke-width="1.5" fill="none"/></svg>',
+    "rpg-cofres-10": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18v10H3z"/><path d="M3 10l2-4h14l2 4"/><circle cx="12" cy="15" r="1.5" fill="currentColor"/></svg>',
+    "rpg-cofres-50": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 11h20v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9z"/><path d="M3 11l2.5-6h13L21 11"/><rect x="10" y="14" width="4" height="4" rx="1" fill="currentColor"/></svg>',
+    "rpg-bonus-100": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+
+    // Hordas RPG
+    "rpg-horda-4": '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M4 19c0-2.8 2.2-5 5-5s5 2.2 5 5v1H4v-1zm10 1v-1c0-1.8-1-3.4-2.5-4.2 1-.5 2.2-.8 3.5-.8 2.2 0 4 1.8 4 4v2h-5z"/></svg>',
+    "rpg-horda-8": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1.1 0 2 .9 2 2v1.1C17.6 5.7 20 8.6 20 12c0 2.2-1 4.2-2.5 5.5l1.5 3.5-3.5-1.5C14.2 20 13.1 20 12 20s-2.2 0-3.5-.5L5 21l1.5-3.5C5 16.2 4 14.2 4 12c0-3.4 2.4-6.3 6-6.9V4c0-1.1.9-2 2-2zm-3 8a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>',
+    "rpg-horda-12": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 5h6l-4.5 4.5 1.5 6.5L12 15l-6 3 1.5-6.5L3 7h6l3-5z"/><path d="M12 7l1.5 2.5h3L14.2 12l.8 3-3-1.5-3 1.5.8-3-2.3-2.5h3L12 7z" fill="#181c28"/></svg>',
+
+    // Post-Game y Caos
+    "rpg-falla-desbloqueada": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>',
+    "rpg-caos-1": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+    "rpg-caos-todos": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1l3 4 5-1-1 5 4 3-4 3 1 5-5-1-3 4-3-4-5 1 1-5-4-3 4-3-1-5 5 1 3-4z"/><circle cx="12" cy="12" r="3" fill="#181c28"/></svg>',
+    "rpg-falla-piso-10": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+
+    // Modo Roguelike
+    "rl-primer-run": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+    "rl-piso-10": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 10l7-7 7 7"/><path d="M5 21h14"/></svg>',
+    "rl-victoria": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/><path d="M12 7l1.5 3 3.5.5-2.5 2.5.5 3.5-3-1.5-3 1.5.5-3.5-2.5-2.5 3.5-.5L12 7z" fill="#181c28"/></svg>',
+    "rl-cazabosses": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/></svg>',
+
+    // Especial Conejil
+    "maxima-bestia": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 2c-1.5 3 0 7 2 9M16 2c1.5 3 0 7-2 9"/><path d="M6 13a6 6 0 0 1 12 0c0 4-2.5 8-6 8s-6-4-6-8z"/><circle cx="9" cy="14" r="1" fill="#181c28"/><circle cx="15" cy="14" r="1" fill="#181c28"/><polygon points="12 2 13 4 15 4 13.5 5.5 14 7.5 12 6.5 10 7.5 10.5 5.5 9 4 11 4 12 2" fill="#ffd93d"/></svg>',
+    "maxima-bestia-todas": '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4h7.6l-6.2 4.5 2.4 7.4-6.2-4.5-6.2 4.5 2.4-7.4-6.2-4.5h7.6z"/><circle cx="12" cy="12" r="3" fill="#181c28"/></svg>'
+  };
+
   const crearIconoLogro = logro => {
     const wrapper = document.createElement("span");
     wrapper.className = "logro-icono-wrapper";
@@ -104,7 +194,16 @@
     }
     const svgWrap = document.createElement("span");
     svgWrap.className = "logro-icono-svg-badge";
-    let iconHtml = logro.icono;
+
+    // 1. Icono temático SVG exacto por ID de logro
+    let iconHtml = ICONOS_TEMATICOS_LOGROS[logro.id];
+
+    // 2. Si no tiene específico por ID, usar el icono directo de su definición
+    if (!iconHtml && logro.icono) {
+      iconHtml = logro.icono;
+    }
+
+    // 3. Fallbacks inteligentes por subcadenas si fuera necesario
     if (!iconHtml) {
       const tipo = logro.id || "";
       if (tipo.startsWith("rpg-") || tipo.includes("jefe") || tipo.includes("enemigo")) iconHtml = window.ICONO?.espada;
@@ -118,6 +217,7 @@
       else if (tipo.includes("nivel")) iconHtml = window.ICONO?.estrella;
       else iconHtml = window.ICONO?.estrella || "★";
     }
+
     svgWrap.innerHTML = iconHtml || "★";
     wrapper.appendChild(svgWrap);
     return wrapper;
@@ -126,11 +226,11 @@
   // 1. Escala Individual: Rangos de Aventurero / Explorador Solitario
   const NIVEL_INDIVIDUAL_A_ICONO = { sprout: "raiz", brújula: "mapa", sword: "espada", shield: "estrella", sunflower: "girasol" };
   const NIVELES_INDIVIDUALES = [
-    { minimo: 0, nombre: "Explorador Novato", icono: "sprout", siguiente: 100, siguienteNombre: "Aventurero Intrépido", siguienteIcono: "brújula" },
-    { minimo: 100, nombre: "Aventurero Intrépido", icono: "brújula", siguiente: 500, siguienteNombre: "Caballero del Sol", siguienteIcono: "sword" },
-    { minimo: 500, nombre: "Caballero del Sol", icono: "sword", siguiente: 1500, siguienteNombre: "Héroe Legendario", siguienteIcono: "shield" },
-    { minimo: 1500, nombre: "Héroe Legendario", icono: "shield", siguiente: 5000, siguienteNombre: "Guardián Supremo", siguienteIcono: "sunflower" },
-    { minimo: 5000, nombre: "Guardián Supremo", icono: "sunflower", siguiente: null, siguienteNombre: "Máximo Nivel", siguienteIcono: null }
+    { minimo: 0, nombre: "Explorador Novato", icono: "sprout", siguiente: 100, siguienteNombre: "Aventurero Intrépido", siguienteIcono: "brújula", beneficio: "Acceso básico a todas las herramientas del santuario y minijuegos." },
+    { minimo: 100, nombre: "Aventurero Intrépido", icono: "brújula", siguiente: 500, siguienteNombre: "Caballero del Sol", siguienteIcono: "sword", beneficio: "+5% de probabilidad de botín raro en cofres y +10 SunCoins diarios." },
+    { minimo: 500, nombre: "Caballero del Sol", icono: "sword", siguiente: 1500, siguienteNombre: "Héroe Legendario", siguienteIcono: "shield", beneficio: "+10% de daño físico en Aventura y acceso prioritario a recetas místicas." },
+    { minimo: 1500, nombre: "Héroe Legendario", icono: "shield", siguiente: 5000, siguienteNombre: "Guardián Supremo", siguienteIcono: "sunflower", beneficio: "+15% de defensa total, marco dorado exclusivo de explorador y +20 SunCoins diarios." },
+    { minimo: 5000, nombre: "Guardián Supremo", icono: "sunflower", siguiente: null, siguienteNombre: "Máximo Nivel", siguienteIcono: null, beneficio: "Aura solar suprema, acceso ilimitado a secretos arcanos y bonificación máxima en todos los modos." }
   ];
 
   // 2. Escala de Pareja: Rangos de Vínculo Afectivo y Amor Mutuo con iconos SVG dedicados
@@ -143,12 +243,177 @@
   };
 
   const NIVELES_PAREJA = [
-    { minimo: 0, nombre: "Primeras Miradas", iconoSvg: SVG_PAREJA.brote, siguiente: 100, siguienteNombre: "Enamorados", siguienteIconoSvg: SVG_PAREJA.corazon },
-    { minimo: 100, nombre: "Enamorados", iconoSvg: SVG_PAREJA.corazon, siguiente: 400, siguienteNombre: "Compañeros de Vida", siguienteIconoSvg: SVG_PAREJA.fuego },
-    { minimo: 400, nombre: "Compañeros de Vida", iconoSvg: SVG_PAREJA.fuego, siguiente: 1000, siguienteNombre: "Almas Gemelas", siguienteIconoSvg: SVG_PAREJA.destello },
-    { minimo: 1000, nombre: "Almas Gemelas", iconoSvg: SVG_PAREJA.destello, siguiente: 3000, siguienteNombre: "Amor Eterno", siguienteIconoSvg: SVG_PAREJA.anillo },
-    { minimo: 3000, nombre: "Amor Eterno", iconoSvg: SVG_PAREJA.anillo, siguiente: null, siguienteNombre: "Vínculo Infinito", siguienteIconoSvg: null }
+    { minimo: 0, nombre: "Primeras Miradas", iconoSvg: SVG_PAREJA.brote, siguiente: 100, siguienteNombre: "Enamorados", siguienteIconoSvg: SVG_PAREJA.corazon, beneficio: "Desbloquea el envío diario de caricias de amor y notas compartidas." },
+    { minimo: 100, nombre: "Enamorados", iconoSvg: SVG_PAREJA.corazon, siguiente: 400, siguienteNombre: "Compañeros de Vida", siguienteIconoSvg: SVG_PAREJA.fuego, beneficio: "Notificaciones de amor instantáneas y fondo romántico suave en el chat." },
+    { minimo: 400, nombre: "Compañeros de Vida", iconoSvg: SVG_PAREJA.fuego, siguiente: 1000, siguienteNombre: "Almas Gemelas", siguienteIconoSvg: SVG_PAREJA.destello, beneficio: "+25% de XP al enviar fotos conjuntas al álbum y stickers exclusivos." },
+    { minimo: 1000, nombre: "Almas Gemelas", iconoSvg: SVG_PAREJA.destello, siguiente: 3000, siguienteNombre: "Amor Eterno", siguienteIconoSvg: SVG_PAREJA.anillo, beneficio: "Desbloquea mini-recuerdos interactivos en el calendario y animación especial de fuegos artificiales." },
+    { minimo: 3000, nombre: "Amor Eterno", iconoSvg: SVG_PAREJA.anillo, siguiente: null, siguienteNombre: "Vínculo Infinito", siguienteIconoSvg: null, beneficio: "Anillo astral de pareja permanente, medalla de Amor Inmortal y efectos mágicos de corazones." }
   ];
+
+  /* Modal de Rangos y Beneficios */
+  function abrirModalRangos(tipoInicial = "individual") {
+    const modal = $("modal-rangos-beneficios");
+    if (!modal) return;
+
+    const btnCerrar = $("btn-cerrar-modal-rangos");
+    const tabInd = $("tab-rangos-individual");
+    const tabPar = $("tab-rangos-pareja");
+    const listaEl = $("modal-rangos-lista");
+    const iconBadge = $("modal-rangos-tipo-icon");
+    const tituloEl = $("modal-rangos-titulo");
+    const subtituloEl = $("modal-rangos-subtitulo");
+
+    let tabActual = tipoInicial;
+
+    function renderLista() {
+      if (!listaEl) return;
+      listaEl.innerHTML = "";
+
+      if (tabActual === "individual") {
+        if (iconBadge) iconBadge.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7 2v11h3v9l7-12h-4l3-8z"/></svg>`;
+        if (tituloEl) tituloEl.textContent = "Rangos de Explorador Individual";
+        if (subtituloEl) subtituloEl.textContent = "Gana XP jugando minijuegos, en Aventura y cuidando mascotas";
+        if (tabInd) tabInd.classList.add("active");
+        if (tabPar) tabPar.classList.remove("active");
+
+        const xpInd = calcularExperiencia();
+        NIVELES_INDIVIDUALES.forEach((lvl, idx) => {
+          const desbloqueado = xpInd >= lvl.minimo;
+          const esActual = desbloqueado && (!lvl.siguiente || xpInd < lvl.siguiente);
+          const iconoKey = NIVEL_INDIVIDUAL_A_ICONO[lvl.icono] || "raiz";
+
+          const item = document.createElement("div");
+          item.className = `modal-rango-item ${desbloqueado ? "desbloqueado" : "bloqueado"} ${esActual ? "rango-actual" : ""}`;
+          item.innerHTML = `
+            <div class="modal-rango-icono-col">
+              <span class="ui-icon" data-icono="${iconoKey}"></span>
+              ${esActual ? '<span class="modal-rango-actual-tag">ACTUAL</span>' : ""}
+            </div>
+            <div class="modal-rango-info-col">
+              <div class="modal-rango-top-row">
+                <strong class="modal-rango-nombre">${lvl.nombre}</strong>
+                <span class="modal-rango-req">${lvl.minimo === 0 ? "Inicial" : `${lvl.minimo} XP`}</span>
+              </div>
+              <p class="modal-rango-beneficio">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="svg-inline-sparkle" aria-hidden="true"><path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z"/></svg>
+                <strong>Beneficio:</strong> ${lvl.beneficio}
+              </p>
+              ${desbloqueado ? '<span class="modal-rango-status-pill pill-ok"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg> Desbloqueado</span>' : `<span class="modal-rango-status-pill pill-lock"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg> Requiere ${lvl.minimo - xpInd} XP más</span>`}
+            </div>
+          `;
+          hidratarIconosEn(item);
+          listaEl.appendChild(item);
+        });
+      } else {
+        if (iconBadge) iconBadge.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+        if (tituloEl) tituloEl.textContent = "Rangos de Vínculo de Pareja";
+        if (subtituloEl) subtituloEl.textContent = "Acumula Amor XP guardando fotos, notas y enviando caricias";
+        if (tabPar) tabPar.classList.add("active");
+        if (tabInd) tabInd.classList.remove("active");
+
+        const xpPar = calcularExperienciaPareja();
+        NIVELES_PAREJA.forEach((lvl, idx) => {
+          const desbloqueado = xpPar >= lvl.minimo;
+          const esActual = desbloqueado && (!lvl.siguiente || xpPar < lvl.siguiente);
+
+          const item = document.createElement("div");
+          item.className = `modal-rango-item item-pareja ${desbloqueado ? "desbloqueado" : "bloqueado"} ${esActual ? "rango-actual" : ""}`;
+          item.innerHTML = `
+            <div class="modal-rango-icono-col">
+              <span class="pareja-modal-svg">${lvl.iconoSvg}</span>
+              ${esActual ? '<span class="modal-rango-actual-tag tag-pink">ACTUAL</span>' : ""}
+            </div>
+            <div class="modal-rango-info-col">
+              <div class="modal-rango-top-row">
+                <strong class="modal-rango-nombre">${lvl.nombre}</strong>
+                <span class="modal-rango-req">${lvl.minimo === 0 ? "Inicial" : `${lvl.minimo} Amor XP`}</span>
+              </div>
+              <p class="modal-rango-beneficio">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="svg-inline-heart" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <strong>Beneficio:</strong> ${lvl.beneficio}
+              </p>
+              ${desbloqueado ? '<span class="modal-rango-status-pill pill-ok"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg> Desbloqueado</span>' : `<span class="modal-rango-status-pill pill-lock"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg> Requiere ${lvl.minimo - xpPar} Amor XP más</span>`}
+            </div>
+          `;
+          listaEl.appendChild(item);
+        });
+      }
+    }
+
+    renderLista();
+
+    if (tabInd && !tabInd.dataset.bound) {
+      tabInd.dataset.bound = "true";
+      tabInd.addEventListener("click", () => {
+        tabActual = "individual";
+        renderLista();
+        try { window._snd?.("pop"); } catch {}
+      });
+    }
+
+    if (tabPar && !tabPar.dataset.bound) {
+      tabPar.dataset.bound = "true";
+      tabPar.addEventListener("click", () => {
+        tabActual = "pareja";
+        renderLista();
+        try { window._snd?.("pop"); } catch {}
+      });
+    }
+
+    const cerrar = () => {
+      modal.classList.remove("active");
+      try { window._snd?.("pop"); } catch {}
+    };
+
+    if (btnCerrar && !btnCerrar.dataset.bound) {
+      btnCerrar.dataset.bound = "true";
+      btnCerrar.addEventListener("click", cerrar);
+    }
+
+    const backdrop = modal.querySelector(".modal-backdrop");
+    if (backdrop && !backdrop.dataset.bound) {
+      backdrop.dataset.bound = "true";
+      backdrop.addEventListener("click", cerrar);
+    }
+
+    modal.classList.add("active");
+    try { window._snd?.("pop"); } catch {}
+  }
+
+  // Vincular eventos de clic a las tarjetas de nivel del lobby
+  function inicializarCardsExperiencia() {
+    const cardInd = $("card-progreso-individual");
+    if (cardInd && !cardInd.dataset.boundModal) {
+      cardInd.dataset.boundModal = "true";
+      const abrir = (e) => {
+        if (e.target.closest("button") || e.target.closest("a")) return;
+        abrirModalRangos("individual");
+      };
+      cardInd.addEventListener("click", abrir);
+      cardInd.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrir(e); }
+      });
+    }
+
+    const cardPar = $("experiencia-card-pareja");
+    if (cardPar && !cardPar.dataset.boundModal) {
+      cardPar.dataset.boundModal = "true";
+      const abrir = (e) => {
+        if (e.target.closest("button") || e.target.closest("a")) return;
+        abrirModalRangos("pareja");
+      };
+      cardPar.addEventListener("click", abrir);
+      cardPar.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrir(e); }
+      });
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", inicializarCardsExperiencia);
+  } else {
+    inicializarCardsExperiencia();
+  }
 
   /* Función global para otorgar XP directamente a la barra de nivel individual */
   window._sumarExperienciaGlobal = (cantidad = 0, motivo = "") => {
@@ -240,8 +505,17 @@
       xpRoguelike = (runsTotal * 5) + (maxPiso * 10) + (vicTotal * 80) + (bossesTotal * 25);
     } catch {}
 
+    // Vínculo acumulado con las mascotas (cada nivel de amor otorga experiencia)
+    let xpVinculoMascotas = 0;
+    try {
+      MASCOTAS_LISTA.forEach(m => {
+        const vinculoRaw = Number(_getMemoryItem(`sa_mascota_vinculo_${u}_${m}`) || 0);
+        xpVinculoMascotas += Math.round(vinculoRaw * 0.15);
+      });
+    } catch {}
+
     const extra = Math.max(0, Number(_getMemoryItem(`sa_experiencia_extra_${u}`)) || 0);
-    return extra + xpMinijuegos + xpAventura + xpRoguelike;
+    return extra + xpMinijuegos + xpAventura + xpRoguelike + xpVinculoMascotas;
   };
 
   // Cálculo de Experiencia de Pareja (fotos conjuntas, notas de amor, visitas consecutivas y cariño mutuo)
@@ -305,7 +579,7 @@
         parejaTituloEl.innerHTML = `${nivelPar.nombre} <span class="pareja-titulo-svg-wrap">${nivelPar.iconoSvg}</span>`;
       }
       if (parejaTotalEl) {
-        parejaTotalEl.innerHTML = `<span class="xp-corazon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span> <span>${xpPar} Amor XP</span>`;
+        parejaTotalEl.textContent = `${xpPar} Amor XP`;
       }
       if (nivelPar.siguiente) {
         const pctPar = ((xpPar - nivelPar.minimo) / (nivelPar.siguiente - nivelPar.minimo)) * 100;

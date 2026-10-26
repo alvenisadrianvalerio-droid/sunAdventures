@@ -44,7 +44,13 @@
         window.AlbumApp.modules.logros?.renderExperiencia();
       } else if (nombre === "mascotas" && typeof window._renderMascotasGrid === "function") {
         window._renderMascotasGrid();
+      } else if (nombre === "calendario") {
+        window.AlbumApp.modules.eventos?.renderCalendario?.();
       }
+      
+      // Notificar ciclo de vida SPA para que módulos secundarios liberen memoria/pausen animaciones
+      window.dispatchEvent(new CustomEvent("sunad:vista-cambiada", { detail: { vista: nombre } }));
+      
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) { console.warn("mostrarVista:", err); }
   }

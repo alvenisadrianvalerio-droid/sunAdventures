@@ -308,6 +308,98 @@ if (!window._extraVistas.includes("diccionario")) {
     renderHistorial();
   }
 
+  // Conversión de Rōmaji a Hiragana para búsqueda en japonés
+  const ROMAJI_TO_HIRAGANA = {
+    'kya':'きゃ','kyu':'きゅ','kyo':'きょ',
+    'sha':'しゃ','shu':'しゅ','sho':'しょ',
+    'cha':'ちゃ','chu':'ちゅ','cho':'ちょ',
+    'nya':'にゃ','nyu':'にゅ','nyo':'にょ',
+    'hya':'ひゃ','hyu':'ひゅ','hyo':'ひょ',
+    'mya':'みゃ','myu':'みゅ','myo':'みょ',
+    'rya':'りゃ','ryu':'りゅ','ryo':'りょ',
+    'gya':'ぎゃ','gyu':'ぎゅ','gyo':'ぎょ',
+    'ja':'じゃ','ju':'じゅ','jo':'じょ',
+    'jya':'じゃ','jyu':'じゅ','jyo':'じょ',
+    'bya':'びゃ','byu':'びゅ','byo':'びょ',
+    'pya':'ぴゃ','pyu':'ぴゅ','pyo':'ぴょ',
+    'shi':'し','chi':'ち','tsu':'つ','fu':'ふ',
+    'ka':'か','ki':'き','ku':'く','ke':'け','ko':'こ',
+    'sa':'さ','si':'し','su':'す','se':'せ','so':'そ',
+    'ta':'た','ti':'ち','tu':'つ','te':'て','to':'と',
+    'na':'な','ni':'に','nu':'ぬ','ne':'ね','no':'の',
+    'ha':'は','hi':'ひ','hu':'ふ','he':'へ','ho':'ほ',
+    'ma':'ま','mi':'み','mu':'む','me':'め','mo':'も',
+    'ya':'や','yu':'ゆ','yo':'よ',
+    'ra':'ら','ri':'り','ru':'る','re':'れ','ro':'ろ',
+    'wa':'わ','wo':'を',
+    'ga':'が','gi':'ぎ','gu':'ぐ','ge':'げ','go':'ご',
+    'za':'ざ','ji':'じ','zu':'ず','ze':'ぜ','zo':'ぞ',
+    'da':'だ','di':'ぢ','du':'づ','de':'で','do':'ど',
+    'ba':'ば','bi':'び','bu':'ぶ','be':'べ','bo':'ぼ',
+    'pa':'ぱ','pi':'ぴ','pu':'ぷ','pe':'ぺ','po':'ぽ',
+    'a':'あ','i':'い','u':'う','e':'え','o':'お','n':'ん'
+  };
+
+  function romajiAHiragana(texto) {
+    if (!texto) return '';
+    let str = texto.toLowerCase()
+      .replace(/ō/g, 'ou').replace(/ū/g, 'uu').replace(/ā/g, 'aa').replace(/ē/g, 'ee').replace(/ī/g, 'ii')
+      .replace(/o\u0304/g, 'ou').replace(/u\u0304/g, 'uu').replace(/a\u0304/g, 'aa').replace(/e\u0304/g, 'ee').replace(/i\u0304/g, 'ii');
+    
+    let res = '';
+    let i = 0;
+    while (i < str.length) {
+      if (i + 1 < str.length && str[i] === str[i+1] && 'bcdfghjklmpqrstvwxyz'.includes(str[i]) && str[i] !== 'n') {
+        res += 'っ';
+        i++;
+        continue;
+      }
+      const c3 = str.slice(i, i + 3);
+      if (ROMAJI_TO_HIRAGANA[c3]) {
+        res += ROMAJI_TO_HIRAGANA[c3];
+        i += 3;
+        continue;
+      }
+      const c2 = str.slice(i, i + 2);
+      if (ROMAJI_TO_HIRAGANA[c2]) {
+        res += ROMAJI_TO_HIRAGANA[c2];
+        i += 2;
+        continue;
+      }
+      const c1 = str.slice(i, i + 1);
+      if (ROMAJI_TO_HIRAGANA[c1]) {
+        if (c1 === 'n' && i + 1 < str.length && 'aiueoy'.includes(str[i+1])) {
+          res += c1;
+        } else {
+          res += ROMAJI_TO_HIRAGANA[c1];
+        }
+        i += 1;
+        continue;
+      }
+      res += str[i];
+      i++;
+    }
+    return res;
+  }
+
+  function generarCandidatosJapones(q) {
+    const norm = (q || '').trim().toLowerCase();
+    const hira1 = romajiAHiragana(norm);
+    const set = new Set();
+    if (hira1 && hira1 !== norm) set.add(hira1);
+    if (norm.endsWith('o') && !norm.endsWith('ou')) {
+      const hO = romajiAHiragana(norm + 'u');
+      if (hO && hO !== norm) set.add(hO);
+    }
+    if (norm.endsWith('u') && !norm.endsWith('uu')) {
+      const hU = romajiAHiragana(norm + 'u');
+      if (hU && hU !== norm) set.add(hU);
+    }
+    if (hira1.endsWith('わ')) set.add(hira1.slice(0, -1) + 'は');
+    if (hira1.endsWith('は')) set.add(hira1.slice(0, -1) + 'わ');
+    return Array.from(set).filter(c => c && c !== norm);
+  }
+
   // Detección de caracteres CJK (Japonés, Coreano, Chino)
   function detectarScript(texto) {
     if (/[\uac00-\ud7af\u1100-\u11ff]/.test(texto)) return "ko"; // Coreano Hangul
@@ -434,7 +526,7 @@ if (!window._extraVistas.includes("diccionario")) {
       if (!seccionActual) continue;
 
       // Pronunciación / Lectura
-      if (/^===?\s*Pronunciation/i.test(l)) {
+      if (/^={3,5}\s*Pronunciation/i.test(l)) {
         for (let j = i + 1; j < lines.length; j++) {
           if (lines[j] && !lines[j].startsWith("=")) {
             if (!seccionActual.lectura) seccionActual.lectura = lines[j];
@@ -445,7 +537,7 @@ if (!window._extraVistas.includes("diccionario")) {
       }
 
       // Etimología
-      if (/^===?\s*Etymology/i.test(l)) {
+      if (/^={3,5}\s*Etymology/i.test(l)) {
         for (let j = i + 1; j < lines.length; j++) {
           if (lines[j] && !lines[j].startsWith("=")) {
             seccionActual.etimologia = lines[j];
@@ -458,9 +550,15 @@ if (!window._extraVistas.includes("diccionario")) {
       }
 
       // Categoría gramatical
-      if (/^===?\s*(Noun|Verb|Adjective|Adverb|Proper noun|Interjection|Phrase|Prefix|Suffix|Counter)/i.test(l)) {
+      if (/^={3,5}\s*(Noun|Verb|Adjective|Adverb|Proper noun|Interjection|Phrase|Prefix|Suffix|Counter)/i.test(l)) {
         categoriaActual = l.replace(/=/g, "").trim();
         if (!seccionActual.categoria) seccionActual.categoria = categoriaActual;
+        continue;
+      }
+
+      // Subsecciones que terminan el bloque de definiciones
+      if (/^={3,5}\s*(Usage notes|Derived terms|Idioms|Descendants|References|Etymology|Readings|Compounds|Alternative forms|Conjugation|Synonyms|Antonyms|Related terms)/i.test(l)) {
+        categoriaActual = "";
         continue;
       }
 
@@ -522,6 +620,90 @@ if (!window._extraVistas.includes("diccionario")) {
     };
   }
 
+  // Resolver términos en rōmaji a su definición japonesa
+  async function resolverRomajiJapones(q) {
+    const candidatos = generarCandidatosJapones(q);
+    if (!candidatos.length) return null;
+
+    const titulos = [q, ...candidatos];
+    const urlEn = `https://en.wiktionary.org/w/api.php?action=query&prop=extracts|revisions&rvprop=content&rvslots=main&explaintext=1&titles=${encodeURIComponent(titulos.join('|'))}&format=json&origin=*`;
+    const res = await fetch(urlEn);
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const pages = Object.values(data?.query?.pages || {});
+
+    // 1. Revisar si alguna página de candidatos ya contiene sección japonesa con definiciones
+    let combinedAudios = {};
+    pages.forEach(p => {
+      const wt = p?.revisions?.[0]?.slots?.main?.["*"] || "";
+      const aud = extraerAudiosDeWikitext(wt);
+      Object.assign(combinedAudios, aud);
+    });
+
+    for (const p of pages) {
+      if (p.missing !== undefined || !p.extract) continue;
+      const parsed = parsearEnWiktionary(p.extract, p.title, combinedAudios);
+      if (parsed) {
+        const secJa = parsed.secciones.find(s => (s.idiomaRaw || "").toLowerCase() === "japanese" || s.idioma.includes("Japonés"));
+        if (secJa && secJa.definiciones && secJa.definiciones.length > 0) {
+          // Si el título es kana/kanji, agregar subtítulo de rōmaji
+          if (!secJa.lectura) secJa.lectura = `${p.title} (${q})`;
+          parsed.palabra = `${p.title} (${q})`;
+          return parsed;
+        }
+      }
+    }
+
+    // 2. Extraer destinos de {{ja-see|...}} o Rōmaji transcription
+    const targetWords = [];
+    pages.forEach(p => {
+      if (p.missing !== undefined) return;
+      const wt = p?.revisions?.[0]?.slots?.main?.["*"] || "";
+      const seeMatch = wt.match(/\{\{ja-see(?:-kango)?\|([^}|]+)/i);
+      if (seeMatch) {
+        let t = seeMatch[1].trim();
+        if (t.startsWith("term=")) t = t.replace("term=", "").trim();
+        if (t && !targetWords.includes(t)) targetWords.push(t);
+      }
+      const romMatch = wt.match(/Rōmaji transcription of\s+(?:\[\[)?([^\],\n|]+)/i);
+      if (romMatch) {
+        let t = romMatch[1].trim();
+        if (t && !targetWords.includes(t)) targetWords.push(t);
+      }
+    });
+
+    if (targetWords.length > 0) {
+      const urlTargets = `https://en.wiktionary.org/w/api.php?action=query&prop=extracts|revisions&rvprop=content&rvslots=main&explaintext=1&titles=${encodeURIComponent(targetWords.join('|'))}&format=json&origin=*`;
+      const resTargets = await fetch(urlTargets);
+      if (resTargets.ok) {
+        const dataTargets = await resTargets.json();
+        const pagesTargets = Object.values(dataTargets?.query?.pages || {});
+        let targetAudios = { ...combinedAudios };
+        pagesTargets.forEach(pt => {
+          const wt = pt?.revisions?.[0]?.slots?.main?.["*"] || "";
+          const aud = extraerAudiosDeWikitext(wt);
+          Object.assign(targetAudios, aud);
+        });
+
+        for (const pt of pagesTargets) {
+          if (pt.missing !== undefined || !pt.extract) continue;
+          const parsed = parsearEnWiktionary(pt.extract, pt.title, targetAudios);
+          if (parsed) {
+            const secJa = parsed.secciones.find(s => (s.idiomaRaw || "").toLowerCase() === "japanese" || s.idioma.includes("Japonés"));
+            if (secJa && secJa.definiciones && secJa.definiciones.length > 0) {
+              if (!secJa.lectura) secJa.lectura = `${pt.title} (${q})`;
+              parsed.palabra = `${pt.title} (${q})`;
+              return parsed;
+            }
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
   // Consulta asíncrona universal
   async function consultarDefinicion(palabra) {
     const q = palabra.trim();
@@ -550,6 +732,19 @@ if (!window._extraVistas.includes("diccionario")) {
         }
       } catch (e) {
         console.warn("[Diccionario] Error consultando término asiático:", e);
+      }
+    }
+
+    // Si el término está en alfabeto latino pero coincide con vocablos o fonética en Rōmaji japonés
+    if (script === "lat") {
+      try {
+        const resRomaji = await resolverRomajiJapones(q);
+        if (resRomaji && resRomaji.secciones && resRomaji.secciones.length > 0) {
+          cacheDiccionario.set(qKey, resRomaji);
+          return resRomaji;
+        }
+      } catch (e) {
+        console.warn("[Diccionario] Error resolviendo rōmaji:", e);
       }
     }
 

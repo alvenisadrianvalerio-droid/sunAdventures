@@ -90,6 +90,7 @@
         await Promise.allSettled([
           window.AlbumApp.modules.fotos?.render(),
           Promise.resolve(window.AlbumApp.modules.notas?.renderNotas()),
+          Promise.resolve(window.AlbumApp.modules.eventos?.cargarEventos?.()),
           Promise.resolve(window.AlbumApp.modules.logros?.renderLogros())
         ]);
 
@@ -102,6 +103,7 @@
         window._sunUserEmail = "";
         window.AlbumApp.modules.fotos?.setFotos([]);
         window.AlbumApp.modules.notas?.setNotas([]);
+        window.AlbumApp.modules.eventos?.setEventos?.([]);
         if (grid) grid.innerHTML = ""; if (empty) empty.classList.remove("hidden");
         if (notasGrid) notasGrid.innerHTML = ""; if (notasEmpty) notasEmpty.classList.remove("hidden");
         if (calendarioEmpty) calendarioEmpty.classList.remove("hidden");

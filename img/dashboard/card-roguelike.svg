@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="portalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A29BFE"/>
+      <stop offset="50%" stop-color="#6C5CE7"/>
+      <stop offset="100%" stop-color="#2D3436"/>
+    </linearGradient>
+    <linearGradient id="d20Face" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7675"/>
+      <stop offset="100%" stop-color="#D63031"/>
+    </linearGradient>
+    <filter id="rogueGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#6C5CE7" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Swirling Astral Rift Portal -->
+  <g transform="translate(80, 80)" filter="url(#rogueGlow)">
+    <circle cx="0" cy="0" r="54" fill="url(#portalGrad)"/>
+    <ellipse cx="0" cy="0" rx="46" ry="24" fill="none" stroke="#FD79A8" stroke-width="2.5" opacity="0.8" transform="rotate(-25)"/>
+    <ellipse cx="0" cy="0" rx="46" ry="24" fill="none" stroke="#FFEAA7" stroke-width="2" opacity="0.7" transform="rotate(40)"/>
+    <circle cx="0" cy="0" r="28" fill="#181926" opacity="0.9"/>
+  </g>
+
+  <!-- Glowing d20 Polyhedral Die -->
+  <g transform="translate(80, 80) scale(0.95)" filter="url(#rogueGlow)">
+    <!-- Central Triangle -->
+    <polygon points="0,-28 -28,18 28,18" fill="url(#d20Face)" stroke="#FFF275" stroke-width="2"/>
+    <!-- Top vertex facets -->
+    <polygon points="0,-28 -34,-6 -28,18" fill="#E84393" stroke="#FFF275" stroke-width="1.8"/>
+    <polygon points="0,-28 34,-6 28,18" fill="#FF7675" stroke="#FFF275" stroke-width="1.8"/>
+    <polygon points="0,-28 -24,-38 0,-44" fill="#FD79A8" stroke="#FFF275" stroke-width="1.5"/>
+    <polygon points="0,-28 24,-38 0,-44" fill="#FFA5A5" stroke="#FFF275" stroke-width="1.5"/>
+    <!-- Bottom vertex facets -->
+    <polygon points="-28,18 0,38 28,18" fill="#C0392B" stroke="#FFF275" stroke-width="1.8"/>
+    <polygon points="-28,18 -34,-6 -40,12" fill="#962D3E" stroke="#FFF275" stroke-width="1.5"/>
+    <polygon points="28,18 34,-6 40,12" fill="#E17055" stroke="#FFF275" stroke-width="1.5"/>
+
+    <!-- Critical 20 on front face -->
+    <text x="0" y="8" font-family="'Outfit', sans-serif" font-size="19" font-weight="900" fill="#FFFFFF" text-anchor="middle">20</text>
+  </g>
+
+  <!-- Cosmic runes and particles -->
+  <circle cx="28" cy="42" r="3" fill="#FFF275"/>
+  <circle cx="132" cy="116" r="3.5" fill="#FD79A8"/>
+  <polygon points="126,38 129,43 134,45 129,47 126,52 124,47 119,45 124,43" fill="#FFEAA7"/>
+</svg>

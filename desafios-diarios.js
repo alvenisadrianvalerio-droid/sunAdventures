@@ -48,36 +48,96 @@
   }
 
   function render(estado = cargarEstado()) {
-    const card = document.getElementById("desafio-minijuegos");
-    if (!card) return;
-
     const progreso = Math.min(estado.juegos.length, META);
-    const barra = document.getElementById("desafio-minijuegos-progreso");
-    const medidor = card.querySelector('[role="progressbar"]');
-    const mensaje = document.getElementById("desafio-minijuegos-estado");
-    const juegos = document.getElementById("desafio-minijuegos-juegos");
     const completo = estado.reclamado;
+    const listoParaReclamar = !completo && estado.juegos.length >= META;
 
-    if (barra) barra.style.width = `${progreso / META * 100}%`;
-    if (medidor) medidor.setAttribute("aria-valuenow", String(progreso));
-    if (mensaje) {
-      mensaje.textContent = completo
-        ? "¡Reto completado!"
-        : `${progreso} de ${META} minijuegos distintos`;
-    }
-    if (juegos) {
-      if (completo) {
-        juegos.textContent = `¡Buen trabajo! Recibiste ${PREMIO_MONEDAS} SunCoins y ${PREMIO_XP} XP.`;
-      } else if (estado.juegos.length) {
-        juegos.textContent = `Probaste: ${estado.juegos.map(nombreJuego).join(" · ")}.`;
-      } else {
-        juegos.textContent = "Completa cualquier minijuego para empezar.";
+    // 1. Render en vista Minijuegos
+    const cardMinijuegos = document.getElementById("desafio-minijuegos");
+    if (cardMinijuegos) {
+      const barra = document.getElementById("desafio-minijuegos-progreso");
+      const medidor = cardMinijuegos.querySelector('[role="progressbar"]');
+      const mensaje = document.getElementById("desafio-minijuegos-estado");
+      const juegos = document.getElementById("desafio-minijuegos-juegos");
+
+      if (barra) barra.style.width = `${(progreso / META) * 100}%`;
+      if (medidor) medidor.setAttribute("aria-valuenow", String(progreso));
+      if (mensaje) {
+        mensaje.textContent = completo
+          ? "¡Reto completado!"
+          : `${progreso} de ${META} minijuegos distintos`;
       }
+      if (juegos) {
+        if (completo) {
+          juegos.textContent = `¡Buen trabajo! Recibiste ${PREMIO_MONEDAS} SunCoins y ${PREMIO_XP} XP.`;
+        } else if (estado.juegos.length) {
+          juegos.textContent = `Probaste: ${estado.juegos.map(nombreJuego).join(" · ")}.`;
+        } else {
+          juegos.textContent = "Completa cualquier minijuego para empezar.";
+        }
+      }
+      cardMinijuegos.classList.toggle("completado", completo);
     }
-    card.classList.toggle("completado", completo);
+
+    // 2. Render en Widget Bento del Dashboard / Lobby
+    const cardBento = document.getElementById("bento-reto-diario");
+    if (cardBento) {
+      const barraBento = document.getElementById("bento-reto-progreso");
+      const medidorBento = cardBento.querySelector('[role="progressbar"]');
+      const conteoBento = document.getElementById("bento-reto-conteo");
+      const descBento = document.getElementById("bento-reto-desc");
+      const btnReclamar = document.getElementById("btn-bento-reto-reclamar");
+
+      if (barraBento) barraBento.style.width = `${(progreso / META) * 100}%`;
+      if (medidorBento) medidorBento.setAttribute("aria-valuenow", String(progreso));
+      if (conteoBento) {
+        conteoBento.textContent = `${progreso}/${META}`;
+      }
+      if (descBento) {
+        if (completo) {
+          descBento.textContent = "¡Completado hoy! Vuelve mañana por más recompensas.";
+        } else if (listoParaReclamar) {
+          descBento.textContent = "¡Meta cumplida! Reclama tus monedas y XP ahora.";
+        } else if (estado.juegos.length === 1) {
+          descBento.textContent = `1 minijuego listo. Falta 1 más para ganar +${PREMIO_MONEDAS} SunCoins.`;
+        } else {
+          descBento.textContent = `Prueba 2 minijuegos distintos hoy para ganar +${PREMIO_MONEDAS} SunCoins y +${PREMIO_XP} XP.`;
+        }
+      }
+
+      if (btnReclamar) {
+        if (completo) {
+          btnReclamar.disabled = true;
+          btnReclamar.classList.remove("reclamable");
+          btnReclamar.classList.add("completado");
+          btnReclamar.innerHTML = `
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Reclamado</span>
+          `;
+        } else if (listoParaReclamar) {
+          btnReclamar.disabled = false;
+          btnReclamar.classList.add("reclamable");
+          btnReclamar.classList.remove("completado");
+          btnReclamar.innerHTML = `
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span>Reclamar</span>
+          `;
+        } else {
+          btnReclamar.disabled = true;
+          btnReclamar.classList.remove("reclamable", "completado");
+          btnReclamar.innerHTML = `
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>${progreso}/${META} Listo</span>
+          `;
+        }
+      }
+
+      cardBento.classList.toggle("reto-completado", completo);
+      cardBento.classList.toggle("reto-listo", listoParaReclamar);
+    }
   }
 
-  function reclamarPremio(estado) {
+  function reclamarPremio(estado = cargarEstado()) {
     if (estado.reclamado || estado.juegos.length < META) return;
 
     const xpKey = `sa_experiencia_extra_${getUsuario()}`;
@@ -102,8 +162,8 @@
     window.dispatchEvent(new Event("sunad:progress"));
     window._snd?.("victoria");
     window.SunModal?.alert({
-      title: "¡Reto completado!",
-      message: `Has probado dos minijuegos distintos. Recibiste <strong>+${PREMIO_MONEDAS} SunCoins</strong> y <strong>+${PREMIO_XP} XP</strong>.`,
+      title: "¡Reto Diario Completado!",
+      message: `Has probado los minijuegos de hoy. Recibiste <strong>+${PREMIO_MONEDAS} SunCoins</strong> y <strong>+${PREMIO_XP} XP</strong>.`,
       variant: "success",
       icon: "🏆",
       confirmText: "¡Genial!"
@@ -119,9 +179,16 @@
       estado.juegos.push(overlay.id);
       if (!guardarEstado(estado)) return;
     }
-    reclamarPremio(estado);
     render(estado);
   }
+
+  // Listener para el botón interactivo de Reclamar en el widget de lobby
+  document.addEventListener("click", event => {
+    const btn = event.target.closest("#btn-bento-reto-reclamar");
+    if (btn && !btn.disabled) {
+      reclamarPremio();
+    }
+  });
 
   window.addEventListener("sunad:progress", registrarMinijuego);
   window.addEventListener("sunad:user-ready", () => render());

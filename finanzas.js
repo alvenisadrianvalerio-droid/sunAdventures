@@ -1,8 +1,8 @@
 (() => {
   "use strict";
 
-  const $ = (s, r = document) => r.querySelector(s);
-  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const $ = (s, r = document) => r?.querySelector ? r.querySelector(s) : null;
+  const $$ = (s, r = document) => r?.querySelectorAll ? [...r.querySelectorAll(s)] : [];
 
   const ui = {
     app: $("#finanzas-app"),
@@ -156,11 +156,121 @@
     const usdDetail = code === "VES"
       ? `${escapeHtml(q.usd.source)} · ${quoteText(copy.bcvDate, { date: q.usd.asOf })}`
       : `${escapeHtml(q.usd.source)} · ${escapeHtml(q.usd.asOf)}`;
-    const rows = [`<article class="finanzas-quote-value"><span>${code === "VES" ? copy.usdLabel : `${code} / USD`}</span><strong>${usdTitle}</strong><small>${usdDetail}${usdTrend ? ` · ${usdTrend}` : ""}</small></article>`];
-    if (q.usdt) {
-      const usdtTrend = trend(q.usdt.localPerUsdt, prev?.usdt);
-      rows.push(`<article class="finanzas-quote-value"><span>${copy.usdtLabel}</span><strong>${quoteText(copy.usdtPerLocal, { rate: quoteNumber(q.usdt.localPerUsdt, 2) })}</strong><small>${quoteText(copy.vesPerUsdt, { rate: quoteNumber(q.usdt.value, 6) })} · ${escapeHtml(q.usdt.source)} · ${copy.buy} ${quoteNumber(q.usdt.buyLocalPerUsdt, 2)} / ${copy.sell} ${quoteNumber(q.usdt.sellLocalPerUsdt, 2)}${usdtTrend ? ` · ${usdtTrend}` : ""}</small></article>`);
+    const formatBs = num => `${quoteNumber(num, 2)} Bs.`;
+    
+    // Tarjetas estilo FinControl
+    let cardsHtml = "";
+    if (code === "VES") {
+      const bcvVal = q.usd.localPerUsd || (1 / q.usd.value);
+      const usdtVal = q.usdt?.localPerUsdt || (bcvVal * 1.15);
+      const usdtBuy = q.usdt?.buyLocalPerUsdt || usdtVal;
+      const usdtSell = q.usdt?.sellLocalPerUsdt || usdtVal;
+      const eurVal = bcvVal * 1.09; // Tasa referencial EUR si no viene del feed
+
+      cardsHtml = `
+      <div class="fincontrol-rates-grid">
+        <!-- Tarjeta USD -->
+        <article class="fincontrol-rate-card">
+          <div class="fincontrol-rate-top">
+            <div class="fincontrol-rate-title-wrap">
+              <div class="fincontrol-rate-avatar usd">$</div>
+              <div>
+                <strong>Dólar (USD)</strong>
+                <small>USD / VES</small>
+              </div>
+            </div>
+            <span class="fincontrol-badge outline">Oficial & P2P</span>
+          </div>
+          <div class="fincontrol-rate-body">
+            <div class="fincontrol-rate-box">
+              <div>
+                <span class="fincontrol-rate-box-label">Tasa Oficial (BCV)</span>
+                <strong class="fincontrol-rate-box-val">${formatBs(bcvVal)}</strong>
+              </div>
+              <button type="button" class="fincontrol-btn-copy" data-copy-val="${bcvVal.toFixed(2)}" title="Copiar tasa">Copiar</button>
+            </div>
+            <div class="fincontrol-rate-box">
+              <div>
+                <span class="fincontrol-rate-box-label">Paralelo / Referencia</span>
+                <strong class="fincontrol-rate-box-val">${formatBs(usdtVal)}</strong>
+              </div>
+              <button type="button" class="fincontrol-btn-copy" data-copy-val="${usdtVal.toFixed(2)}" title="Copiar tasa">Copiar</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Tarjeta USDT -->
+        <article class="fincontrol-rate-card">
+          <div class="fincontrol-rate-top">
+            <div class="fincontrol-rate-title-wrap">
+              <div class="fincontrol-rate-avatar usdt">₮</div>
+              <div>
+                <strong>Tether (USDT)</strong>
+                <small>Binance P2P</small>
+              </div>
+            </div>
+            <span class="fincontrol-badge success">En Vivo</span>
+          </div>
+          <div class="fincontrol-rate-body">
+            <div class="fincontrol-rate-box">
+              <div>
+                <span class="fincontrol-rate-box-label">Precio P2P Promedio</span>
+                <strong class="fincontrol-rate-box-val text-emerald">${formatBs(usdtVal)}</strong>
+              </div>
+              <button type="button" class="fincontrol-btn-copy" data-copy-val="${usdtVal.toFixed(2)}" title="Copiar tasa">Copiar</button>
+            </div>
+            <div class="fincontrol-rate-sub-metrics">
+              <div><small>Compra</small> <span>${formatBs(usdtBuy)}</span></div>
+              <div><small>Venta</small> <span>${formatBs(usdtSell)}</span></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Tarjeta EURO -->
+        <article class="fincontrol-rate-card">
+          <div class="fincontrol-rate-top">
+            <div class="fincontrol-rate-title-wrap">
+              <div class="fincontrol-rate-avatar eur">€</div>
+              <div>
+                <strong>Euro (EUR)</strong>
+                <small>EUR / VES</small>
+              </div>
+            </div>
+            <span class="fincontrol-badge outline">BCV Ref</span>
+          </div>
+          <div class="fincontrol-rate-body">
+            <div class="fincontrol-rate-box">
+              <div>
+                <span class="fincontrol-rate-box-label">Tasa Oficial (BCV)</span>
+                <strong class="fincontrol-rate-box-val">${formatBs(eurVal)}</strong>
+              </div>
+              <button type="button" class="fincontrol-btn-copy" data-copy-val="${eurVal.toFixed(2)}" title="Copiar tasa">Copiar</button>
+            </div>
+          </div>
+        </article>
+      </div>`;
+    } else {
+      cardsHtml = `<div class="finanzas-quote-values">
+        <article class="finanzas-quote-value"><span>${code} / USD</span><strong>${usdTitle}</strong><small>${usdDetail}${usdTrend ? ` · ${usdTrend}` : ""}</small></article>
+      </div>`;
     }
+
+    ui.quoteValues.innerHTML = cardsHtml;
+
+    // Listeners para los botones de copiar
+    $$("[data-copy-val]", ui.quoteValues).forEach(btn => {
+      btn.addEventListener("click", () => {
+        navigator.clipboard?.writeText(btn.dataset.copyVal);
+        const originalText = btn.textContent;
+        btn.textContent = "✓ Copiado";
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove("copied");
+        }, 1800);
+      });
+    });
+
     const chartSvg = sparkline(history, code);
     if (chartSvg) {
       ui.quoteChart.innerHTML = chartSvg;
@@ -551,8 +661,12 @@
     ui.quoteCard.hidden = state.section !== "cotizaciones";
     ui.reminderCard.hidden = state.section !== "recordatorios";
     ui.panel.hidden = state.section === "cotizaciones" || state.section === "recordatorios";
-    ui.period.closest(".finanzas-toolbar").hidden = ui.panel.hidden;
-    $(".finanzas-scopes").hidden = ui.panel.hidden;
+    const toolbarRow = $(".finanzas-toolbar-row");
+    if (toolbarRow) toolbarRow.hidden = ui.panel.hidden;
+    else {
+      ui.period?.closest(".finanzas-toolbar") && (ui.period.closest(".finanzas-toolbar").hidden = ui.panel.hidden);
+      $(".finanzas-scopes") && ($(".finanzas-scopes").hidden = ui.panel.hidden);
+    }
 
     const settings = state.data?.[activeScope()]?.settings;
     if (settings) { state.currency = settings.moneda; ui.currency.value = state.currency; }
@@ -570,8 +684,22 @@
   }
 
   /* ---------- Dashboard ---------- */
-  function metricCard(label, value, tone, detail = "") {
-    return `<article class="finanzas-metric ${tone}"><span>${escapeHtml(label)}</span><strong>${money(value)}</strong>${detail ? `<small>${escapeHtml(detail)}</small>` : ""}</article>`;
+  function metricCard(label, value, tone, detail = "", iconSvg = "", footerText = "") {
+    let iconClass = "bg-blue";
+    if (tone === "income" || tone === "balance-positive") iconClass = "bg-emerald";
+    else if (tone === "expense" || tone === "balance-negative") iconClass = "bg-rose";
+    
+    return `<article class="finanzas-metric ${tone}">
+      <div class="finanzas-metric-header">
+        <span class="finanzas-metric-label">${escapeHtml(label)}</span>
+        ${iconSvg ? `<div class="finanzas-metric-icon ${iconClass}">${iconSvg}</div>` : ""}
+      </div>
+      <div class="finanzas-metric-value">
+        <strong>${money(value)}</strong>
+      </div>
+      ${detail ? `<div class="finanzas-metric-detail">${escapeHtml(detail)}</div>` : ""}
+      ${footerText ? `<div class="finanzas-metric-footer">${footerText}</div>` : ""}
+    </article>`;
   }
   function categoryOptions(scope, type, selectedId = "") {
     const cats = state.data[scope]?.categories || [];
@@ -906,26 +1034,48 @@
       ui.panel.innerHTML = `<div class="finanzas-empty finanzas-empty-large"><strong>Aún no hay más integrantes</strong><span>Invita a la otra persona a tu grupo desde el menú de perfil → Amigos y grupo para activar los gastos compartidos.</span></div>`;
       return;
     }
-    const metrics = `<div class="finanzas-metrics">
-      ${metricCard("Ingresos del mes", totals.income, "income", "Lo que entró")}
-      ${metricCard("Gastos del mes", totals.expense, "expense", "Lo que gastaste")}
-      ${metricCard("Disponible", balance, balance >= 0 ? "balance-positive" : "balance-negative", balance >= 0 ? "¡Vas con saldo positivo!" : "Atención: gastos mayores a ingresos")}
+    // Íconos SVG estilo FinControl
+    const iconIncome = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M17 7v10H7"/></svg>`;
+    const iconExpense = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>`;
+    const iconProfit = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7L13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/></svg>`;
+    const iconBudget = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>`;
+
+    const periodStr = `${state.period}-01`;
+    const periodBudgets = data.budgets.filter(b => b.periodo === periodStr);
+    const totalBudget = periodBudgets.reduce((s, b) => s + Number(b.limite), 0);
+    const budgetRemaining = totalBudget > 0 ? Math.max(0, totalBudget - totals.expense) : 0;
+    const budgetPct = totalBudget > 0 ? Math.min(100, Math.round((totals.expense / totalBudget) * 100)) : 0;
+
+    const metrics = `<div class="finanzas-metrics ${totalBudget > 0 ? "has-four" : ""}">
+      ${metricCard("Ganancia Neta", balance, balance >= 0 ? "balance-positive" : "balance-negative", `+${money(totals.income)} · -${money(totals.expense)}`, iconProfit, `<span class="finanzas-metric-link" data-nav-to="reportes">Ver balance detallado →</span>`)}
+      ${metricCard("Ingresos", totals.income, "income", `${totals.incomes.length} cobro(s) registrados`, iconIncome, `<span class="finanzas-metric-link" data-open-quick-add data-quick-type="ingreso">+ Registrar ingreso</span>`)}
+      ${metricCard("Gastos", totals.expense, "expense", `${totals.expenses.length} egreso(s) registrados`, iconExpense, `<span class="finanzas-metric-link" data-open-quick-add data-quick-type="gasto">+ Registrar gasto</span>`)}
+      ${totalBudget > 0 ? metricCard("Presupuesto Restante", budgetRemaining, budgetRemaining > 0 ? "balance-positive" : "balance-negative", `${budgetPct}% consumido de ${money(totalBudget)}`, iconBudget, `<span class="finanzas-metric-link" data-nav-to="presupuestos">Ajustar presupuestos →</span>`) : ""}
     </div>`;
 
     const svgCard = `<svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:-3px;margin-left:5px;display:inline-block;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>`;
     const svgCouple = `<svg viewBox="0 0 24 24" width="20" height="20" style="vertical-align:-3px;margin-left:5px;display:inline-block;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`;
-    const svgPlus = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
-    const svgLightbulb = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>`;
-    const svgSparkles = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>`;
+    const svgRates = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>`;
 
     const heroQuick = `<div class="finanzas-hero-quick">
       <div class="finanzas-hero-text">
-        <h2>${isCouple ? `Finanzas en Pareja ${svgCouple}` : `Tu resumen financiero ${svgCard}`}</h2>
-        <p>${rows.length ? `Llevas <strong>${rows.length} movimientos</strong> registrados en ${escapeHtml(state.period)}.` : "Aún no has registrado movimientos este mes. ¡Anota el primero en un clic!"}</p>
+        <div class="finanzas-hero-title-row">
+          <h2>${isCouple ? `Finanzas en Pareja ${svgCouple}` : `Panel de Control ${svgCard}`}</h2>
+          <span class="finanzas-live-badge"><span class="finanzas-pulse-dot"></span>En tiempo real</span>
+        </div>
+        <p>${rows.length ? `Resumen de <strong>${rows.length} movimientos</strong> y liquidez en <strong>${escapeHtml(state.period)}</strong>.` : "Resumen en tiempo real de ingresos, gastos y liquidez."}</p>
       </div>
       <div class="finanzas-hero-actions">
-        <button type="button" class="btn-primary finanzas-btn-big-add" data-open-quick-add>
-          ${svgPlus} Registrar movimiento
+        <button type="button" class="btn-secondary finanzas-btn-action" data-nav-to="cotizaciones">
+          ${svgRates} Tasas en Vivo
+        </button>
+        <button type="button" class="btn-primary finanzas-btn-action success" data-open-quick-add data-quick-type="ingreso">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10M17 7v10H7"/></svg>
+          Nuevo Ingreso
+        </button>
+        <button type="button" class="btn-primary finanzas-btn-action danger" data-open-quick-add data-quick-type="gasto">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          Registrar Gasto
         </button>
       </div>
     </div>`;
@@ -938,7 +1088,7 @@
         </div>
         <button type="button" class="finanzas-text-button" data-nav-to="movimientos">Ver todos (${rows.length}) →</button>
       </div>
-      ${movementsList(scope, rows.slice(0, 5))}
+      ${movementsList(scope, rows.slice(0, 6))}
     </section>`;
 
     const sections = {
@@ -993,65 +1143,67 @@
     const txForm = $("#finanzas-movimiento-form", ui.panel);
     
     // Conmutador interactivo Gasto / Ingreso
-    $$("[data-set-type]", txForm || ui.panel).forEach(btn => {
-      btn.addEventListener("click", () => {
-        const type = btn.dataset.setType;
-        const hiddenType = $('input[name="tipo"]', txForm);
-        if (hiddenType) hiddenType.value = type;
-        $$("[data-set-type]", txForm).forEach(b => b.classList.toggle("active", b === btn));
-        const catSel = $('select[name="categoria_id"]', txForm);
-        if (catSel) catSel.innerHTML = categoryOptions(scope, type);
-        const quickChips = $("#finanzas-quick-cat-chips", txForm);
-        if (quickChips) {
-          quickChips.innerHTML = (state.data[scope]?.categories || []).filter(c => c.tipo === type).slice(0, 6).map(c => 
-            `<button type="button" class="finanzas-cat-chip" data-select-cat="${escapeHtml(c.id)}">${escapeHtml(c.nombre)}</button>`
-          ).join("");
-          bindCategoryChips();
-        }
-      });
-    });
-
-    // Selección rápida de categoría con un toque
-    const bindCategoryChips = () => {
-      $$("[data-select-cat]", txForm).forEach(chip => {
-        chip.addEventListener("click", () => {
-          const catId = chip.dataset.selectCat;
+    if (txForm) {
+      $$("[data-set-type]", txForm).forEach(btn => {
+        btn.addEventListener("click", () => {
+          const type = btn.dataset.setType;
+          const hiddenType = $('input[name="tipo"]', txForm);
+          if (hiddenType) hiddenType.value = type;
+          $$("[data-set-type]", txForm).forEach(b => b.classList.toggle("active", b === btn));
           const catSel = $('select[name="categoria_id"]', txForm);
-          if (catSel) catSel.value = catId;
-          $$("[data-select-cat]", txForm).forEach(c => c.classList.toggle("selected", c === chip));
+          if (catSel) catSel.innerHTML = categoryOptions(scope, type);
+          const quickChips = $("#finanzas-quick-cat-chips", txForm);
+          if (quickChips) {
+            quickChips.innerHTML = (state.data[scope]?.categories || []).filter(c => c.tipo === type).slice(0, 6).map(c => 
+              `<button type="button" class="finanzas-cat-chip" data-select-cat="${escapeHtml(c.id)}">${escapeHtml(c.nombre)}</button>`
+            ).join("");
+            bindCategoryChips();
+          }
         });
       });
-    };
-    bindCategoryChips();
 
-    // Chips de montos rápidos (+5, +10, +20, etc.)
-    $$("[data-quick-amount]", txForm || ui.panel).forEach(btn => {
-      btn.addEventListener("click", () => {
-        const inputMonto = $("#finanzas-input-monto", txForm);
-        if (!inputMonto) return;
-        const add = Number(btn.dataset.quickAmount) || 0;
-        const actual = Number(inputMonto.value) || 0;
-        inputMonto.value = (actual + add).toFixed(2);
-        inputMonto.focus();
+      // Selección rápida de categoría con un toque
+      const bindCategoryChips = () => {
+        $$("[data-select-cat]", txForm).forEach(chip => {
+          chip.addEventListener("click", () => {
+            const catId = chip.dataset.selectCat;
+            const catSel = $('select[name="categoria_id"]', txForm);
+            if (catSel) catSel.value = catId;
+            $$("[data-select-cat]", txForm).forEach(c => c.classList.toggle("selected", c === chip));
+          });
+        });
+      };
+      bindCategoryChips();
+
+      // Chips de montos rápidos (+5, +10, +20, etc.)
+      $$("[data-quick-amount]", txForm).forEach(btn => {
+        btn.addEventListener("click", () => {
+          const inputMonto = $("#finanzas-input-monto", txForm);
+          if (!inputMonto) return;
+          const add = Number(btn.dataset.quickAmount) || 0;
+          const actual = Number(inputMonto.value) || 0;
+          inputMonto.value = (actual + add).toFixed(2);
+          inputMonto.focus();
+        });
       });
-    });
 
-    txForm?.addEventListener("change", e => {
-      if (e.target.name === "tipo") {
-        const catSel = $('select[name="categoria_id"]', txForm);
-        catSel.innerHTML = categoryOptions(scope, e.target.value);
-        const quickChips = $("#finanzas-quick-cat-chips", txForm);
-        if (quickChips) {
-          quickChips.innerHTML = (state.data[scope]?.categories || []).filter(c => c.tipo === e.target.value).slice(0, 6).map(c => 
-            `<button type="button" class="finanzas-cat-chip" data-select-cat="${escapeHtml(c.id)}">${escapeHtml(c.nombre)}</button>`
-          ).join("");
-          bindCategoryChips();
+      txForm.addEventListener("change", e => {
+        if (e.target.name === "tipo") {
+          const catSel = $('select[name="categoria_id"]', txForm);
+          if (catSel) catSel.innerHTML = categoryOptions(scope, e.target.value);
+          const quickChips = $("#finanzas-quick-cat-chips", txForm);
+          if (quickChips) {
+            quickChips.innerHTML = (state.data[scope]?.categories || []).filter(c => c.tipo === e.target.value).slice(0, 6).map(c => 
+              `<button type="button" class="finanzas-cat-chip" data-select-cat="${escapeHtml(c.id)}">${escapeHtml(c.nombre)}</button>`
+            ).join("");
+            bindCategoryChips();
+          }
+        } else if (e.target.name === "categoria_id") {
+          $$("[data-select-cat]", txForm).forEach(c => c.classList.toggle("selected", c.dataset.selectCat === e.target.value));
         }
-      } else if (e.target.name === "categoria_id") {
-        $$("[data-select-cat]", txForm).forEach(c => c.classList.toggle("selected", c.dataset.selectCat === e.target.value));
-      }
-    });
-    txForm?.addEventListener("submit", e => { e.preventDefault(); handleForm(txForm, () => saveMovement(txForm, scope)); });
+      });
+      txForm.addEventListener("submit", e => { e.preventDefault(); handleForm(txForm, () => saveMovement(txForm, scope)); });
+    }
     $("[data-finanzas-cancel-edit]", ui.panel)?.addEventListener("click", () => { state.editingId = null; render(); });
 
     $$("[data-edit-movement]", ui.panel).forEach(b => b.addEventListener("click", () => {
@@ -1223,10 +1375,18 @@
     }));
 
     // Navegación rápida desde botones amigables
-    $("[data-open-quick-add]", ui.panel)?.addEventListener("click", () => {
-      state.section = "movimientos";
-      render();
-      $("#finanzas-input-monto", ui.panel)?.focus();
+    $$("[data-open-quick-add]", ui.panel).forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.section = "movimientos";
+        state.editingId = null;
+        render();
+        const quickType = btn.dataset.quickType;
+        if (quickType) {
+          const typeBtn = $(`[data-set-type="${quickType}"]`, ui.panel);
+          if (typeBtn) typeBtn.click();
+        }
+        $("#finanzas-input-monto", ui.panel)?.focus();
+      });
     });
 
     $$("[data-nav-to]", ui.panel).forEach(btn => {
@@ -1291,6 +1451,7 @@
     $$("[data-finanzas-section]").forEach(b => b.addEventListener("click", () => {
       state.section = b.dataset.finanzasSection;
       state.editingId = null;
+      b.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
       render();
     }));
     $$("[data-finanzas-scope]").forEach(b => b.addEventListener("click", () => {
