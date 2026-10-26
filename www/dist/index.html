@@ -1539,66 +1539,214 @@
   <!-- ============================================================
        VISTA CALENDARIO ESPECIAL (Fechas, Aniversarios y Recuerdos)
        ============================================================ -->
+  <!-- ============================================================
+       VISTA CALENDARIO: "NUESTRO TIEMPO" (Four Sunflowers)
+       ============================================================ -->
   <section id="calendario" class="calendario-section view" data-view="calendario">
+    <!-- Header romántico -->
     <div class="calendario-header">
-      <h2 class="calendario-title">Calendario Especial</h2>
-      <p class="calendario-subtitle">Nuestras fechas importantes, aniversarios y recuerdos para celebrar siempre.</p>
-    </div>
-
-    <div class="calendario-actions">
-      <button id="btn-add-evento" class="btn-primary" type="button">
-        <span>+</span> Añadir fecha especial
-      </button>
-      <button id="btn-notif-permiso" class="btn-secondary" type="button" style="display:none;">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      <div class="calendario-header-badge">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
-        Activar recordatorios
-      </button>
+        <span>Four Sunflowers · Diario Compartido</span>
+      </div>
+      <h2 class="calendario-title">Nuestro Tiempo</h2>
+      <p class="calendario-subtitle">Nuestras fechas importantes, recuerdos inolvidables y próximos planes juntos.</p>
     </div>
 
-    <!-- Contenedor Cuadrícula de Calendario -->
-    <div class="calendario-wrapper">
-      <div class="calendario-toolbar">
-        <button id="cal-prev" class="cal-nav-btn" type="button" aria-label="Mes anterior">‹</button>
-        <span id="cal-mes-actual" class="cal-mes-actual">Mes Año</span>
-        <button id="cal-next" class="cal-nav-btn" type="button" aria-label="Mes siguiente">›</button>
+    <!-- Banner Destacado: Cuenta Regresiva de Amor -->
+    <div id="cal-countdown-banner" class="cal-countdown-banner">
+      <div class="cal-countdown-icon">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
       </div>
-
-      <div class="cal-dias-semana" aria-hidden="true">
-        <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+      <div class="cal-countdown-content">
+        <span class="cal-countdown-label">Próximo Hito Especial</span>
+        <h4 id="cal-countdown-title" class="cal-countdown-title">Cargando fecha especial...</h4>
+        <p id="cal-countdown-desc" class="cal-countdown-desc">Cada día cuenta nuestra historia de amor.</p>
       </div>
-
-      <div id="cal-grid" class="cal-grid"></div>
-    </div>
-
-    <!-- Próximas Fechas -->
-    <div class="calendario-proximos-card">
-      <h3 class="cal-seccion-titulo">
-        <span>Próximas Fechas</span>
-        <small class="cal-seccion-sub">Cuenta regresiva de nuestros aniversarios e hitos</small>
-      </h3>
-      <div id="cal-proximos" class="cal-proximos-lista"></div>
-      <div id="cal-proximos-vacio" class="cal-proximos-vacio">
-        <p>No hay fechas programadas próximamente.</p>
-        <p class="cal-vacio-hint">Haz clic en <strong>+ Añadir fecha especial</strong> o en cualquier día del calendario para agendar una.</p>
+      <div class="cal-countdown-badge" id="cal-countdown-badge">
+        <span id="cal-countdown-days" class="cal-countdown-number">--</span>
+        <span class="cal-countdown-unit">días</span>
       </div>
     </div>
 
-    <div id="calendario-empty" class="calendario-empty hidden">
-      <p>Aún no tienes fechas agregadas.</p>
-      <p class="calendario-empty-hint">Guarda cumpleaños, aniversarios y momentos que quieras recordar juntos.</p>
+    <!-- Barra de Controles y Acciones -->
+    <div class="calendario-actions-bar">
+      <!-- Alternador de Vistas: Cuadrícula de Mes vs Agenda Cronológica -->
+      <div class="cal-view-toggle" role="group" aria-label="Cambiar vista del calendario">
+        <button type="button" class="cal-view-btn active" data-cal-view="mes" id="btn-cal-view-mes">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span>Mes</span>
+        </button>
+        <button type="button" class="cal-view-btn" data-cal-view="agenda" id="btn-cal-view-agenda">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          <span>Agenda</span>
+        </button>
+      </div>
+
+      <!-- Leyenda Rápida de Categorías en Escritorio -->
+      <div class="cal-categorias-chips" aria-label="Filtro rápido de planes">
+        <button type="button" class="cal-chip active" data-cat-filter="all">Todos</button>
+        <button type="button" class="cal-chip cat-cita" data-cat-filter="cita">❤️ Cita</button>
+        <button type="button" class="cal-chip cat-viaje" data-cat-filter="viaje">✈️ Viaje</button>
+        <button type="button" class="cal-chip cat-comida" data-cat-filter="comida">🍔 Comida</button>
+        <button type="button" class="cal-chip cat-aniversario" data-cat-filter="aniversario">⭐ Especial</button>
+        <button type="button" class="cal-chip cat-nota" data-cat-filter="nota">📌 Nota</button>
+      </div>
+
+      <div class="calendario-actions-right">
+        <button id="btn-add-evento" class="btn-primary btn-add-plan-primary" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Añadir plan</span>
+        </button>
+        <button id="btn-notif-permiso" class="btn-secondary" type="button" style="display:none;" title="Activar recordatorios automáticos">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span>Recordatorios</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Layout Maestro: Cuadrícula / Agenda y Panel Lateral Dinámico -->
+    <div class="calendario-master-layout">
+      <!-- Columna Principal: Cuadrícula o Agenda -->
+      <div class="calendario-main-column">
+        <!-- VISTA CUADRÍCULA DE MES -->
+        <div id="cal-view-mes-container" class="calendario-wrapper">
+          <div class="calendario-toolbar">
+            <button id="cal-prev" class="cal-nav-btn" type="button" aria-label="Mes anterior">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+            <div class="cal-mes-center">
+              <span id="cal-mes-actual" class="cal-mes-actual">Mes Año</span>
+              <button type="button" id="btn-cal-ir-hoy" class="cal-btn-hoy">Ir a hoy</button>
+            </div>
+            <button id="cal-next" class="cal-nav-btn" type="button" aria-label="Mes siguiente">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+
+          <div class="cal-dias-semana" aria-hidden="true">
+            <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span class="fin-semana">Sáb</span><span class="fin-semana">Dom</span>
+          </div>
+
+          <div id="cal-grid" class="cal-grid"></div>
+        </div>
+
+        <!-- VISTA AGENDA CRONOLÓGICA (Oculta por defecto en vista mes) -->
+        <div id="cal-view-agenda-container" class="calendario-agenda-container hidden">
+          <div class="cal-agenda-header">
+            <h3 class="cal-seccion-titulo">
+              <span>Agenda Compartida</span>
+              <small class="cal-seccion-sub">Línea de tiempo cronológica de nuestros planes y recuerdos</small>
+            </h3>
+          </div>
+          <div id="cal-agenda-lista" class="cal-agenda-lista"></div>
+          <div id="cal-agenda-vacia" class="cal-agenda-vacia hidden">
+            <p>No hay eventos registrados para esta categoría.</p>
+            <button type="button" class="btn-secondary btn-sm" id="btn-agenda-agregar">Crear primer plan</button>
+          </div>
+        </div>
+
+        <!-- Próximas Fechas Destacadas (Mini-feed inferior) -->
+        <div class="calendario-proximos-card">
+          <div class="cal-proximos-header">
+            <h3 class="cal-seccion-titulo">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+              <span>Próximos Momentos</span>
+              <small class="cal-seccion-sub">Los días especiales que vienen pronto</small>
+            </h3>
+          </div>
+          <div id="cal-proximos" class="cal-proximos-lista"></div>
+          <div id="cal-proximos-vacio" class="cal-proximos-vacio">
+            <p>No hay fechas programadas próximamente.</p>
+            <p class="cal-vacio-hint">Haz clic en <strong>+ Añadir plan</strong> o selecciona cualquier día en el calendario.</p>
+          </div>
+        </div>
+
+        <div id="calendario-empty" class="calendario-empty hidden">
+          <p>Aún no tienes fechas agregadas en Nuestro Tiempo.</p>
+          <p class="calendario-empty-hint">Guarda cumpleaños, aniversarios, citas y aventuras que viviremos juntos.</p>
+        </div>
+      </div>
+
+      <!-- Panel Lateral / Bottom Sheet en Móvil para Día Seleccionado -->
+      <aside id="cal-dia-panel" class="cal-dia-panel" aria-label="Planes del día seleccionado">
+        <div class="cal-panel-handle" aria-hidden="true"></div>
+        <div class="cal-panel-header">
+          <div class="cal-panel-fecha-meta">
+            <span id="cal-panel-diasemana" class="cal-panel-diasemana">Hoy</span>
+            <h3 id="cal-panel-fecha-texto" class="cal-panel-fecha-texto">Selecciona un día</h3>
+          </div>
+          <button type="button" id="btn-cerrar-dia-panel" class="cal-panel-close-btn" aria-label="Cerrar panel">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Contenedor de planes del día -->
+        <div id="cal-panel-eventos-lista" class="cal-panel-eventos-lista">
+          <div class="cal-panel-placeholder">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;margin-bottom:8px;">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <p>Haz clic en cualquier día de la cuadrícula para ver o agregar planes aquí.</p>
+          </div>
+        </div>
+
+        <!-- Botón de acción para el día seleccionado -->
+        <div class="cal-panel-footer">
+          <button type="button" id="btn-panel-add-plan" class="btn-primary w-100 btn-panel-add">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span id="btn-panel-add-text">Añadir plan a este día</span>
+          </button>
+        </div>
+      </aside>
     </div>
   </section>
 
-  <!-- MODAL FECHA / EVENTO -->
+  <!-- MODAL FECHA / PLAN ROMÁNTICO -->
   <div id="evento-modal" class="modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-evento-modal></div>
     <div class="modal-content evento-modal-content">
       <div class="evento-modal-header">
         <div class="evento-modal-header-main">
-          <div class="evento-modal-badge" aria-hidden="true">
+          <div class="evento-modal-badge" id="modal-category-preview-badge" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="4" ry="4"></rect>
               <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -1608,8 +1756,8 @@
             </svg>
           </div>
           <div>
-            <h3 id="evento-modal-title" class="evento-modal-title">Fecha especial</h3>
-            <p class="evento-modal-subtitle">Guarda un día inolvidable y programa su recordatorio</p>
+            <h3 id="evento-modal-title" class="evento-modal-title">Añadir Plan o Recuerdo</h3>
+            <p class="evento-modal-subtitle">Organiza una cita, viaje, comida o guarda una fecha inolvidable</p>
           </div>
         </div>
         <button type="button" class="evento-modal-close-btn" data-close-evento-modal aria-label="Cerrar ventana">
@@ -1621,6 +1769,43 @@
       </div>
 
       <form id="evento-form" class="evento-form-modern">
+        <!-- Selector Visual de Categorías -->
+        <div class="evento-field-group">
+          <label class="evento-label">
+            <span class="evento-label-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </span>
+            Tipo de plan o evento
+          </label>
+          <div class="cal-categoria-selector" id="evento-categoria-selector" role="radiogroup" aria-label="Categoría del evento">
+            <button type="button" class="cat-card active" data-categoria="cita" data-color="rosa">
+              <span class="cat-card-icon">❤️</span>
+              <span class="cat-card-name">Cita Romance</span>
+            </button>
+            <button type="button" class="cat-card" data-categoria="viaje" data-color="amarillo">
+              <span class="cat-card-icon">✈️</span>
+              <span class="cat-card-name">Viaje Aventura</span>
+            </button>
+            <button type="button" class="cat-card" data-categoria="comida" data-color="naranja">
+              <span class="cat-card-icon">🍔</span>
+              <span class="cat-card-name">Comida Receta</span>
+            </button>
+            <button type="button" class="cat-card" data-categoria="aniversario" data-color="dorado">
+              <span class="cat-card-icon">⭐</span>
+              <span class="cat-card-name">Aniversario Hito</span>
+            </button>
+            <button type="button" class="cat-card" data-categoria="nota" data-color="cielo">
+              <span class="cat-card-icon">📌</span>
+              <span class="cat-card-name">Nota Recordatorio</span>
+            </button>
+          </div>
+          <input type="hidden" id="evento-categoria" name="categoria" value="cita">
+        </div>
+
         <div class="evento-field-group">
           <label class="evento-label" for="evento-titulo">
             <span class="evento-label-icon">
@@ -1628,27 +1813,45 @@
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
               </svg>
             </span>
-            ¿Qué celebramos?
+            ¿Qué tenemos planeado o celebramos?
           </label>
           <div class="evento-input-wrap">
-            <input type="text" id="evento-titulo" maxlength="60" placeholder="Ej. Cumpleaños de sunchisito, Nuestro Aniversario..." required autocomplete="off">
+            <input type="text" id="evento-titulo" maxlength="60" placeholder="Ej. Cena romántica en terraza, Picnic en el parque..." required autocomplete="off">
           </div>
         </div>
         
-        <div class="evento-field-group">
-          <label class="evento-label" for="evento-fecha">
-            <span class="evento-label-icon">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-            </span>
-            ¿Cuándo es?
-          </label>
-          <div class="evento-input-wrap">
-            <input type="date" id="evento-fecha" required>
+        <!-- Fechas: Inicio y Fin opcional para rangos -->
+        <div class="evento-fechas-grid">
+          <div class="evento-field-group">
+            <label class="evento-label" for="evento-fecha">
+              <span class="evento-label-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </span>
+              Fecha inicio
+            </label>
+            <div class="evento-input-wrap">
+              <input type="date" id="evento-fecha" required>
+            </div>
+          </div>
+
+          <div class="evento-field-group" id="group-evento-fecha-fin">
+            <label class="evento-label" for="evento-fecha-fin">
+              <span class="evento-label-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 14 14"></polyline>
+                </svg>
+              </span>
+              Fecha fin <span class="evento-label-opcional">(opcional)</span>
+            </label>
+            <div class="evento-input-wrap">
+              <input type="date" id="evento-fecha-fin">
+            </div>
           </div>
         </div>
 
@@ -1662,10 +1865,11 @@
             Detalles o dedicatoria <span class="evento-label-opcional">(opcional)</span>
           </label>
           <div class="evento-input-wrap">
-            <textarea id="evento-descripcion" rows="2" maxlength="200" placeholder="Ej. Cena romántica, pastel favorito, regalo sorpresa..."></textarea>
+            <textarea id="evento-descripcion" rows="2" maxlength="200" placeholder="Ej. Llevar cámara, reservar a las 8pm, código de vestimenta..."></textarea>
           </div>
         </div>
 
+        <!-- Paleta de Color complementaria -->
         <div class="evento-field-group">
           <label class="evento-label">
             <span class="evento-label-icon">
@@ -1674,14 +1878,16 @@
                 <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
               </svg>
             </span>
-            Color del recordatorio
+            Color distintivo
           </label>
           <div class="color-picker evento-color-picker">
-            <button type="button" class="color-option color-amarillo activo" data-color="amarillo" aria-label="Color amarillo"></button>
-            <button type="button" class="color-option color-rosa" data-color="rosa" aria-label="Color rosa"></button>
+            <button type="button" class="color-option color-rosa activo" data-color="rosa" aria-label="Color rosa"></button>
+            <button type="button" class="color-option color-amarillo" data-color="amarillo" aria-label="Color amarillo girasol"></button>
+            <button type="button" class="color-option color-naranja" data-color="naranja" aria-label="Color naranja"></button>
+            <button type="button" class="color-option color-dorado" data-color="dorado" aria-label="Color dorado"></button>
+            <button type="button" class="color-option color-cielo" data-color="cielo" aria-label="Color cielo"></button>
             <button type="button" class="color-option color-lila" data-color="lila" aria-label="Color lila"></button>
             <button type="button" class="color-option color-menta" data-color="menta" aria-label="Color menta"></button>
-            <button type="button" class="color-option color-cielo" data-color="cielo" aria-label="Color cielo"></button>
           </div>
         </div>
 
@@ -1713,7 +1919,7 @@
 
           <label class="evento-checkbox-row" for="evento-recurrente">
             <div class="evento-checkbox-wrapper">
-              <input type="checkbox" id="evento-recurrente" checked>
+              <input type="checkbox" id="evento-recurrente">
               <span class="evento-custom-checkbox" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="20 6 9 17 4 12"></polyline>
