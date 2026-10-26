@@ -407,158 +407,160 @@
 
     <div class="lobby view active" data-view="inicio">
       <div class="lobby-content">
-        <!-- Hero Principal con Identidad -->
-        <header class="lobby-hero">
-          <div class="lobby-hero-brand">
-            <img class="lobby-brand-img" src="img/dashboard/brand-four-sunflowers.svg" alt="Four Sunflowers" width="340" height="96" fetchpriority="high" decoding="async">
-            <h1 class="sr-only">Four Sunflowers</h1>
-            <p class="lobby-hero-tagline">Nuestro rincón compartido de recuerdos, juegos y aventuras 🌻</p>
-          </div>
-        </header>
+        <main class="dashboard-hub">
+          <!-- Hero Principal con Identidad -->
+          <header class="lobby-hero">
+            <div class="lobby-hero-brand">
+              <img class="lobby-brand-img" src="img/dashboard/brand-four-sunflowers.svg" alt="Four Sunflowers" width="340" height="96" fetchpriority="high" decoding="async">
+              <h1 class="sr-only">Four Sunflowers</h1>
+              <p class="lobby-hero-tagline">Nuestro rincón compartido de recuerdos, juegos y aventuras 🌻</p>
+            </div>
+          </header>
 
-        <!-- Niveles de Progreso e Interacción -->
-        <div class="experiencia-contenedor">
-          <!-- Tarjeta 1: Nivel Individual del Explorador -->
-          <div class="experiencia-card experiencia-card-individual">
-            <div class="experiencia-badge-tipo">
-              <span class="ui-icon" data-icono="persona"></span> Nivel Individual
+          <!-- Niveles de Progreso e Interacción -->
+          <div class="experiencia-contenedor">
+            <!-- Tarjeta 1: Nivel Individual del Explorador -->
+            <div class="experiencia-card experiencia-card-individual">
+              <div class="experiencia-badge-tipo">
+                <span class="ui-icon" data-icono="persona"></span> Nivel Individual
+              </div>
+              <div class="experiencia-topline">
+                <span id="experiencia-titulo" class="exp-titulo-principal">Novatos</span>
+                <strong class="experiencia-xp-total">
+                  <img class="xp-icon" src="img/items%20de%20aventura/estrella.webp" alt="XP" width="16" height="16" loading="lazy" decoding="async">
+                  <span id="experiencia-xp">0 XP</span>
+                </strong>
+              </div>
+              <div class="experiencia-barra"><span id="experiencia-progreso"></span></div>
+              <small id="experiencia-siguiente">100 XP para Enamorados.</small>
             </div>
-            <div class="experiencia-topline">
-              <span id="experiencia-titulo" class="exp-titulo-principal">Novatos</span>
-              <strong class="experiencia-xp-total">
-                <img class="xp-icon" src="img/items%20de%20aventura/estrella.webp" alt="XP" width="16" height="16" loading="lazy" decoding="async">
-                <span id="experiencia-xp">0 XP</span>
-              </strong>
-            </div>
-            <div class="experiencia-barra"><span id="experiencia-progreso"></span></div>
-            <small id="experiencia-siguiente">100 XP para Enamorados.</small>
-          </div>
 
-          <!-- Tarjeta 2: Nivel de Pareja (Vínculo de Amor) -->
-          <div class="experiencia-card experiencia-card-pareja" id="experiencia-card-pareja">
-            <div class="experiencia-badge-tipo exp-badge-pareja">
-              <span class="pareja-corazon-icono-svg" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                </svg>
-              </span> Nivel de Pareja
-            </div>
-            <div class="experiencia-topline">
-              <span id="pareja-exp-titulo" class="exp-titulo-principal">Conexión Naciente</span>
-              <strong class="experiencia-xp-total exp-total-pareja">
-                <span class="xp-corazon-svg" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+            <!-- Tarjeta 2: Nivel de Pareja (Vínculo de Amor) -->
+            <div class="experiencia-card experiencia-card-pareja" id="experiencia-card-pareja">
+              <div class="experiencia-badge-tipo exp-badge-pareja">
+                <span class="pareja-corazon-icono-svg" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                   </svg>
-                </span>
-                <span id="pareja-exp-total">0 Amor XP</span>
-              </strong>
+                </span> Nivel de Pareja
+              </div>
+              <div class="experiencia-topline">
+                <span id="pareja-exp-titulo" class="exp-titulo-principal">Conexión Naciente</span>
+                <strong class="experiencia-xp-total exp-total-pareja">
+                  <span class="xp-corazon-svg" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                  </span>
+                  <span id="pareja-exp-total">0 Amor XP</span>
+                </strong>
+              </div>
+              <div class="experiencia-barra experiencia-barra-pareja"><span id="pareja-exp-progreso"></span></div>
+              <div class="pareja-exp-footer">
+                <small id="pareja-exp-siguiente">100 Amor XP para Primeras Miradas.</small>
+                <button type="button" class="btn-pareja-subir-amor" id="btn-pareja-dar-amor" title="Enviar amor a tu pareja (+15 Amor XP)">
+                  <span class="btn-amor-icon-wrap" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                  </span>
+                  <span class="btn-amor-texto">Enviar amor</span>
+                  <span class="btn-amor-sparkle" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor">
+                      <path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z"/>
+                    </svg>
+                  </span>
+                </button>
+              </div>
             </div>
-            <div class="experiencia-barra experiencia-barra-pareja"><span id="pareja-exp-progreso"></span></div>
-            <div class="pareja-exp-footer">
-              <small id="pareja-exp-siguiente">100 Amor XP para Primeras Miradas.</small>
-              <button type="button" class="btn-pareja-subir-amor" id="btn-pareja-dar-amor" title="Enviar amor a tu pareja (+15 Amor XP)">
-                <span class="btn-amor-icon-wrap" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                  </svg>
-                </span>
-                <span class="btn-amor-texto">Enviar amor</span>
-                <span class="btn-amor-sparkle" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor">
-                    <path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z"/>
-                  </svg>
-                </span>
-              </button>
+          </div>
+
+          <!-- Nuevo Dashboard Visual: 11 Herramientas -->
+          <nav class="dashboard-visual-nav" aria-label="Herramientas y Aventuras de Four Sunflowers">
+            <!-- Fila 1: 6 Iconos (Álbum, Notas, Mascotas, Calendario, Aventura, Roguelike) -->
+            <div class="dashboard-row dashboard-row-1">
+              <a href="#album" class="dash-item" data-view-link="album" aria-label="Álbum de Recuerdos">
+                <div class="dash-item-card">
+                  <img src="img/dashboard/card-album.svg" alt="Cámara Álbum" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
+                </div>
+                <span class="dash-item-label">Álbum</span>
+              </a>
+
+              <a href="#notas" class="dash-item" data-view-link="notas" aria-label="Notitas para Ti">
+                <div class="dash-item-card">
+                  <img src="img/dashboard/card-notas.svg" alt="Libreta de Notas" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
+                </div>
+                <span class="dash-item-label">Notas</span>
+              </a>
+
+              <a href="#mascotas" class="dash-item" data-view-link="mascotas" aria-label="Nuestras Mascotas">
+                <div class="dash-item-card">
+                  <img src="img/dashboard/card-mascotas.svg" alt="Casita de Mascotas" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
+                </div>
+                <span class="dash-item-label">Mascotas</span>
+              </a>
+
+              <a href="#calendario" class="dash-item" data-view-link="calendario" aria-label="Calendario Especial">
+                <div class="dash-item-card">
+                  <img src="img/dashboard/card-calendario.svg" alt="Calendario Especial" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
+                </div>
+                <span class="dash-item-label">Calendario</span>
+              </a>
+
+              <a href="#rpg" class="dash-item" data-view-link="rpg" aria-label="Modo Aventura">
+                <div class="dash-item-card">
+                  <img src="img/dashboard/card-aventura.svg" alt="Espada de Aventura" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
+                </div>
+                <span class="dash-item-label">Aventura</span>
+              </a>
+
+              <a href="#roguelike" class="dash-item" data-view-link="roguelike" aria-label="Falla Astral Roguelike">
+                <div class="dash-item-card">
+                  <img src="img/dashboard/card-roguelike.svg" alt="Portal Roguelike" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
+                </div>
+                <span class="dash-item-label">Falla Astral</span>
+              </a>
             </div>
-          </div>
-        </div>
 
-        <!-- Nuevo Dashboard Visual: 11 Herramientas -->
-        <nav class="dashboard-visual-nav" aria-label="Herramientas y Aventuras de Four Sunflowers">
-          <!-- Fila 1: 6 Iconos (Álbum, Notas, Mascotas, Calendario, Aventura, Roguelike) -->
-          <div class="dashboard-row dashboard-row-1">
-            <a href="#album" class="dash-item" data-view-link="album" aria-label="Álbum de Recuerdos">
-              <div class="dash-item-card">
-                <img src="img/dashboard/card-album.svg" alt="Cámara Álbum" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
-              </div>
-              <span class="dash-item-label">Álbum</span>
-            </a>
+            <!-- Fila 2: 5 Iconos (Minijuegos, Logros, Recetario, Finanzas, Diccionario) -->
+            <div class="dashboard-row dashboard-row-2">
+              <a href="#minijuegos" class="dash-item" data-view-link="minijuegos" aria-label="Minijuegos">
+                <div class="dash-item-card">
+                  <img src="img/dashboard/card-minijuegos.svg" alt="Mando Minijuegos" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
+                </div>
+                <span class="dash-item-label">Minijuegos</span>
+              </a>
 
-            <a href="#notas" class="dash-item" data-view-link="notas" aria-label="Notitas para Ti">
-              <div class="dash-item-card">
-                <img src="img/dashboard/card-notas.svg" alt="Libreta de Notas" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
-              </div>
-              <span class="dash-item-label">Notas</span>
-            </a>
+              <a href="#logros" class="dash-item" data-view-link="logros" aria-label="Salón de Logros">
+                <div class="dash-item-card">
+                  <img src="img/dashboard/card-logros.svg" alt="Trofeo Logros" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
+                </div>
+                <span class="dash-item-label">Logros</span>
+              </a>
 
-            <a href="#mascotas" class="dash-item" data-view-link="mascotas" aria-label="Nuestras Mascotas">
-              <div class="dash-item-card">
-                <img src="img/dashboard/card-mascotas.svg" alt="Casita de Mascotas" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
-              </div>
-              <span class="dash-item-label">Mascotas</span>
-            </a>
+              <a href="#recetas" class="dash-item" data-view-link="recetas" aria-label="Recetario Mágico">
+                <div class="dash-item-card">
+                  <img src="img/dashboard/card-recetas.svg" alt="Olla Recetario" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
+                </div>
+                <span class="dash-item-label">Recetas</span>
+              </a>
 
-            <a href="#calendario" class="dash-item" data-view-link="calendario" aria-label="Calendario Especial">
-              <div class="dash-item-card">
-                <img src="img/dashboard/card-calendario.svg" alt="Calendario Especial" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
-              </div>
-              <span class="dash-item-label">Calendario</span>
-            </a>
+              <a href="#finanzas" class="dash-item" data-view-link="finanzas" aria-label="Finanzas y Ahorro">
+                <div class="dash-item-card">
+                  <img src="img/dashboard/card-finanzas.svg" alt="Alcancía Cerdito" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
+                </div>
+                <span class="dash-item-label">Finanzas</span>
+              </a>
 
-            <a href="#rpg" class="dash-item" data-view-link="rpg" aria-label="Modo Aventura">
-              <div class="dash-item-card">
-                <img src="img/dashboard/card-aventura.svg" alt="Espada de Aventura" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
-              </div>
-              <span class="dash-item-label">Aventura</span>
-            </a>
-
-            <a href="#roguelike" class="dash-item" data-view-link="roguelike" aria-label="Falla Astral Roguelike">
-              <div class="dash-item-card">
-                <img src="img/dashboard/card-roguelike.svg" alt="Portal Roguelike" class="dash-item-img" width="160" height="160" fetchpriority="high" decoding="async">
-              </div>
-              <span class="dash-item-label">Falla Astral</span>
-            </a>
-          </div>
-
-          <!-- Fila 2: 5 Iconos (Minijuegos, Logros, Recetario, Finanzas, Diccionario) -->
-          <div class="dashboard-row dashboard-row-2">
-            <a href="#minijuegos" class="dash-item" data-view-link="minijuegos" aria-label="Minijuegos">
-              <div class="dash-item-card">
-                <img src="img/dashboard/card-minijuegos.svg" alt="Mando Minijuegos" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
-              </div>
-              <span class="dash-item-label">Minijuegos</span>
-            </a>
-
-            <a href="#logros" class="dash-item" data-view-link="logros" aria-label="Salón de Logros">
-              <div class="dash-item-card">
-                <img src="img/dashboard/card-logros.svg" alt="Trofeo Logros" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
-              </div>
-              <span class="dash-item-label">Logros</span>
-            </a>
-
-            <a href="#recetas" class="dash-item" data-view-link="recetas" aria-label="Recetario Mágico">
-              <div class="dash-item-card">
-                <img src="img/dashboard/card-recetas.svg" alt="Olla Recetario" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
-              </div>
-              <span class="dash-item-label">Recetas</span>
-            </a>
-
-            <a href="#finanzas" class="dash-item" data-view-link="finanzas" aria-label="Finanzas y Ahorro">
-              <div class="dash-item-card">
-                <img src="img/dashboard/card-finanzas.svg" alt="Alcancía Cerdito" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
-              </div>
-              <span class="dash-item-label">Finanzas</span>
-            </a>
-
-            <a href="#diccionario" class="dash-item" data-view-link="diccionario" aria-label="Diccionario">
-              <div class="dash-item-card">
-                <img src="img/dashboard/card-diccionario.svg" alt="Libro Diccionario" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
-              </div>
-              <span class="dash-item-label">Diccionario</span>
-            </a>
-          </div>
-        </nav>
+              <a href="#diccionario" class="dash-item" data-view-link="diccionario" aria-label="Diccionario">
+                <div class="dash-item-card">
+                  <img src="img/dashboard/card-diccionario.svg" alt="Libro Diccionario" class="dash-item-img" width="160" height="160" loading="lazy" decoding="async">
+                </div>
+                <span class="dash-item-label">Diccionario</span>
+              </a>
+            </div>
+          </nav>
+        </main>
       </div>
     </div>
     <audio id="pop" src="sounds/soundreality-pop-sound-423716.mp3" preload="auto"></audio>
