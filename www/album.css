@@ -6294,6 +6294,21 @@ body.light .logros-global-track {
   cursor: pointer;
   transition: all .22s cubic-bezier(.34, 1.56, .64, 1);
   backdrop-filter: blur(8px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+}
+
+.logro-filtro-btn svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  transition: transform .2s ease;
+}
+
+.logro-filtro-btn:hover svg {
+  transform: scale(1.15);
 }
 
 .logro-filtro-btn:hover {
