@@ -37,13 +37,8 @@ html {
 }
 
 body {
-  background-color: #0c0e17;
-  background-image: 
-    radial-gradient(circle 650px at 50% 120px, rgba(255, 217, 61, 0.08), transparent 75%),
-    radial-gradient(circle 850px at 50% 550px, rgba(138, 79, 255, 0.07), transparent 70%),
-    radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 36px 36px;
-  background-attachment: fixed;
+  background-color: #0a0b10;
+  background-image: radial-gradient(circle 750px at 50% 120px, rgba(255, 217, 61, 0.05), transparent 70%);
   color: var(--text);
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
@@ -53,11 +48,7 @@ body {
 
 body.light {
   background-color: #faf3e0;
-  background-image: 
-    radial-gradient(circle 600px at 50% 120px, rgba(255, 217, 61, 0.15), transparent 75%),
-    radial-gradient(circle 800px at 50% 500px, rgba(255, 107, 168, 0.08), transparent 70%);
-  background-size: 100% 100%, 100% 100%;
-  background-attachment: fixed;
+  background-image: radial-gradient(circle 600px at 50% 120px, rgba(255, 217, 61, 0.12), transparent 70%);
 }
 
 ::selection {
@@ -950,40 +941,41 @@ body.light .user-dropdown-item.active {
 
 .experiencia-card {
   width: 100%;
-  padding: 0.85rem 1rem;
-  border-radius: 18px;
+  padding: 0.85rem 1.1rem;
+  border-radius: 16px;
   box-sizing: border-box;
   color: var(--text);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .1);
-  transition: transform .25s ease, box-shadow .25s ease;
+  background: #141724;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .experiencia-card-individual {
-  border: 1px solid rgba(255, 217, 61, .32);
-  border-top: 1px solid rgba(255, 217, 61, .55);
-  background: linear-gradient(155deg, rgba(255, 217, 61, .14) 0%, rgba(22, 26, 40, .92) 100%);
+  border-left: 3px solid #ffd93d;
+  background: linear-gradient(90deg, rgba(255, 217, 61, 0.08) 0%, #141724 40%);
 }
 
 .experiencia-card-pareja {
-  border: 1px solid rgba(255, 107, 168, .36);
-  border-top: 1px solid rgba(255, 107, 168, .6);
-  background: linear-gradient(155deg, rgba(255, 107, 168, .16) 0%, rgba(32, 18, 30, .94) 100%);
+  border-left: 3px solid #ff6ba8;
+  background: linear-gradient(90deg, rgba(255, 107, 168, 0.08) 0%, #141724 40%);
+}
+
+body.light .experiencia-card {
+  background: #ffffff;
+  border-color: rgba(139, 90, 20, 0.16);
+  box-shadow: 0 4px 12px rgba(139, 90, 20, 0.08);
 }
 
 body.light .experiencia-card-individual {
-  border-color: rgba(212, 148, 30, .35);
-  border-top-color: #fff;
-  background: linear-gradient(145deg, rgba(255, 243, 204, .95), rgba(255, 255, 255, .98));
-  box-shadow: 0 6px 18px rgba(139, 90, 20, .12);
+  border-left: 3px solid #d4941e;
+  background: linear-gradient(90deg, rgba(255, 243, 204, 0.9) 0%, #ffffff 40%);
 }
 
 body.light .experiencia-card-pareja {
-  border-color: rgba(255, 107, 168, .4);
-  border-top-color: #fff;
-  background: linear-gradient(145deg, rgba(255, 235, 243, .95), rgba(255, 255, 255, .98));
-  box-shadow: 0 6px 18px rgba(255, 107, 168, .14);
+  border-left: 3px solid #ff6ba8;
+  background: linear-gradient(90deg, rgba(255, 235, 243, 0.9) 0%, #ffffff 40%);
 }
 
 .experiencia-badge-tipo {
@@ -3007,6 +2999,12 @@ body.tema-fondo-fuego .nav-container {
   backdrop-filter: blur(8px);
   transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), box-shadow .25s;
   animation: shopBubble 3s ease-in-out infinite;
+}
+
+/* En el inicio/dashboard no flota porque ya es una herramienta oficial del grid */
+body:has(.lobby.active) .shop-bubble,
+.lobby.active ~ .shop-bubble {
+  display: none !important;
 }
 
 @keyframes shopBubble {
@@ -5208,112 +5206,101 @@ body.light .player-close {
 }
 
 /* ============================================================
-   CONTENEDOR PRINCIPAL: DASHBOARD HUB (CONSOLA DE JUEGO)
-   ============================================================ */
-.dashboard-hub {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 1080px;
-  margin: 0.5rem auto 2.5rem;
-  padding: 1.6rem 1.8rem 2.2rem;
-  background: linear-gradient(180deg, rgba(22, 25, 38, 0.82) 0%, rgba(14, 16, 25, 0.94) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-top: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 32px;
-  box-shadow: 
-    0 24px 60px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  position: relative;
-  box-sizing: border-box;
-}
-
-body.light .dashboard-hub {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 248, 238, 0.96) 100%);
-  border: 1px solid rgba(139, 90, 20, 0.16);
-  border-top: 1px solid #fff;
-  box-shadow: 0 18px 45px rgba(139, 90, 20, 0.12);
-}
-
-/* ============================================================
-   BANNER FOUR SUNFLOWERS (COMPACTO Y ELEGANTE)
+   BANNER FOUR SUNFLOWERS (DESTACADO, CÁLIDO Y ELEGANTE)
    ============================================================ */
 .lobby-hero {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  max-width: 720px;
-  margin: 0 auto 0.65rem;
-  padding: 0.65rem 1.25rem;
-  background: linear-gradient(135deg, rgba(255, 217, 61, 0.08) 0%, rgba(35, 28, 22, 0.4) 100%);
-  border: 1px solid rgba(255, 217, 61, 0.22);
-  border-top: 1px solid rgba(255, 217, 61, 0.4);
-  border-radius: 20px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  max-width: 820px;
+  margin: 0.25rem auto 1rem;
+  padding: 0.85rem 1.6rem;
+  background: linear-gradient(90deg, #1f160e 0%, #15121a 60%, #0d0e15 100%);
+  border: 1px solid rgba(255, 217, 61, 0.28);
+  border-left: 4px solid #ffd93d;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   box-sizing: border-box;
 }
 
 body.light .lobby-hero {
-  background: linear-gradient(135deg, rgba(255, 243, 204, 0.9), rgba(255, 255, 255, 0.95));
-  border-color: rgba(212, 148, 30, 0.26);
-  border-top-color: #fff;
-  box-shadow: 0 6px 18px rgba(139, 90, 20, 0.08);
+  background: linear-gradient(90deg, #fff6e5 0%, #fffbf0 60%, #ffffff 100%);
+  border: 1px solid rgba(212, 148, 30, 0.3);
+  border-left: 4px solid #d4941e;
+  box-shadow: 0 4px 14px rgba(139, 90, 20, 0.1);
 }
 
 .lobby-hero-brand {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.2rem;
+  align-items: center;
+  gap: 1.25rem;
   width: 100%;
 }
 
 .lobby-brand-img {
-  max-width: 210px;
+  max-width: 180px;
   width: 100%;
   height: auto;
-  margin-top: -6px;
-  filter: drop-shadow(0 3px 10px rgba(255, 217, 61, 0.35));
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 8px rgba(255, 217, 61, 0.35));
   user-select: none;
-  transform: translateZ(0);
+}
+
+.lobby-hero-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.lobby-hero-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #ffd93d;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+body.light .lobby-hero-title {
+  color: #b45309;
 }
 
 .lobby-hero-tagline {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 500;
-  color: var(--text);
-  opacity: 0.85;
+  color: #e2e8f0;
+  opacity: 0.9;
   letter-spacing: 0.01em;
 }
 
+body.light .lobby-hero-tagline {
+  color: #4b382a;
+}
+
 @media (max-width: 680px) {
-  .dashboard-hub {
-    padding: 1.1rem 0.85rem 1.6rem;
-    border-radius: 24px;
-    margin: 0.3rem auto 1.5rem;
-  }
   .lobby-hero {
-    padding: 0.55rem 0.85rem;
-    border-radius: 16px;
-    margin: 0 auto 0.5rem;
+    padding: 0.65rem 1rem;
+    border-radius: 14px;
+    margin: 0 auto 0.65rem;
+  }
+  .lobby-hero-brand {
+    gap: 0.85rem;
   }
   .lobby-brand-img {
-    max-width: 175px;
-    margin-top: -3px;
+    max-width: 130px;
+  }
+  .lobby-hero-title {
+    font-size: 1.05rem;
   }
   .lobby-hero-tagline {
-    font-size: 0.72rem;
+    font-size: 0.74rem;
   }
 }
 
 /* ============================================================
-   NUEVO DASHBOARD VISUAL (2 FILAS ESCRITORIO / CARRUSEL MÓVIL)
+   NUEVO DASHBOARD VISUAL (2 FILAS DE 6 ICONOS / CARRUSEL MÓVIL)
    ============================================================ */
 
 .dashboard-visual-nav {
@@ -5322,17 +5309,17 @@ body.light .lobby-hero {
   align-items: center;
   gap: 0.85rem;
   width: 100%;
-  max-width: 1080px;
-  margin: 0.85rem auto 0.5rem;
+  max-width: 1160px;
+  margin: 0.85rem auto 1.5rem;
   box-sizing: border-box;
 }
 
-/* Filas escritorio: Fila 1 (6) y Fila 2 (5 centrada) */
+/* Filas escritorio: 6 y 6 centradas */
 .dashboard-row {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 1.1rem;
+  gap: 1.15rem;
   width: 100%;
 }
 
@@ -5345,171 +5332,137 @@ body.light .lobby-hero {
   text-decoration: none;
   outline: none;
   flex-shrink: 0;
-  width: 105px;
+  width: 102px;
   cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
 }
 
-/* Tarjeta contenedora del icono: gradiente sutil y luz cenital */
+/* Tarjeta sólida, ligera y sin glassmorphism para 60 FPS */
 .dash-item-card {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 94px;
-  height: 94px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, #1e202b 0%, #15171f 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.22);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.25s ease, background 0.25s ease;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  width: 92px;
+  height: 92px;
+  border-radius: 18px;
+  background: #141620;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.2s ease, background 0.2s ease;
   position: relative;
   box-sizing: border-box;
 }
 
 body.light .dash-item-card {
-  background: linear-gradient(180deg, #ffffff 0%, #f7f0e4 100%);
-  border-color: rgba(139, 90, 20, 0.15);
+  background: #ffffff;
+  border-color: rgba(139, 90, 20, 0.16);
   border-top-color: #fff;
-  box-shadow: 0 6px 18px rgba(139, 90, 20, 0.1), inset 0 1px 0 #fff;
+  box-shadow: 0 4px 12px rgba(139, 90, 20, 0.08);
 }
 
-/* Imagen dentro de la tarjeta */
+/* Imagen dentro de la tarjeta: única que se escala en hover */
 .dash-item-img {
   width: 66px;
   height: 66px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.4, 1), filter 0.2s ease;
   pointer-events: none;
+  will-change: transform, filter;
 }
 
-/* Tipografía de la etiqueta */
+/* Tipografía de la etiqueta: blanco puro nítido */
 .dash-item-label {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  color: #f8fafc;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75), 0 2px 6px rgba(0, 0, 0, 0.4);
+  color: #ffffff;
   letter-spacing: -0.01em;
   text-align: center;
   line-height: 1.2;
-  transition: color 0.25s ease, transform 0.25s ease, text-shadow 0.25s ease;
+  transition: color 0.2s ease;
   white-space: nowrap;
 }
 
 body.light .dash-item-label {
   color: #2b1f14;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
-/* Efecto Hover & Focus Base (Desktop) */
+/* Hover liviano: la tarjeta permanece quieta (sin saltos ni repintado de sombras) */
 .dash-item:hover .dash-item-card,
 .dash-item:focus-visible .dash-item-card {
-  transform: translateY(-7px) scale(1.06);
-  border-color: rgba(255, 217, 61, 0.7);
-  background: linear-gradient(180deg, #252838 0%, #171924 100%);
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.5), 0 0 24px rgba(255, 217, 61, 0.35);
+  border-color: rgba(255, 255, 255, 0.28);
+  background: #191c28;
 }
 
 body.light .dash-item:hover .dash-item-card,
 body.light .dash-item:focus-visible .dash-item-card {
-  background: linear-gradient(180deg, #ffffff 0%, #fff2d9 100%);
-  border-color: rgba(255, 184, 0, 0.6);
-  box-shadow: 0 14px 28px rgba(139, 90, 20, 0.18), 0 0 20px rgba(255, 217, 61, 0.4);
+  border-color: rgba(212, 148, 30, 0.45);
+  background: #fffdf8;
 }
 
 .dash-item:hover .dash-item-img,
 .dash-item:focus-visible .dash-item-img {
-  transform: scale(1.12) translateY(-2px);
-  filter: drop-shadow(0 8px 16px rgba(255, 217, 61, 0.5));
+  transform: scale(1.12);
 }
 
 .dash-item:hover .dash-item-label,
 .dash-item:focus-visible .dash-item-label {
-  color: #ffe066;
-  text-shadow: 0 0 12px rgba(255, 217, 61, 0.6), 0 1px 3px rgba(0, 0, 0, 0.9);
-  transform: translateY(-2px);
+  color: #ffd93d;
 }
 
-body.light .dash-item:hover .dash-item-label,
-body.light .dash-item:focus-visible .dash-item-label {
-  color: #b45309;
-  text-shadow: none;
-}
-
-/* Resplandores temáticos por categoría de herramienta al hacer hover */
-.dash-item[data-view-link="finanzas"]:hover .dash-item-card {
-  border-color: rgba(255, 120, 168, 0.65);
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.5), 0 0 26px rgba(255, 120, 168, 0.45);
-}
+/* Resplandores temáticos por categoría aplicados en la imagen (drop-shadow) */
 .dash-item[data-view-link="finanzas"]:hover .dash-item-img {
-  filter: drop-shadow(0 8px 16px rgba(255, 120, 168, 0.55));
+  filter: drop-shadow(0 0 14px rgba(255, 107, 168, 0.85));
 }
 .dash-item[data-view-link="finanzas"]:hover .dash-item-label {
   color: #ff9ec6;
-  text-shadow: 0 0 12px rgba(255, 120, 168, 0.6);
 }
 
-.dash-item[data-view-link="recetas"]:hover .dash-item-card {
-  border-color: rgba(255, 140, 50, 0.65);
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.5), 0 0 26px rgba(255, 140, 50, 0.45);
-}
 .dash-item[data-view-link="recetas"]:hover .dash-item-img {
-  filter: drop-shadow(0 8px 16px rgba(255, 140, 50, 0.55));
+  filter: drop-shadow(0 0 14px rgba(255, 140, 50, 0.85));
 }
 .dash-item[data-view-link="recetas"]:hover .dash-item-label {
   color: #ffb076;
-  text-shadow: 0 0 12px rgba(255, 140, 50, 0.6);
 }
 
-.dash-item[data-view-link="rpg"]:hover .dash-item-card,
-.dash-item[data-view-link="roguelike"]:hover .dash-item-card {
-  border-color: rgba(168, 85, 247, 0.7);
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.5), 0 0 26px rgba(168, 85, 247, 0.5);
-}
 .dash-item[data-view-link="rpg"]:hover .dash-item-img,
 .dash-item[data-view-link="roguelike"]:hover .dash-item-img {
-  filter: drop-shadow(0 8px 16px rgba(168, 85, 247, 0.6));
+  filter: drop-shadow(0 0 14px rgba(168, 85, 247, 0.9));
 }
 .dash-item[data-view-link="rpg"]:hover .dash-item-label,
 .dash-item[data-view-link="roguelike"]:hover .dash-item-label {
   color: #d8b4fe;
-  text-shadow: 0 0 12px rgba(168, 85, 247, 0.65);
 }
 
-.dash-item[data-view-link="minijuegos"]:hover .dash-item-card {
-  border-color: rgba(56, 189, 248, 0.65);
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.5), 0 0 26px rgba(56, 189, 248, 0.45);
-}
 .dash-item[data-view-link="minijuegos"]:hover .dash-item-img {
-  filter: drop-shadow(0 8px 16px rgba(56, 189, 248, 0.55));
+  filter: drop-shadow(0 0 14px rgba(56, 189, 248, 0.85));
 }
 .dash-item[data-view-link="minijuegos"]:hover .dash-item-label {
   color: #7dd3fc;
-  text-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
 }
 
-.dash-item[data-view-link="mascotas"]:hover .dash-item-card {
-  border-color: rgba(52, 211, 153, 0.65);
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.5), 0 0 26px rgba(52, 211, 153, 0.45);
-}
 .dash-item[data-view-link="mascotas"]:hover .dash-item-img {
-  filter: drop-shadow(0 8px 16px rgba(52, 211, 153, 0.55));
+  filter: drop-shadow(0 0 14px rgba(52, 211, 153, 0.85));
 }
 .dash-item[data-view-link="mascotas"]:hover .dash-item-label {
   color: #6ee7b7;
-  text-shadow: 0 0 12px rgba(52, 211, 153, 0.6);
 }
 
-.dash-item:active .dash-item-card {
+#dash-btn-tienda:hover .dash-item-img {
+  filter: drop-shadow(0 0 14px rgba(255, 217, 61, 0.9));
+}
+#dash-btn-tienda:hover .dash-item-label {
+  color: #ffd93d;
+}
+
+.dash-item:active .dash-item-img {
   transform: scale(0.96);
 }
 
 /* Indicador accesible de teclado */
-.dash-item:focus-visible {
-  border-radius: 20px;
-}
 .dash-item:focus-visible .dash-item-card {
   outline: 2px solid #ffd93d;
   outline-offset: 3px;

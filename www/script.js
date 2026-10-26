@@ -2298,5 +2298,22 @@ sprite.style.opacity = "0.25";
   window.addEventListener("sunad:user-ready", () => setTimeout(comprobarStarterPetModal, 600));
   setTimeout(comprobarStarterPetModal, 1500);
 
+  /* ---------- Botón Tienda en Dashboard ---------- */
+  const btnTiendaDash = $("dash-btn-tienda");
+  if (btnTiendaDash) {
+    btnTiendaDash.addEventListener("click", e => {
+      e.preventDefault();
+      try {
+        if (window.Tienda?.abrir) {
+          window.Tienda.abrir();
+        } else {
+          $("shop-bubble")?.click();
+        }
+      } catch (err) {
+        console.warn("dash-btn-tienda click:", err);
+      }
+    });
+  }
+
   console.log("✅ script.js v5 cargado (getNivel hoisteada)");
 });
