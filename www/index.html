@@ -392,10 +392,10 @@
       <div class="nav-actions">
         <!-- Acciones Rápidas (Campana, Chat, Ajustes) -->
         <div class="nav-quick-actions" id="nav-quick-actions">
-          <a href="#logros" class="nav-action-btn" data-view-link="logros" title="Salón de Logros y Recompensas" aria-label="Logros">
+          <a href="#logros" class="nav-action-btn" id="nav-btn-quick-notif" data-view-link="logros" title="Notificaciones & Logros" aria-label="Notificaciones y Logros">
             <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
           </a>
-          <a href="#chat" class="nav-action-btn" data-view-link="chat" title="Chat y Mensajes Privados" aria-label="Chat">
+          <a href="#chat" class="nav-action-btn" id="nav-btn-quick-chat" data-view-link="chat" title="Chat y Mensajes Privados" aria-label="Chat">
             <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
           </a>
           <button type="button" class="nav-action-btn" id="nav-btn-quick-settings" data-action="ajustes" title="Ajustes de la App" aria-label="Ajustes">
@@ -419,26 +419,26 @@
             <a href="#logros" class="user-dropdown-item" data-view-link="logros"><span class="user-dropdown-icon"
                 data-icono="trofeo"></span><span>Logros</span></a>
             <a href="#chat" class="user-dropdown-item" data-view-link="chat"><span class="user-dropdown-icon"
-                data-icono="chat"></span><span>Chat Privado 💬</span></a>
+                data-icono="chat"></span><span>Chat Privado</span></a>
             <a href="#notas" class="user-dropdown-item" data-view-link="notas"><span class="user-dropdown-icon"
                 data-icono="nota"></span><span>Notitas</span></a>
             <a href="#diccionario" class="user-dropdown-item" data-view-link="diccionario"><span
-                class="user-dropdown-icon" data-icono="libro"></span><span>Diccionario 📖</span></a>
+                class="user-dropdown-icon" data-icono="libro"></span><span>Diccionario</span></a>
             <a href="#recetas" class="user-dropdown-item" data-view-link="recetas"><span class="user-dropdown-icon"
-                data-icono="comida"></span><span>Recetas 🍳</span></a>
+                data-icono="comida"></span><span>Recetas</span></a>
             <div class="user-dropdown-divider"></div>
             <button type="button" class="user-dropdown-item" data-action="perfil"><span class="user-dropdown-icon"
                 data-icono="persona"></span><span>Mi perfil</span></button>
             <button type="button" class="user-dropdown-item" data-action="pareja" style="color:#ff6ba8;"><span
                 class="user-dropdown-icon" data-icono="corazon"></span><span>Mi Pareja</span></button>
             <button type="button" class="user-dropdown-item" data-action="amigos"><span class="user-dropdown-icon"
-                data-icono="amigos"></span><span>Mi Grupo de Aventuras 👥</span></button>
+                data-icono="amigos"></span><span>Mi Grupo de Aventuras</span></button>
             <button type="button" class="user-dropdown-item" data-action="ajustes"><span class="user-dropdown-icon"
                 data-icono="ajustes"></span><span>Ajustes</span></button>
             <button type="button" class="user-dropdown-item" data-action="offline"><span class="user-dropdown-icon"
                 data-icono="descargar"></span><span>Descargar todo</span></button>
             <button type="button" class="user-dropdown-item" data-action="descargar"><span class="user-dropdown-icon"
-                data-icono="descargar"></span><span>Descargar App (APK) 📱</span></button>
+                data-icono="descargar"></span><span>Descargar App (APK)</span></button>
             <div class="user-dropdown-divider"></div>
             <button type="button" id="logout-btn" class="user-dropdown-item user-dropdown-item-danger"
               data-action="logout"><span class="user-dropdown-icon"
@@ -2820,6 +2820,76 @@ Artista - Canción
         });
       }
 
+      // Configurar botones de Acciones Rápidas (Campana, Chat, Ajustes)
+      function setupQuickActions() {
+        var btnSettings = document.getElementById("nav-btn-quick-settings");
+        if (btnSettings && !btnSettings.dataset.bound) {
+          btnSettings.dataset.bound = "true";
+          btnSettings.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.AlbumApp?.modules?.grupo?.abrirAjustes) {
+              window.AlbumApp.modules.grupo.abrirAjustes();
+            } else {
+              var m = document.getElementById("settings-modal");
+              if (m) {
+                m.classList.add("active");
+                m.setAttribute("aria-hidden", "false");
+                document.body.style.overflow = "hidden";
+              }
+            }
+          });
+        }
+
+        var btnNotif = document.getElementById("nav-btn-quick-notif");
+        if (btnNotif && !btnNotif.dataset.bound) {
+          btnNotif.dataset.bound = "true";
+          btnNotif.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof window._activarNotificacionesPush === "function") {
+              window._activarNotificacionesPush().catch(function () {});
+            } else if ("Notification" in window) {
+              Notification.requestPermission().then(function (perm) {
+                if (window.AlbumApp?.alertar) {
+                  if (perm === "granted") {
+                    window.AlbumApp.alertar({ title: "¡Notificaciones activadas!", message: "Recibirás avisos de eventos, mensajes y retos.", variant: "success", icon: "🔔" });
+                  } else {
+                    window.AlbumApp.alertar({ title: "Notificaciones", message: "Estado actual: " + perm, variant: "warning", icon: "🔕" });
+                  }
+                }
+              });
+            } else if (window.AlbumApp?.alertar) {
+              window.AlbumApp.alertar({ title: "Notificaciones", message: "Tu dispositivo no soporta notificaciones de sistema.", icon: "🔕" });
+            }
+          });
+        }
+
+        // Toggle robusto para píldora de usuario
+        var pill = document.getElementById("user-menu-toggle");
+        if (pill && !pill.dataset.boundPill) {
+          pill.dataset.boundPill = "true";
+          pill.addEventListener("click", function (e) {
+            e.stopPropagation();
+            var dd = document.getElementById("user-dropdown");
+            var info = document.getElementById("user-info");
+            if (!dd) return;
+            var open = dd.classList.contains("open");
+            if (open) {
+              dd.classList.remove("open");
+              dd.setAttribute("aria-hidden", "true");
+              pill.setAttribute("aria-expanded", "false");
+              if (info) info.classList.remove("open");
+            } else {
+              dd.classList.add("open");
+              dd.setAttribute("aria-hidden", "false");
+              pill.setAttribute("aria-expanded", "true");
+              if (info) info.classList.add("open");
+            }
+          });
+        }
+      }
+
       function init() {
         var h = (location.hash || "").replace(/^#/, "").trim();
         if (h && document.querySelector('[data-view="' + h + '"]')) {
@@ -2829,6 +2899,7 @@ Artista - Canción
           actualizarBreadcrumb("inicio");
         }
         setupTopBarSearch();
+        setupQuickActions();
       }
       if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
       else setTimeout(init, 50);
