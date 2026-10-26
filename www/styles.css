@@ -5763,8 +5763,104 @@ body.light .bento-tool-item:focus-visible .bento-tool-icon-wrap {
     border-radius: 16px;
   }
 
+  .bento-progress-card,
+  .bento-reto-card {
+    padding: 0.75rem 0.85rem;
+    gap: 0.45rem;
+  }
+
+  .bento-card-header {
+    flex-wrap: wrap;
+    gap: 0.35rem 0.5rem;
+    align-items: center;
+  }
+
+  .bento-header-left {
+    gap: 0.35rem;
+  }
+
+  .bento-badge {
+    white-space: nowrap;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.45rem;
+  }
+
+  .bento-ver-mas-pill {
+    padding: 0.12rem 0.4rem;
+    font-size: 0.62rem;
+  }
+
+  .bento-xp-value {
+    font-size: 0.8rem;
+    margin-left: auto;
+  }
+
+  .bento-card-footer {
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    align-items: center;
+  }
+
+  .bento-sig-text {
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+    flex: 1 1 180px;
+  }
+
+  .btn-pareja-subir-amor {
+    margin-left: auto;
+  }
+
+  .bento-reto-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+  }
+
+  .bento-reto-desc {
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+  }
+
+  .btn-bento-reclamar {
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.35rem 0.65rem;
+  }
+
   .bento-modules-card {
     padding: 1rem 1.1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .bento-tools-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.55rem;
+  }
+
+  .bento-tool-icon-wrap {
+    width: 68px;
+    height: 68px;
+  }
+
+  .bento-tool-img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .bento-card-header {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .btn-pareja-subir-amor {
+    width: 100%;
+    justify-content: center;
+    padding: 0.35rem 0.65rem;
   }
 }
 
