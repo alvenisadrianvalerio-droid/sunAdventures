@@ -5503,28 +5503,46 @@ body.light .bento-rank-name {
   font-size: 0.72rem;
   color: #94a3b8;
   font-weight: 600;
+  min-height: 24px;
 }
 
 body.light .bento-card-footer {
   color: #64748b;
 }
 
+.bento-sig-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 190px;
+}
+
 .btn-pareja-subir-amor {
-  background: #ff6ba8;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: linear-gradient(135deg, #ff6ba8, #f43f5e);
   color: #ffffff;
   border: none;
   border-radius: 6px;
-  padding: 0.2rem 0.55rem;
+  padding: 0.22rem 0.6rem;
   font-size: 0.7rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
   white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(255, 107, 168, 0.35);
+  flex-shrink: 0;
 }
 
 .btn-pareja-subir-amor:hover {
-  background: #f43f5e;
+  filter: brightness(1.1);
   transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(255, 107, 168, 0.5);
+}
+
+.btn-pareja-subir-amor:active {
+  transform: translateY(0);
 }
 
 /* MÓDULOS DE AVENTURA EN GRID COMPACTO (Span 12) */
@@ -5782,27 +5800,44 @@ body.light .bento-card-clickable:hover {
   flex-shrink: 0;
 }
 
+.bento-header-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
 .bento-ver-mas-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   font-size: 0.65rem;
   font-weight: 700;
   color: #ffd93d;
   background: rgba(255, 217, 61, 0.12);
-  border: 1px solid rgba(255, 217, 61, 0.25);
-  padding: 0.15rem 0.45rem;
+  border: 1px solid rgba(255, 217, 61, 0.28);
+  padding: 0.12rem 0.45rem;
   border-radius: 999px;
   letter-spacing: 0.02em;
-  transition: background 0.2s ease, transform 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.4, 1);
+}
+
+.bento-ver-mas-pill.pill-pink {
+  color: #ff6ba8;
+  background: rgba(255, 107, 168, 0.14);
+  border-color: rgba(255, 107, 168, 0.3);
 }
 
 .bento-card-clickable:hover .bento-ver-mas-pill {
-  background: rgba(255, 217, 61, 0.22);
-  transform: scale(1.05);
+  background: rgba(255, 217, 61, 0.25);
+  border-color: #ffd93d;
+  transform: translateY(-1px);
 }
 
-.bento-footer-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
+.bento-card-clickable:hover .bento-ver-mas-pill.pill-pink {
+  background: rgba(255, 107, 168, 0.28);
+  border-color: #ff6ba8;
+  transform: translateY(-1px);
 }
 
 /* Estilos del Modal de Rangos y Beneficios */
@@ -6099,4 +6134,49 @@ body.light .modal-rango-beneficio {
   background: rgba(255, 255, 255, 0.05);
   color: #94a3b8;
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Alineación y colores consistentes de iconos SVG de pareja */
+.pareja-titulo-svg-wrap,
+.pareja-sig-svg-wrap {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-left: 0.25rem;
+  color: #ff6ba8;
+}
+
+.pareja-sig-svg-wrap {
+  margin-left: 0.2rem;
+}
+
+.svg-pareja-icono {
+  display: inline-block;
+  vertical-align: middle;
+  color: #ff6ba8;
+}
+
+/* Efectos sutiles de degradado de fondo en las tarjetas Bento superiores */
+.bento-individual {
+  background: linear-gradient(180deg, rgba(255, 217, 61, 0.03) 0%, rgba(19, 21, 31, 1) 40%);
+}
+
+.bento-pareja {
+  background: linear-gradient(180deg, rgba(255, 107, 168, 0.03) 0%, rgba(19, 21, 31, 1) 40%);
+}
+
+.bento-reto-card {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.03) 0%, rgba(19, 21, 31, 1) 40%);
+}
+
+body.light .bento-individual {
+  background: linear-gradient(180deg, rgba(255, 217, 61, 0.05) 0%, #ffffff 40%);
+}
+
+body.light .bento-pareja {
+  background: linear-gradient(180deg, rgba(255, 107, 168, 0.05) 0%, #ffffff 40%);
+}
+
+body.light .bento-reto-card {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.05) 0%, #ffffff 40%);
 }

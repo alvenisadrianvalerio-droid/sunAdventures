@@ -413,10 +413,16 @@
           <!-- BENTO 1: Progreso Individual (Span 4) -->
           <div class="bento-card bento-progress-card bento-individual bento-card-clickable" id="card-progreso-individual" role="button" tabindex="0" title="Haz clic para ver todos los rangos y beneficios" aria-label="Ver todos los rangos individuales y beneficios">
             <div class="bento-card-header">
-              <span class="bento-badge bento-badge-gold">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2a5 5 0 100 10 5 5 0 000-10zm-7 18a7 7 0 0114 0H5z"/></svg>
-                Nivel Individual
-              </span>
+              <div class="bento-header-left">
+                <span class="bento-badge bento-badge-gold">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 2a5 5 0 100 10 5 5 0 000-10zm-7 18a7 7 0 0114 0H5z"/></svg>
+                  Nivel Individual
+                </span>
+                <span class="bento-ver-mas-pill" title="Ver rangos y beneficios">
+                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  Rangos
+                </span>
+              </div>
               <strong class="bento-xp-value">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="svg-inline-xp"><path d="M7 2v11h3v9l7-12h-4l3-8z"/></svg>
                 <span id="experiencia-xp">0 XP</span>
@@ -425,21 +431,23 @@
             <div class="bento-rank-name" id="experiencia-titulo">Novatos</div>
             <div class="experiencia-barra"><span id="experiencia-progreso"></span></div>
             <div class="bento-card-footer">
-              <span id="experiencia-siguiente">100 XP para Enamorados.</span>
-              <span class="bento-ver-mas-pill">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                Rangos
-              </span>
+              <span id="experiencia-siguiente" class="bento-sig-text">100 XP para Enamorados.</span>
             </div>
           </div>
 
           <!-- BENTO 2: Progreso de Pareja (Span 4) -->
           <div class="bento-card bento-progress-card bento-pareja bento-card-clickable" id="experiencia-card-pareja" role="button" tabindex="0" title="Haz clic para ver todos los rangos y beneficios de amor" aria-label="Ver todos los rangos de pareja y beneficios">
             <div class="bento-card-header">
-              <span class="bento-badge bento-badge-pink">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                Vínculo de Amor
-              </span>
+              <div class="bento-header-left">
+                <span class="bento-badge bento-badge-pink">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                  Vínculo de Amor
+                </span>
+                <span class="bento-ver-mas-pill pill-pink" title="Ver rangos y beneficios de amor">
+                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  Rangos
+                </span>
+              </div>
               <strong class="bento-xp-value bento-xp-pink">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="svg-inline-xp"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                 <span id="pareja-exp-total">0 Amor XP</span>
@@ -448,16 +456,11 @@
             <div class="bento-rank-name" id="pareja-exp-titulo">Conexión Naciente</div>
             <div class="experiencia-barra experiencia-barra-pareja"><span id="pareja-exp-progreso"></span></div>
             <div class="bento-card-footer">
-              <span id="pareja-exp-siguiente">100 Amor XP para Primeras Miradas.</span>
-              <div class="bento-footer-actions">
-                <span class="bento-ver-mas-pill">
-                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                  Rangos
-                </span>
-                <button type="button" class="btn-pareja-subir-amor" id="btn-pareja-dar-amor" title="Enviar amor a tu pareja (+15 Amor XP)">
-                  Enviar amor
-                </button>
-              </div>
+              <span id="pareja-exp-siguiente" class="bento-sig-text">100 Amor XP para Primeras Miradas.</span>
+              <button type="button" class="btn-pareja-subir-amor" id="btn-pareja-dar-amor" title="Enviar amor a tu pareja (+15 Amor XP)">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <span>Enviar amor</span>
+              </button>
             </div>
           </div>
 
