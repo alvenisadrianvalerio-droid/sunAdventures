@@ -896,8 +896,8 @@ body.light .user-dropdown-item.active {
   align-items: center;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0.65rem 1.25rem 2rem;
-  min-height: calc(100vh - 70px);
+  padding: 0.35rem 1rem 0.5rem;
+  min-height: auto;
   position: relative;
   box-sizing: border-box;
 }
@@ -5266,15 +5266,15 @@ body.light .player-close {
   align-items: center;
   width: 100%;
   max-width: 1140px;
-  margin: 0 auto 1.5rem;
-  padding: 0 1rem;
+  margin: 0 auto 0.5rem;
+  padding: 0 0.75rem;
   box-sizing: border-box;
 }
 
 .bento-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  gap: 0.75rem;
+  gap: 0.55rem;
   width: 100%;
 }
 
@@ -5548,10 +5548,10 @@ body.light .bento-card-footer {
 /* MÓDULOS DE AVENTURA EN GRID COMPACTO (Span 12) */
 .bento-modules-card {
   grid-column: span 12;
-  padding: 0.85rem 1.2rem;
+  padding: 0.65rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .bento-card-title-row {
@@ -5559,7 +5559,7 @@ body.light .bento-card-footer {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding-bottom: 0.45rem;
+  padding-bottom: 0.35rem;
 }
 
 body.light .bento-card-title-row {
@@ -5568,7 +5568,7 @@ body.light .bento-card-title-row {
 
 .bento-section-title {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 800;
   color: #f1f5f9;
   letter-spacing: -0.01em;
@@ -5579,13 +5579,13 @@ body.light .bento-section-title {
 }
 
 .bento-section-count {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #ffd93d;
   background: rgba(255, 217, 61, 0.12);
-  padding: 0.15rem 0.5rem;
+  padding: 0.12rem 0.45rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 217, 61, 0.25);
 }
@@ -5600,7 +5600,7 @@ body.light .bento-section-count {
 .bento-tools-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 0.75rem;
+  gap: 0.55rem;
   width: 100%;
 }
 
@@ -5608,7 +5608,7 @@ body.light .bento-section-count {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.25rem;
   text-decoration: none;
   background: transparent;
   border: none;
@@ -5624,14 +5624,14 @@ body.light .bento-section-count {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 78px;
-  height: 78px;
+  width: 68px;
+  height: 68px;
   max-width: 100%;
   aspect-ratio: 1 / 1;
   background: #171926;
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-top: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 15px;
+  border-radius: 14px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s cubic-bezier(0.2, 0.8, 0.4, 1);
   box-sizing: border-box;
@@ -5645,15 +5645,15 @@ body.light .bento-tool-icon-wrap {
 }
 
 .bento-tool-img {
-  width: 52px;
-  height: 52px;
+  width: 46px;
+  height: 46px;
   object-fit: contain;
   transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.4, 1), filter 0.2s ease;
   pointer-events: none;
 }
 
 .bento-tool-name {
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: #f1f5f9;
   letter-spacing: -0.01em;
