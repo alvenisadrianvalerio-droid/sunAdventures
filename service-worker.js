@@ -1,14 +1,21 @@
-const CACHE_NAME = "sunad-v238";
+const CACHE_NAME = "sunad-v240-pwa";
 const ASSETS_ESTATICOS = [
   "./", "./index.html", "./styles.css", "./album.css", "./juegos.css",
   "./rpg.css", "./rpg-loot.css", "./temas.css", "./finanzas.css", "./capsula-tiempo.css", "./pareja-chat.css", "./diccionario.css", "./recetas.css",
+  "./assets/app.bundle.min.css",
+  "./assets/vendor-core.bundle.min.js",
+  "./assets/view-logros.bundle.min.js",
+  "./assets/view-album-social.bundle.min.js",
+  "./assets/view-utilidades.bundle.min.js",
+  "./assets/view-rpg.bundle.min.js",
+  "./assets/view-app-extras.bundle.min.js",
   "./script.js", "./album.js", "./capsula-tiempo.js", "./preferences.js", "./finanzas.js", "./diccionario.js", "./recetas.js", "./icons-emojis.js", "./juegos.js",
   "./src/modules/album-core.js", "./src/modules/album-grupo.js", "./src/modules/album-logros.js",
   "./src/modules/album-fotos.js", "./src/modules/album-chat.js", "./src/modules/album-notas.js", "./src/modules/album-auth.js", "./src/modules/album-eventos.js",
   "./src/modules/album-router.js",
   "./ds.js", "./offline.js", "./tienda.js", "./perfil.js", "./logros-extra.js",
-  "./sprites-config.js", "./efectos.js", "./rpg-data.js", "./rpg.js", "./rpg-postgame.js", "./rpg-loot.js",
-  "./rpg-canvas.js", "./rpg-habilidades.js", "./rpg-minimap.js",
+  "./sprites-config.js", "./sprites-names.js", "./efectos.js", "./rpg-data.js", "./rpg.js", "./rpg-postgame.js", "./rpg-loot.js",
+  "./rpg-items-dinamicos.js", "./rpg-loadout.js", "./rpg-canvas.js", "./rpg-habilidades.js", "./rpg-minimap.js",
   "./rpg-roguelike.js", "./desafios-diarios.js", "./mejoras.js", "./parches-v2.js", "./parches-v3.js", "./pareja-sistema.js",
   "./manifest.json", "./img/girasol-loading.png", "./img/girasol-loading.webp",
   "./img/girasol.webp", "./img/mapache.webp", "./img/receta-mochi-matcha.jpg",
@@ -55,7 +62,7 @@ const ASSETS_ESTATICOS = [
   "./img/biomas/gen-df614595-485a-47f1-a074-7d4b4aa3d08e.png",
   "./img/biomas/gen-e46023c3-4ac1-4361-b312-e6f525bcead6.png",
   "./img/biomas/gen-ef4c41e3-8713-47f7-acde-eefb81a85d11.png",
-  "./img/biomas/gen-f34b37dd-a44a-4ac1-8ef3-a5b18a314480.png",
+  "./img/biomas/gen-f34b37dd-a44a-4ac1-8ef3-a5b18a314480.png"
 ];
 // ... resto igual
 

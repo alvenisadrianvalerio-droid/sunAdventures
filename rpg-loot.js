@@ -23,17 +23,28 @@
   };
 
   function renderIcono(item, size) {
+    const sz = size ? `width:${size};height:${size};` : "";
+    const placeholderHtml = `<div class="loot-placeholder-box" style="${sz}" title="Objeto sin sprite"><span class="loot-placeholder-symbol">?</span></div>`;
+
+    if (!item) return placeholderHtml;
+
+    // 1. Si tiene sprite sheet asignado (col, row)
     if (Array.isArray(item.sprite) && item.sprite.length === 2) {
-      const s = SHEETS[item.sheet] || SHEETS.loot1;
+      const s = SHEETS[item.sheet] || SHEETS.loot2 || SHEETS.loot1;
       const [col, row] = item.sprite;
       if (col >= 0 && col < s.cols && row >= 0 && row < s.rows) {
         const px = s.cols > 1 ? (col / (s.cols - 1)) * 100 : 50;
         const py = s.rows > 1 ? (row / (s.rows - 1)) * 100 : 50;
-        const sz = size ? `width:${size};height:${size};` : "";
         return `<div class="loot-sprite" style="${sz}background-image:url('${s.url}');background-size:${s.cols*100}% ${s.rows*100}%;background-position:${px}% ${py}%"></div>`;
       }
     }
-    return `<span class="loot-icono" data-icono="${item.icono || "estrella"}"></span>`;
+
+    // 2. Si tiene imagen explícita
+    if (item.imagen) {
+      return `<img class="loot-sprite" src="${item.imagen}" alt="${item.nombre || ''}" style="${sz}" onerror="this.onerror=null;this.replaceWith((() => { const s = document.createElement('div'); s.className='loot-placeholder-box'; s.style='${sz}'; s.innerHTML='<span class=\"loot-placeholder-symbol\">?</span>'; return s; })());">`;
+    }
+
+    return placeholderHtml;
   }
 
   /* ---------- Persistencia ---------- */
@@ -420,12 +431,14 @@
   function sortearItemVictoria(jefe) {
     const pgBonus = (window.RpgPostGame?.getState?.()?.bendiciones?.ojoTornasol || 0) * 0.0005;
     const x = Math.random();
-    const probTornasolJefe = 0.001 + pgBonus;
-    const probTornasolNormal = 0.0003 + pgBonus;
+    // Curva balanceada: Común 55%, Raro 25%, Épico 12%, Legendario 6%, Mítico 1.8%, Tornasol 0.2%
+    // En Jefes: Común 30%, Raro 35%, Épico 22%, Legendario 9%, Mítico 3.5%, Tornasol 0.5%
+    const probTornasolJefe = 0.005 + pgBonus;
+    const probTornasolNormal = 0.002 + pgBonus;
 
     const r = jefe
-      ? (x < probTornasolJefe ? "tornasol" : x < 0.0028 + pgBonus ? "mitico" : x < 0.016 ? "legendario" : x < 0.18 ? "epico" : x < 0.55 ? "raro" : "comun")
-      : (x < probTornasolNormal ? "tornasol" : x < 0.0009 + pgBonus ? "mitico" : x < 0.006 ? "legendario" : x < 0.09 ? "epico" : x < 0.40 ? "raro" : "comun");
+      ? (x < probTornasolJefe ? "tornasol" : x < 0.040 + pgBonus ? "mitico" : x < 0.130 ? "legendario" : x < 0.350 ? "epico" : x < 0.700 ? "raro" : "comun")
+      : (x < probTornasolNormal ? "tornasol" : x < 0.020 + pgBonus ? "mitico" : x < 0.080 ? "legendario" : x < 0.200 ? "epico" : x < 0.450 ? "raro" : "comun");
     return sortearItem(r, sortearCalidad());
   }
 
@@ -511,6 +524,26 @@
         </div>
         ${item.habilidades.map(h => `<div style="font-size:.75rem;margin-bottom:.2rem;"><strong>${h.nombre}</strong> <span style="opacity:.7;">(${h.tipo})</span>: <small style="opacity:.85;">${h.desc || ''}</small></div>`).join("")}
       </div>`;
+    }
+
+    // Afijo pasivo especial
+    const AFIJOS_DESC = {
+      sed_de_sangre: { nombre: "Sed de Sangre", desc: "Golpes críticos curan 15% del daño infligido y otorgan +10% ATK por 2 turnos.", icon: "🩸" },
+      baluarte_espinoso: { nombre: "Baluarte Espinoso", desc: "Al recibir daño, devuelve el 150% de tu DEF como daño reflejado.", icon: "🛡️" },
+      velo_espectral: { nombre: "Velo Espectral", desc: "Al esquivar un golpe enemigo, tu siguiente ataque tiene 100% crítico garantizado y sangrado.", icon: "💨" },
+      sobrecarga_solar: { nombre: "Sobrecarga Solar", desc: "Cada 3 turnos, acumula energía solar y desata una explosión del 80% de tu ATK.", icon: "☀️" },
+      saqueador: { nombre: "Saqueador", desc: "+15% oro y probabilidad aumentada de conseguir botines raros.", icon: "💰" }
+    };
+    if (item.afijo && AFIJOS_DESC[item.afijo]) {
+      const af = AFIJOS_DESC[item.afijo];
+      statsTexto += `<div style="margin-top:.6rem;padding:.5rem;background:rgba(255,217,61,.1);border:1px solid rgba(255,217,61,.4);border-radius:8px;text-align:left;">
+        <div style="font-size:.7rem;font-weight:900;text-transform:uppercase;color:#ffd93d;margin-bottom:.2rem;">${af.icon} AFIJO: ${af.nombre.toUpperCase()}</div>
+        <div style="font-size:.75rem;color:#fff2bf;">${af.desc}</div>
+      </div>`;
+    }
+
+    if (item.cooldown) {
+      statsTexto += `<div style="margin-top:.4rem;"><span style="display:inline-flex;align-items:center;gap:4px;padding:.2rem .5rem;background:rgba(45,125,210,.2);border:1px solid rgba(142,214,255,.35);border-radius:6px;font-size:.72rem;color:#8ed6ff;font-weight:800;">⏳ Cooldown en combate: ${item.cooldown} turnos</span></div>`;
     }
 
     m.querySelector(".rpg-loot-modal-desc").innerHTML = statsTexto;
@@ -674,6 +707,29 @@
       `;
     }
 
+    const AFIJOS_DESC = {
+      sed_de_sangre: { nombre: "Sed de Sangre", desc: "Golpes críticos curan 15% del daño y dan +10% ATK (2 turnos).", icon: "🩸" },
+      baluarte_espinoso: { nombre: "Baluarte Espinoso", desc: "Al recibir daño, refleja 150% de tu DEF.", icon: "🛡️" },
+      velo_espectral: { nombre: "Velo Espectral", desc: "Al esquivar, siguiente ataque tiene 100% crítico + sangrado.", icon: "💨" },
+      sobrecarga_solar: { nombre: "Sobrecarga Solar", desc: "Cada 3 turnos, desata una explosión solar del 80% de tu ATK.", icon: "☀️" },
+      saqueador: { nombre: "Saqueador", desc: "+15% oro y +10% probabilidad de botín extra.", icon: "💰" }
+    };
+    let afijoHtml = "";
+    if (item.afijo && AFIJOS_DESC[item.afijo]) {
+      const af = AFIJOS_DESC[item.afijo];
+      afijoHtml = `
+        <div class="rpg-item-tooltip-afijo">
+          <div class="rpg-item-tooltip-afijo-title"><span>${af.icon}</span> <span>AFIJO: ${af.nombre}</span></div>
+          <div class="rpg-item-tooltip-afijo-desc">${af.desc}</div>
+        </div>
+      `;
+    }
+
+    let cooldownHtml = "";
+    if (item.cooldown) {
+      cooldownHtml = `<div class="rpg-item-tooltip-cooldown">⏳ Cooldown: ${item.cooldown} turnos</div>`;
+    }
+
     tip.innerHTML = `
       <div class="rpg-item-tooltip-header">
         <div class="rpg-item-tooltip-icon">${renderIcono(item, "32px")}</div>
@@ -685,9 +741,13 @@
           </div>
         </div>
       </div>
-      <div class="rpg-item-tooltip-drop">🎲 Drop rate: ${dropPct}%</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        <div class="rpg-item-tooltip-drop">🎲 Drop rate: ${dropPct}%</div>
+        ${cooldownHtml}
+      </div>
       ${item.desc ? `<div class="rpg-item-tooltip-desc">"${item.desc}"</div>` : ""}
       <div class="rpg-item-tooltip-stats">${statsHtml}</div>
+      ${afijoHtml}
       ${habsHtml}
     `;
 
@@ -1041,10 +1101,10 @@
 
   /* ---------- Colección ---------- */
   const CATS = [
-    { id:"todos",       label:"Todos",     sheets:null },
-    { id:"loot1",       label:"Arsenal",   sheets:["loot1"] },
-    { id:"loot2",       label:"Recursos",  sheets:["loot2"] },
-    { id:"consumibles", label:"Pociones",  soloConsumibles:true }
+    { id: "todos", label: "Todos", filter: () => true },
+    { id: "loot1", label: "Arsenal", filter: p => !p.consumible && (p.tipo === "atk" || p.tipo === "def" || (p.stats && (p.stats.atk || p.stats.def)) && p.tipo !== "util" && p.tipo !== "key") },
+    { id: "loot2", label: "Recursos", filter: p => !p.consumible && (p.tipo === "util" || p.tipo === "key" || (p.stats && !p.stats.atk && !p.stats.def)) },
+    { id: "consumibles", label: "Pociones", filter: p => !!p.consumible || p.tipo === "hp" }
   ];
   let filtro = "todos";
 
@@ -1056,12 +1116,10 @@
     const uniq = Object.keys(loot).length;
     const cat = CATS.find(x => x.id === filtro) || CATS[0];
 
-    let pool = POOL;
-    if (cat.sheets) pool = pool.filter(p => cat.sheets.includes(p.sheet));
-    if (cat.soloConsumibles) pool = pool.filter(p => p.consumible);
+    let pool = POOL.filter(cat.filter);
 
     const filtros = CATS.map(x => `<button class="rpg-col-filtro ${x.id === filtro ? "active" : ""}" data-cat="${x.id}">${x.label}</button>`).join("");
-    const puedeReroll = filtro === "loot1" || filtro === "loot2";
+    const puedeReroll = filtro === "loot1" || filtro === "loot2" || filtro === "todos";
 
     // Panel de selección de hasta 9 objetos para reroll
     const arrSeleccion = [...seleccionReroll];

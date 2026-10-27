@@ -66,16 +66,11 @@
                 suerte: 0.45
             };
 
-            function escalarStats(stats, rareza) {
+            function escalarStats(stats) {
                 if (!stats) return {};
-                const mult = MULT_RAREZA[rareza] || 1.0;
                 const escalados = {};
                 Object.entries(stats).forEach(([key, val]) => {
-                    const tipoMult = MULT_TIPO_STAT[key] || 1.0;
-                    // Escalado equilibrado con progresión controlada
-                    const factor = Math.sqrt(mult * tipoMult);
-                    const baseCalc = Number(val) * factor;
-                    escalados[key] = Math.max(1, Math.round(baseCalc));
+                    escalados[key] = Number(val) || 0;
                 });
                 return escalados;
             }
@@ -88,28 +83,14 @@
 
                 return entradas.map(([coord, info]) => {
                     const [col, row] = coord.split(",").map(Number);
-                    let tipo = "util";
-                    if (info.stats) {
+                    let tipo = info.tipo || "util";
+                    if (!info.tipo && info.stats) {
                         if (info.stats.atk) tipo = "atk";
                         else if (info.stats.def) tipo = "def";
                         else if (info.stats.hp) tipo = "hp";
                     }
-                    if (info.tipo) tipo = info.tipo;
 
-                    const statsEscalados = escalarStats(info.stats, info.rar);
-
-                    // Si el objeto no tiene stats o quedaron en 0, otorgar stats base según rareza para que nunca tenga 0 util
-                    if (!info.stats || Object.keys(info.stats).length === 0 || Object.values(statsEscalados).every(v => !v)) {
-                        const baseAtk = info.rar === "mitico" || info.rar === "tornasol" ? 25 : info.rar === "legendario" ? 18 : info.rar === "epico" ? 12 : info.rar === "raro" ? 8 : 4;
-                        statsEscalados.atk = baseAtk;
-                        statsEscalados.def = Math.max(1, Math.round(baseAtk / 2));
-                        if (tipo === "util") tipo = "atk";
-                    }
-
-                    // Si el objeto tiene stats configurados fijos o específicos como Origen de la vida
-                    if (coord === "5,4" || info.nombre?.includes("Origen de la vida")) {
-                        statsEscalados.hp = 3500;
-                    }
+                    const statsEscalados = escalarStats(info.stats);
 
                     const valorPrincipal = statsEscalados.atk || statsEscalados.def || statsEscalados.hp ||
                         Object.values(statsEscalados)[0] || 1;
@@ -137,8 +118,10 @@
                         icono: info.icono || "espada",
                         desc: info.desc || "",
                         consumible: !!info.consumible,
-                        stats: statsEscalados,          // ← stats escalados
-                        statsRaw: info.stats || {},     // ← stats originales (por si acaso)
+                        cooldown: info.cooldown || 0,
+                        afijo: info.afijo || null,
+                        stats: statsEscalados,          // ← stats balanceados reales
+                        statsRaw: info.stats || {},     // ← stats originales
                         habilidades: habsFinales,
                         calidad: "normal"
                     };
@@ -361,6 +344,26 @@
                         });
                         return activas;
                     } catch { return []; }
+                },
+                getAfijosActivos() {
+                    try {
+                        const loot = RL.cargarLoot?.() || {};
+                        const afijos = new Set();
+                        Object.keys(loot).forEach(id => {
+                            if ((loot[id] || 0) <= 0) return;
+                            const it = RL.POOL.find(p => p.id === id);
+                            if (it && !it.consumible && it.afijo) {
+                                afijos.add(it.afijo);
+                            }
+                        });
+                        return Array.from(afijos);
+                    } catch { return []; }
+                },
+                tieneAfijo(nombreAfijo) {
+                    try {
+                        const afijos = this.getAfijosActivos();
+                        return afijos.includes(nombreAfijo);
+                    } catch { return false; }
                 },
                 recargarPool() {
                     const p = construirPool();
