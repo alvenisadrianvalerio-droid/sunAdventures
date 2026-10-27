@@ -513,9 +513,6 @@ body.light .nav-brand-banner {
   .nav-container {
     padding: 0.5rem 0.85rem;
   }
-  .nav-action-btn:nth-child(2) {
-    display: none;
-  }
 }
 
 .nav-hamburger {
