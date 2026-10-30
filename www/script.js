@@ -22,127 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const numLS = k => Number(localStorage.getItem(k) || 0);
   const setNumLS = (k, v) => localStorage.setItem(k, String(v));
 
-  /* ---------- Girasol lobby ---------- */
-  try {
-    const g = qs(".girasol-wrapper"), pop = $("pop"), b = qs(".burbuja");
-    if (g && pop) {
-      pop.volume = 0.15;
-      const fr = [
-        "Mi lugar favorito",
-        "Contigo hasta el infinito",
-        "Cada día te elijo",
-        "Eres mi casualidad más bonita",
-        "Mi persona favorita en el mundo",
-        "Gracias por existir",
-        "Siempre tú, siempre yo, siempre nosotros",
-        "Te pensé, y apareciste",
-        "Tú haces que todo sea más bonito",
-        "Mi hogar eres tú",
-        "El amor de mi vida entero",
-        "Mi corazón late por ti",
-        "Juntos somos invencibles",
-        "Tu sonrisa ilumina mis días",
-        "Te amo más que ayer y menos que mañana"
-      ];
-      let ultFrase = b?.textContent || "";
-      let timerBurbuja = null;
+  /* ---------- Girasol lobby (removido) ---------- */
 
-      const cambiarFrase = () => {
-        let nueva = randomDe(fr);
-        let intentos = 0;
-        while (nueva === ultFrase && intentos < 8) {
-          nueva = randomDe(fr);
-          intentos++;
-        }
-        ultFrase = nueva;
-        if (b) {
-          b.textContent = nueva;
-          b.classList.add("visible");
-          if (timerBurbuja) clearTimeout(timerBurbuja);
-          timerBurbuja = setTimeout(() => {
-            b.classList.remove("visible");
-          }, 1600);
-        }
-      };
-
-      const lanzarCorazones = (origX, origY) => {
-        const paleta = ["#ff3366", "#ff6b8b", "#ff4081", "#ff1744", "#f50057", "#e91e63", "#ff79a8"];
-        const rect = g.getBoundingClientRect();
-        const baseLeft = (typeof origX === "number" && !isNaN(origX)) ? origX : (rect.width / 2);
-        const baseTop = (typeof origY === "number" && !isNaN(origY)) ? origY : (rect.height / 2);
-
-        const svgCorazon = SVG.heart || '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
-
-        for (let i = 0; i < 7; i++) {
-          const h = document.createElement("div");
-          h.innerHTML = svgCorazon;
-          const tam = 1.6 + Math.random() * 0.8; // 1.6rem a 2.4rem
-          const color = paleta[Math.floor(Math.random() * paleta.length)];
-          const dx = (Math.random() - 0.5) * 110;
-          const rot = (Math.random() - 0.5) * 50;
-          const posX = baseLeft + (Math.random() - 0.5) * 36;
-          const posY = baseTop + (Math.random() - 0.5) * 36;
-
-          h.style.cssText = `position:absolute;pointer-events:none;width:${tam}rem;height:${tam}rem;color:${color};filter:drop-shadow(0 2px 8px rgba(255,51,102,0.65));animation:heartFloat 1.4s cubic-bezier(0.2,0.8,0.3,1) forwards;animation-delay:${i * 0.04}s;left:${posX}px;top:${posY}px;--dx:${dx}px;--rot:${rot}deg;z-index:99;display:flex;align-items:center;justify-content:center;`;
-          const svgInside = h.querySelector("svg");
-          if (svgInside) {
-            svgInside.style.width = "100%";
-            svgInside.style.height = "100%";
-            svgInside.style.filter = "drop-shadow(0 0 4px rgba(255,255,255,0.7))";
-          }
-          g.appendChild(h);
-          setTimeout(() => h.remove(), 1600);
-        }
-      };
-
-      const accionarGirasol = e => {
-        pop.currentTime = 0;
-        pop.play().catch(() => {});
-        cambiarFrase();
-
-        let x = null, y = null;
-        if (e) {
-          if (e.touches && e.touches[0]) {
-            const r = g.getBoundingClientRect();
-            x = e.touches[0].clientX - r.left;
-            y = e.touches[0].clientY - r.top;
-          } else if (e.changedTouches && e.changedTouches[0]) {
-            const r = g.getBoundingClientRect();
-            x = e.changedTouches[0].clientX - r.left;
-            y = e.changedTouches[0].clientY - r.top;
-          } else if (typeof e.offsetX === "number") {
-            x = e.offsetX;
-            y = e.offsetY;
-          }
-        }
-        lanzarCorazones(x, y);
-
-        // Efecto rebote en el girasol
-        g.classList.add("activo");
-        setTimeout(() => g.classList.remove("activo"), 600);
-      };
-
-      g.addEventListener("mouseenter", () => {
-        pop.currentTime = 0;
-        pop.play().catch(() => {});
-        cambiarFrase();
-      });
-
-      let touchHandled = false;
-      g.addEventListener("touchstart", e => {
-        touchHandled = true;
-        accionarGirasol(e);
-      }, { passive: true });
-
-      g.addEventListener("click", e => {
-        if (touchHandled) {
-          touchHandled = false;
-          return;
-        }
-        accionarGirasol(e);
-      });
-    }
-  } catch {}
 
   /* ---------- Tema ---------- */
   try {
@@ -157,18 +38,126 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ---------- Datos ---------- */
   const MASCOTAS = {
-    mapache:{nombre:"Mapache",imagen:"img/mapache.png",sonido:"chitter",favorita:"pizza"},
-    girasol:{nombre:"Girasol",imagen:"img/mascota-girasol.png",sonido:"twinkle",favorita:"agua"},
-    gatito:{nombre:"Siamesa",imagen:"img/siamesa.png",sonido:"meow",favorita:"pescado"},
-    "gatito-negro":{nombre:"Armstrong",imagen:"img/gatito-negro.png",sonido:"meow",favorita:"pescado"},
-    hamburguesa:{nombre:"Hamburguesa",imagen:"img/hamburguesa.png",sonido:"crunch",favorita:"pizza"},
-    oveja:{nombre:"Oveja",imagen:"img/oveja.png",sonido:"baa",favorita:"manzana"},
-    pollito:{nombre:"Pollito",imagen:"img/pollito.png",sonido:"peep",favorita:"semillas"},
-    jirafa:{nombre:"Jirafa",imagen:"img/jirafa.png",sonido:"blip",favorita:"manzana"},
-    unicornio:{nombre:"Unicornio",imagen:"img/unicornio.png",sonido:"sparkle",favorita:"cupcake"},
-    conejo:{nombre:"Conejito",imagen:"img/conejito.png",sonido:"hop",favorita:"zanahoria"},
-    "dragon-bebe":{nombre:"Dragón Bebé",imagen:"img/dragon-bebe.png",sonido:"fireball",favorita:"carbon"},
-    "dragon-anciano":{nombre:"Dragón Anciano",imagen:"img/dragon-anciano.png",sonido:"growl",favorita:"carbon"}
+    mapache: {
+      nombre: "Mapache",
+      imagen: "img/mapache.webp",
+      sonido: "chitter",
+      favorita: "pizza",
+      rol: "recolector",
+      rolLabel: "Recolector",
+      rolColor: "#f39c12",
+      pasiva: { nombre: "Ojo de Trapero", desc: "+15% SunCoins ganadas y mayor botín", stat: "oroBonus", val: 15 }
+    },
+    girasol: {
+      nombre: "Girasol",
+      imagen: "img/mascota-girasol.webp",
+      sonido: "twinkle",
+      favorita: "agua",
+      rol: "soporte",
+      rolLabel: "Soporte Solar",
+      rolColor: "#f1c40f",
+      pasiva: { nombre: "Fotosíntesis", desc: "Regenera +5 HP por turno en batalla", stat: "regenBonus", val: 5 }
+    },
+    gatito: {
+      nombre: "Siamesa",
+      imagen: "img/siamesa.webp",
+      sonido: "meow",
+      favorita: "pescado",
+      rol: "dps",
+      rolLabel: "DPS Crítico",
+      rolColor: "#e74c3c",
+      pasiva: { nombre: "Garra Sarcástica", desc: "+10% de probabilidad de golpe crítico", stat: "critBonus", val: 10 }
+    },
+    "gatito-negro": {
+      nombre: "Armstrong",
+      imagen: "img/gatito-negro.webp",
+      sonido: "meow",
+      favorita: "pescado",
+      rol: "agil",
+      rolLabel: "Evasivo",
+      rolColor: "#9b59b6",
+      pasiva: { nombre: "Sombra Nocturna", desc: "+8% de evasión en combates", stat: "esqBonus", val: 8 }
+    },
+    hamburguesa: {
+      nombre: "Hamburguesa",
+      imagen: "img/hamburguesa.webp",
+      sonido: "crunch",
+      favorita: "pizza",
+      rol: "tanque",
+      rolLabel: "Tanque Glotón",
+      rolColor: "#e67e22",
+      pasiva: { nombre: "Capa Extra Queso", desc: "+35 HP máximo de aventura", stat: "hp_max", val: 35 }
+    },
+    oveja: {
+      nombre: "Oveja",
+      imagen: "img/oveja.webp",
+      sonido: "baa",
+      favorita: "manzana",
+      rol: "soporte",
+      rolLabel: "Protectora",
+      rolColor: "#1abc9c",
+      pasiva: { nombre: "Manto de Lana", desc: "+6 de defensa y paz interior", stat: "def_fijo", val: 6 }
+    },
+    pollito: {
+      nombre: "Pollito",
+      imagen: "img/pollito.webp",
+      sonido: "peep",
+      favorita: "semillas",
+      rol: "agil",
+      rolLabel: "Velocista",
+      rolColor: "#f1c40f",
+      pasiva: { nombre: "Aleteo Precoz", desc: "+6 de velocidad y reflejos rápidos", stat: "velBonus", val: 6 }
+    },
+    jirafa: {
+      nombre: "Jirafa",
+      imagen: "img/jirafa.webp",
+      sonido: "blip",
+      favorita: "manzana",
+      rol: "soporte",
+      rolLabel: "Centinela",
+      rolColor: "#d35400",
+      pasiva: { nombre: "Vista Panorámica", desc: "+15% de experiencia en combate y minijuegos", stat: "xpBonus", val: 15 }
+    },
+    unicornio: {
+      nombre: "Unicornio",
+      imagen: "img/unicornio.webp",
+      sonido: "sparkle",
+      favorita: "cupcake",
+      rol: "magico",
+      rolLabel: "Arcano Sagrado",
+      rolColor: "#3498db",
+      pasiva: { nombre: "Cuerno Astral", desc: "+20% daño a jefes y aura sagrada", stat: "crit_jefe", val: 20 }
+    },
+    conejo: {
+      nombre: "Conejito",
+      imagen: "img/conejito.webp",
+      sonido: "hop",
+      favorita: "zanahoria",
+      rol: "dps",
+      rolLabel: "Salto Vorpal",
+      rolColor: "#2ecc71",
+      pasiva: { nombre: "Brinco Furtivo", desc: "+8% golpe crítico y +5 de ataque", stat: "atk_fijo", val: 5 }
+    },
+    "dragon-bebe": {
+      nombre: "Dragón Bebé",
+      imagen: "img/dragon-bebe.webp",
+      sonido: "fireball",
+      favorita: "carbon",
+      rol: "dps",
+      rolLabel: "Llama Naciente",
+      rolColor: "#e74c3c",
+      pasiva: { nombre: "Aliento Ígneo", desc: "+8 de ataque fijo y chispas de fuego", stat: "atk_fijo", val: 8 }
+    },
+    "dragon-anciano": {
+      nombre: "Dragón Anciano",
+      imagen: "img/dragon-anciano.webp",
+      sonido: "growl",
+      favorita: "carbon",
+      rol: "tanque",
+      rolLabel: "Soberano Ancestral",
+      rolColor: "#8e44ad",
+      pasiva: { nombre: "Escamas Milenarias", desc: "+10 defensa fija y +40 HP máximo", stat: "def_fijo", val: 10 }
+    }
   };
   const FRASES = {
     mapache:["¡Hola! Soy tu mapache","Ñam ñam...","¡Súbeme una foto!","¡Qué bonito todo!","Te acompaño siempre"],
@@ -340,8 +329,58 @@ document.addEventListener("DOMContentLoaded", () => {
     skinsC:u=>`mascota_skins_${u}`,
     skinsE:(u,m)=>`mascota_skins_eq_${u}_${m}`,
     amistad:u=>`mascota_amistad_${u}`,
-    cuidado:(u,m)=>`mascota_cuidado_${u}_${m}`
+    cuidado:(u,m)=>`mascota_cuidado_${u}_${m}`,
+    vinculo:(u,m)=>`sa_mascota_vinculo_${u}_${m}`
   };
+
+  /* ---------- Sistema de Vínculo de Amor (Jugador - Mascota) ---------- */
+  const NIVELES_VINCULO = [
+    { nivel: 1, min: 0,    max: 100,  titulo: "Recién Llegado", rango: "I",  icono: "sprout", bonoPct: 0,   desc: "Tu mascota aún te está conociendo." },
+    { nivel: 2, min: 101,  max: 350,  titulo: "Compañero Fiel", rango: "II", icono: "corazon", bonoPct: 15, desc: "Desbloquea la Pasiva de Aventura Rango I (+15% efecto)." },
+    { nivel: 3, min: 351,  max: 750,  titulo: "Buen Amigo",    rango: "III", icono: "estrella", bonoPct: 30, desc: "Pasiva Rango II (+30% efecto) y regalos diarios de SunCoins." },
+    { nivel: 4, min: 751,  max: 1400, titulo: "Mejor Amigo",   rango: "IV", icono: "corona",  bonoPct: 50, desc: "Pasiva Rango III (+50% efecto) y diálogos íntimos de cariño." },
+    { nivel: 5, min: 1401, max: 99999, titulo: "Alma Gemela",  rango: "V",  icono: "anillo",  bonoPct: 75, desc: "Pasiva al Máximo (+75% efecto) y Aura de Luz Sagrada dorada." }
+  ];
+
+  const getVinculoData = m => {
+    try {
+      const u = getUserId();
+      const xp = Math.max(0, Number(localStorage.getItem(KEY.vinculo(u, m)) || 0));
+      const niv = NIVELES_VINCULO.slice().reverse().find(n => xp >= n.min) || NIVELES_VINCULO[0];
+      const sig = NIVELES_VINCULO.find(n => n.nivel === niv.nivel + 1) || null;
+      const progreso = sig ? Math.min(100, Math.round(((xp - niv.min) / (sig.min - niv.min)) * 100)) : 100;
+      return { xp, nivel: niv.nivel, titulo: niv.titulo, rango: niv.rango, icono: niv.icono, bonoPct: niv.bonoPct, desc: niv.desc, siguiente: sig, progreso };
+    } catch {
+      return { xp: 0, nivel: 1, titulo: "Recién Llegado", rango: "I", icono: "sprout", bonoPct: 0, desc: "Tu mascota aún te está conociendo.", siguiente: NIVELES_VINCULO[1], progreso: 0 };
+    }
+  };
+
+  const subirVinculo = (m, d, motivo = "") => {
+    try {
+      if (!m || d <= 0) return;
+      const u = getUserId();
+      const prev = getVinculoData(m);
+      const nuevaXp = Math.max(0, prev.xp + Math.round(d));
+      localStorage.setItem(KEY.vinculo(u, m), String(nuevaXp));
+      const nuevo = getVinculoData(m);
+      if (nuevo.nivel > prev.nivel) {
+        snd("fanfarria");
+        notifMascota(`¡Vínculo Nivel ${nuevo.nivel}!`, `${MASCOTAS[m]?.nombre || "Tu mascota"} es ahora tu ${nuevo.titulo}`);
+        lanzarCorazones?.(12);
+        try { window._sumarAmorPareja?.(20, `Vínculo de ${MASCOTAS[m]?.nombre || "mascota"} subió de nivel`); } catch {}
+      } else if (motivo) {
+        // Notificación suave opcional
+      }
+      window.dispatchEvent(new CustomEvent("sunad:vinculo-cambiado", { detail: { mascota: m, xp: nuevaXp, nivel: nuevo.nivel } }));
+      window.dispatchEvent(new Event("sunad:progress"));
+      return nuevo;
+    } catch (e) {
+      console.warn("subirVinculo:", e);
+    }
+  };
+  window._getVinculoData = getVinculoData;
+  window._subirVinculo = subirVinculo;
+  window._NIVELES_VINCULO = NIVELES_VINCULO;
   const statsDef = () => ({ hambre:80, felicidad:100, energia:100, ultimaActualizacion:Date.now(), durmiendo:false });
   const cargarStats = m => {
     try {
@@ -533,6 +572,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const kXp = `sa_experiencia_extra_${u}`;
       const actualXp = Math.max(0, Number(localStorage.getItem(kXp)) || 0);
       localStorage.setItem(kXp, String(actualXp + xpPremio));
+
+      // Sumar Amor XP a la mascota activa por jugar juntos
+      const mActual = localStorage.getItem("mascota_actual") || "mapache";
+      subirVinculo(mActual, Math.max(5, Math.round(m * 0.5) + 3), "Minijuego en equipo");
     } catch {}
     if (window.decirMascota) window.decirMascota(mot || `+${m}`, 2500);
     window.dispatchEvent(new Event("sunad:progress"));
@@ -605,6 +648,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!m || !statsM) return;
         const av = $("mm-avatar-img"); if (av) { av.src = m.imagen; av.alt = m.nombre; }
         const nom = $("mm-nombre-txt"); if (nom) nom.textContent = m.nombre;
+        const rolBadge = $("mm-rol-badge");
+        if (rolBadge) {
+          rolBadge.textContent = m.rolLabel || "Compañero";
+          rolBadge.style.backgroundColor = m.rolColor ? `${m.rolColor}26` : "rgba(255,217,61,0.15)";
+          rolBadge.style.borderColor = m.rolColor || "rgba(255,217,61,0.4)";
+          rolBadge.style.color = m.rolColor || "var(--accent)";
+        }
         const est = $("mm-estado");
         if (est) {
           let estado = "Tranquila";
@@ -615,6 +665,27 @@ document.addEventListener("DOMContentLoaded", () => {
           else if (statsM.energia < 25) estado = "Cansada";
           est.textContent = estado;
         }
+
+        /* Actualizar Vínculo de Amor */
+        const vd = getVinculoData(mascotaActual);
+        const nivTxt = $("mm-vinculo-nivel-txt");
+        if (nivTxt) nivTxt.textContent = `Nivel ${vd.nivel} · ${vd.titulo}`;
+        const descTxt = $("mm-vinculo-desc-txt");
+        if (descTxt) descTxt.textContent = vd.desc;
+        const xpTxt = $("mm-vinculo-xp-txt");
+        if (xpTxt) xpTxt.textContent = vd.siguiente ? `${vd.xp} / ${vd.siguiente.min} Amor XP` : `${vd.xp} Amor XP (Máximo)`;
+        const fill = $("mm-vinculo-fill");
+        if (fill) fill.style.width = `${vd.progreso}%`;
+
+        /* Actualizar Habilidad Pasiva */
+        const pNom = $("mm-pasiva-nombre");
+        if (pNom) pNom.textContent = m.pasiva ? `${m.pasiva.nombre} (Rango ${vd.rango})` : "Compañero Leal";
+        const pDesc = $("mm-pasiva-desc");
+        if (pDesc) {
+          const bonoStr = vd.bonoPct > 0 ? ` [Potenciado +${vd.bonoPct}% por Vínculo]` : "";
+          pDesc.textContent = (m.pasiva ? m.pasiva.desc : "Te acompaña con alegría y lealtad.") + bonoStr;
+        }
+
         const mon = $("mm-monedas"); if (mon) mon.textContent = getMonedas();
         const hp = Math.round(statsM.hambre), fp = Math.round(statsM.felicidad), ep = Math.round(statsM.energia);
         const hv = $("mm-stat-hambre-val"), fv = $("mm-stat-felicidad-val"), ev = $("mm-stat-energia-val");
@@ -633,6 +704,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const meta = MASCOTAS[mascotaActual];
         mascota.classList.toggle("dormida", !!statsM.durmiendo);
         mascota.classList.toggle("hambrienta", statsM.hambre < 25 && !statsM.durmiendo);
+        const vd = getVinculoData(mascotaActual);
+        mascota.classList.toggle("vinculo-alma-gemela", vd.nivel >= 5);
         if (statsM.durmiendo && meta.imagenDormida) setMascotaImg(mascotaImg, meta.imagenDormida, meta.nombre, meta.imagen);
         else setMascotaImg(mascotaImg, meta.imagen, meta.nombre);
         let z = qs(".mascota-zzz-cont", mascota);
@@ -653,6 +726,13 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.style.overflow = "hidden";
       actualizarModalMascota();
       renderInv(); renderCuidado(); renderCambiarMascota();
+      if (typeof window.hidratarIconos === "function") window.hidratarIconos(m);
+      else {
+        m.querySelectorAll("[data-icono]").forEach(el => {
+          const k = el.dataset.icono;
+          if (window.ICONO?.[k] && !el.querySelector("svg")) el.innerHTML = window.ICONO[k];
+        });
+      }
       window.dispatchEvent(new Event("sunad:mascota-cambiada"));
     };
     window.cerrarMascotaModal = () => {
@@ -694,11 +774,43 @@ document.addEventListener("DOMContentLoaded", () => {
       const c = $("mm-cuidado-diario"); if (!c) return;
       const cu = cargarCuidado(mascotaActual);
       const t = [
-        { id:"alimentar", icono:ICONO.manzana, txt:"Alimentar" },
-        { id:"jugar",     icono:ICONO.jugar,   txt:"Jugar" },
-        { id:"mimar",     icono:ICONO.mimar,   txt:"Mimar" }
+        { id: "alimentar", iconoKey: "cuenco", txt: "Alimentar", sub: "+4 Amor XP", color: "#f39c12" },
+        { id: "jugar",     iconoKey: "jugar",  txt: "Jugar",     sub: "+15 Amor XP", color: "#3498db" },
+        { id: "mimar",     iconoKey: "mimar",  txt: "Mimar",     sub: "+8 Amor XP", color: "#e74c3c" }
       ];
-      c.innerHTML = `<div class="cuidado-diario-titulo"><span>Cuidado diario</span><span class="cuidado-diario-racha">${cu.racha || 0} ${cu.racha === 1 ? "día" : "días"}</span></div><div class="cuidado-diario-tareas">${t.map(x => `<div class="cuidado-tarea ${cu.tareas.includes(x.id) ? "hecha" : ""}"><span class="cuidado-tarea-emoji">${x.icono || ""}</span><span class="cuidado-tarea-txt">${x.txt}</span>${cu.tareas.includes(x.id) ? '<span class="cuidado-tarea-check">✓</span>' : ''}</div>`).join("")}</div>`;
+      c.innerHTML = `
+        <div class="cuidado-diario-titulo">
+          <div class="cuidado-diario-tit-left">
+            <span class="cuidado-tit-icon" data-icono="corazonManos"></span>
+            <span>Rutina de Cuidado Diario</span>
+          </div>
+          <span class="cuidado-diario-racha">🔥 ${cu.racha || 0} ${cu.racha === 1 ? "día seguido" : "días seguidos"}</span>
+        </div>
+        <div class="cuidado-diario-tareas">
+          ${t.map(x => {
+            const hecha = cu.tareas.includes(x.id);
+            const iconSvg = ICONO[x.iconoKey] || "";
+            return `
+              <div class="cuidado-tarea ${hecha ? "hecha" : ""}" data-tarea="${x.id}">
+                <div class="cuidado-tarea-icon-wrap" style="color:${x.color}">
+                  ${iconSvg}
+                </div>
+                <strong class="cuidado-tarea-txt">${x.txt}</strong>
+                <span class="cuidado-tarea-sub">${hecha ? "¡Listo hoy!" : x.sub}</span>
+                ${hecha ? '<span class="cuidado-tarea-check">✓</span>' : ''}
+              </div>`;
+          }).join("")}
+        </div>
+        <div class="cuidado-diario-premio-hint">
+          <span>🎁 Completa los 3 para ganar <strong>+${20 + (cu.racha || 0) * 2} 🪙</strong> y <strong>+25 Amor XP</strong></span>
+        </div>`;
+      if (typeof window.hidratarIconos === "function") window.hidratarIconos(c);
+      else {
+        c.querySelectorAll("[data-icono]").forEach(el => {
+          const k = el.dataset.icono;
+          if (window.ICONO?.[k] && !el.querySelector("svg")) el.innerHTML = window.ICONO[k];
+        });
+      }
     }
     window._renderCuidado = renderCuidado;
 
@@ -709,19 +821,36 @@ document.addEventListener("DOMContentLoaded", () => {
         const ok = desbloqueada(id);
         const comprable = esComprable(id);
         const d = DESBLOQUEO[id];
+        const mData = MASCOTAS[id];
+        const vd = getVinculoData(id);
         const item = document.createElement("button");
         item.type = "button";
         item.className = "mm-cambiar-item" + (id === mascotaActual ? " activa" : "") + (!ok ? " bloqueada" : "") + (comprable ? " comprable" : "");
-        item.innerHTML = `<img alt=""><span class="mm-cambiar-info"></span>`;
+        item.innerHTML = `
+          <div class="mm-cambiar-thumb-wrap">
+            <img alt="">
+            ${ok ? `<span class="mm-cambiar-vinculo-tag">Nv.${vd.nivel}</span>` : ''}
+          </div>
+          <div class="mm-cambiar-info-col">
+            <div class="mm-cambiar-top-row">
+              <strong class="mm-cambiar-nombre">${mData.nombre}</strong>
+              <span class="mm-cambiar-rol-tag" style="color:${mData.rolColor||'var(--accent)'}">${mData.rolLabel||''}</span>
+            </div>
+            <span class="mm-cambiar-pasiva-mini">${mData.pasiva?.nombre || 'Compañero'}</span>
+            <span class="mm-cambiar-sub-txt"></span>
+          </div>`;
         const im = item.querySelector("img");
         im.onerror = () => { im.onerror = null; im.src = "img/girasol-loading.png"; };
-        im.src = MASCOTAS[id].imagen;
-        const info = item.querySelector(".mm-cambiar-info");
+        im.src = mData.imagen;
+        const subTxt = item.querySelector(".mm-cambiar-sub-txt");
         if (comprable && d) {
-          info.textContent = `${d.precio} 🪙`;
-          item.title = `Comprar ${MASCOTAS[id].nombre} (nivel ${d.reqNivel})`;
+          subTxt.innerHTML = `<span class="mm-cambiar-precio">${d.precio} 🪙</span> · Requiere Nivel ${d.reqNivel}`;
+          item.title = `Adoptar ${mData.nombre} (${d.precio} SunCoins)`;
+        } else if (ok) {
+          subTxt.textContent = id === mascotaActual ? "★ Equipada actualmente" : `${vd.titulo} · ${vd.xp} Amor XP`;
+          item.title = `Equipar a ${mData.nombre}`;
         } else {
-          item.title = MASCOTAS[id].nombre;
+          subTxt.textContent = "🔒 Aún bloqueada";
         }
         if (ok && id !== mascotaActual && !comprable) {
           item.addEventListener("click", () => {
@@ -733,7 +862,7 @@ document.addEventListener("DOMContentLoaded", () => {
             visual();
             actualizarModalMascota();
             renderInv(); renderCuidado(); renderCambiarMascota();
-            decirMascota(`¡Hola! Ahora soy ${MASCOTAS[mascotaActual].nombre}`);
+            decirMascota(`¡Hola! Ahora te acompaña ${MASCOTAS[mascotaActual].nombre}`);
             window.dispatchEvent(new Event("sunad:mascota-cambiada"));
           });
         } else if (comprable) {
@@ -755,7 +884,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const b = 20 + c.racha * 2;
           setMonedas(getMonedas() + b);
           setNumLS(`sa_cuidado_racha_${getUserId()}`, c.racha);
-          notifMascota(`+${b}`, `¡Cuidado diario completado! Racha: ${c.racha} días`);
+          subirVinculo(mascotaActual, 25, "¡Cuidado diario completo!");
+          notifMascota(`+${b} 🪙`, `¡Cuidado diario completado! Racha: ${c.racha} días (+25 Amor XP)`);
           if (statsM) { statsM.felicidad = clamp(statsM.felicidad + 15); guardarStats(mascotaActual, statsM); }
           decirMascota(`¡${c.racha} días seguidos cuidándome!`);
         }
@@ -776,6 +906,7 @@ document.addEventListener("DOMContentLoaded", () => {
         guardarStats(mascotaActual, statsM);
         marcarTarea("mimar");
         subirAmistadTodas(1);
+        subirVinculo(mascotaActual, 8, "Mimos");
         actualizarModalMascota();
         renderCuidado();
         visual();
@@ -849,10 +980,11 @@ document.addEventListener("DOMContentLoaded", () => {
         guardarStats(mascotaActual, statsM);
         marcarTarea("alimentar");
         subirAmistadTodas(1);
+        subirVinculo(mascotaActual, fav ? 10 : 4, fav ? "Comida favorita" : "Snack");
         snd("comer");
         lanzarCorazones(fav ? 8 : 3);
         decirMascota(randomDe(fav ? ["¡PIZZA! ¡Mi favorita!", "¡Ñam ñam!", "¡Eres el mejor!"] : ["¡Gracias por la comida!", "Ñam ñam...", "¡Qué rico!"]));
-        if (fav) { setMonedas(getMonedas() + 3); notifMascota("+3", "¡Comida favorita!"); }
+        if (fav) { setMonedas(getMonedas() + 3); notifMascota("+3 🪙", "¡Comida favorita! (+10 Amor XP)"); }
         actualizarModalMascota();
         renderInv(); renderCuidado(); visual();
         window.dispatchEvent(new CustomEvent("sunad:mascota-accion", { detail: { tipo: "alimentar", id, mascota: mascotaActual } }));
@@ -1054,6 +1186,8 @@ document.addEventListener("DOMContentLoaded", () => {
         p.hidden = !activa;
       });
       if (target === "inventario") renderInv?.();
+      else if (target === "cuidado") renderCuidado?.();
+      else if (target === "cambiar") renderCambiarMascota?.();
     };
 
     document.addEventListener("click", e => {
@@ -1082,8 +1216,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (window._mascotaIntervals) window._mascotaIntervals.forEach(clearInterval);
     window._mascotaIntervals = [
-      setInterval(() => { try { if (!mascotaBurbuja.classList.contains("visible")) decirMascota(randomDe(FRASES[mascotaActual])); } catch {} }, 45000),
-      setInterval(() => { try { decaer(statsM); guardarStats(mascotaActual, statsM); actualizarModalMascota(); visual(); } catch {} }, 60000)
+      setInterval(() => {
+        try {
+          if (document.hidden) return;
+          if (!mascotaBurbuja.classList.contains("visible")) decirMascota(randomDe(FRASES[mascotaActual]));
+        } catch {}
+      }, 45000),
+      setInterval(() => {
+        try {
+          if (document.hidden) return;
+          decaer(statsM);
+          guardarStats(mascotaActual, statsM);
+          actualizarModalMascota();
+          visual();
+        } catch {}
+      }, 60000)
     ];
   }
 
@@ -1424,7 +1571,104 @@ sprite.style.opacity = "0.25";
   /* ============================================================
      GRID MASCOTAS
      ============================================================ */
+  function actualizarHogarMascota() {
+    const act = localStorage.getItem("mascota_actual") || "mapache";
+    const info = MASCOTAS[act] || MASCOTAS.mapache;
+    const vData = getVinculoData(act);
+    const u = getUserId();
+
+    const imgEl = $("hogar-mascota-img");
+    const nombreEl = $("hogar-mascota-nombre");
+    const badgeVinculoEl = $("hogar-mascota-badge-vinculo");
+    const tituloVinculoEl = $("hogar-mascota-titulo-vinculo");
+    const fraseEl = $("hogar-mascota-frase");
+    const fillEl = $("hogar-mascota-barra-fill");
+    const xpTextoEl = $("hogar-mascota-xp-texto");
+    const bonoTextoEl = $("hogar-mascota-bono-texto");
+    const btnCuidado = $("btn-hogar-abrir-cuidado");
+    const btnEvolucion = $("btn-hogar-evolucionar");
+
+    if (imgEl && info) {
+      imgEl.src = info.imagen;
+      imgEl.alt = info.nombre;
+    }
+    if (nombreEl && info) nombreEl.textContent = info.nombre;
+    if (badgeVinculoEl) badgeVinculoEl.textContent = `Rango ${vData.rango}`;
+    if (tituloVinculoEl) tituloVinculoEl.textContent = vData.titulo;
+
+    const FRASES_MASCOTA = {
+      mapache: "¡Listo para cualquier aventura a tu lado!",
+      girasol: "Brillando siempre para alegrarte el día.",
+      gatito: "Ronroneando de felicidad cada vez que vienes.",
+      "gatito-negro": "Tu amuleto leal de buena suerte en cada paso.",
+      hamburguesa: "¡El bocado más crujiente y tierno del mundo!",
+      pollito: "Pío pío, ¡siguiendo tus huellas a donde vayas!",
+      oveja: "Suave, tranquila y siempre acompañándote con calma.",
+      conejo: "¡Saltando de emoción por nuestros logros juntos!",
+      jirafa: "Mirando alto hacia nuestro hermoso futuro.",
+      unicornio: "Esparciendo chispas de magia en cada rincón.",
+      "dragon-bebe": "Pequeño pero con un fuego ardiente de lealtad.",
+      "dragon-anciano": "Guardián legendario de nuestro amor infinito."
+    };
+    if (fraseEl) fraseEl.textContent = `"${FRASES_MASCOTA[act] || '¡Siempre a tu lado!'}"`;
+
+    if (fillEl) fillEl.style.width = `${vData.progreso}%`;
+    if (xpTextoEl) {
+      if (vData.siguiente) {
+        xpTextoEl.textContent = `${vData.xp} / ${vData.siguiente.min} XP Vínculo`;
+      } else {
+        xpTextoEl.textContent = `${vData.xp} XP · ¡Vínculo Supremo!`;
+      }
+    }
+    if (bonoTextoEl) bonoTextoEl.textContent = `+${vData.bonoPct}% Efecto Pasivo`;
+
+    if (btnCuidado && !btnCuidado.dataset.bound) {
+      btnCuidado.dataset.bound = "true";
+      btnCuidado.addEventListener("click", () => {
+        const modal = $("mascota-cuidado-modal");
+        if (modal) {
+          modal.classList.add("active");
+          modal.hidden = false;
+          window._actualizarModalCuidado?.();
+        } else {
+          try { notifMascota(info.nombre, "¡Te mira con infinito amor y felicidad!"); snd("pop"); } catch {}
+        }
+      });
+    }
+
+    // Regla de evolución del Dragón Bebé a Anciano:
+    // Requiere tener Dragon Bebé activo o adquirido, y haber alcanzado Vínculo Nivel >= 5
+    if (btnEvolucion) {
+      const tieneBebe = getMascotasCompradas().includes("dragon-bebe") || act === "dragon-bebe";
+      const yaTieneAnciano = getMascotasCompradas().includes("dragon-anciano");
+      const vinculoBebe = getVinculoData("dragon-bebe");
+      const puedeEvolucionar = tieneBebe && !yaTieneAnciano && vinculoBebe.nivel >= 5;
+
+      if (puedeEvolucionar) {
+        btnEvolucion.style.display = "inline-flex";
+        if (!btnEvolucion.dataset.bound) {
+          btnEvolucion.dataset.bound = "true";
+          btnEvolucion.addEventListener("click", () => {
+            const compradas = getMascotasCompradas();
+            if (!compradas.includes("dragon-anciano")) {
+              compradas.push("dragon-anciano");
+              setMascotasCompradas(compradas);
+              localStorage.setItem("mascota_actual", "dragon-anciano");
+              notifMascota("¡EVOLUCIÓN LEGENDARIA!", "¡Tu Dragón Bebé ha madurado al Dragón Anciano!");
+              try { snd("fanfarria") || snd("compra"); } catch {}
+              renderGrid();
+              window.dispatchEvent(new Event("sunad:progress"));
+            }
+          });
+        }
+      } else {
+        btnEvolucion.style.display = "none";
+      }
+    }
+  }
+
   function renderGrid() {
+    actualizarHogarMascota();
     const g = $("mascotas-grid"), e = $("mascotas-empty");
     if (!g) return;
     const act = localStorage.getItem("mascota_actual") || "mapache";
@@ -1459,9 +1703,18 @@ sprite.style.opacity = "0.25";
       }
       else {
         p.textContent = "Mascota adquirida";
-        b.textContent = "✓ Adquirida";
-        b.classList.add("activo");
-        b.disabled = true;
+        b.textContent = (id === act) ? "✓ En Compañía" : "Acompañarme";
+        if (id === act) b.classList.add("activo");
+        b.disabled = (id === act);
+        if (id !== act) {
+          b.addEventListener("click", () => {
+            localStorage.setItem("mascota_actual", id);
+            notifMascota("Nuevo compañero", `Ahora te acompaña ${info.nombre}`);
+            try { snd("pop"); } catch {}
+            renderGrid();
+            window.dispatchEvent(new Event("sunad:progress"));
+          });
+        }
       }
       c.append(im, h, p, b);
       g.appendChild(c);
@@ -1479,6 +1732,10 @@ sprite.style.opacity = "0.25";
 
   /* ---------- Hidratar iconos ---------- */
   function hidratarIconos(root = document) {
+    if (root && root.nodeType === 1 && root.hasAttribute("data-icono")) {
+      const k = root.dataset.icono;
+      if (ICONO[k] && !qs("svg", root)) root.innerHTML = ICONO[k];
+    }
     qsa("[data-icono]", root).forEach(el => {
       const k = el.dataset.icono;
       if (ICONO[k] && !qs("svg", el)) el.innerHTML = ICONO[k];
@@ -1495,7 +1752,13 @@ sprite.style.opacity = "0.25";
     _hidraCola.clear();
   };
   new MutationObserver(muts => {
-    for (const m of muts) for (const n of m.addedNodes) if (n.nodeType === 1) _hidraCola.add(n);
+    for (const m of muts) {
+      for (const n of m.addedNodes) {
+        if (n.nodeType === 1 && (n.hasAttribute("data-icono") || (n.firstElementChild && n.querySelector("[data-icono]")))) {
+          _hidraCola.add(n);
+        }
+      }
+    }
     if (!_hidraPend && _hidraCola.size) { _hidraPend = true; requestAnimationFrame(_hidraFlush); }
   }).observe(document.body, { childList: true, subtree: true });
 
@@ -1809,6 +2072,20 @@ sprite.style.opacity = "0.25";
       const SL = { ...TIENDA_ITEMS.cabeza, ...TIENDA_ITEMS.cuello, ...TIENDA_ITEMS.ojos, ...TIENDA_ITEMS.fondos, ...TIENDA_ITEMS.efectos };
       const activos = [];
       Object.values(eq).forEach(id => { const s = SL[id]; if (s && s.bonus) activos.push(s.bonus); });
+
+      // Pasiva de la Mascota Activa potenciada por el Vínculo de Amor
+      const petMeta = MASCOTAS[mascotaActual];
+      if (petMeta && petMeta.pasiva) {
+        const vd = getVinculoData(mascotaActual);
+        const factor = 1 + (vd.bonoPct / 100);
+        const valorEfectivo = Math.round(petMeta.pasiva.val * factor);
+        activos.push({
+          tipo: petMeta.pasiva.stat,
+          val: valorEfectivo,
+          desc: `${petMeta.pasiva.nombre} (Vínculo Nv.${vd.nivel}): +${valorEfectivo}`
+        });
+      }
+
       return activos;
     } catch { return []; }
   }
@@ -1864,11 +2141,12 @@ sprite.style.opacity = "0.25";
     const u = getUserId();
     setNumLS(`sa_tienda_compras_${u}`, numLS(`sa_tienda_compras_${u}`) + 1);
   });
-  setInterval(() => {
+  // Verificar récord inicial de monedas una sola vez (setMonedas ya lo mantiene al día en tiempo real)
+  try {
     const u = getUserId();
     const actual = getMonedas();
     if (actual > numLS(`sa_monedas_max_${u}`)) setNumLS(`sa_monedas_max_${u}`, actual);
-  }, 5000);
+  } catch {}
 
   Object.entries(SKINS).forEach(([id, s]) => {
     if (s.icono && !ICONO[s.icono]) console.warn(`[Skin] ${id}: icono "${s.icono}" no existe en ICONO`);
@@ -2030,5 +2308,151 @@ sprite.style.opacity = "0.25";
   window.addEventListener("sunad:user-ready", () => setTimeout(comprobarStarterPetModal, 600));
   setTimeout(comprobarStarterPetModal, 1500);
 
-  console.log("✅ script.js v5 cargado (getNivel hoisteada)");
+  /* ---------- Botón Tienda en Dashboard ---------- */
+  const btnTiendaDash = $("dash-btn-tienda");
+  if (btnTiendaDash) {
+    btnTiendaDash.addEventListener("click", e => {
+      e.preventDefault();
+      try {
+        if (window.Tienda?.abrir) {
+          window.Tienda.abrir();
+        } else {
+          $("shop-bubble")?.click();
+        }
+      } catch (err) {
+        console.warn("dash-btn-tienda click:", err);
+      }
+    });
+  }
+
+  /* ---------- Control de Falla Astral (Bloqueo condicional tras RPG) ---------- */
+  function actualizarEstadoFallaAstral() {
+    const btnFalla = $("dash-btn-falla");
+    const candado = $("dash-falla-candado");
+    if (!btnFalla) return;
+
+    let desbloqueado = false;
+    try {
+      if (typeof window.RpgPostGame?.esDesbloqueado === "function") {
+        desbloqueado = window.RpgPostGame.esDesbloqueado();
+      } else {
+        const u = getUserId();
+        const rRaw = localStorage.getItem(`sa_rpg_${u}`);
+        if (rRaw) {
+          const r = JSON.parse(rRaw);
+          desbloqueado = (r.jefesDerrotados && r.jefesDerrotados.includes("vacio-10")) ||
+                         (r.zonasConquistadas && r.zonasConquistadas.length >= 150);
+        }
+      }
+    } catch {}
+
+    btnFalla.classList.toggle("bento-tool-locked", !desbloqueado);
+    if (candado) candado.style.display = desbloqueado ? "none" : "flex";
+  }
+
+  const btnFalla = $("dash-btn-falla");
+  if (btnFalla) {
+    btnFalla.addEventListener("click", e => {
+      let desbloqueado = false;
+      try {
+        if (typeof window.RpgPostGame?.esDesbloqueado === "function") {
+          desbloqueado = window.RpgPostGame.esDesbloqueado();
+        }
+      } catch {}
+
+      if (!desbloqueado) {
+        e.preventDefault();
+        e.stopPropagation();
+        try { snd("golpe") || snd("pop"); } catch {}
+        if (window.SunModal?.alert) {
+          window.SunModal.alert({
+            title: "Falla Astral Bloqueada",
+            message: "La Falla Astral es una grieta multiversal mística. Debes <strong>derrotar al Kraken Abisal o completar las 150 zonas del Modo Aventura</strong> para abrirla.",
+            variant: "warning",
+            icon: "🔒",
+            confirmText: "Entendido"
+          });
+        } else {
+          alert("🔒 Debes completar el Modo Aventura para desbloquear la Falla Astral.");
+        }
+      } else {
+        // Si está desbloqueado, dirigir directamente a Roguelike o Post-Game
+        e.preventDefault();
+        location.hash = "#rpg";
+        setTimeout(() => {
+          if (window.RpgRoguelike?.abrir) {
+            window.RpgRoguelike.abrir();
+          } else {
+            document.querySelector('[data-rpg-tab="roguelike"]')?.click();
+          }
+        }, 150);
+      }
+    });
+  }
+
+  /* ---------- Hub Selector de Minijuegos en Dashboard ---------- */
+  const btnMinijuegosDash = $("dash-btn-minijuegos");
+  const modalMinijuegos = $("modal-minijuegos-hub");
+  const btnCerrarMinijuegos = $("btn-cerrar-modal-minijuegos");
+
+  function abrirModalMinijuegos(e) {
+    if (e) e.preventDefault();
+    if (!modalMinijuegos) {
+      location.hash = "#mascotas";
+      return;
+    }
+    modalMinijuegos.classList.add("active");
+    try { snd("pop"); } catch {}
+  }
+
+  function cerrarModalMinijuegos() {
+    if (!modalMinijuegos) return;
+    modalMinijuegos.classList.remove("active");
+    try { snd("pop"); } catch {}
+  }
+
+  if (btnMinijuegosDash) {
+    btnMinijuegosDash.addEventListener("click", abrirModalMinijuegos);
+  }
+
+  if (btnCerrarMinijuegos) {
+    btnCerrarMinijuegos.addEventListener("click", cerrarModalMinijuegos);
+  }
+
+  if (modalMinijuegos) {
+    const backdrop = modalMinijuegos.querySelector(".modal-backdrop");
+    backdrop?.addEventListener("click", cerrarModalMinijuegos);
+
+    modalMinijuegos.querySelectorAll("[data-launch-juego]").forEach(card => {
+      card.addEventListener("click", () => {
+        const juego = card.dataset.launchJuego;
+        cerrarModalMinijuegos();
+        try { snd("pop"); } catch {}
+
+        if (juego === "girasol" && typeof window.juegoGirasol === "function") {
+          window.juegoGirasol();
+        } else if (juego === "memoria" && typeof window.juegoMemoria === "function") {
+          window.juegoMemoria();
+        } else if (juego === "adivina" && typeof window.juegoAdivina === "function") {
+          window.juegoAdivina();
+        } else if (juego === "dados" && typeof window.JUEGO_FNS?.dados === "function") {
+          window.JUEGO_FNS.dados();
+        } else if (juego === "snake" && typeof window.juegoSnake === "function") {
+          window.juegoSnake();
+        } else {
+          // Fallback al botón de la vista de minijuegos si existe
+          const btn = document.querySelector(`.btn-minijuego[data-juego="${juego}"]`);
+          if (btn) btn.click();
+          else location.hash = "#mascotas";
+        }
+      });
+    });
+  }
+
+  window.actualizarEstadoFallaAstral = actualizarEstadoFallaAstral;
+  actualizarEstadoFallaAstral();
+  window.addEventListener("sunad:progress", actualizarEstadoFallaAstral);
+  window.addEventListener("sunad:user-ready", () => setTimeout(actualizarEstadoFallaAstral, 500));
+
+  console.log("✅ script.js v5 cargado (Falla Astral & Minijuegos interactivos)");
 });

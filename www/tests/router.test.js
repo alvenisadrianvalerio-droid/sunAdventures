@@ -18,7 +18,8 @@ describe('Suite 02: Characterization de Vistas y Rutas SPA', () => {
     'mascotas',
     'finanzas',
     'diccionario',
-    'recetas'
+    'recetas',
+    'calendario'
   ];
 
   test('index.html debe contener el contenedor <section> o elemento de cada vista estática', () => {

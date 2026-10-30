@@ -1,0 +1,22 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
+  <defs>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="145%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#080612" flood-opacity="0.48"/>
+    </filter>
+    <linearGradient id="goldG" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFF3A8"/>
+      <stop offset="50%" stop-color="#FFD93D"/>
+      <stop offset="100%" stop-color="#E08E00"/>
+    </linearGradient>
+        <linearGradient id="cardRoyal" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFFBEB"/><stop offset="100%" stop-color="#FDE68A"/></linearGradient>
+  </defs>
+  <ellipse cx="80" cy="144" rx="46" ry="8" fill="#000" opacity="0.32"/>
+  <g filter="url(#sh)">
+        <g transform="rotate(-22 64 96)"><rect x="38" y="38" width="56" height="82" rx="9" fill="url(#cardRoyal)" stroke="#F59E0B" stroke-width="2.5"/><path d="M66 64 l10 14 -10 14 -10 -14 z" fill="#EF4444"/></g>
+    <g transform="rotate(-6 76 92)"><rect x="48" y="34" width="56" height="82" rx="9" fill="url(#cardRoyal)" stroke="#F59E0B" stroke-width="2.5"/><path d="M76 62 l11 15 -11 15 -11 -15 z" fill="#7C3AED"/></g>
+    <g transform="rotate(12 92 94)"><rect x="64" y="36" width="56" height="82" rx="9" fill="url(#cardRoyal)" stroke="#F59E0B" stroke-width="2.5"/><path d="M92 86 C92 86 76 74 76 64 C76 58 81 54 86 54 C89 54 92 57 92 60 C92 57 95 54 98 54 C103 54 108 58 108 64 C108 74 92 86 92 86 Z" fill="#EC4899"/></g>
+  </g>
+  <path d="M28 34l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#FFF3A8" opacity="0.9"/>
+  <path d="M132 28l2.2 6 6 2.2-6 2.2-2.2 6-2.2-6-6-2.2 6-2.2z" fill="#FFD93D" opacity="0.85"/>
+  <circle cx="128" cy="122" r="3" fill="#FFF3A8" opacity="0.8"/>
+</svg>

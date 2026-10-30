@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    PERFIL.JS — Perfil de usuario mejorado
    ============================================================ */
 (function () {
@@ -218,6 +218,98 @@
     $("perfil-guardar")?.addEventListener("click", guardar);
     initAvatar();
   }
+
+  
+  /* ---------- Respaldo y Sincronización en la Nube (Supabase user_metadata) ---------- */
+  const PREFIJOS_SYNC = [
+    "monedas_",
+    "sa_monedas_max_",
+    "sa_experiencia_extra_",
+    "sa_amor_pareja_",
+    "sunad_logros_",
+    "sa_logros_recompensados_",
+    "mascotas_compradas_",
+    "mascotas_conocidas_",
+    "mascota_amistad_",
+    "skins_compradas_",
+    "skins_equipadas_",
+    "sa_rpg_",
+    "sa_rpg_loot_",
+    "sa_rpg_stats_",
+    "sa_rpg_cofres_",
+    "sa_rl_meta_"
+  ];
+
+  function recolectarEstadoProgreso(uid) {
+    const data = {};
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k || !k.includes(uid)) continue;
+        if (PREFIJOS_SYNC.some(p => k.startsWith(p))) {
+          const val = localStorage.getItem(k);
+          if (val && val.length < 16000) data[k] = val;
+        }
+      }
+    } catch {}
+    return data;
+  }
+
+  function restaurarEstadoProgreso(cloudData, uid) {
+    if (!cloudData || typeof cloudData !== "object") return false;
+    let restaurado = false;
+    try {
+      Object.entries(cloudData).forEach(([k, val]) => {
+        if (!k.includes(uid) || typeof val !== "string") return;
+        const localVal = localStorage.getItem(k);
+        if (!localVal) {
+          localStorage.setItem(k, val);
+          restaurado = true;
+        } else if (k.startsWith("monedas_") || k.startsWith("sa_experiencia_extra_") || k.startsWith("sa_amor_pareja_")) {
+          if ((Number(val) || 0) > (Number(localVal) || 0)) {
+            localStorage.setItem(k, val);
+            restaurado = true;
+          }
+        }
+      });
+    } catch {}
+    return restaurado;
+  }
+
+  let _syncTimer = null;
+  async function sincronizarProgresoNube() {
+    try {
+      const sbClient = sb();
+      if (!sbClient || !navigator.onLine) return;
+      const { data: { session } } = await sbClient.auth.getSession();
+      if (!session?.user?.id) return;
+      const uid = session.user.id;
+      const snapshot = recolectarEstadoProgreso(uid);
+      if (!Object.keys(snapshot).length) return;
+      await sbClient.auth.updateUser({
+        data: { sunad_backup_v1: snapshot, sunad_backup_ts: Date.now() }
+      });
+    } catch {}
+  }
+
+  window.addEventListener("sunad:user-ready", async () => {
+    try {
+      const sbClient = sb();
+      if (!sbClient) return;
+      const { data: { session } } = await sbClient.auth.getSession();
+      if (!session?.user?.id) return;
+      const uid = session.user.id;
+      const backup = session.user.user_metadata?.sunad_backup_v1;
+      if (backup && restaurarEstadoProgreso(backup, uid)) {
+        window.dispatchEvent(new Event("sunad:progress"));
+      }
+    } catch {}
+  });
+
+  window.addEventListener("sunad:progress", () => {
+    if (_syncTimer) clearTimeout(_syncTimer);
+    _syncTimer = setTimeout(sincronizarProgresoNube, 12000);
+  });
 
   window.abrirPerfilModal = abrir;
 

@@ -1,0 +1,55 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF275"/>
+      <stop offset="50%" stop-color="#FFD93D"/>
+      <stop offset="100%" stop-color="#E67E22"/>
+    </linearGradient>
+    <linearGradient id="coral" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB8B8"/>
+      <stop offset="50%" stop-color="#FF7675"/>
+      <stop offset="100%" stop-color="#D63031"/>
+    </linearGradient>
+    <linearGradient id="pink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FD79A8"/>
+      <stop offset="100%" stop-color="#E84393"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#81ECEC"/>
+      <stop offset="50%" stop-color="#74B9FF"/>
+      <stop offset="100%" stop-color="#0984E3"/>
+    </linearGradient>
+    <linearGradient id="mint" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#55EFC4"/>
+      <stop offset="100%" stop-color="#00B894"/>
+    </linearGradient>
+    <linearGradient id="purple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A29BFE"/>
+      <stop offset="50%" stop-color="#6C5CE7"/>
+      <stop offset="100%" stop-color="#341F97"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#DFE6E9"/>
+      <stop offset="100%" stop-color="#636E72"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFEAA7"/>
+      <stop offset="50%" stop-color="#FDCB6E"/>
+      <stop offset="100%" stop-color="#E17055"/>
+    </linearGradient>
+    <linearGradient id="dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D3436"/>
+      <stop offset="100%" stop-color="#181926"/>
+    </linearGradient>
+    <filter id="sh" x="-18%" y="-18%" width="136%" height="136%">
+      <feDropShadow dx="2" dy="7" stdDeviation="5" flood-color="#000" flood-opacity="0.34"/>
+    </filter>
+  </defs>
+  <g transform="translate(80, 80)" filter="url(#sh)">
+    <path d="M-50 -36 H50 C58 -36 64 -30 64 -22 V20 C64 28 58 34 50 34 H-12 L-38 54 L-32 34 H-50 C-58 34 -64 28 -64 20 V-22 C-64 -30 -58 -36 -50 -36 Z" fill="url(#pink)" stroke="#B71540" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- Heart inside bubble -->
+    <path d="M0 -4 C0 -14 14 -18 20 -10 C26 -18 40 -14 40 -4 C40 10 20 22 20 22 C20 22 0 10 0 -4 Z" transform="translate(-20, -4)" fill="#FFFFFF"/>
+  </g>
+  <polygon points="132,26 135,33 142,36 135,39 132,46 129,39 122,36 129,33" fill="#FFF275"/>
+</svg>

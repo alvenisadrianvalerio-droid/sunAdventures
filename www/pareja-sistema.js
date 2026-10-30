@@ -115,8 +115,111 @@
   }
 
   /* ------------------------------------------------------------
-     3. CUIDADO COMPARTIDO DE LA MASCOTA
+     3. CUIDADO COMPARTIDO DE LA MASCOTA, AMOR EN VIVO Y CÁPSULAS
      ------------------------------------------------------------ */
+  function lluviaCorazonesPareja(cantidad = 18) {
+    try {
+      const cont = document.createElement("div");
+      cont.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:99999;overflow:hidden;";
+      document.body.appendChild(cont);
+
+      const colores = ["#ff3366", "#ff6ba8", "#fb7185", "#f43f5e", "#ffd93d"];
+      for (let i = 0; i < cantidad; i++) {
+        const h = document.createElement("div");
+        const size = 18 + Math.round(Math.random() * 20);
+        const left = 8 + Math.random() * 84;
+        const dur = 1.6 + Math.random() * 1.4;
+        const delay = Math.random() * 0.55;
+        const col = colores[i % colores.length];
+        h.style.cssText = `position:absolute;bottom:-40px;left:${left}%;width:${size}px;height:${size}px;opacity:0;transform:translateY(0) scale(0.6);transition:transform ${dur}s cubic-bezier(.2,.8,.3,1) ${delay}s, opacity ${dur}s ease ${delay}s;filter:drop-shadow(0 3px 8px rgba(255,51,102,0.45));`;
+        h.innerHTML = `<svg viewBox="0 0 24 24" width="100%" height="100%" fill="${col}"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+        cont.appendChild(h);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            const drift = (Math.random() - 0.5) * 110;
+            h.style.opacity = "0.95";
+            h.style.transform = `translate(${drift}px, -${window.innerHeight + 120}px) scale(1.15) rotate(${Math.round((Math.random() - 0.5) * 45)}deg)`;
+          });
+        });
+      }
+      setTimeout(() => cont.remove(), 3600);
+    } catch {}
+  }
+
+  function suscribirCanalParejaRealtime() {
+    if (!sb()) return;
+    const grupo = window._getGrupoActivo?.();
+    if (!grupo?.id) return;
+
+    if (canalParejaRealtime) {
+      try { sb().removeChannel(canalParejaRealtime); } catch {}
+      canalParejaRealtime = null;
+    }
+
+    try {
+      canalParejaRealtime = sb()
+        .channel(`pareja_sync_${grupo.id}`)
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "mensajes", filter: `grupo_id=eq.${grupo.id}` },
+          (payload) => {
+            const msg = payload?.new;
+            if (!msg || !msg.contenido) return;
+            const myId = getUserId();
+            if (msg.user_id === myId) return;
+
+            if (msg.contenido.startsWith("💖_AMOR_SYNC_:")) {
+              try {
+                const data = JSON.parse(msg.contenido.slice("💖_AMOR_SYNC_:".length));
+                const u = getUserId();
+                const k = `sa_amor_pareja_${u}`;
+                const actual = Math.max(0, Number(localStorage.getItem(k)) || 0);
+                const nuevo = Math.max(actual + (Number(data.delta) || 15), Number(data.total) || 0);
+                localStorage.setItem(k, String(nuevo));
+                lluviaCorazonesPareja(22);
+                try { window._snd?.("victoria") || window._snd?.("pop"); } catch {}
+                try {
+                  window.decirMascota?.(`💕 ¡@${data.from || parejaActual?.username || "Tu pareja"} te envió una lluvia de amor! (+${data.delta || 15} Amor XP)`, 4500);
+                  window._TiendaAPI?.notifMascota?.("💖 ¡Amor recibido!", `@${data.from || parejaActual?.username || "Tu pareja"} te envió cariño (+${data.delta || 15} Amor XP)`);
+                } catch {}
+                window.dispatchEvent(new Event("sunad:progress"));
+              } catch (e) { console.warn("AMOR_SYNC parse:", e); }
+            } else if (msg.contenido.startsWith("⏳_CAPSULA_SYNC_:")) {
+              try {
+                const remotas = JSON.parse(msg.contenido.slice("⏳_CAPSULA_SYNC_:".length));
+                if (remotas && typeof remotas === "object") {
+                  window.SunCapsulaTiempo?.sincronizarRemotas?.(remotas);
+                }
+              } catch (e) { console.warn("CAPSULA_SYNC parse:", e); }
+            } else if (msg.contenido.startsWith("🐾_MASCOTA_SYNC_:")) {
+              try {
+                const acc = JSON.parse(msg.contenido.slice("🐾_MASCOTA_SYNC_:".length));
+                window.decirMascota?.(`🐾 ¡@${parejaActual?.username || "Tu pareja"} acaba de ${acc.tipo || "cuidar"} a la mascota!`, 4000);
+              } catch {}
+            } else if (msg.contenido.startsWith("📅_EVENTO_SYNC_:")) {
+              try {
+                const data = JSON.parse(msg.contenido.slice("📅_EVENTO_SYNC_:".length));
+                window.AlbumApp?.modules?.eventos?.recibirEventoRemoto?.(data);
+                const verb = data.action === "reaccion" ? "le dio ❤️ al plan" : "agendó un nuevo plan";
+                window.decirMascota?.(`📅 ¡@${parejaActual?.username || "Tu pareja"} ${verb}: "${data.evento?.titulo || ""}"!`, 4200);
+              } catch {}
+            } else if (msg.contenido.startsWith("📖_LEXICO_SYNC_:")) {
+              try {
+                const data = JSON.parse(msg.contenido.slice("📖_LEXICO_SYNC_:".length));
+                if (Array.isArray(data.lista)) {
+                  window.SunDiccionario?.sincronizarLexicoRemoto?.(data.lista);
+                  window.decirMascota?.(`📖 ¡@${parejaActual?.username || "Tu pareja"} actualizó Nuestro Léxico!`, 3800);
+                }
+              } catch {}
+            }
+          }
+        )
+        .subscribe();
+    } catch (e) {
+      console.warn("suscribirCanalParejaRealtime:", e);
+    }
+  }
+
   function conectarCuidadoCompartidoMascota() {
     window.addEventListener("sunad:mascota-accion", async (ev) => {
       if (!parejaActual?.id || !sb()) return;
@@ -138,6 +241,66 @@
       } catch (err) {
         console.warn("sync mascota:", err);
       }
+    });
+
+    window.addEventListener("sunad:amor-enviado", async (ev) => {
+      lluviaCorazonesPareja(16);
+      if (!sb()) return;
+      try {
+        const { data: { session } } = await sb().auth.getSession();
+        if (!session) return;
+        const grupo = window._getGrupoActivo?.();
+        if (!grupo) return;
+        const payload = {
+          from: session.user.user_metadata?.username || session.user.email?.split("@")[0] || "Tu pareja",
+          delta: ev.detail?.delta || 15,
+          total: ev.detail?.total || 0,
+          ts: Date.now()
+        };
+        await sb().from("mensajes").insert({
+          room_id: grupo.id,
+          grupo_id: grupo.id,
+          user_id: session.user.id,
+          destinatario_id: parejaActual?.id || null,
+          contenido: `💖_AMOR_SYNC_:${JSON.stringify(payload)}`
+        });
+      } catch (err) {
+        console.warn("sync amor:", err);
+      }
+    });
+
+    window.addEventListener("sunad:evento-sync", async (ev) => {
+      if (!sb()) return;
+      try {
+        const { data: { session } } = await sb().auth.getSession();
+        if (!session) return;
+        const grupo = window._getGrupoActivo?.();
+        if (!grupo) return;
+        await sb().from("mensajes").insert({
+          room_id: grupo.id,
+          grupo_id: grupo.id,
+          user_id: session.user.id,
+          destinatario_id: parejaActual?.id || null,
+          contenido: `📅_EVENTO_SYNC_:${JSON.stringify(ev.detail || {})}`
+        });
+      } catch {}
+    });
+
+    window.addEventListener("sunad:lexico-sync", async (ev) => {
+      if (!sb()) return;
+      try {
+        const { data: { session } } = await sb().auth.getSession();
+        if (!session) return;
+        const grupo = window._getGrupoActivo?.();
+        if (!grupo) return;
+        await sb().from("mensajes").insert({
+          room_id: grupo.id,
+          grupo_id: grupo.id,
+          user_id: session.user.id,
+          destinatario_id: parejaActual?.id || null,
+          contenido: `📖_LEXICO_SYNC_:${JSON.stringify(ev.detail || {})}`
+        });
+      } catch {}
     });
   }
 
@@ -480,16 +643,19 @@
     parejaActual = cargarParejaLocal();
     actualizarUIPareja();
     sincronizarNubePareja();
+    suscribirCanalParejaRealtime();
 
     window.addEventListener("sunad:user-ready", () => {
       parejaActual = cargarParejaLocal();
       actualizarUIPareja();
       sincronizarNubePareja();
+      suscribirCanalParejaRealtime();
     });
     window.addEventListener("sunad:group-ready", () => {
       parejaActual = cargarParejaLocal();
       actualizarUIPareja();
       sincronizarNubePareja();
+      suscribirCanalParejaRealtime();
     });
   }
 
@@ -500,7 +666,8 @@
     desvincular: desvincularPareja,
     abrirModal: abrirModalPareja,
     cerrarModal: cerrarModalPareja,
-    sincronizar: sincronizarNubePareja
+    sincronizar: sincronizarNubePareja,
+    lluviaCorazones: lluviaCorazonesPareja
   };
 
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();

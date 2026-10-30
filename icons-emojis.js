@@ -147,6 +147,14 @@
     tormentaElectrica: S(`<path d="M17.5 12a4.5 4.5 0 0 0-8.5-1.5A5 5 0 0 0 4 15h15a3 3 0 0 0-.5-3z"/><path d="M11 15l-2 5h3.5l-1.5 4 4.5-6h-3l2-3z" fill="currentColor"/><path d="M6 19l-1 2M18 19l-1 2"/>`),
     volcanErupcion: S(`<path d="M4 21L9 8h6l5 13H4z"/><path d="M9 8c1.5 1 4.5 1 6 0"/><path d="M12 8V2M9 4l1.5 2M15 4l-1.5 2"/><circle cx="8" cy="2" r="1" fill="currentColor"/><circle cx="16" cy="3" r="1.2" fill="currentColor"/><path d="M11 11l-1 4M13 11l1 5"/>`),
     galaxiaEspacial: S(`<ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(-30 12 12)"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><circle cx="5" cy="6" r="1" fill="currentColor"/><circle cx="19" cy="17" r="1.2" fill="currentColor"/><circle cx="19" cy="7" r=".8" fill="currentColor"/><circle cx="5" cy="18" r=".8" fill="currentColor"/>`),
-    neonGlow: S(`<path d="M4 12h3l2-6 6 12 2-6h3"/><circle cx="12" cy="12" r="9"/><circle cx="9" cy="6" r="1" fill="currentColor"/><circle cx="15" cy="18" r="1" fill="currentColor"/>`)
+    neonGlow: S(`<path d="M4 12h3l2-6 6 12 2-6h3"/><circle cx="12" cy="12" r="9"/><circle cx="9" cy="6" r="1" fill="currentColor"/><circle cx="15" cy="18" r="1" fill="currentColor"/>`),
+
+    /* —— Íconos Dedicados para el Sistema de Mascotas —— */
+    cuenco: S(`<path d="M3 9h18c-.8 6.5-5 11-9 11s-8.2-4.5-9-11z"/><path d="M7 9c0-2 2-4 5-4s5 2 5 4"/>`),
+    corazonManos: S(`<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/><path d="M2 17l4 4M22 17l-4 4"/>`),
+    huellaCorazon: F(`<circle cx="6" cy="8" r="1.8"/><circle cx="10" cy="5" r="1.8"/><circle cx="14" cy="5" r="1.8"/><circle cx="18" cy="8" r="1.8"/><path d="M12 20.2l-.9-.8c-3.2-2.9-5.3-4.8-5.3-7.2 0-1.9 1.5-3.4 3.4-3.4 1.1 0 2.1.5 2.8 1.3.7-.8 1.7-1.3 2.8-1.3 1.9 0 3.4 1.5 3.4 3.4 0 2.4-2.1 4.3-5.3 7.2l-.9.8z"/>`),
+    chispas: F(`<path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2L12 2z"/><path d="M19 16l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z" opacity=".7"/>`),
+    corazonAlas: S(`<path d="M12 18.5l-1.2-1.1C6.5 13.6 3.7 11.1 3.7 8c0-2.5 2-4.5 4.5-4.5 1.4 0 2.8.7 3.8 1.7 1-1 2.4-1.7 3.8-1.7 2.5 0 4.5 2 4.5 4.5 0 3.1-2.8 5.6-7.1 9.4l-1.2 1.1z"/><path d="M3.7 8C1.5 8 0 6 0 4s2-3 4-2c2 1 3 3 3.7 6M20.3 8c2.2 0 3.7-2 3.7-4s-2-3-4-2c-2 1-3 3-3.7 6"/>`),
+    anillo: S(`<circle cx="12" cy="14" r="7"/><path d="M12 7l-2-4h4l-2 4z" fill="currentColor"/><path d="M9 3h6"/>`)
   };
 })();

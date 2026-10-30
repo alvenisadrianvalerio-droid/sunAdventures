@@ -1,0 +1,681 @@
+﻿{
+    "1,0":  {
+                "row":  0,
+                "col":  1,
+                "nombre":  "Amuleto Sol",
+                "archivo":  "amuleto-sol.png",
+                "id":  "amuleto-sol"
+            },
+    "2,6":  {
+                "row":  6,
+                "col":  2,
+                "nombre":  "Libro Morado",
+                "archivo":  "libro-morado.png",
+                "id":  "libro-morado"
+            },
+    "0,8":  {
+                "row":  8,
+                "col":  0,
+                "nombre":  "Pergamino Rayo",
+                "archivo":  "pergamino-rayo.png",
+                "id":  "pergamino-rayo"
+            },
+    "9,7":  {
+                "row":  7,
+                "col":  9,
+                "nombre":  "Pergamino Fuego",
+                "archivo":  "pergamino-fuego.png",
+                "id":  "pergamino-fuego"
+            },
+    "5,0":  {
+                "row":  0,
+                "col":  5,
+                "nombre":  "Arco Elfico",
+                "archivo":  "arco-elfico.png",
+                "id":  "arco-elfico"
+            },
+    "0,0":  {
+                "row":  0,
+                "col":  0,
+                "nombre":  "Alabarda",
+                "archivo":  "alabarda.png",
+                "id":  "alabarda"
+            },
+    "9,1":  {
+                "row":  1,
+                "col":  9,
+                "nombre":  "Cimitarra",
+                "archivo":  "cimitarra.png",
+                "id":  "cimitarra"
+            },
+    "3,3":  {
+                "row":  3,
+                "col":  3,
+                "nombre":  "Escudo Madera",
+                "archivo":  "escudo-madera.png",
+                "id":  "escudo-madera"
+            },
+    "5,8":  {
+                "row":  8,
+                "col":  5,
+                "nombre":  "Pocion Morada",
+                "archivo":  "pocion-morada.png",
+                "id":  "pocion-morada"
+            },
+    "0,6":  {
+                "row":  6,
+                "col":  0,
+                "nombre":  "Libro Azul",
+                "archivo":  "libro-azul.png",
+                "id":  "libro-azul"
+            },
+    "5,7":  {
+                "row":  7,
+                "col":  5,
+                "nombre":  "Orbe Creacion",
+                "archivo":  "orbe-creacion.png",
+                "id":  "orbe-creacion"
+            },
+    "8,4":  {
+                "row":  4,
+                "col":  8,
+                "nombre":  "Gema Roja",
+                "archivo":  "gema-roja.png",
+                "id":  "gema-roja"
+            },
+    "5,4":  {
+                "row":  4,
+                "col":  5,
+                "nombre":  "Gema Azul",
+                "archivo":  "gema-azul.png",
+                "id":  "gema-azul"
+            },
+    "6,4":  {
+                "row":  4,
+                "col":  6,
+                "nombre":  "Gema Dorada",
+                "archivo":  "gema-dorada.png",
+                "id":  "gema-dorada"
+            },
+    "8,3":  {
+                "row":  3,
+                "col":  8,
+                "nombre":  "Espada Hielo",
+                "archivo":  "espada-hielo.png",
+                "id":  "espada-hielo"
+            },
+    "5,9":  {
+                "row":  9,
+                "col":  5,
+                "nombre":  "Tridente",
+                "archivo":  "tridente.png",
+                "id":  "tridente"
+            },
+    "7,2":  {
+                "row":  2,
+                "col":  7,
+                "nombre":  "Daga Cristal",
+                "archivo":  "daga-cristal.png",
+                "id":  "daga-cristal"
+            },
+    "1,2":  {
+                "row":  2,
+                "col":  1,
+                "nombre":  "Coraza Placas",
+                "archivo":  "coraza-placas.png",
+                "id":  "coraza-placas"
+            },
+    "3,7":  {
+                "row":  7,
+                "col":  3,
+                "nombre":  "Obsidiana Viva",
+                "archivo":  "obsidiana-viva.png",
+                "id":  "obsidiana-viva"
+            },
+    "5,3":  {
+                "row":  3,
+                "col":  5,
+                "nombre":  "Esmeralda Lagrima",
+                "archivo":  "esmeralda-lagrima.png",
+                "id":  "esmeralda-lagrima"
+            },
+    "2,1":  {
+                "row":  1,
+                "col":  2,
+                "nombre":  "Baya Solar",
+                "archivo":  "baya-solar.png",
+                "id":  "baya-solar"
+            },
+    "7,0":  {
+                "row":  0,
+                "col":  7,
+                "nombre":  "Baculo Fuego",
+                "archivo":  "baculo-fuego.png",
+                "id":  "baculo-fuego"
+            },
+    "1,9":  {
+                "row":  9,
+                "col":  1,
+                "nombre":  "Runa Ancestral",
+                "archivo":  "runa-ancestral.png",
+                "id":  "runa-ancestral"
+            },
+    "4,4":  {
+                "row":  4,
+                "col":  4,
+                "nombre":  "Garrote Puas",
+                "archivo":  "garrote-puas.png",
+                "id":  "garrote-puas"
+            },
+    "6,3":  {
+                "row":  3,
+                "col":  6,
+                "nombre":  "Espada",
+                "archivo":  "espada.png",
+                "id":  "espada"
+            },
+    "1,6":  {
+                "row":  6,
+                "col":  1,
+                "nombre":  "Libro Dorado",
+                "archivo":  "libro-dorado.png",
+                "id":  "libro-dorado"
+            },
+    "0,4":  {
+                "row":  4,
+                "col":  0,
+                "nombre":  "Espada Ropera",
+                "archivo":  "espada-ropera.png",
+                "id":  "espada-ropera"
+            },
+    "2,5":  {
+                "row":  5,
+                "col":  2,
+                "nombre":  "Hacha",
+                "archivo":  "hacha.png",
+                "id":  "hacha"
+            },
+    "0,9":  {
+                "row":  9,
+                "col":  0,
+                "nombre":  "Reliquia",
+                "archivo":  "reliquia.png",
+                "id":  "reliquia"
+            },
+    "2,9":  {
+                "row":  9,
+                "col":  2,
+                "nombre":  "Saco Monedas",
+                "archivo":  "saco-monedas.png",
+                "id":  "saco-monedas"
+            },
+    "5,2":  {
+                "row":  2,
+                "col":  5,
+                "nombre":  "Daga",
+                "archivo":  "daga.png",
+                "id":  "daga"
+            },
+    "7,4":  {
+                "row":  4,
+                "col":  7,
+                "nombre":  "Gema Morada",
+                "archivo":  "gema-morada.png",
+                "id":  "gema-morada"
+            },
+    "9,8":  {
+                "row":  8,
+                "col":  9,
+                "nombre":  "Raiz Mandinga",
+                "archivo":  "raiz-mandinga.png",
+                "id":  "raiz-mandinga"
+            },
+    "9,5":  {
+                "row":  5,
+                "col":  9,
+                "nombre":  "Lanza Acero",
+                "archivo":  "lanza-acero.png",
+                "id":  "lanza-acero"
+            },
+    "8,0":  {
+                "row":  0,
+                "col":  8,
+                "nombre":  "Baculo Infinito",
+                "archivo":  "baculo-infinito.png",
+                "id":  "baculo-infinito"
+            },
+    "9,2":  {
+                "row":  2,
+                "col":  9,
+                "nombre":  "Elixir Dragon",
+                "archivo":  "elixir-dragon.png",
+                "id":  "elixir-dragon"
+            },
+    "4,9":  {
+                "row":  9,
+                "col":  4,
+                "nombre":  "Tallo Espina",
+                "archivo":  "tallo-espina.png",
+                "id":  "tallo-espina"
+            },
+    "8,8":  {
+                "row":  8,
+                "col":  8,
+                "nombre":  "Pocion Verde",
+                "archivo":  "pocion-verde.png",
+                "id":  "pocion-verde"
+            },
+    "8,7":  {
+                "row":  7,
+                "col":  8,
+                "nombre":  "Pergamino Escudo",
+                "archivo":  "pergamino-escudo.png",
+                "id":  "pergamino-escudo"
+            },
+    "5,5":  {
+                "row":  5,
+                "col":  5,
+                "nombre":  "Hongo",
+                "archivo":  "hongo.png",
+                "id":  "hongo"
+            },
+    "8,2":  {
+                "row":  2,
+                "col":  8,
+                "nombre":  "Diamante Estrella",
+                "archivo":  "diamante-estrella.png",
+                "id":  "diamante-estrella"
+            },
+    "1,3":  {
+                "row":  3,
+                "col":  1,
+                "nombre":  "Escudo Dragon",
+                "archivo":  "escudo-dragon.png",
+                "id":  "escudo-dragon"
+            },
+    "3,4":  {
+                "row":  4,
+                "col":  3,
+                "nombre":  "Frasco Vacio",
+                "archivo":  "frasco-vacio.png",
+                "id":  "frasco-vacio"
+            },
+    "0,7":  {
+                "row":  7,
+                "col":  0,
+                "nombre":  "Martillo Hierro",
+                "archivo":  "martillo-hierro.png",
+                "id":  "martillo-hierro"
+            },
+    "5,1":  {
+                "row":  1,
+                "col":  5,
+                "nombre":  "Caliz Estelar",
+                "archivo":  "caliz-estelar.png",
+                "id":  "caliz-estelar"
+            },
+    "4,7":  {
+                "row":  7,
+                "col":  4,
+                "nombre":  "Ojo Horus",
+                "archivo":  "ojo-horus.png",
+                "id":  "ojo-horus"
+            },
+    "1,7":  {
+                "row":  7,
+                "col":  1,
+                "nombre":  "Martillo Trueno",
+                "archivo":  "martillo-trueno.png",
+                "id":  "martillo-trueno"
+            },
+    "2,0":  {
+                "row":  0,
+                "col":  2,
+                "nombre":  "Anillo Esmeralda",
+                "archivo":  "anillo-esmeralda.png",
+                "id":  "anillo-esmeralda"
+            },
+    "1,4":  {
+                "row":  4,
+                "col":  1,
+                "nombre":  "Flecha Dorada",
+                "archivo":  "flecha-dorada.png",
+                "id":  "flecha-dorada"
+            },
+    "2,4":  {
+                "row":  4,
+                "col":  2,
+                "nombre":  "Flor Roja",
+                "archivo":  "flor-roja.png",
+                "id":  "flor-roja"
+            },
+    "2,7":  {
+                "row":  7,
+                "col":  2,
+                "nombre":  "Moneda Oro",
+                "archivo":  "moneda-oro.png",
+                "id":  "moneda-oro"
+            },
+    "3,9":  {
+                "row":  9,
+                "col":  3,
+                "nombre":  "Semilla Vida",
+                "archivo":  "semilla-vida.png",
+                "id":  "semilla-vida"
+            },
+    "4,3":  {
+                "row":  3,
+                "col":  4,
+                "nombre":  "Escudo Torre",
+                "archivo":  "escudo-torre.png",
+                "id":  "escudo-torre"
+            },
+    "3,0":  {
+                "row":  0,
+                "col":  3,
+                "nombre":  "Anillo Poder",
+                "archivo":  "anillo-poder.png",
+                "id":  "anillo-poder"
+            },
+    "7,5":  {
+                "row":  5,
+                "col":  7,
+                "nombre":  "Katana",
+                "archivo":  "katana.png",
+                "id":  "katana"
+            },
+    "6,0":  {
+                "row":  0,
+                "col":  6,
+                "nombre":  "Arco Madera",
+                "archivo":  "arco-madera.png",
+                "id":  "arco-madera"
+            },
+    "7,6":  {
+                "row":  6,
+                "col":  7,
+                "nombre":  "Loto Eter",
+                "archivo":  "loto-eter.png",
+                "id":  "loto-eter"
+            },
+    "6,7":  {
+                "row":  7,
+                "col":  6,
+                "nombre":  "Orquidea Hielo",
+                "archivo":  "orquidea-hielo.png",
+                "id":  "orquidea-hielo"
+            },
+    "7,1":  {
+                "row":  1,
+                "col":  7,
+                "nombre":  "Casco Hierro",
+                "archivo":  "casco-hierro.png",
+                "id":  "casco-hierro"
+            },
+    "0,2":  {
+                "row":  2,
+                "col":  0,
+                "nombre":  "Collar Diente",
+                "archivo":  "collar-diente.png",
+                "id":  "collar-diente"
+            },
+    "4,0":  {
+                "row":  0,
+                "col":  4,
+                "nombre":  "Anillo Zafiro",
+                "archivo":  "anillo-zafiro.png",
+                "id":  "anillo-zafiro"
+            },
+    "8,1":  {
+                "row":  1,
+                "col":  8,
+                "nombre":  "Cetro Solar",
+                "archivo":  "cetro-solar.png",
+                "id":  "cetro-solar"
+            },
+    "2,3":  {
+                "row":  3,
+                "col":  2,
+                "nombre":  "Escudo Hierro",
+                "archivo":  "escudo-hierro.png",
+                "id":  "escudo-hierro"
+            },
+    "8,6":  {
+                "row":  6,
+                "col":  8,
+                "nombre":  "Mandoble Divino",
+                "archivo":  "mandoble-divino.png",
+                "id":  "mandoble-divino"
+            },
+    "6,9":  {
+                "row":  9,
+                "col":  6,
+                "nombre":  "Vara Cristal",
+                "archivo":  "vara-cristal.png",
+                "id":  "vara-cristal"
+            },
+    "8,5":  {
+                "row":  5,
+                "col":  8,
+                "nombre":  "Lagrima Hada",
+                "archivo":  "lagrima-hada.png",
+                "id":  "lagrima-hada"
+            },
+    "1,1":  {
+                "row":  1,
+                "col":  1,
+                "nombre":  "Baston",
+                "archivo":  "baston.png",
+                "id":  "baston"
+            },
+    "6,2":  {
+                "row":  2,
+                "col":  6,
+                "nombre":  "Daga Asesino",
+                "archivo":  "daga-asesino.png",
+                "id":  "daga-asesino"
+            },
+    "0,5":  {
+                "row":  5,
+                "col":  0,
+                "nombre":  "Guadaña",
+                "archivo":  "guadaña.png",
+                "id":  "guadaña"
+            },
+    "4,6":  {
+                "row":  6,
+                "col":  4,
+                "nombre":  "Libro Verde",
+                "archivo":  "libro-verde.png",
+                "id":  "libro-verde"
+            },
+    "1,8":  {
+                "row":  8,
+                "col":  1,
+                "nombre":  "Perla Mar",
+                "archivo":  "perla-mar.png",
+                "id":  "perla-mar"
+            },
+    "4,5":  {
+                "row":  5,
+                "col":  4,
+                "nombre":  "Hoja Verde",
+                "archivo":  "hoja-verde.png",
+                "id":  "hoja-verde"
+            },
+    "1,5":  {
+                "row":  5,
+                "col":  1,
+                "nombre":  "Guantelete",
+                "archivo":  "guantelete.png",
+                "id":  "guantelete"
+            },
+    "4,8":  {
+                "row":  8,
+                "col":  4,
+                "nombre":  "Pocion Dorada",
+                "archivo":  "pocion-dorada.png",
+                "id":  "pocion-dorada"
+            },
+    "4,2":  {
+                "row":  2,
+                "col":  4,
+                "nombre":  "Cristal Hielo",
+                "archivo":  "cristal-hielo.png",
+                "id":  "cristal-hielo"
+            },
+    "9,6":  {
+                "row":  6,
+                "col":  9,
+                "nombre":  "Mapa Antiguo",
+                "archivo":  "mapa-antiguo.png",
+                "id":  "mapa-antiguo"
+            },
+    "4,1":  {
+                "row":  1,
+                "col":  4,
+                "nombre":  "Brazalete Oro",
+                "archivo":  "brazalete-oro.png",
+                "id":  "brazalete-oro"
+            },
+    "9,3":  {
+                "row":  3,
+                "col":  9,
+                "nombre":  "Espada Legend",
+                "archivo":  "espada-legend.png",
+                "id":  "espada-legend"
+            },
+    "7,7":  {
+                "row":  7,
+                "col":  7,
+                "nombre":  "Pendientes Estrella",
+                "archivo":  "pendientes-estrella.png",
+                "id":  "pendientes-estrella"
+            },
+    "0,1":  {
+                "row":  1,
+                "col":  0,
+                "nombre":  "Ballesta",
+                "archivo":  "ballesta.png",
+                "id":  "ballesta"
+            },
+    "7,8":  {
+                "row":  8,
+                "col":  7,
+                "nombre":  "Pocion Roja",
+                "archivo":  "pocion-roja.png",
+                "id":  "pocion-roja"
+            },
+    "3,1":  {
+                "row":  1,
+                "col":  3,
+                "nombre":  "Botas Aladas",
+                "archivo":  "botas-aladas.png",
+                "id":  "botas-aladas"
+            },
+    "3,2":  {
+                "row":  2,
+                "col":  3,
+                "nombre":  "Corona Plata",
+                "archivo":  "corona-plata.png",
+                "id":  "corona-plata"
+            },
+    "0,3":  {
+                "row":  3,
+                "col":  0,
+                "nombre":  "Escudo Alba",
+                "archivo":  "escudo-alba.png",
+                "id":  "escudo-alba"
+            },
+    "5,6":  {
+                "row":  6,
+                "col":  5,
+                "nombre":  "Llave Antigua",
+                "archivo":  "llave-antigua.png",
+                "id":  "llave-antigua"
+            },
+    "7,3":  {
+                "row":  3,
+                "col":  7,
+                "nombre":  "Espada Fuego",
+                "archivo":  "espada-fuego.png",
+                "id":  "espada-fuego"
+            },
+    "9,4":  {
+                "row":  4,
+                "col":  9,
+                "nombre":  "Gema Verde",
+                "archivo":  "gema-verde.png",
+                "id":  "gema-verde"
+            },
+    "3,8":  {
+                "row":  8,
+                "col":  3,
+                "nombre":  "Pocion Blanca",
+                "archivo":  "pocion-blanca.png",
+                "id":  "pocion-blanca"
+            },
+    "6,5":  {
+                "row":  5,
+                "col":  6,
+                "nombre":  "Hongo Dorado",
+                "archivo":  "hongo-dorado.png",
+                "id":  "hongo-dorado"
+            },
+    "3,5":  {
+                "row":  5,
+                "col":  3,
+                "nombre":  "Hacha Guerra",
+                "archivo":  "hacha-guerra.png",
+                "id":  "hacha-guerra"
+            },
+    "6,8":  {
+                "row":  8,
+                "col":  6,
+                "nombre":  "Pocion Naranja",
+                "archivo":  "pocion-naranja.png",
+                "id":  "pocion-naranja"
+            },
+    "3,6":  {
+                "row":  6,
+                "col":  3,
+                "nombre":  "Libro Rojo",
+                "archivo":  "libro-rojo.png",
+                "id":  "libro-rojo"
+            },
+    "2,2":  {
+                "row":  2,
+                "col":  2,
+                "nombre":  "Corona Oro",
+                "archivo":  "corona-oro.png",
+                "id":  "corona-oro"
+            },
+    "6,6":  {
+                "row":  6,
+                "col":  6,
+                "nombre":  "Llave Dorada",
+                "archivo":  "llave-dorada.png",
+                "id":  "llave-dorada"
+            },
+    "6,1":  {
+                "row":  1,
+                "col":  6,
+                "nombre":  "Capa Sombras",
+                "archivo":  "capa-sombras.png",
+                "id":  "capa-sombras"
+            },
+    "2,8":  {
+                "row":  8,
+                "col":  2,
+                "nombre":  "Pocion Azul",
+                "archivo":  "pocion-azul.png",
+                "id":  "pocion-azul"
+            },
+    "9,0":  {
+                "row":  0,
+                "col":  9,
+                "nombre":  "Baculo Rayo",
+                "archivo":  "baculo-rayo.png",
+                "id":  "baculo-rayo"
+            }
+}

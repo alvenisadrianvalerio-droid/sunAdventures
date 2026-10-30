@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    RPG-ENCANTAMIENTO.JS — Añade stats aleatorios con oro
    ============================================================ */
 (function () {
@@ -40,12 +40,12 @@
 
     // ---------- Costo de encantamiento según rareza ----------
     const COSTO_ENCANTAMIENTO = {
-        comun: 200,
-        raro: 1000,
-        epico: 5000,
-        legendario: 25000,
-        mitico: 100000,
-        tornasol: 500000
+        comun: 40,
+        raro: 120,
+        epico: 300,
+        legendario: 750,
+        mitico: 1500,
+        tornasol: 3000
     };
 
     // Máximo de encantamientos por item (según rareza)

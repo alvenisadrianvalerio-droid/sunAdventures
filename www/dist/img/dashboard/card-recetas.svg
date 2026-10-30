@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="potGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF9F43"/>
+      <stop offset="50%" stop-color="#EE5253"/>
+      <stop offset="100%" stop-color="#B33939"/>
+    </linearGradient>
+    <linearGradient id="soupGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FED330"/>
+      <stop offset="100%" stop-color="#FA8231"/>
+    </linearGradient>
+    <filter id="cookShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#000" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+
+  <!-- Gentle Steam clouds -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.75">
+    <path d="M60 42 Q52 30 64 18 Q72 10 66 4"/>
+    <path d="M80 38 Q70 24 84 14 Q92 6 86 2"/>
+    <path d="M100 42 Q92 30 104 18 Q112 10 106 4"/>
+  </g>
+
+  <!-- Cooking Cauldron / Pot -->
+  <g filter="url(#cookShadow)">
+    <!-- Side handles -->
+    <rect x="22" y="70" width="16" height="8" rx="4" fill="#57606F"/>
+    <rect x="122" y="70" width="16" height="8" rx="4" fill="#57606F"/>
+
+    <!-- Pot Body -->
+    <path d="M32 64 H128 C128 64 132 126 80 126 C28 126 32 64 32 64 Z" fill="url(#potGrad)" stroke="#B33939" stroke-width="2.5"/>
+
+    <!-- Shiny rim -->
+    <ellipse cx="80" cy="64" rx="48" ry="14" fill="#4B4B4B" stroke="#747D8C" stroke-width="2"/>
+    <ellipse cx="80" cy="64" rx="44" ry="11" fill="url(#soupGrad)"/>
+
+    <!-- Floating Herbs / Veggies in broth -->
+    <circle cx="70" cy="63" r="3.5" fill="#20BF6B"/>
+    <circle cx="94" cy="65" r="3" fill="#EB3B5A"/>
+    <circle cx="82" cy="67" r="2.5" fill="#20BF6B"/>
+    <circle cx="62" cy="66" r="2" fill="#FA8231"/>
+
+    <!-- Big Wooden Chef Spoon resting slanted -->
+    <g transform="translate(100, 36) rotate(32)">
+      <rect x="-3" y="0" width="6" height="68" rx="3" fill="#F7B731"/>
+      <ellipse cx="0" cy="68" rx="10" ry="14" fill="#FA8231"/>
+    </g>
+
+    <!-- Star magic sparkles on pot -->
+    <polygon points="52,90 54,95 59,96 55,98 56,103 52,100 48,103 49,98 45,96 50,95" fill="#FFF275"/>
+    <polygon points="106,96 107,99 111,100 108,102 109,105 106,103 103,105 104,102 101,100 105,99" fill="#FFF275" opacity="0.8"/>
+  </g>
+</svg>

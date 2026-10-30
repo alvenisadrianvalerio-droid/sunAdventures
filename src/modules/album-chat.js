@@ -62,7 +62,14 @@
   }
 
   function renderMensajeChat(m, mapaPerfiles) {
-    if (!chatMessages) return;
+    if (!chatMessages || !m) return;
+    if (typeof m.contenido === "string" && (
+      m.contenido.startsWith("💖_AMOR_SYNC_:") ||
+      m.contenido.startsWith("🐾_MASCOTA_SYNC_:") ||
+      m.contenido.startsWith("⏳_CAPSULA_SYNC_:") ||
+      m.contenido.startsWith("📅_EVENTO_SYNC_:") ||
+      m.contenido.startsWith("📖_LEXICO_SYNC_:")
+    )) return;
     const perfil = mapaPerfiles?.[m.user_id] || {};
     const usuarioActualId = window.AlbumApp.modules.grupo?.getUsuarioActualId() || window._sunUserId;
     const esPropio = m.user_id === usuarioActualId;
@@ -348,12 +355,31 @@
   const btnToggleSidebar = $("chat-btn-toggle-sidebar");
   btnToggleSidebar?.addEventListener("click", e => {
     e.stopPropagation();
-    $("chat-sidebar")?.classList.toggle("mobile-open");
+    const sidebar = $("chat-sidebar");
+    if (!sidebar) return;
+    sidebar.classList.add("is-animating");
+    const onEnd = () => {
+      sidebar.classList.remove("is-animating");
+      sidebar.removeEventListener("transitionend", onEnd);
+    };
+    sidebar.addEventListener("transitionend", onEnd);
+    setTimeout(onEnd, 260);
+    sidebar.classList.toggle("mobile-open");
   });
 
   // Cerrar sidebar móvil al tocar el área de mensajes
   chatMessages?.addEventListener("click", () => {
-    $("chat-sidebar")?.classList.remove("mobile-open");
+    const sidebar = $("chat-sidebar");
+    if (sidebar && sidebar.classList.contains("mobile-open")) {
+      sidebar.classList.add("is-animating");
+      const onEnd = () => {
+        sidebar.classList.remove("is-animating");
+        sidebar.removeEventListener("transitionend", onEnd);
+      };
+      sidebar.addEventListener("transitionend", onEnd);
+      setTimeout(onEnd, 260);
+      sidebar.classList.remove("mobile-open");
+    }
   });
 
   // Suscripción en tiempo real siempre activa para detectar nuevos mensajes y mostrar punto rojo
@@ -373,6 +399,13 @@
       if (m.destinatario_id && m.destinatario_id !== miId) return;
 
       const vistaActiva = document.querySelector("[data-view].active")?.dataset.view;
+      if (typeof m.contenido === "string" && (
+        m.contenido.startsWith("💖_AMOR_SYNC_:") ||
+        m.contenido.startsWith("🐾_MASCOTA_SYNC_:") ||
+        m.contenido.startsWith("⏳_CAPSULA_SYNC_:") ||
+        m.contenido.startsWith("📅_EVENTO_SYNC_:") ||
+        m.contenido.startsWith("📖_LEXICO_SYNC_:")
+      )) return;
       if (vistaActiva !== "chat") {
         mostrarPuntoNotificacion();
       }

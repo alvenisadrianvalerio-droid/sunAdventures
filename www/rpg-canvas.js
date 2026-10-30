@@ -138,7 +138,8 @@ shieldBurst:  { sheet:'loot2', col:2, row:4, w:70, h:70, tint:'#a684f0', pulse:t
     _resize() {
       const p = this.canvas.parentElement;
       if (!p) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const esGamaBaja = document.documentElement.classList.contains("gama-baja") || window.IS_LOW_END_DEVICE;
+      const dpr = esGamaBaja ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       const w = p.clientWidth, h = p.clientHeight;
       this.canvas.width  = w * dpr;
       this.canvas.height = h * dpr;
@@ -159,8 +160,10 @@ shieldBurst:  { sheet:'loot2', col:2, row:4, w:70, h:70, tint:'#a684f0', pulse:t
     }
     burst(fxKey, x, y, count = 10, opts = {}) {
       const fx = FX[fxKey] || FX.hit;
-      for (let i = 0; i < count; i++) {
-        const a = (i / count) * Math.PI * 2 + rnd(-0.4, 0.4);
+      const esGamaBaja = document.documentElement.classList.contains("gama-baja") || window.IS_LOW_END_DEVICE;
+      const total = esGamaBaja ? Math.min(count, 5) : count;
+      for (let i = 0; i < total; i++) {
+        const a = (i / total) * Math.PI * 2 + rnd(-0.4, 0.4);
         const d = rnd(50, 110);
         this.particles.push({
           kind:'burst', fx, x, y,
@@ -345,12 +348,6 @@ shieldBurst:  { sheet:'loot2', col:2, row:4, w:70, h:70, tint:'#a684f0', pulse:t
   }
 
   function attachBattleHooks() {
-    // Cuando entra nueva batalla, aseguramos capa
-    const obs = new MutationObserver(() => {
-      if ($('rpg-batalla')) setTimeout(ensureFxLayer, 30);
-    });
-    obs.observe(document.body, { childList:true, subtree:true });
-
     // Escucha el log de combate para disparar efectos
     const logObs = new MutationObserver((muts) => {
       if (!fxLayer) ensureFxLayer();
@@ -394,6 +391,7 @@ shieldBurst:  { sheet:'loot2', col:2, row:4, w:70, h:70, tint:'#a684f0', pulse:t
     });
 
     const reattachLog = () => {
+      if ($('rpg-batalla')) setTimeout(ensureFxLayer, 30);
       const log = $('rpg-log');
       if (log && !log._fxBound) {
         log._fxBound = true;
@@ -401,8 +399,10 @@ shieldBurst:  { sheet:'loot2', col:2, row:4, w:70, h:70, tint:'#a684f0', pulse:t
       }
     };
 
-    // Reengancha cuando cambie la batalla
-    new MutationObserver(reattachLog).observe(document.body, { childList:true, subtree:true });
+    const rpgRoot = $('rpg-content') || $('rpg') || document.body;
+    new MutationObserver(reattachLog).observe(rpgRoot, { childList:true, subtree:true });
+    window.addEventListener('hashchange', reattachLog, { passive: true });
+    window.addEventListener('sunad:view-change', reattachLog, { passive: true });
     setTimeout(reattachLog, 600);
   }
 

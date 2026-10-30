@@ -63,45 +63,64 @@
         if (authModal) cerrarAuthModal();
         ocultarLoading();
 
-        await window.AlbumApp.modules.grupo?.asegurarGrupoActivo().catch(e => console.warn("asegurarGrupo:", e));
-        try {
-          const { data: perfil } = await supabase.from("perfiles").select("username,avatar_url").eq("id", session.user.id).single();
-          if (perfil?.avatar_url) {
-            const av = document.querySelector(".user-avatar");
-            if (av) av.innerHTML = `<img src="${perfil.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-          }
-          if (perfil?.username) {
-            localStorage.setItem("sunad_username", perfil.username);
-            const ue = $("user-email"); if (ue) ue.textContent = perfil.username;
-            const udn = $("user-dropdown-name"); if (udn) udn.textContent = perfil.username;
-          }
-        } catch { }
-
         localStorage.setItem("sunad_uid", session.user.id);
         window._sunUserId = session.user.id;
+
+        // Paralelizar grupo activo y perfil del usuario para acelerar el arranque
+        await Promise.allSettled([
+          window.AlbumApp.modules.grupo?.asegurarGrupoActivo().catch(e => console.warn("asegurarGrupo:", e)),
+          (async () => {
+            try {
+              const { data: perfil } = await supabase.from("perfiles").select("username,avatar_url").eq("id", session.user.id).single();
+              if (perfil?.avatar_url) {
+                const av = document.querySelector(".user-avatar");
+                if (av) av.innerHTML = `<img src="${perfil.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+              }
+              if (perfil?.username) {
+                localStorage.setItem("sunad_username", perfil.username);
+                const ue = $("user-email"); if (ue) ue.textContent = perfil.username;
+                const udn = $("user-dropdown-name"); if (udn) udn.textContent = perfil.username;
+              }
+            } catch { }
+          })()
+        ]);
+
         window.dispatchEvent(new Event("sunad:user-ready"));
         window.AlbumApp.modules.logros?.registrarVisita();
 
         await Promise.allSettled([
           window.AlbumApp.modules.fotos?.cargarFotos(),
-          window.AlbumApp.modules.notas?.cargarNotas()
+          window.AlbumApp.modules.notas?.cargarNotas(),
+          window.AlbumApp.modules.eventos?.cargarEventos?.()
         ]);
 
-        await Promise.allSettled([
-          window.AlbumApp.modules.fotos?.render(),
-          Promise.resolve(window.AlbumApp.modules.notas?.renderNotas()),
-          Promise.resolve(window.AlbumApp.modules.logros?.renderLogros())
-        ]);
-
+        // Priorizar la vista activa de inmediato y diferir el renderizado pesado de vistas ocultas
+        const vistaActiva = document.querySelector("[data-view].active")?.dataset.view || "inicio";
         window.AlbumApp.modules.logros?.renderExperiencia();
-        if (typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
-        window.AlbumApp.modules.chat?.cargarAmigosSidebar?.();
+
+        if (vistaActiva === "album") await window.AlbumApp.modules.fotos?.render();
+        else if (vistaActiva === "notas") window.AlbumApp.modules.notas?.renderNotas();
+        else if (vistaActiva === "logros") window.AlbumApp.modules.logros?.renderLogros();
+        else if (vistaActiva === "mascotas" && typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
+        else if (vistaActiva === "calendario") window.AlbumApp.modules.eventos?.renderCalendario?.();
+
+        const deferIdle = window.requestIdleCallback || (cb => setTimeout(cb, 120));
+        deferIdle(() => {
+          try {
+            if (vistaActiva !== "album") window.AlbumApp.modules.fotos?.render();
+            if (vistaActiva !== "notas") window.AlbumApp.modules.notas?.renderNotas();
+            if (vistaActiva !== "logros") window.AlbumApp.modules.logros?.renderLogros({ notificar: false });
+            if (vistaActiva !== "mascotas" && typeof window._renderMascotasGrid === "function") window._renderMascotasGrid();
+            window.AlbumApp.modules.chat?.cargarAmigosSidebar?.();
+          } catch (e) { console.warn("deferIdle render:", e); }
+        });
       } else {
         localStorage.removeItem("sunad_uid");
         window._sunUserId = null;
         window._sunUserEmail = "";
         window.AlbumApp.modules.fotos?.setFotos([]);
         window.AlbumApp.modules.notas?.setNotas([]);
+        window.AlbumApp.modules.eventos?.setEventos?.([]);
         if (grid) grid.innerHTML = ""; if (empty) empty.classList.remove("hidden");
         if (notasGrid) notasGrid.innerHTML = ""; if (notasEmpty) notasEmpty.classList.remove("hidden");
         if (calendarioEmpty) calendarioEmpty.classList.remove("hidden");
@@ -257,12 +276,21 @@
     userDropdown.classList.remove("open"); userDropdown.setAttribute("aria-hidden", "true");
     userMenuToggle.setAttribute("aria-expanded", "false"); userInfo?.classList.remove("open");
   };
+  let ultimoToggleUserMenu = 0;
   const toggleMenu = e => {
+    const ahora = Date.now();
+    if (ahora - ultimoToggleUserMenu < 350) {
+      if (e.cancelable) e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    ultimoToggleUserMenu = ahora;
     if (e.cancelable && e.type !== "click") e.preventDefault();
     e.stopPropagation();
     userDropdown?.classList.contains("open") ? cerrarMenuPerfil() : abrirMenuPerfil();
   };
   userMenuToggle?.addEventListener("click", toggleMenu);
+  userMenuToggle?.addEventListener("touchend", toggleMenu, { passive: false });
 
   // Cerrar menú al tocar fuera
   const cerrarSiTocaFuera = e => {
@@ -317,19 +345,19 @@
     }
   };
 
-  userDropdown?.querySelectorAll("[data-action]").forEach(item => {
-    item.addEventListener("click", e => {
+  // Delegación de eventos en un único listener para todo el dropdown
+  userDropdown?.addEventListener("click", e => {
+    const actionItem = e.target.closest("[data-action]");
+    if (actionItem && userDropdown.contains(actionItem)) {
       e.preventDefault();
       e.stopPropagation();
-      ejecutarAccionDropdown(item, e);
-    });
-  });
-
-  // Enlaces de vistas (Mapa, Logros, Notitas, Playlists)
-  userDropdown?.querySelectorAll("a.user-dropdown-item").forEach(link => {
-    link.addEventListener("click", () => {
-      setTimeout(() => { cerrarMenuPerfil(); }, 120);
-    });
+      ejecutarAccionDropdown(actionItem, e);
+      return;
+    }
+    const navLink = e.target.closest("a.user-dropdown-item");
+    if (navLink && userDropdown.contains(navLink)) {
+      cerrarMenuPerfil();
+    }
   });
 
   window.AlbumApp.modules.auth = {

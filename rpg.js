@@ -928,6 +928,9 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   function tickBuffs() {
     buffsHeroe = buffsHeroe.map(b => ({ ...b, turnos: b.turnos - 1 })).filter(b => b.turnos > 0);
     buffsEnemigo = buffsEnemigo.map(b => ({ ...b, turnos: b.turnos - 1 })).filter(b => b.turnos > 0);
+    if (state._cooldownPocion && state._cooldownPocion > 0) {
+      state._cooldownPocion--;
+    }
     renderBuffs();
   }
 
@@ -1384,6 +1387,48 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       }
     });
 
+    // ─── Afijos Roguelike / Aventura Activos ───
+    const tieneAfijo = af => window.RpgItems?.tieneAfijo?.(af);
+
+    // 1. Sed de Sangre: al asestar crítico, cura 15% del daño y otorga +10% ATK por 2 turnos
+    if (evento === "atacar" && contexto.crit && tieneAfijo("sed_de_sangre")) {
+      const dmgReal = contexto.dmg || 0;
+      const curacion = Math.max(1, Math.round(dmgReal * 0.15));
+      state.hp = clamp(state.hp + curacion, 0, hpMax());
+      guardar(state);
+      buffsHeroe.push({ tipo: "atk", val: Math.max(5, Math.round(atkTotal() * 0.1)), turnos: 2, label: "🩸 SED DE SANGRE" });
+      log(`🩸 Sed de Sangre: ¡Crítico voraz! Recuperas ${curacion} HP y ganas +10% ATK por 2 turnos.`, "curar");
+      floatDmg("#sprite-heroe", `+${curacion}`, "curar");
+      activada = true;
+    }
+
+    // 2. Baluarte Espinoso: al recibir daño, devuelve 150% de tu DEF al atacante
+    if (evento === "recibir-dano" && tieneAfijo("baluarte_espinoso") && enemigo && !enemigo.terminado) {
+      const defHeroe = defTotal() + buffVal("def");
+      const contragolpe = Math.max(10, Math.round(defHeroe * 1.5));
+      enemigo.hp = Math.max(0, enemigo.hp - contragolpe);
+      log(`🛡️ Baluarte Espinoso: devuelves ${contragolpe} daño reflejado al atacante.`, "daño");
+      floatDmg("#sprite-enemigo", `-${contragolpe}`, "daño");
+      FX({ tipo: "attack", target: "enemy", valor: contragolpe, fxKey: "hammer" });
+      activada = true;
+    }
+
+    // 3. Sobrecarga Solar: cada 3 turnos desata una descarga del 80% del ATK
+    if (evento === "turno-propio" && tieneAfijo("sobrecarga_solar") && enemigo && !enemigo.terminado) {
+      state._sobrecargaCargas = (state._sobrecargaCargas || 0) + 1;
+      if (state._sobrecargaCargas >= 3) {
+        state._sobrecargaCargas = 0;
+        const dmgSolar = Math.max(15, Math.round((atkTotal() + buffVal("atk")) * 0.8));
+        enemigo.hp = Math.max(0, enemigo.hp - dmgSolar);
+        log(`☀️ Sobrecarga Solar: ¡Tu arsenal estalla liberando ${dmgSolar} daño solar radiante!`, "critico");
+        floatDmg("#sprite-enemigo", `-${dmgSolar}`, "critico");
+        FX({ tipo: "attack", target: "enemy", valor: dmgSolar, fxKey: "fireball", critico: true });
+        activada = true;
+      } else {
+        log(`☀️ Sobrecarga Solar: acumulando energía solar (${state._sobrecargaCargas}/3)...`, "info");
+      }
+    }
+
     return activada;
   }
 
@@ -1484,7 +1529,12 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     const hits = hab.hits || 1;
     const esAoE = hab.alcance === "todos";
     let totalDmg = 0;
-    const critBase = critTotal() + (bonusTipo("crit_pct") / 100) + (buffVal("crit") / 100);
+    const veloActivo = !!state._veloEspectralCrit;
+    if (veloActivo) {
+      delete state._veloEspectralCrit;
+      log("💨 Velo Espectral: ¡El contraataque sombrío desata un crítico garantizado con sangrado mortal!", "critico");
+    }
+    const critBase = veloActivo ? 1.0 : (critTotal() + (bonusTipo("crit_pct") / 100) + (buffVal("crit") / 100));
     const atkBuffed = atkTotal() + buffVal("atk");
     let algunCrit = false;
     for (let i = 0; i < hits; i++) {
@@ -1505,6 +1555,13 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     FX({ tipo: "attack", target: "enemy", valor: totalDmg, fxKey: fxKey, critico: algunCrit });
     SND("atrapado");
 
+    if (veloActivo && enemigo && !enemigo.terminado) {
+      const bleedDmg = Math.max(15, Math.round(totalDmg * 0.25));
+      enemigo.sangrado = (enemigo.sangrado || 0) + bleedDmg;
+      enemigo.sangradoDur = Math.max(enemigo.sangradoDur || 0, 3);
+      log(`🩸 Velo Espectral: desgarro profundo aplica sangrado (-${bleedDmg} HP/turno).`, "daño");
+    }
+
     if (hab.drain) {
       const robado = Math.round(totalDmg * hab.drain);
       state.hp = clamp(state.hp + robado, 0, hpMax());
@@ -1517,7 +1574,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     qs("#sprite-enemigo")?.classList.add("golpeado");
     setTimeout(() => qs("#sprite-enemigo")?.classList.remove("golpeado"), 350);
     chequearFaseJefe();
-    comprobarPasivas("atacar", { dmg: totalDmg, hab });
+    comprobarPasivas("atacar", { dmg: totalDmg, hab, crit: algunCrit });
     if (enemigo.hp <= 0) return setTimeout(victoria, 500);
 
     if (pasiva.tipo === "doble_ataque" && Math.random() * 100 < pasiva.val) {
@@ -2129,6 +2186,10 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       if (esqHeroe > 0 && Math.random() < esqHeroe) {
         log(`😎 ¡Esquivaste el ataque de ${mob.nombre}${mob.esLider ? " (Líder)" : ""}!`, "curar");
         floatDmg("#sprite-heroe", "¡ESQUIVA!", "curar");
+        if (window.RpgItems?.tieneAfijo?.("velo_espectral")) {
+          state._veloEspectralCrit = true;
+          log("💨 ¡Velo Espectral activado! Tu próximo golpe será un impacto crítico asegurado.", "critico");
+        }
         actualizarHPs();
         return setTimeout(siguienteMobAtaca, 200);
       }
@@ -2185,6 +2246,10 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if (esqHeroe > 0 && Math.random() < esqHeroe) {
       log(`😎 ¡Esquivaste el ataque de ${enemigo.nombre}!`, "curar");
       floatDmg("#sprite-heroe", "¡ESQUIVA!", "curar");
+      if (window.RpgItems?.tieneAfijo?.("velo_espectral")) {
+        state._veloEspectralCrit = true;
+        log("💨 ¡Velo Espectral activado! Tu próximo golpe será un impacto crítico asegurado.", "critico");
+      }
       actualizarHPs();
       tickBuffs();
       turnoJugador = true;
@@ -2442,7 +2507,15 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     if (!turnoJugador || !enemigo) return;
     const RL = window.RpgLoot; if (!RL?.usarConsumible) return;
     const item = RL.POOL.find(p => p.id === id); if (!item) return;
+
+    if (state._cooldownPocion && state._cooldownPocion > 0) {
+      log(`⏳ Pociones en cooldown: debes esperar ${state._cooldownPocion} turno(s) más.`, "daño");
+      floatDmg("#sprite-heroe", `⏳ ${state._cooldownPocion}T`, "daño");
+      return;
+    }
+
     if (!RL.usarConsumible(id)) return;
+    state._cooldownPocion = item.cooldown || 3;
     const st = item.stats || {};
     const curVal = st.hp || item.val || 100;
     const a = state.hp;
@@ -2452,7 +2525,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       guardar(state);
       SND("comer");
       const curado = Math.round(state.hp - a);
-      log(`Usas ${item.nombre}. +${curado} HP.`, "curar");
+      log(`Usas ${item.nombre} (Cooldown: ${state._cooldownPocion}T). +${curado} HP.`, "curar");
       floatDmg("#sprite-heroe", `+${curado}`, "curar");
       FX({ tipo: "consumible", target: "hero", valor: curado, fxKey: "potionBlue" });
 
@@ -2644,6 +2717,11 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       const xpGanado = Math.max(2, Math.round(xp * 0.25));
       localStorage.setItem(kXp, String(actualXp + xpGanado));
       window.dispatchEvent(new Event("sunad:progress"));
+    } catch { }
+    try {
+      const petAct = localStorage.getItem("mascota_actual") || "mapache";
+      const amorG = eraJefe ? 12 : 4;
+      window._subirVinculo?.(petAct, amorG, eraJefe ? "Jefe derrotado en equipo" : "Victoria de Aventura");
     } catch { }
     try { notifMascota?.("¡Victoria!", "+" + mon + " monedas · +" + xp + " XP"); } catch { }
     guardar(state);

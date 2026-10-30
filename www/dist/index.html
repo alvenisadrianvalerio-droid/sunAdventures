@@ -1,0 +1,3569 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SunAd</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffd93d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SunAd">
+  <meta name="description" content="Un rincón para guardar nuestros recuerdos con girasoles">
+  <meta name="author" content="A.A.V.C">
+  <meta property="og:title" content="Four Sunflowers · Nuestro rincón">
+  <meta property="og:description" content="Un pedacito de nosotros en cada foto.">
+  <meta property="og:image" content="img/girasol.jpg">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/app.bundle.min.css">
+  <style>
+    svg {
+      max-width: 100%;
+      max-height: 100%
+    }
+
+    svg:not([width]):not([height]) {
+      width: 1em;
+      height: 1em
+    }
+
+    [data-view]:not(.active) {
+      display: none !important
+    }
+
+    #loading-screen:not(.active) {
+      display: none !important
+    }
+
+    /* Fallback crítico para el panel y modos de Recetas */
+    .recetas-despensa-box.hidden,
+    .recetas-search-box.hidden {
+      display: none !important;
+    }
+
+    .recetas-modos-nav {
+      display: flex;
+      gap: 0.6rem;
+      background: rgba(14, 18, 30, 0.7);
+      padding: 0.35rem;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 0.8rem;
+    }
+
+    .recetas-modo-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.1rem;
+      border-radius: 12px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: rgba(255, 255, 255, 0.75);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.22s ease;
+    }
+
+    .recetas-modo-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .recetas-modo-btn.active {
+      background: linear-gradient(135deg, rgba(255, 159, 61, 0.22), rgba(245, 158, 11, 0.15));
+      border-color: rgba(255, 159, 61, 0.45);
+      color: #ffb86c;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.15);
+    }
+
+    .recetas-modo-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff9f3d, #e11d48);
+      color: #fff;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .loading-flower {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 5rem;
+      height: 5rem;
+      transform-origin: center center;
+      -webkit-transform-origin: center center;
+      animation: loadingSpin 1.5s ease-in-out infinite !important;
+      filter: drop-shadow(0 6px 15px rgba(255, 217, 61, .4));
+      will-change: transform;
+    }
+
+    .loading-flower img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+      display: block;
+    }
+
+    @keyframes loadingSpin {
+      0% {
+        transform: rotate(0deg) scale(1);
+      }
+
+      50% {
+        transform: rotate(180deg) scale(1.15);
+      }
+
+      100% {
+        transform: rotate(360deg) scale(1);
+      }
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      align-items: center;
+      justify-content: center;
+      z-index: 100
+    }
+
+    .modal.active {
+      display: flex
+    }
+
+    /* ⚡ RENDERING ENGINE & MOBILE/PC HIGH-PERFORMANCE OPTIMIZATIONS */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Acelerar GPU en modales y overlays sin degradar FPS */
+    .modal,
+    .modal-content,
+    .polaroid,
+    .nav-container,
+    .rpg-horda-item {
+      will-change: auto;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+    }
+
+    /* Desplazamiento fluido nativo en teléfonos con contención de overscroll */
+    html,
+    body {
+      overscroll-behavior-y: none;
+      touch-action: pan-y pinch-zoom;
+    }
+
+    /* Responsive tap response: eliminar delay de 300ms en enlaces y botones móviles */
+    button,
+    a,
+    input,
+    select,
+    textarea,
+    .polaroid,
+    .nav-link,
+    [role="button"] {
+      touch-action: manipulation;
+    }
+
+    /* Optimización de decodificación y renderizado de imágenes */
+    img {
+      content-visibility: auto;
+    }
+
+    /* Reducir consumo de memoria en dispositivos con preferencia de ahorro o baja potencia */
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* ============================================================
+       OPTIMIZACIÓN MÓVILES GAMA BAJA / RENDERING LIGERO
+       Desactivar backdrop-filter pesado en pantallas móviles (< 768px)
+       y reemplazarlo por opacidad y color sólido de alta velocidad.
+       ============================================================ */
+    @media (max-width: 768px) {
+
+      .modal-backdrop,
+      .tienda-overlay,
+      .amistad-overlay,
+      .minijuego-overlay,
+      .rpg-fin-combate-overlay,
+      .nav-container,
+      .player,
+      .ml-player,
+      .ml-modal,
+      .sun-modal-overlay,
+      .polaroid-viewer,
+      body[class*="tema-fondo-"] .modal-backdrop,
+      [style*="backdrop-filter"] {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      .modal-backdrop,
+      .tienda-overlay,
+      .amistad-overlay,
+      .minijuego-overlay,
+      .sun-modal-overlay {
+        background: rgba(8, 10, 18, 0.92) !important;
+      }
+
+      .nav-container {
+        background: rgba(14, 16, 26, 0.96) !important;
+      }
+
+      /* Sombras difusas pesadas simplificadas para evitar repaint en GPU móvil */
+      .polaroid,
+      .rpg-zone-card,
+      .tienda-item,
+      .modal-content,
+      .experiencia-card,
+      .lobby-btn {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+      }
+
+      /* Filtros pesados de brillo/contraste desactivados en scroll */
+      .mascota-img {
+        filter: none !important;
+      }
+    }
+
+    /* Clase forzada para celulares de gama baja detectados automáticamente */
+    html.gama-baja *,
+    html.gama-baja *::before,
+    html.gama-baja *::after {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      text-shadow: none !important;
+    }
+
+    html.gama-baja .polaroid,
+    html.gama-baja .rpg-zone-card,
+    html.gama-baja .tienda-item,
+    html.gama-baja .modal-content,
+    html.gama-baja .experiencia-card,
+    html.gama-baja .receta-card {
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28) !important;
+      border-radius: 12px;
+    }
+
+    /* Reducir transiciones y animaciones redundantes en gama baja para aliviar el hilo de UI */
+    html.gama-baja *:not(.loading-flower):not(.loading-flower img):not(.rpg-fx-canvas) {
+      animation-duration: 0.15s !important;
+      transition-duration: 0.12s !important;
+    }
+
+    /* Evitar desbordes de repintado en modales y secciones complejas */
+    html.gama-baja .modal-backdrop,
+    html.gama-baja .tienda-overlay,
+    html.gama-baja .amistad-overlay,
+    html.gama-baja .minijuego-overlay,
+    html.gama-baja .rpg-fin-combate-overlay,
+    html.gama-baja .sun-modal-overlay {
+      background: rgba(8, 10, 18, 0.95) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    /* Ocultar botones de descargar app cuando se ejecuta dentro de la APK */
+    html.en-apk [data-action="descargar"],
+    html.en-apk [data-action="descargar-directo"],
+    html.en-apk #descarga-app-modal,
+    html.en-apk button.lobby-btn[data-action="descargar"],
+    html.en-apk .user-dropdown-item[data-action="descargar"],
+    body.en-apk [data-action="descargar"],
+    body.en-apk #descarga-app-modal {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      opacity: 0 !important;
+    }
+  </style>
+  <script>
+    /* Detección de APK nativa (Capacitor / WebView / Standalone / TWA / Custom Scheme) */
+    (function () {
+      try {
+        var ua = navigator.userAgent || "";
+        var esCapacitor = !!(window.Capacitor && (window.Capacitor.isNative || (typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform())));
+        var esAndroidAsset = window.location.protocol === 'capacitor:' || window.location.protocol === 'file:' || (window.location.hostname === 'localhost' && window.location.port === '' && /Android/i.test(ua));
+        var esStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        var esApkUserAgent = /SunAdventures|SunAd|wv|WebView|Capacitor|Crosswalk|Android.*Version\/[0-9.]+/i.test(ua);
+        var esPackageParam = window.location.search.indexOf("app=1") !== -1 || window.location.search.indexOf("platform=apk") !== -1 || localStorage.getItem("sunad_es_apk") === "true";
+
+        if (esCapacitor || esAndroidAsset || esApkUserAgent || esStandalone || esPackageParam) {
+          document.documentElement.classList.add("en-apk");
+          if (document.body) document.body.classList.add("en-apk");
+          localStorage.setItem("sunad_es_apk", "true");
+        }
+      } catch (e) { }
+    })();
+
+    /* Detección automática de hardware gama baja (<= 4 núcleos o <= 4GB RAM) y modo de ahorro */
+    (function () {
+      try {
+        var cores = navigator.hardwareConcurrency || 4;
+        var ram = navigator.deviceMemory || 4;
+        var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        var saveData = connection && connection.saveData;
+        var esMovil = /Android|iPhone|iPod|Mobile/i.test(navigator.userAgent);
+        var forzarGamaBaja = localStorage.getItem("sunad_modo_gama_baja") === "true";
+        if (forzarGamaBaja || saveData || (esMovil && (cores <= 4 || ram <= 3))) {
+          document.documentElement.classList.add("gama-baja");
+          window.IS_LOW_END_DEVICE = true;
+        }
+      } catch (e) { }
+    })();
+  </script>
+</head>
+
+<body>
+
+  <section id="background-container">
+    <header class="nav-container">
+      <!-- Menú hamburguesa desactivado
+      <button id="nav-hamburger" class="nav-hamburger" type="button" aria-label="Abrir menú" aria-expanded="false"
+        aria-controls="main-nav-links">
+        <span class="nav-hamburger-bar"></span>
+        <span class="nav-hamburger-bar"></span>
+        <span class="nav-hamburger-bar"></span>
+      </button>
+      -->
+
+      <a href="#inicio" class="nav-brand-banner" data-view-link="inicio" aria-label="Ir a Inicio - Four Sunflowers">
+        <img class="nav-brand-img" src="img/dashboard/brand-four-sunflowers.svg" alt="Four Sunflowers" width="168"
+          height="48" fetchpriority="high" decoding="async">
+      </a>
+
+      <!-- CENTRO: Título Dinámico (Breadcrumb) y Buscador Global -->
+      <div class="nav-center-wrap" id="nav-center-wrap">
+        <div class="nav-breadcrumb-pill" id="nav-breadcrumb-pill" title="Sección actual">
+          <span class="nav-breadcrumb-icon" id="nav-breadcrumb-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+            </svg>
+          </span>
+          <span class="nav-breadcrumb-text" id="nav-breadcrumb-text">Panel Principal</span>
+        </div>
+        <div class="nav-search-bar" id="nav-search-bar" role="search">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="nav-search-icon">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="nav-global-search" class="nav-search-input"
+            placeholder="Buscar aventuras, notas o recetas..." aria-label="Buscar en Four Sunflowers"
+            autocomplete="off">
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Acciones Rápidas (Campana, Chat, Ajustes) -->
+        <div class="nav-quick-actions" id="nav-quick-actions">
+          <a href="#logros" class="nav-action-btn" id="nav-btn-quick-notif" data-view-link="logros"
+            title="Notificaciones & Logros" aria-label="Notificaciones y Logros">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </a>
+          <a href="#chat" class="nav-action-btn" id="nav-btn-quick-chat" data-view-link="chat"
+            title="Chat y Mensajes Privados" aria-label="Chat">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </a>
+          <button type="button" class="nav-action-btn" id="nav-btn-quick-settings" data-action="ajustes"
+            title="Ajustes de la App" aria-label="Ajustes">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+              </path>
+            </svg>
+          </button>
+        </div>
+
+        <button id="btn-open-login" class="btn-auth" aria-label="Entrar"><span class="btn-auth-icon"><img
+              src="img/items%20de%20aventura/corona.webp" alt="" width="18" height="18" decoding="async"></span><span
+            class="btn-auth-text">Entrar</span></button>
+        <div id="user-info" class="user-info" style="display:none">
+          <button id="user-menu-toggle" class="user-pill" aria-haspopup="true"><span class="user-avatar"
+              data-icono="persona"></span><span id="user-email" class="user-email"></span><span
+              class="user-chevron">▾</span></button>
+          <div id="user-dropdown" class="user-dropdown" aria-hidden="true">
+            <div class="user-dropdown-header">
+              <div class="user-dropdown-avatar" data-icono="persona"></div>
+              <div class="user-dropdown-info"><span id="user-dropdown-name" class="user-dropdown-name"></span><span
+                  class="user-dropdown-role">Explorador de aventuras</span></div>
+            </div>
+            <a href="#logros" class="user-dropdown-item" data-view-link="logros"><span class="user-dropdown-icon"
+                data-icono="trofeo"></span><span>Logros</span></a>
+            <a href="#chat" class="user-dropdown-item" data-view-link="chat"><span class="user-dropdown-icon"
+                data-icono="chat"></span><span>Chat Privado</span></a>
+            <a href="#notas" class="user-dropdown-item" data-view-link="notas"><span class="user-dropdown-icon"
+                data-icono="nota"></span><span>Notitas</span></a>
+            <a href="#diccionario" class="user-dropdown-item" data-view-link="diccionario"><span
+                class="user-dropdown-icon" data-icono="libro"></span><span>Diccionario</span></a>
+            <a href="#recetas" class="user-dropdown-item" data-view-link="recetas"><span class="user-dropdown-icon"
+                data-icono="comida"></span><span>Recetas</span></a>
+            <div class="user-dropdown-divider"></div>
+            <button type="button" class="user-dropdown-item" data-action="perfil"><span class="user-dropdown-icon"
+                data-icono="persona"></span><span>Mi perfil</span></button>
+            <button type="button" class="user-dropdown-item" data-action="pareja" style="color:#ff6ba8;"><span
+                class="user-dropdown-icon" data-icono="corazon"></span><span>Mi Pareja</span></button>
+            <button type="button" class="user-dropdown-item" data-action="amigos"><span class="user-dropdown-icon"
+                data-icono="amigos"></span><span>Mi Grupo de Aventuras</span></button>
+            <button type="button" class="user-dropdown-item" data-action="ajustes"><span class="user-dropdown-icon"
+                data-icono="ajustes"></span><span>Ajustes</span></button>
+            <button type="button" class="user-dropdown-item" data-action="offline"><span class="user-dropdown-icon"
+                data-icono="descargar"></span><span>Descargar todo</span></button>
+            <button type="button" class="user-dropdown-item" data-action="descargar"><span class="user-dropdown-icon"
+                data-icono="descargar"></span><span>Descargar App (APK)</span></button>
+            <div class="user-dropdown-divider"></div>
+            <button type="button" id="logout-btn" class="user-dropdown-item user-dropdown-item-danger"
+              data-action="logout"><span class="user-dropdown-icon"
+                data-icono="salir"></span><span>Salir</span></button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="lobby view active" data-view="inicio">
+      <div class="lobby-content cozy-bento-lobby">
+        <div class="bento-grid">
+          <!-- FILA RESPONSIVE DE TARJETAS DE PROGRESO (Individual, Pareja, Reto Diario) -->
+          <div class="bento-cards-row">
+
+            <!-- BENTO 1: Progreso Individual -->
+            <div class="bento-card bento-progress-card bento-individual bento-card-clickable"
+              id="card-progreso-individual" role="button" tabindex="0"
+              title="Haz clic para ver todos los rangos y beneficios"
+              aria-label="Ver todos los rangos individuales y beneficios">
+              <div class="bento-card-header">
+                <div class="bento-header-left">
+                  <span class="bento-badge bento-badge-gold">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true">
+                      <path d="M12 2a5 5 0 100 10 5 5 0 000-10zm-7 18a7 7 0 0114 0H5z" />
+                    </svg>
+                    Nivel Individual
+                  </span>
+                  <span class="bento-ver-mas-pill" title="Ver rangos y beneficios">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    Rangos
+                  </span>
+                </div>
+                <strong class="bento-xp-value">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="svg-inline-xp">
+                    <path d="M7 2v11h3v9l7-12h-4l3-8z" />
+                  </svg>
+                  <span id="experiencia-xp">0 XP</span>
+                </strong>
+              </div>
+              <div class="bento-rank-name" id="experiencia-titulo">Novatos</div>
+              <div class="experiencia-barra"><span id="experiencia-progreso"></span></div>
+              <div class="bento-card-footer">
+                <span id="experiencia-siguiente" class="bento-sig-text">100 XP para Enamorados.</span>
+              </div>
+            </div>
+
+            <!-- BENTO 2: Progreso de Pareja -->
+            <div class="bento-card bento-progress-card bento-pareja bento-card-clickable" id="experiencia-card-pareja"
+              role="button" tabindex="0" title="Haz clic para ver todos los rangos y beneficios de amor"
+              aria-label="Ver todos los rangos de pareja y beneficios">
+              <div class="bento-card-header">
+                <div class="bento-header-left">
+                  <span class="bento-badge bento-badge-pink">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true">
+                      <path
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                    </svg>
+                    Vínculo de Amor
+                  </span>
+                  <span class="bento-ver-mas-pill pill-pink" title="Ver rangos y beneficios de amor">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2"
+                      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    Rangos
+                  </span>
+                </div>
+                <strong class="bento-xp-value bento-xp-pink">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="svg-inline-xp">
+                    <path
+                      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                  <span id="pareja-exp-total">0 Amor XP</span>
+                </strong>
+              </div>
+              <div class="bento-rank-name" id="pareja-exp-titulo">Conexión Naciente</div>
+              <div class="experiencia-barra experiencia-barra-pareja"><span id="pareja-exp-progreso"></span></div>
+              <div class="bento-card-footer">
+                <span id="pareja-exp-siguiente" class="bento-sig-text">100 Amor XP para Primeras Miradas.</span>
+                <button type="button" class="btn-pareja-subir-amor" id="btn-pareja-dar-amor"
+                  title="Enviar amor a tu pareja (+15 Amor XP)">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true">
+                    <path
+                      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                  <span>Enviar amor</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- BENTO 3: Widget Reto Diario de Minijuegos -->
+            <div class="bento-card bento-reto-card" id="bento-reto-diario" aria-live="polite">
+              <div class="bento-card-header">
+                <span class="bento-badge bento-badge-amber">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  Reto Diario
+                </span>
+                <span class="bento-reto-recompensa">
+                  <img src="img/items%20de%20aventura/icon.webp" alt="SunCoins" width="14" height="14" loading="lazy"
+                    decoding="async">
+                  <span>+20</span>
+                  <img src="img/items%20de%20aventura/estrella.webp" alt="XP" width="14" height="14" loading="lazy"
+                    decoding="async">
+                  <span>+25</span>
+                </span>
+              </div>
+              <div class="bento-reto-title-row">
+                <div class="bento-reto-title-left">
+                  <span class="bento-rank-name">Minijuegos del Día</span>
+                  <span class="bento-reto-conteo" id="bento-reto-conteo">0/2</span>
+                </div>
+                <div class="bento-reto-icon-accent">
+                  <img src="img/dashboard/card-minijuegos.svg" alt="Minijuegos" width="36" height="36" decoding="async">
+                </div>
+              </div>
+              <div class="experiencia-barra experiencia-barra-reto" role="progressbar" aria-valuemin="0"
+                aria-valuemax="2" aria-valuenow="0">
+                <span id="bento-reto-progreso"></span>
+              </div>
+              <div class="bento-card-footer bento-reto-footer">
+                <span id="bento-reto-desc" class="bento-reto-desc">Prueba 2 minijuegos distintos para reclamar.</span>
+                <button type="button" class="btn-bento-reclamar" id="btn-bento-reto-reclamar" disabled>
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span>0/2 Listo</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- BENTO 4: Cuadrícula Armoniosa de Módulos (Span 12) -->
+          <div class="bento-card bento-modules-card">
+            <div class="bento-card-title-row">
+              <h2 class="bento-section-title">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="svg-inline-sparkle">
+                  <path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z" />
+                </svg>
+                Aventuras & Herramientas
+              </h2>
+              <span class="bento-section-count">12 Módulos</span>
+            </div>
+            <nav class="bento-tools-grid" aria-label="Herramientas y Aventuras de Four Sunflowers">
+              <a href="#album" class="bento-tool-item" data-view-link="album" aria-label="Álbum de Recuerdos">
+                <div class="bento-tool-icon-wrap">
+                  <img src="img/dashboard/card-album.svg" alt="Cámara Álbum" class="bento-tool-img" width="160"
+                    height="160" fetchpriority="high" decoding="async">
+                </div>
+                <span class="bento-tool-name">Álbum</span>
+              </a>
+
+              <a href="#notas" class="bento-tool-item" data-view-link="notas" aria-label="Notitas para Ti">
+                <div class="bento-tool-icon-wrap">
+                  <img src="img/dashboard/card-notas.svg" alt="Libreta de Notas" class="bento-tool-img" width="160"
+                    height="160" fetchpriority="high" decoding="async">
+                </div>
+                <span class="bento-tool-name">Notas</span>
+              </a>
+
+              <a href="#mascotas" class="bento-tool-item" data-view-link="mascotas" aria-label="Nuestras Mascotas">
+                <div class="bento-tool-icon-wrap">
+                  <img src="img/dashboard/card-mascotas.svg" alt="Casita de Mascotas" class="bento-tool-img" width="160"
+                    height="160" fetchpriority="high" decoding="async">
+                </div>
+                <span class="bento-tool-name">Mascotas</span>
+              </a>
+
+              <a href="#calendario" class="bento-tool-item" data-view-link="calendario"
+                aria-label="Calendario Especial">
+                <div class="bento-tool-icon-wrap">
+                  <img src="img/dashboard/card-calendario.svg" alt="Calendario Especial" class="bento-tool-img"
+                    width="160" height="160" fetchpriority="high" decoding="async">
+                </div>
+                <span class="bento-tool-name">Calendario</span>
+              </a>
+
+              <a href="#rpg" class="bento-tool-item" data-view-link="rpg" aria-label="Modo Aventura">
+                <div class="bento-tool-icon-wrap">
+                  <img src="img/dashboard/card-aventura.svg" alt="Espada de Aventura" class="bento-tool-img" width="160"
+                    height="160" fetchpriority="high" decoding="async">
+                </div>
+                <span class="bento-tool-name">Aventura</span>
+              </a>
+
+              <a href="#roguelike" class="bento-tool-item" id="dash-btn-falla" data-view-link="roguelike"
+                aria-label="Falla Astral Roguelike">
+                <div class="bento-tool-icon-wrap">
+                  <img src="img/dashboard/card-roguelike.svg" alt="Portal Roguelike" class="bento-tool-img" width="160"
+                    height="160" fetchpriority="high" decoding="async">
+                  <div class="bento-lock-badge" id="dash-falla-candado"
+                    title="Bloqueado: Completa el Modo Aventura para desbloquear">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                      <path
+                        d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                    </svg>
+                  </div>
+                </div>
+                <span class="bento-tool-name">Falla Astral</span>
+              </a>
+
+              <a href="#minijuegos" class="bento-tool-item" id="dash-btn-minijuegos" data-view-link="minijuegos"
+                aria-label="Minijuegos">
+                <div class="bento-tool-icon-wrap">
+                  <img src="img/dashboard/card-minijuegos.svg" alt="Mando Minijuegos" class="bento-tool-img" width="160"
+                    height="160" loading="lazy" decoding="async">
+                </div>
+                <span class="bento-tool-name">Minijuegos</span>
+              </a>
+
+              <a href="#logros" class="bento-tool-item" data-view-link="logros" aria-label="Salón de Logros">
+                <div class="bento-tool-icon-wrap">
+                  <img src="img/dashboard/card-logros.svg" alt="Trofeo Logros" class="bento-tool-img" width="160"
+                    height="160" loading="lazy" decoding="async">
+                </div>
+                <span class="bento-tool-name">Logros</span>
+              </a>
+
+              <a href="#recetas" class="bento-tool-item" data-view-link="recetas" aria-label="Recetario Mágico">
+                <div class="bento-tool-icon-wrap">
+                  <img src="img/dashboard/card-recetas.svg" alt="Olla Recetario" class="bento-tool-img" width="160"
+                    height="160" loading="lazy" decoding="async">
+                </div>
+                <span class="bento-tool-name">Recetas</span>
+              </a>
+
+              <a href="#finanzas" class="bento-tool-item" data-view-link="finanzas" aria-label="Finanzas y Ahorro">
+                <div class="bento-tool-icon-wrap">
+                  <img src="img/dashboard/card-finanzas.svg" alt="Alcancía Cerdito" class="bento-tool-img" width="160"
+                    height="160" loading="lazy" decoding="async">
+                </div>
+                <span class="bento-tool-name">Finanzas</span>
+              </a>
+
+              <a href="#diccionario" class="bento-tool-item" data-view-link="diccionario" aria-label="Diccionario">
+                <div class="bento-tool-icon-wrap">
+                  <img src="img/dashboard/card-diccionario.svg" alt="Libro Diccionario" class="bento-tool-img"
+                    width="160" height="160" loading="lazy" decoding="async">
+                </div>
+                <span class="bento-tool-name">Diccionario</span>
+              </a>
+
+              <button type="button" class="bento-tool-item bento-tool-btn" id="dash-btn-tienda"
+                aria-label="Abrir Tienda">
+                <div class="bento-tool-icon-wrap">
+                  <img src="img/items%20de%20aventura/tienda.webp" alt="Tienda de Aventuras" class="bento-tool-img"
+                    width="160" height="160" loading="lazy" decoding="async">
+                </div>
+                <span class="bento-tool-name">Tienda</span>
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- MODAL: RANGOS Y BENEFICIOS (NIVEL INDIVIDUAL Y PAREJA) -->
+    <div id="modal-rangos-beneficios" class="modal modal-rangos-overlay" role="dialog" aria-modal="true"
+      aria-labelledby="modal-rangos-titulo">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content modal-rangos-content">
+        <div class="modal-rangos-header">
+          <div class="modal-rangos-title-wrap">
+            <span class="modal-rangos-icon-badge" id="modal-rangos-tipo-icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M7 2v11h3v9l7-12h-4l3-8z" />
+              </svg>
+            </span>
+            <div>
+              <h2 id="modal-rangos-titulo" class="modal-rangos-title">Rangos y Beneficios</h2>
+              <span id="modal-rangos-subtitulo" class="modal-rangos-sub">Descubre lo que desbloqueas al subir de
+                nivel</span>
+            </div>
+          </div>
+          <button type="button" class="modal-rangos-close-btn" id="btn-cerrar-modal-rangos"
+            aria-label="Cerrar modal">✕</button>
+        </div>
+
+        <!-- Tabs para alternar entre Rango Individual y Pareja -->
+        <div class="modal-rangos-tabs">
+          <button type="button" class="modal-rangos-tab active" id="tab-rangos-individual">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="svg-inline-xp">
+              <path d="M7 2v11h3v9l7-12h-4l3-8z" />
+            </svg>
+            Rango Individual
+          </button>
+          <button type="button" class="modal-rangos-tab" id="tab-rangos-pareja">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="svg-inline-xp"
+              style="color:#ff6ba8">
+              <path
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+            Vínculo de Pareja
+          </button>
+        </div>
+
+        <!-- Lista dinámica de rangos y beneficios -->
+        <div class="modal-rangos-body" id="modal-rangos-lista">
+          <!-- Inyectado dinámicamente por JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: HUB SELECTOR DE MINIJUEGOS -->
+    <div id="modal-minijuegos-hub" class="modal modal-hub-overlay" role="dialog" aria-modal="true"
+      aria-labelledby="modal-minijuegos-titulo">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content modal-hub-content">
+        <div class="modal-hub-header">
+          <div class="modal-hub-title-wrap">
+            <span class="modal-hub-icon-badge">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="6" width="20" height="12" rx="3"></rect>
+                <path d="M6 12h4m-2-2v4m7-2h.01m3 0h.01"></path>
+              </svg>
+            </span>
+            <div>
+              <h2 id="modal-minijuegos-titulo" class="modal-hub-title">Sala de Minijuegos</h2>
+              <span class="modal-hub-sub">Elige un minijuego, diviértete y completa tu reto diario</span>
+            </div>
+          </div>
+          <button type="button" class="modal-rangos-close-btn" id="btn-cerrar-modal-minijuegos"
+            aria-label="Cerrar selección de minijuegos">✕</button>
+        </div>
+
+        <div class="minijuegos-hub-grid">
+          <button type="button" class="minijuego-hub-card" data-launch-juego="girasol">
+            <div class="minijuego-hub-icon-wrap icon-girasol">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z" />
+                <circle cx="12" cy="12" r="4" />
+              </svg>
+            </div>
+            <div class="minijuego-hub-info">
+              <strong class="minijuego-hub-nombre">Atrapa el Girasol</strong>
+              <span class="minijuego-hub-desc">Atrapa los girasoles cayendo a tiempo</span>
+            </div>
+            <span class="minijuego-hub-arrow">→</span>
+          </button>
+
+          <button type="button" class="minijuego-hub-card" data-launch-juego="memoria">
+            <div class="minijuego-hub-icon-wrap icon-memoria">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </div>
+            <div class="minijuego-hub-info">
+              <strong class="minijuego-hub-nombre">Juego de Memoria</strong>
+              <span class="minijuego-hub-desc">Empareja las mascotas y pon a prueba tu mente</span>
+            </div>
+            <span class="minijuego-hub-arrow">→</span>
+          </button>
+
+          <button type="button" class="minijuego-hub-card" data-launch-juego="adivina">
+            <div class="minijuego-hub-icon-wrap icon-adivina">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <div class="minijuego-hub-info">
+              <strong class="minijuego-hub-nombre">Adivina la Mascota</strong>
+              <span class="minijuego-hub-desc">Identifica al compañero misterioso</span>
+            </div>
+            <span class="minijuego-hub-arrow">→</span>
+          </button>
+
+          <button type="button" class="minijuego-hub-card" data-launch-juego="dados">
+            <div class="minijuego-hub-icon-wrap icon-dados">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+                <circle cx="8" cy="8" r="1.5" fill="currentColor"></circle>
+                <circle cx="16" cy="16" r="1.5" fill="currentColor"></circle>
+                <circle cx="12" cy="12" r="1.5" fill="currentColor"></circle>
+                <circle cx="16" cy="8" r="1.5" fill="currentColor"></circle>
+                <circle cx="8" cy="16" r="1.5" fill="currentColor"></circle>
+              </svg>
+            </div>
+            <div class="minijuego-hub-info">
+              <strong class="minijuego-hub-nombre">Dados Locos</strong>
+              <span class="minijuego-hub-desc">Lanza los dados y desafía tu suerte</span>
+            </div>
+            <span class="minijuego-hub-arrow">→</span>
+          </button>
+
+          <button type="button" class="minijuego-hub-card" data-launch-juego="snake">
+            <div class="minijuego-hub-icon-wrap icon-snake">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a4 4 0 0 0-4 4v4a4 4 0 0 0 8 0V6a4 4 0 0 0-4-4z"></path>
+                <path d="M16 10v4a4 4 0 0 1-8 0v-4"></path>
+                <path d="M12 18v4"></path>
+              </svg>
+            </div>
+            <div class="minijuego-hub-info">
+              <strong class="minijuego-hub-nombre">Serpiente Clásica</strong>
+              <span class="minijuego-hub-desc">Come manzanas y bate tu récord</span>
+            </div>
+            <span class="minijuego-hub-arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <audio id="pop" src="sounds/soundreality-pop-sound-423716.mp3" preload="auto"></audio>
+  </section>
+
+  <section id="chat" class="chat-section view" data-view="chat">
+    <div class="chat-layout">
+      <!-- SIDEBAR AMIGOS (Izquierda) -->
+      <aside class="chat-sidebar" id="chat-sidebar">
+        <div class="chat-sidebar-header">
+          <div class="chat-sidebar-title-row">
+            <span class="chat-sidebar-title">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              Amigos
+            </span>
+            <button type="button" class="chat-sidebar-reload-btn" id="chat-amigos-recargar" title="Actualizar amigos">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat grupal botón directo en la lista -->
+        <button type="button" class="chat-amigo-item active" id="chat-item-grupo" data-modo-directo="grupo">
+          <div class="chat-amigo-avatar chat-amigo-avatar-grupo">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </div>
+          <div class="chat-amigo-info">
+            <span class="chat-amigo-nombre">Chat de Grupo</span>
+            <span class="chat-amigo-sub">Todos los miembros</span>
+          </div>
+        </button>
+
+        <div class="chat-sidebar-sublabel">Tus amigos</div>
+        <div class="chat-amigos-lista" id="chat-amigos-lista">
+          <div class="chat-amigos-cargando">Cargando amigos...</div>
+        </div>
+      </aside>
+
+      <!-- PANEL PRINCIPAL DEL CHAT (Derecha) -->
+      <main class="chat-main-area">
+        <div class="chat-panel">
+          <div class="chat-panel-top">
+            <div class="chat-top-status">
+              <button type="button" class="chat-btn-mobile-sidebar" id="chat-btn-toggle-sidebar" title="Ver amigos">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <span>Amigos</span>
+              </button>
+              <span class="chat-status-dot online"></span>
+              <span id="chat-status" class="chat-status">Grupo activo</span>
+            </div>
+            <div class="chat-top-actions">
+              <button type="button" id="btn-enable-push" class="chat-push-btn-inline" title="Notificaciones Push">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+                <span class="push-btn-text">Notificaciones</span>
+              </button>
+            </div>
+          </div>
+          <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+          <form id="chat-form" class="chat-form">
+            <input type="file" id="chat-file-input" accept="image/*" style="display:none;" aria-label="Adjuntar imagen">
+            <button type="button" class="chat-btn-attach" id="chat-attach-btn"
+              title="Adjuntar foto (o pégala con Ctrl+V)">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </button>
+            <textarea id="chat-input" maxlength="2000" rows="1" autocomplete="off"
+              placeholder="Escribe un mensaje o pega una foto (Ctrl+V)..."></textarea>
+            <button type="submit" class="chat-btn-send" id="chat-submit-btn" aria-label="Enviar mensaje">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+              </svg>
+            </button>
+          </form>
+        </div>
+      </main>
+    </div>
+
+    <!-- MENÚ ACCIONES DE AMIGO (POPOVER) -->
+    <div id="chat-amigo-popover" class="chat-amigo-popover" hidden>
+      <div class="chat-amigo-popover-header">
+        <div class="chat-amigo-popover-avatar" id="chat-popover-avatar"></div>
+        <div>
+          <strong id="chat-popover-nombre">@usuario</strong>
+          <small id="chat-popover-status">Amigo del grupo</small>
+        </div>
+      </div>
+      <div class="chat-amigo-popover-actions">
+        <button type="button" class="chat-popover-btn" id="chat-popover-btn-privado">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          Abrir chat privado
+        </button>
+        <button type="button" class="chat-popover-btn" id="chat-popover-btn-grupo">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          Invitar a chat de grupo
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section id="logros" class="logros-section view" data-view="logros">
+    <div class="logros-header">
+      <h2 class="logros-title">Logros</h2>
+      <p class="logros-subtitle">Cada pequeño recuerdo, hazaña y batalla cuenta</p>
+    </div>
+
+    <div class="logros-resumen-card">
+      <div class="logros-resumen-stats">
+        <div class="logros-resumen-dato">
+          <strong id="logros-desbloqueados">0</strong>
+          <span>de <span id="logros-total-count">0</span> logros desbloqueados</span>
+        </div>
+        <span id="logros-porcentaje-global" class="logros-resumen-pct">0%</span>
+      </div>
+      <div class="logros-global-track">
+        <div id="logros-global-fill" class="logros-global-fill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Filtros de categoría -->
+    <div class="logros-filtros-bar" id="logros-filtros-bar">
+      <button type="button" class="logro-filtro-btn active" data-cat="todos">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2l2.4 7.2h7.6l-6.1 4.5 2.3 7.3L12 16.5l-6.2 4.5 2.3-7.3-6.1-4.5h7.6L12 2z" />
+        </svg>
+        <span>Todos</span>
+      </button>
+      <button type="button" class="logro-filtro-btn" data-cat="rpg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" aria-hidden="true">
+          <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"></polyline>
+          <line x1="13" y1="19" x2="19" y2="13"></line>
+          <line x1="16" y1="16" x2="20" y2="20"></line>
+          <line x1="19" y1="21" x2="21" y2="19"></line>
+          <polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"></polyline>
+          <line x1="5" y1="14" x2="9" y2="18"></line>
+          <line x1="7" y1="17" x2="3" y2="21"></line>
+          <line x1="3" y1="19" x2="5" y2="21"></line>
+        </svg>
+        <span>RPG & Falla</span>
+      </button>
+      <button type="button" class="logro-filtro-btn" data-cat="roguelike">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path
+            d="M12 2a9 9 0 0 0-9 9c0 3.6 2.1 6.7 5.2 8.1L8 22h8l-.2-2.9C18.9 17.7 21 14.6 21 11a9 9 0 0 0-9-9zm-3.5 11c-.83 0-1.5-.67-1.5-1.5S7.67 10 8.5 10s1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm7 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-5 4v-2h3v2h-3z" />
+        </svg>
+        <span>Roguelike</span>
+      </button>
+      <button type="button" class="logro-filtro-btn" data-cat="mascotas">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <ellipse cx="4.5" cy="10" rx="2" ry="3" />
+          <ellipse cx="9" cy="5.5" rx="2" ry="3" />
+          <ellipse cx="15" cy="5.5" rx="2" ry="3" />
+          <ellipse cx="19.5" cy="10" rx="2" ry="3" />
+          <path
+            d="M17.3 14c-.6-.7-1.5-1.2-2.5-1.4-1-.2-1.9-.1-2.8-.1s-1.8-.1-2.8.1c-1 .2-1.9.7-2.5 1.4-1.2 1.4-1.7 3.3-1.2 5.1.5 1.8 2.1 3 4 3 1.1 0 2.2-.4 3-.9.8.5 1.9.9 3 .9 1.9 0 3.5-1.2 4-3 .5-1.8 0-3.7-1.2-5.1z" />
+        </svg>
+        <span>Mascotas</span>
+      </button>
+      <button type="button" class="logro-filtro-btn" data-cat="minijuegos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="6" width="20" height="12" rx="6"></rect>
+          <line x1="6" y1="12" x2="10" y2="12"></line>
+          <line x1="8" y1="10" x2="8" y2="14"></line>
+          <line x1="15" y1="13" x2="15.01" y2="13"></line>
+          <line x1="18" y1="11" x2="18.01" y2="11"></line>
+        </svg>
+        <span>Minijuegos</span>
+      </button>
+      <button type="button" class="logro-filtro-btn" data-cat="general">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span>General & Tienda</span>
+      </button>
+      <button type="button" class="logro-filtro-btn" data-cat="grupo">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path
+            d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+        </svg>
+        <span>Grupo</span>
+      </button>
+    </div>
+
+    <h3 class="logros-categoria" id="logros-cat-titulo-personal">Logros de mi cuenta</h3>
+    <div id="logros-personales-grid" class="logros-grid"></div>
+
+    <h3 class="logros-categoria" id="logros-cat-titulo-grupo">Logros del grupo</h3>
+    <div id="logros-grupo-grid" class="logros-grid"></div>
+  </section>
+
+  <section id="album" class="album-section view" data-view="album">
+    <div class="album-header">
+      <h2 class="album-title">Nuestro álbum</h2>
+      <p class="album-subtitle">Cada foto guarda un momento que no queremos olvidar.</p>
+    </div>
+    <div class="album-actions">
+      <button id="btn-add-photo" class="btn-primary"><span>+</span> Añadir un recuerdo</button>
+      <button id="btn-paste-photos" class="btn-secondary"
+        title="Pega fotos del portapapeles o selecciona múltiples archivos para guardarlos como polaroids">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;">
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+          <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+        </svg>Pegar fotos
+      </button>
+      <button id="btn-seleccionar-fotos" class="btn-secondary" type="button"
+        title="Activar modo de selección para eliminar varias fotos">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;">
+          <polyline points="9 11 12 14 22 4"></polyline>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>Seleccionar
+      </button>
+      <input type="file" id="input-paste-photos" accept="image/*" multiple style="display:none;">
+    </div>
+    <div id="album-seleccion-bar" class="album-seleccion-bar hidden" aria-live="polite">
+      <div class="album-seleccion-info">
+        <span id="album-seleccion-contador">0 seleccionadas</span>
+      </div>
+      <div class="album-seleccion-botones">
+        <button id="btn-seleccionar-todas" type="button" class="btn-secondary btn-sm">Seleccionar todas</button>
+        <button id="btn-eliminar-seleccionadas" type="button" class="btn-danger btn-sm" disabled>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;">
+            <path d="M3 6h18" />
+            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+          </svg>Eliminar seleccionadas
+        </button>
+        <button id="btn-cancelar-seleccion" type="button" class="btn-secondary btn-sm">Cancelar</button>
+      </div>
+    </div>
+    <div id="album-grid" class="album-grid"></div>
+    <div id="album-empty" class="album-empty">
+      <p>Aquí empieza nuestra historia.</p>
+      <p class="album-empty-hint">Aún no hay fotos. Sube la primera.</p>
+    </div>
+  </section>
+
+  <section id="notas" class="notas-section view" data-view="notas">
+    <div class="notas-header">
+      <h2 class="notas-title">Notitas para ti</h2>
+      <p class="notas-subtitle">Pensamientos que quiero guardar</p>
+    </div>
+    <div class="notas-actions"><button id="btn-add-nota" class="btn-primary"><span>+</span> Añadir notita</button></div>
+    <div id="notas-grid" class="notas-grid"></div>
+    <div id="notas-empty" class="notas-empty">
+      <p>Aún no hay notitas.</p>
+      <p class="notas-empty-hint">Escribe la primera.</p>
+    </div>
+  </section>
+
+  <section id="mascotas" class="mascotas-section view" data-view="mascotas">
+    <div class="mascotas-header">
+      <h2 class="mascotas-title">Hogar y Refugio de Mascotas</h2>
+      <p class="mascotas-subtitle">Cuida, interactúa y fortalece el vínculo con tus compañeros. Puedes adoptarlos con
+        SunCoins y equiparlos para el Modo Aventura y Roguelike.</p>
+    </div>
+
+    <!-- Panel de Compañero Activo / Refugio -->
+    <div id="mascotas-hogar-panel" class="mascotas-hogar-panel">
+      <div class="mascotas-hogar-main">
+        <div class="mascotas-hogar-avatar-wrap">
+          <img id="hogar-mascota-img" src="img/mapache.webp" alt="Mascota Activa" class="mascotas-hogar-avatar"
+            width="96" height="96">
+          <span id="hogar-mascota-badge-vinculo" class="mascotas-hogar-badge" title="Rango de Vínculo">Rango I</span>
+        </div>
+        <div class="mascotas-hogar-info">
+          <div class="mascotas-hogar-top">
+            <h3 id="hogar-mascota-nombre" class="mascotas-hogar-nombre">Mapache Explorador</h3>
+            <span id="hogar-mascota-titulo-vinculo" class="mascotas-hogar-titulo-vinculo">Recién Llegado</span>
+          </div>
+          <p id="hogar-mascota-frase" class="mascotas-hogar-frase">"¡Me alegra muchísimo estar a tu lado!"</p>
+          <div class="mascotas-hogar-barra-wrap">
+            <div class="mascotas-hogar-barra-track">
+              <span id="hogar-mascota-barra-fill" class="mascotas-hogar-barra-fill" style="width: 25%"></span>
+            </div>
+            <div class="mascotas-hogar-barra-meta">
+              <small id="hogar-mascota-xp-texto">25 / 100 XP Vínculo</small>
+              <small id="hogar-mascota-bono-texto">+0% Efecto Pasivo</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mascotas-hogar-actions">
+        <button type="button" class="btn-hogar-accion" id="btn-hogar-abrir-cuidado"
+          title="Abrir panel de cuidado y mimos">
+          <span class="ui-icon" data-icono="corazon"></span>
+          <span>Cuidado y Mimos</span>
+        </button>
+        <button type="button" class="btn-hogar-accion btn-hogar-evolucion" id="btn-hogar-evolucionar"
+          style="display:none;" title="Evolucionar al Dragón Ancestral">
+          <span class="ui-icon" data-icono="fuego"></span>
+          <span>¡Evolución Dragón!</span>
+        </button>
+      </div>
+    </div>
+    <div class="minijuegos-menu">
+      <button class="btn-minijuego" id="btn-juego-girasol" data-juego="girasol"><span class="btn-minijuego-icon"
+          data-icono="girasol"></span><span class="btn-minijuego-text">Atrapa el girasol</span></button>
+      <button class="btn-minijuego" id="btn-juego-memoria" data-juego="memoria"><span class="btn-minijuego-icon"
+          data-icono="imagen"></span><span class="btn-minijuego-text">Memoria</span></button>
+      <button class="btn-minijuego" id="btn-juego-adivina" data-juego="adivina"><span class="btn-minijuego-icon"
+          data-icono="globo"></span><span class="btn-minijuego-text">Adivina la mascota</span></button>
+    </div>
+    <section class="desafio-diario" id="desafio-minijuegos" aria-live="polite">
+      <div class="desafio-diario-cabecera"><span class="desafio-diario-icono" data-icono="calendario"></span>
+        <div>
+          <h3 id="desafio-minijuegos-titulo">Reto diario de minijuegos</h3>
+          <p>Prueba 2 minijuegos distintos. Sin rachas ni penalización por descansar.</p>
+        </div>
+      </div>
+      <div class="desafio-diario-progreso" role="progressbar" aria-valuemin="0" aria-valuemax="2" aria-valuenow="0">
+        <span id="desafio-minijuegos-progreso"></span>
+      </div>
+      <div class="desafio-diario-pie"><span id="desafio-minijuegos-estado">0 de 2 minijuegos distintos</span><span
+          class="desafio-diario-premio"><img class="desafio-diario-premio-icon coin-icon"
+            src="img/items%20de%20aventura/icon.webp" alt="SunCoins" width="16" height="16" loading="lazy"
+            decoding="async"> +20 SunCoins · <img class="desafio-diario-premio-icon"
+            src="img/items%20de%20aventura/estrella.webp" alt="XP" width="16" height="16" loading="lazy"
+            decoding="async"> +25 XP</span></div>
+      <p class="desafio-diario-juegos" id="desafio-minijuegos-juegos">Completa cualquier minijuego para empezar.</p>
+    </section>
+    <div class="mascotas-grid" id="mascotas-grid"></div>
+    <div id="mascotas-empty" class="mascotas-empty hidden">
+      <p>Aún no has desbloqueado ninguna mascota.</p>
+    </div>
+  </section>
+
+  <section id="finanzas" class="finanzas-section view" data-view="finanzas">
+    <div class="finanzas-shell">
+      <header class="finanzas-header">
+        <div class="finanzas-brand-wrap">
+          <div class="finanzas-brand-avatar">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+              <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+              <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+            </svg>
+          </div>
+          <div>
+            <div class="finanzas-brand-title">
+              <h1>FinControl</h1>
+              <span class="fincontrol-badge outline">Gestión Financiera</span>
+            </div>
+            <p class="finanzas-intro">Resumen en tiempo real de ingresos, gastos, acuerdos y liquidez.</p>
+          </div>
+        </div>
+        <div class="finanzas-header-controls">
+          <label class="finanzas-currency"><span>Moneda Global</span><select id="finanzas-moneda"
+              aria-label="Moneda de visualización">
+              <option value="VES">VES · Bolívar venezolano</option>
+              <option value="USD">USD · Dólar americano</option>
+              <option value="EUR">EUR · Euro</option>
+              <option value="COP">COP · Peso colombiano</option>
+              <option value="ARS">ARS · Peso argentino</option>
+              <option value="MXN">MXN · Peso mexicano</option>
+              <option value="CLP">CLP · Peso chileno</option>
+              <option value="PEN">PEN · Sol peruano</option>
+            </select></label>
+        </div>
+      </header>
+      <p id="finanzas-error" class="finanzas-alert" role="status" aria-live="polite" hidden></p>
+      <div id="finanzas-login" class="finanzas-login" hidden><span class="finanzas-login-icon"
+          aria-hidden="true">↗</span>
+        <h2>Inicia sesión para empezar</h2>
+        <p>Los movimientos se guardan de forma segura y puedes compartir los de Pareja con tu grupo.</p><button
+          id="finanzas-login-btn" class="btn-primary" type="button">Entrar o crear cuenta</button>
+      </div>
+      <div id="finanzas-app" hidden>
+        <nav class="finanzas-tabs" aria-label="Apartados de finanzas">
+          <button type="button" class="finanzas-tab active" data-finanzas-section="resumen">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2l1.6 6.4L20 10l-6.4 1.6L12 18l-1.6-6.4L4 10l6.4-1.6L12 2z" />
+                <path d="M19 3l.7 2.8L22 6.5l-2.3.7L19 10l-.7-2.8L16 6.5l2.3-.7L19 3z" opacity=".7" />
+              </svg></span>
+            <span class="finanzas-tab-text">Inicio</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="movimientos">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="2" />
+                <circle cx="12" cy="12" r="2.5" />
+                <path d="M6 12h.01M18 12h.01" />
+              </svg></span>
+            <span class="finanzas-tab-text">Movimientos</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="presupuestos">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20V10M18 20V4M6 20v-4" />
+              </svg></span>
+            <span class="finanzas-tab-text">Límites</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="metas">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <circle cx="12" cy="12" r="6" />
+                <circle cx="12" cy="12" r="2" fill="currentColor" />
+              </svg></span>
+            <span class="finanzas-tab-text">Ahorros</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="categorias">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                <line x1="7" y1="7" x2="7.01" y2="7" />
+              </svg></span>
+            <span class="finanzas-tab-text">Categorías</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="inventario">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
+              </svg></span>
+            <span class="finanzas-tab-text">Inventario</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="reportes">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 6l-9.5 9.5-5-5L1 18" />
+                <path d="M17 6h6v6" />
+              </svg></span>
+            <span class="finanzas-tab-text">Gráficos</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="cotizaciones">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 2.1l4 4-4 4" />
+                <path d="M3 6.1h18" />
+                <path d="M7 21.9l-4-4 4-4" />
+                <path d="M21 17.9H3" />
+              </svg></span>
+            <span class="finanzas-tab-text">Divisas</span>
+          </button>
+          <button type="button" class="finanzas-tab" data-finanzas-section="recordatorios">
+            <span class="finanzas-tab-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg></span>
+            <span class="finanzas-tab-text">Avisos</span>
+          </button>
+        </nav>
+        <section id="finanzas-quote-card" class="finanzas-quote-card" hidden>
+          <div class="finanzas-quote-heading">
+            <div>
+              <div class="fincontrol-rates-header-title">
+                <span class="finanzas-eyebrow">MERCADO DE DIVISAS</span>
+                <span class="fincontrol-badge success"><span class="finanzas-pulse-dot"></span>En Vivo</span>
+              </div>
+              <h2 id="finanzas-quote-title">Tasas de Cambio en Bolívares (VES)</h2>
+              <p class="fincontrol-rates-subtitle">Cotizaciones en tiempo real de USD (BCV & Paralelo), USDT (Binance
+                P2P) y EURO.</p>
+            </div>
+            <span id="finanzas-quote-updated" class="finanzas-quote-updated" aria-live="polite">Consultando
+              cotización…</span>
+          </div>
+          <div id="finanzas-quote-values" class="finanzas-quote-values" aria-live="polite"></div>
+          <div id="finanzas-quote-chart" class="finanzas-quote-chart" role="img"
+            aria-label="Mini gráfico del precio de la moneda"></div>
+          <p id="finanzas-quote-status" class="finanzas-quote-status"></p>
+          <label class="finanzas-price-alert"><input id="finanzas-price-alert-toggle"
+              type="checkbox"><span><strong>Aviso discreto en el escritorio</strong><small>Silencioso, solo ante cambios
+                de 0,1 % o más y como máximo cada 15 minutos.</small></span></label>
+          <small id="finanzas-price-alert-status" class="finanzas-reminder-status" role="status"
+            aria-live="polite"></small>
+        </section>
+        <section id="finanzas-reminder-card" class="finanzas-reminder" hidden>
+          <div class="finanzas-reminder-copy"><span class="finanzas-eyebrow">RECORDATORIO DIARIO</span>
+            <h2 id="finanzas-reminder-title">Recordatorios diarios</h2>
+            <p>Recibe un aviso si todavía no registraste los gastos de hoy.</p>
+          </div>
+          <form id="finanzas-reminder-form" class="finanzas-reminder-form">
+            <label class="finanzas-reminder-option"><input id="finanzas-reminder-personal" type="checkbox"
+                checked><span>Finanzas personales</span></label>
+            <label class="finanzas-reminder-option"><input id="finanzas-reminder-group" type="checkbox"
+                checked><span>Finanzas del grupo</span></label>
+            <label class="finanzas-reminder-time"><span>Hora del aviso</span><input id="finanzas-reminder-time"
+                type="time" value="20:00" required></label>
+            <p id="finanzas-reminder-timezone" class="finanzas-reminder-timezone"></p>
+            <button id="finanzas-reminder-save" class="btn-primary" type="submit">Guardar recordatorios</button>
+            <small id="finanzas-reminder-status" class="finanzas-reminder-status" role="status"
+              aria-live="polite"></small>
+          </form>
+        </section>
+        <div class="finanzas-toolbar-row">
+          <nav class="finanzas-scopes" aria-label="Ámbito de finanzas">
+            <button type="button" class="finanzas-scope active" data-finanzas-scope="personal"
+              aria-pressed="true">Personal</button>
+            <button type="button" class="finanzas-scope" data-finanzas-scope="pareja"
+              aria-pressed="false">Compartidas</button>
+          </nav>
+          <div class="finanzas-toolbar"><label><span>Período</span><input id="finanzas-periodo"
+                type="month"></label><button id="finanzas-recargar" class="btn-secondary"
+              type="button">Actualizar</button></div>
+        </div>
+        <main id="finanzas-panel" class="finanzas-panel"></main>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       VISTA DICCIONARIO
+       ============================================================ -->
+  <section id="diccionario" class="diccionario-section view" data-view="diccionario">
+    <div class="diccionario-container">
+      <header class="diccionario-header">
+        <span class="diccionario-badge">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+          Herramienta de Consulta
+        </span>
+        <h1 class="diccionario-title">Diccionario</h1>
+        <p class="diccionario-desc">Escribe cualquier palabra para descubrir su significado, etimología y definiciones.
+        </p>
+      </header>
+
+      <div class="diccionario-search-box">
+        <form id="diccionario-form" class="diccionario-form" autocomplete="off">
+          <span class="diccionario-search-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </span>
+          <input type="text" id="diccionario-input" class="diccionario-input"
+            placeholder="Escribe una palabra o kanji/hangul (ej. 野菜, 사랑, amor, flower)..." maxlength="60" required>
+          <button type="submit" class="diccionario-btn-submit">
+            <span>Buscar</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <div class="diccionario-historial">
+        <div class="diccionario-historial-head">
+          <span>Búsquedas recientes</span>
+          <button type="button" id="diccionario-borrar-historial" class="diccionario-btn-limpiar">Limpiar
+            historial</button>
+        </div>
+        <div id="diccionario-historial-chips" class="diccionario-historial-chips">
+          <!-- Chips dinámicos -->
+        </div>
+      </div>
+
+      <main id="diccionario-resultado" class="diccionario-resultado">
+        <div class="dic-empty">
+          <div class="dic-empty-icon">📖</div>
+          <h3>Explora el significado de las palabras</h3>
+          <p>Escribe cualquier término arriba o haz clic en una de las palabras del historial para ver su definición.
+          </p>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       VISTA RECETARIO MÁGICO
+       ============================================================ -->
+  <section id="recetas" class="recetas-section view" data-view="recetas">
+    <div class="recetas-container">
+      <header class="recetas-header">
+        <span class="recetas-badge">
+          <span class="ui-icon" data-icono="comida"></span>
+          <span>Cocina Internacional</span>
+        </span>
+        <h1 class="recetas-title">Recetario Mágico</h1>
+        <p class="recetas-desc">Encuentra recetas exquisitas de todo el mundo con ingredientes traducidos y preparación
+          guiada paso a paso.</p>
+      </header>
+
+      <!-- Modos de Búsqueda: Búsqueda General vs Mis Ingredientes (Despensa) -->
+      <div class="recetas-modos-nav">
+        <button type="button" class="recetas-modo-btn active" id="recetas-modo-general" data-recetas-modo="general">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span>Buscar por Nombre o Plato</span>
+        </button>
+        <button type="button" class="recetas-modo-btn" id="recetas-modo-despensa" data-recetas-modo="despensa">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span>Cocinar con lo que tengo (Ingredientes)</span>
+          <span class="recetas-modo-badge">¡Nuevo!</span>
+        </button>
+      </div>
+
+      <div class="recetas-search-box" id="recetas-box-general">
+        <form id="recetas-form" class="recetas-form" autocomplete="off">
+          <span class="recetas-search-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </span>
+          <input type="text" id="recetas-input" class="recetas-input"
+            placeholder="Busca un plato o categoría (ej. pasta carbonara, ramen, sushi, curry, pizza)..."
+            maxlength="60">
+          <button type="submit" class="recetas-btn-submit">
+            <span>Buscar</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" />
+            </svg>
+          </button>
+          <button type="button" id="recetas-btn-sorpresa" class="recetas-btn-sorpresa"
+            title="Elegir una receta al azar">
+            <svg class="receta-icon-svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+              stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="3" />
+              <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+              <circle cx="16" cy="16" r="1.5" fill="currentColor" />
+              <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+              <circle cx="16" cy="8" r="1.5" fill="currentColor" />
+              <circle cx="8" cy="16" r="1.5" fill="currentColor" />
+            </svg>
+            <span>¡Sorpréndeme!</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Panel de Cocinar con mis Ingredientes (Despensa) -->
+      <div class="recetas-despensa-box hidden" id="recetas-box-despensa">
+        <div class="recetas-despensa-header">
+          <div class="recetas-despensa-info">
+            <h3 class="recetas-despensa-titulo">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+              <span>Ingresa qué ingredientes tienes en casa</span>
+            </h3>
+            <p class="recetas-despensa-sub">Te mostraremos recetas que puedes preparar con ellos y qué ingredientes
+              adicionales te faltarían.</p>
+          </div>
+          <button type="button" id="recetas-despensa-limpiar" class="recetas-despensa-btn-limpiar"
+            title="Quitar todos los ingredientes">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span>Limpiar</span>
+          </button>
+        </div>
+
+        <!-- Formulario para agregar ingrediente -->
+        <form id="recetas-ingrediente-form" class="recetas-ingrediente-form" autocomplete="off">
+          <div class="recetas-ingrediente-input-wrap">
+            <span class="recetas-ingrediente-input-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </span>
+            <input type="text" id="recetas-ingrediente-input" class="recetas-ingrediente-input"
+              placeholder="Escribe un ingrediente (ej. huevo, pollo, arroz, tomate, ajo, queso, papa)..."
+              maxlength="40">
+          </div>
+          <button type="submit" class="recetas-ingrediente-btn-add">
+            <span>Agregar</span>
+          </button>
+          <button type="button" id="recetas-despensa-buscar-btn" class="recetas-btn-submit">
+            <span>Buscar Recetas</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </form>
+
+        <!-- Tags de ingredientes agregados -->
+        <div class="recetas-tags-container" id="recetas-tags-container">
+          <span class="recetas-tags-placeholder" id="recetas-tags-placeholder">Aún no has agregado ingredientes. Escribe
+            arriba o toca los atajos rápidos de abajo.</span>
+        </div>
+
+        <!-- Atajos rápidos populares para agregar con 1 clic -->
+        <div class="recetas-despensa-sugerencias">
+          <span class="recetas-sugerencias-label">Sugerencias rápidas:</span>
+          <div class="recetas-sugerencias-chips" id="recetas-sugerencias-chips">
+            <button type="button" class="receta-sug-chip" data-ing="Pollo">+ Pollo</button>
+            <button type="button" class="receta-sug-chip" data-ing="Huevo">+ Huevo</button>
+            <button type="button" class="receta-sug-chip" data-ing="Arroz">+ Arroz</button>
+            <button type="button" class="receta-sug-chip" data-ing="Tomate">+ Tomate</button>
+            <button type="button" class="receta-sug-chip" data-ing="Cebolla">+ Cebolla</button>
+            <button type="button" class="receta-sug-chip" data-ing="Ajo">+ Ajo</button>
+            <button type="button" class="receta-sug-chip" data-ing="Queso">+ Queso</button>
+            <button type="button" class="receta-sug-chip" data-ing="Pasta">+ Pasta</button>
+            <button type="button" class="receta-sug-chip" data-ing="Carne de Res">+ Carne</button>
+            <button type="button" class="receta-sug-chip" data-ing="Papas">+ Papa</button>
+            <button type="button" class="receta-sug-chip" data-ing="Leche">+ Leche</button>
+            <button type="button" class="receta-sug-chip" data-ing="Zanahoria">+ Zanahoria</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categorías rápidas con Iconos SVG -->
+      <div class="recetas-categorias">
+        <button type="button" class="receta-cat-chip active" data-cat-chip="Asian">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12c0 5 4 9 9 9s9-4 9-9H3z" />
+            <path d="M19 4L8 12M21 7l-9 8" />
+          </svg>
+          <span>Asiática</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Japanese">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="12" r="4" fill="currentColor" />
+          </svg>
+          <span>Japonesa</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Chinese">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6.4-4.8-6.4 4.8 2.4-7.2-6-4.8h7.6z" />
+          </svg>
+          <span>China</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Chicken">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M15.5 13a4.5 4.5 0 0 0-4.5-4.5 4.5 4.5 0 0 0-4.5 4.5c0 2 1.5 3.5 3.5 4l-4 4a1.5 1.5 0 0 0 2 2l4-4c.5 2 2 3.5 4 3.5a4.5 4.5 0 0 0 4.5-4.5 4.5 4.5 0 0 0-5-5z" />
+          </svg>
+          <span>Pollo</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Pasta">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 13h18c0 4-3.5 8-9 8s-9-4-9-8z" />
+            <path d="M12 5v5M8 6c0 2.5 1 4 1 4M16 6c0 2.5-1 4-1 4" />
+          </svg>
+          <span>Pastas</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Beef">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5c0 3 2 6 6 7l2 3h2l2-3c4-1 6-4 6-7z" />
+            <circle cx="8.5" cy="10" r="1.5" fill="currentColor" />
+          </svg>
+          <span>Carne</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Seafood">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12c4-6 12-6 16 0-4 6-12 6-16 0z" />
+            <circle cx="16" cy="12" r="1" fill="currentColor" />
+            <path d="M2 10l2 2-2 2M20 12l2-2v4l-2-2z" />
+          </svg>
+          <span>Mariscos</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Dessert">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 20h18v-6l-9-4-9 4v6z" />
+            <path d="M3 14c3 0 3 2 6 2s3-2 6-2 3 2 6 2" />
+            <circle cx="12" cy="7" r="2" fill="currentColor" />
+          </svg>
+          <span>Postres</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Vegetarian">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21a9 9 0 0 0 9-9c0-5-4-9-9-9S3 7 3 12a9 9 0 0 0 9 9z" />
+            <path d="M12 3v18M3 12c4.5-1 9 1 18 0" />
+          </svg>
+          <span>Vegetariano</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Breakfast">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="14" rx="9" ry="6" />
+            <ellipse cx="12" cy="10" rx="7.5" ry="4.5" />
+            <ellipse cx="12" cy="7" rx="6" ry="3" />
+          </svg>
+          <span>Desayunos</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Starter">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 14c0-5 3.5-9 8-9s8 4 8 9H4z" />
+            <path d="M4 14c1 1.5 2 2 4 2s3-1 4-1 2 1 4 1 3-.5 4-2" />
+          </svg>
+          <span>Entradas</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Pork">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5c0 3 2 6 6 7l2 3h2l2-3c4-1 6-4 6-7z" />
+            <circle cx="8.5" cy="10" r="1.5" fill="currentColor" />
+          </svg>
+          <span>Cerdo</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Vegan">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 21a9 9 0 0 0 9-9c0-5-4-9-9-9S3 7 3 12a9 9 0 0 0 9 9z" />
+            <path d="M12 3v18M3 12c4.5-1 9 1 18 0" />
+          </svg>
+          <span>Vegano</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Lamb">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 10a5 5 0 0 0-5-5H8a5 5 0 0 0-5 5c0 3 2 6 6 7l2 3h2l2-3c4-1 6-4 6-7z" />
+          </svg>
+          <span>Cordero</span>
+        </button>
+        <button type="button" class="receta-cat-chip" data-cat-chip="Miscellaneous">
+          <svg class="receta-icon-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+            <path d="M7 2v20" />
+            <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" />
+          </svg>
+          <span>Variados</span>
+        </button>
+      </div>
+
+      <!-- Contador y Grilla de Recetas -->
+      <div class="recetas-info-bar">
+        <span id="recetas-contador" class="recetas-contador">Explorando recetas del mundo</span>
+      </div>
+
+      <div id="recetas-grid" class="recetas-grid">
+        <!-- Render dinámico -->
+      </div>
+
+      <!-- Paginación / Cargar Más Recetas -->
+      <div id="recetas-paginacion" class="recetas-paginacion hidden">
+        <button type="button" id="recetas-btn-mas" class="recetas-btn-mas">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          <span id="recetas-btn-mas-text">Cargar más recetas</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       VISTA CALENDARIO ESPECIAL (Fechas, Aniversarios y Recuerdos)
+       ============================================================ -->
+  <!-- ============================================================
+       VISTA CALENDARIO: "NUESTRO TIEMPO" (Four Sunflowers)
+       ============================================================ -->
+  <section id="calendario" class="calendario-section view" data-view="calendario">
+    <!-- Header romántico -->
+    <div class="calendario-header">
+      <div class="calendario-header-badge">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <path
+            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+        </svg>
+        <span>Four Sunflowers · Diario Compartido</span>
+      </div>
+      <h2 class="calendario-title">Nuestro Tiempo</h2>
+      <p class="calendario-subtitle">Nuestras fechas importantes, recuerdos inolvidables y próximos planes juntos.</p>
+    </div>
+
+    <!-- Banner Destacado: Cuenta Regresiva de Amor -->
+    <div id="cal-countdown-banner" class="cal-countdown-banner">
+      <div class="cal-countdown-icon">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <div class="cal-countdown-content">
+        <span class="cal-countdown-label">Próximo Hito Especial</span>
+        <h4 id="cal-countdown-title" class="cal-countdown-title">Cargando fecha especial...</h4>
+        <p id="cal-countdown-desc" class="cal-countdown-desc">Cada día cuenta nuestra historia de amor.</p>
+      </div>
+      <div class="cal-countdown-badge" id="cal-countdown-badge">
+        <span id="cal-countdown-days" class="cal-countdown-number">--</span>
+        <span class="cal-countdown-unit">días</span>
+      </div>
+    </div>
+
+    <!-- Barra de Controles y Acciones -->
+    <div class="calendario-actions-bar">
+      <!-- Alternador de Vistas: Cuadrícula de Mes vs Agenda Cronológica -->
+      <div class="cal-view-toggle" role="group" aria-label="Cambiar vista del calendario">
+        <button type="button" class="cal-view-btn active" data-cal-view="mes" id="btn-cal-view-mes">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span>Mes</span>
+        </button>
+        <button type="button" class="cal-view-btn" data-cal-view="agenda" id="btn-cal-view-agenda">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          <span>Agenda</span>
+        </button>
+      </div>
+
+      <!-- Leyenda Rápida de Categorías en Escritorio -->
+      <div class="cal-categorias-chips" aria-label="Filtro rápido de planes">
+        <button type="button" class="cal-chip active" data-cat-filter="all">Todos</button>
+        <button type="button" class="cal-chip cat-cita" data-cat-filter="cita">❤️ Cita</button>
+        <button type="button" class="cal-chip cat-viaje" data-cat-filter="viaje">✈️ Viaje</button>
+        <button type="button" class="cal-chip cat-comida" data-cat-filter="comida">🍔 Comida</button>
+        <button type="button" class="cal-chip cat-aniversario" data-cat-filter="aniversario">⭐ Especial</button>
+        <button type="button" class="cal-chip cat-nota" data-cat-filter="nota">📌 Nota</button>
+      </div>
+
+      <div class="calendario-actions-right">
+        <button id="btn-add-evento" class="btn-primary btn-add-plan-primary" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Añadir plan</span>
+        </button>
+        <button id="btn-notif-permiso" class="btn-secondary" type="button" style="display:none;"
+          title="Activar recordatorios automáticos">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span>Recordatorios</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Layout Maestro: Cuadrícula / Agenda y Panel Lateral Dinámico -->
+    <div class="calendario-master-layout">
+      <!-- Columna Principal: Cuadrícula o Agenda -->
+      <div class="calendario-main-column">
+        <!-- VISTA CUADRÍCULA DE MES -->
+        <div id="cal-view-mes-container" class="calendario-wrapper">
+          <div class="calendario-toolbar">
+            <button id="cal-prev" class="cal-nav-btn" type="button" aria-label="Mes anterior">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+            <div class="cal-mes-center">
+              <span id="cal-mes-actual" class="cal-mes-actual">Mes Año</span>
+              <button type="button" id="btn-cal-ir-hoy" class="cal-btn-hoy">Ir a hoy</button>
+            </div>
+            <button id="cal-next" class="cal-nav-btn" type="button" aria-label="Mes siguiente">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+          </div>
+
+          <div class="cal-dias-semana" aria-hidden="true">
+            <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span
+              class="fin-semana">Sáb</span><span class="fin-semana">Dom</span>
+          </div>
+
+          <div id="cal-grid" class="cal-grid"></div>
+        </div>
+
+        <!-- VISTA AGENDA CRONOLÓGICA (Oculta por defecto en vista mes) -->
+        <div id="cal-view-agenda-container" class="calendario-agenda-container hidden">
+          <div class="cal-agenda-header">
+            <h3 class="cal-seccion-titulo">
+              <span>Agenda Compartida</span>
+              <small class="cal-seccion-sub">Línea de tiempo cronológica de nuestros planes y recuerdos</small>
+            </h3>
+          </div>
+          <div id="cal-agenda-lista" class="cal-agenda-lista"></div>
+          <div id="cal-agenda-vacia" class="cal-agenda-vacia hidden">
+            <p>No hay eventos registrados para esta categoría.</p>
+            <button type="button" class="btn-secondary btn-sm" id="btn-agenda-agregar">Crear primer plan</button>
+          </div>
+        </div>
+
+        <!-- Próximas Fechas Destacadas (Mini-feed inferior) -->
+        <div class="calendario-proximos-card">
+          <div class="cal-proximos-header">
+            <h3 class="cal-seccion-titulo">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+              <span>Próximos Momentos</span>
+              <small class="cal-seccion-sub">Los días especiales que vienen pronto</small>
+            </h3>
+          </div>
+          <div id="cal-proximos" class="cal-proximos-lista"></div>
+          <div id="cal-proximos-vacio" class="cal-proximos-vacio">
+            <p>No hay fechas programadas próximamente.</p>
+            <p class="cal-vacio-hint">Haz clic en <strong>+ Añadir plan</strong> o selecciona cualquier día en el
+              calendario.</p>
+          </div>
+        </div>
+
+        <div id="calendario-empty" class="calendario-empty hidden">
+          <p>Aún no tienes fechas agregadas en Nuestro Tiempo.</p>
+          <p class="calendario-empty-hint">Guarda cumpleaños, aniversarios, citas y aventuras que viviremos juntos.</p>
+        </div>
+      </div>
+
+      <!-- Panel Lateral / Bottom Sheet en Móvil para Día Seleccionado -->
+      <aside id="cal-dia-panel" class="cal-dia-panel" aria-label="Planes del día seleccionado">
+        <div class="cal-panel-handle" aria-hidden="true"></div>
+        <div class="cal-panel-header">
+          <div class="cal-panel-fecha-meta">
+            <span id="cal-panel-diasemana" class="cal-panel-diasemana">Hoy</span>
+            <h3 id="cal-panel-fecha-texto" class="cal-panel-fecha-texto">Selecciona un día</h3>
+          </div>
+          <button type="button" id="btn-cerrar-dia-panel" class="cal-panel-close-btn" aria-label="Cerrar panel">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Contenedor de planes del día -->
+        <div id="cal-panel-eventos-lista" class="cal-panel-eventos-lista">
+          <div class="cal-panel-placeholder">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;margin-bottom:8px;">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <p>Haz clic en cualquier día de la cuadrícula para ver o agregar planes aquí.</p>
+          </div>
+        </div>
+
+        <!-- Botón de acción para el día seleccionado -->
+        <div class="cal-panel-footer">
+          <button type="button" id="btn-panel-add-plan" class="btn-primary w-100 btn-panel-add">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span id="btn-panel-add-text">Añadir plan a este día</span>
+          </button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- MODAL FECHA / PLAN ROMÁNTICO -->
+  <div id="evento-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-evento-modal></div>
+    <div class="modal-content evento-modal-content">
+      <div class="evento-modal-header">
+        <div class="evento-modal-header-main">
+          <div class="evento-modal-badge" id="modal-category-preview-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="4" ry="4"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+              <path d="M12 14.5l.01.01M9.5 17.5l.01.01M14.5 17.5l.01.01"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 id="evento-modal-title" class="evento-modal-title">Añadir Plan o Recuerdo</h3>
+            <p class="evento-modal-subtitle">Organiza una cita, viaje, comida o guarda una fecha inolvidable</p>
+          </div>
+        </div>
+        <button type="button" class="evento-modal-close-btn" data-close-evento-modal aria-label="Cerrar ventana">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="evento-form" class="evento-form-modern">
+        <!-- Selector Visual de Categorías -->
+        <div class="evento-field-group">
+          <label class="evento-label">
+            <span class="evento-label-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </span>
+            Tipo de plan o evento
+          </label>
+          <div class="cal-categoria-selector" id="evento-categoria-selector" role="radiogroup"
+            aria-label="Categoría del evento">
+            <button type="button" class="cat-card active" data-categoria="cita" data-color="rosa">
+              <span class="cat-card-icon">❤️</span>
+              <span class="cat-card-name">Cita Romance</span>
+            </button>
+            <button type="button" class="cat-card" data-categoria="viaje" data-color="amarillo">
+              <span class="cat-card-icon">✈️</span>
+              <span class="cat-card-name">Viaje Aventura</span>
+            </button>
+            <button type="button" class="cat-card" data-categoria="comida" data-color="naranja">
+              <span class="cat-card-icon">🍔</span>
+              <span class="cat-card-name">Comida Receta</span>
+            </button>
+            <button type="button" class="cat-card" data-categoria="aniversario" data-color="dorado">
+              <span class="cat-card-icon">⭐</span>
+              <span class="cat-card-name">Aniversario Hito</span>
+            </button>
+            <button type="button" class="cat-card" data-categoria="nota" data-color="cielo">
+              <span class="cat-card-icon">📌</span>
+              <span class="cat-card-name">Nota Recordatorio</span>
+            </button>
+          </div>
+          <input type="hidden" id="evento-categoria" name="categoria" value="cita">
+        </div>
+
+        <div class="evento-field-group">
+          <label class="evento-label" for="evento-titulo">
+            <span class="evento-label-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z">
+                </path>
+              </svg>
+            </span>
+            ¿Qué tenemos planeado o celebramos?
+          </label>
+          <div class="evento-input-wrap">
+            <input type="text" id="evento-titulo" maxlength="60"
+              placeholder="Ej. Cena romántica en terraza, Picnic en el parque..." required autocomplete="off">
+          </div>
+        </div>
+
+        <!-- Fechas: Inicio y Fin opcional para rangos -->
+        <div class="evento-fechas-grid">
+          <div class="evento-field-group">
+            <label class="evento-label" for="evento-fecha">
+              <span class="evento-label-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </span>
+              Fecha inicio
+            </label>
+            <div class="evento-input-wrap">
+              <input type="date" id="evento-fecha" required>
+            </div>
+          </div>
+
+          <div class="evento-field-group" id="group-evento-fecha-fin">
+            <label class="evento-label" for="evento-fecha-fin">
+              <span class="evento-label-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 14 14"></polyline>
+                </svg>
+              </span>
+              Fecha fin <span class="evento-label-opcional">(opcional)</span>
+            </label>
+            <div class="evento-input-wrap">
+              <input type="date" id="evento-fecha-fin">
+            </div>
+          </div>
+        </div>
+
+        <div class="evento-field-group">
+          <label class="evento-label" for="evento-descripcion">
+            <span class="evento-label-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </span>
+            Detalles o dedicatoria <span class="evento-label-opcional">(opcional)</span>
+          </label>
+          <div class="evento-input-wrap">
+            <textarea id="evento-descripcion" rows="2" maxlength="200"
+              placeholder="Ej. Llevar cámara, reservar a las 8pm, código de vestimenta..."></textarea>
+          </div>
+        </div>
+
+        <!-- Paleta de Color complementaria -->
+        <div class="evento-field-group">
+          <label class="evento-label">
+            <span class="evento-label-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+              </svg>
+            </span>
+            Color distintivo
+          </label>
+          <div class="color-picker evento-color-picker">
+            <button type="button" class="color-option color-rosa activo" data-color="rosa"
+              aria-label="Color rosa"></button>
+            <button type="button" class="color-option color-amarillo" data-color="amarillo"
+              aria-label="Color amarillo girasol"></button>
+            <button type="button" class="color-option color-naranja" data-color="naranja"
+              aria-label="Color naranja"></button>
+            <button type="button" class="color-option color-dorado" data-color="dorado"
+              aria-label="Color dorado"></button>
+            <button type="button" class="color-option color-cielo" data-color="cielo" aria-label="Color cielo"></button>
+            <button type="button" class="color-option color-lila" data-color="lila" aria-label="Color lila"></button>
+            <button type="button" class="color-option color-menta" data-color="menta" aria-label="Color menta"></button>
+          </div>
+        </div>
+
+        <div class="evento-opciones-card">
+          <div class="evento-field-subgroup">
+            <label class="evento-label" for="evento-recordatorio">
+              <span class="evento-label-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </span>
+              Recordarme con:
+            </label>
+            <div class="evento-select-wrap">
+              <select id="evento-recordatorio">
+                <option value="0">El mismo día</option>
+                <option value="1" selected>1 día de anticipación</option>
+                <option value="3">3 días de anticipación</option>
+                <option value="7">1 semana de anticipación</option>
+              </select>
+              <div class="evento-select-caret" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <label class="evento-checkbox-row" for="evento-recurrente">
+            <div class="evento-checkbox-wrapper">
+              <input type="checkbox" id="evento-recurrente">
+              <span class="evento-custom-checkbox" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
+            </div>
+            <div class="evento-checkbox-text">
+              <span class="evento-checkbox-title">Repetir cada año</span>
+              <span class="evento-checkbox-desc">Ideal para cumpleaños, aniversarios y fechas memorables</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="evento-modal-actions">
+          <button type="button" class="evento-btn-cancel" data-close-evento-modal>Cancelar</button>
+          <button type="submit" class="evento-btn-save">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            <span>Guardar fecha</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DETALLE DE RECETA -->
+  <div id="receta-modal" class="receta-modal hidden" aria-modal="true" role="dialog">
+    <div class="receta-modal-content">
+      <button type="button" id="receta-modal-cerrar" class="receta-modal-cerrar" aria-label="Cerrar receta">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+      <div id="receta-modal-body">
+        <!-- Contenido dinámico -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL NOTA -->
+  <div id="nota-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-nota-modal></div>
+    <div class="modal-content nota-modal-content">
+      <h3 id="nota-modal-title" class="modal-title">Nueva notita</h3>
+      <form id="nota-form" class="modal-form">
+        <div class="nota-editor-layout">
+          <div class="nota-editor-fields">
+            <label class="form-field"><span class="form-label">Título (opcional)</span><input type="text"
+                id="nota-titulo" maxlength="50" placeholder="Un titulito..."></label>
+            <label class="form-field"><span class="form-label">Notita</span><textarea id="nota-contenido" rows="4"
+                maxlength="300" placeholder="Escribe algo bonito..." required></textarea></label>
+            <div class="form-field"><span class="form-label">Color</span>
+              <div class="color-picker">
+                <button type="button" class="color-option color-amarillo activo" data-color="amarillo"></button>
+                <button type="button" class="color-option color-rosa" data-color="rosa"></button>
+                <button type="button" class="color-option color-lila" data-color="lila"></button>
+                <button type="button" class="color-option color-menta" data-color="menta"></button>
+                <button type="button" class="color-option color-cielo" data-color="cielo"></button>
+              </div>
+            </div>
+          </div>
+          <div class="nota-preview-column"><span class="form-label">Vista previa</span>
+            <div id="nota-preview" class="nota-preview" hidden></div>
+          </div>
+        </div>
+        <div class="modal-actions"><button type="button" class="btn-secondary" data-close-nota-modal>Mejor
+            luego</button><button type="submit" class="btn-primary">Guardar notita</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL PAREJA DEDICADO -->
+  <div id="pareja-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-pareja></div>
+    <div class="modal-content pareja-modal-content">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;">
+        <h3 class="modal-title" style="margin:0;color:#ff6ba8;display:inline-flex;align-items:center;gap:.5rem;">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="#ff6ba8" aria-hidden="true"
+            style="vertical-align:middle;">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+          </svg>
+          <span>Mi Pareja</span>
+        </h3>
+        <button type="button" class="btn-secondary" data-close-pareja
+          style="padding:.3rem .6rem;border-radius:50%;line-height:1;">✕</button>
+      </div>
+
+      <div id="pareja-estado-container"></div>
+
+      <h4 class="friends-subtitle" style="margin-top:.8rem;color:#ff6ba8;">Vincular desde tu grupo o amigos</h4>
+      <div id="pareja-candidatos-lista" class="friend-list"></div>
+
+      <h4 class="friends-subtitle" style="margin-top:.8rem;">O buscar por nombre de usuario</h4>
+      <form id="pareja-search-form" class="friend-search-form">
+        <input id="pareja-search-input" type="text" maxlength="20" placeholder="Nombre de tu pareja" autocomplete="off">
+        <button type="submit" class="btn-pareja">Buscar</button>
+      </form>
+      <div id="pareja-search-results" class="friend-list"></div>
+
+      <div class="modal-actions" style="margin-top:1.2rem;">
+        <button type="button" class="btn-secondary" data-close-pareja>Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL AMIGOS Y GRUPO -->
+  <div id="friends-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-friends></div>
+    <div class="modal-content friends-modal-content">
+      <h3 class="modal-title">Mi Grupo de Aventuras 👥</h3>
+      <p id="friends-group-name" class="friends-group-name"></p>
+      <form id="friend-search-form" class="friend-search-form"><input id="friend-search-input" type="text"
+          maxlength="20" placeholder="Buscar por nombre" autocomplete="off"><button type="submit"
+          class="btn-primary">Buscar</button></form>
+      <div id="friend-search-results" class="friend-list"></div>
+      <h4 class="friends-subtitle">Miembros</h4>
+      <div id="group-members-list" class="friend-list"></div>
+      <h4 class="friends-subtitle">Invitaciones recibidas</h4>
+      <div id="group-invites-list" class="friend-list"></div>
+      <div class="modal-actions"><button type="button" class="btn-secondary" data-close-friends>Cerrar</button></div>
+    </div>
+  </div>
+
+  <!-- MODAL AJUSTES -->
+  <div id="settings-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-settings></div>
+    <div class="modal-content settings-modal-content">
+      <div class="settings-modal-header">
+        <div class="settings-modal-header-left">
+          <div class="settings-modal-badge-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+              </path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title">Ajustes</h3>
+            <p class="settings-modal-subtitle">Personaliza tu experiencia en Four Sunflowers</p>
+          </div>
+        </div>
+        <button type="button" class="settings-modal-close" data-close-settings aria-label="Cerrar ajustes">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="settings-cards-stack">
+        <!-- ITEM 1: Idioma -->
+        <div class="settings-card-item">
+          <div class="settings-card-icon-wrap" style="--sc-color: #60a5fa;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+              </path>
+            </svg>
+          </div>
+          <div class="settings-card-content">
+            <div class="settings-card-text">
+              <strong>Idioma de la aplicación</strong>
+              <small>Elige el idioma principal de textos y menús</small>
+            </div>
+            <div class="settings-select-wrapper">
+              <select id="settings-language" class="settings-modern-select">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+                <option value="pt">Português</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
+                <option value="ko">한국어</option>
+                <option value="it">Italiano</option>
+                <option value="fr">Français</option>
+              </select>
+              <span class="settings-select-arrow">▾</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ITEM 2: Animaciones -->
+        <div class="settings-card-item">
+          <div class="settings-card-icon-wrap" style="--sc-color: #f59e0b;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div class="settings-card-content">
+            <div class="settings-card-text">
+              <strong>Desactivar animaciones</strong>
+              <small>Reduce efectos visuales y optimiza rendimiento</small>
+            </div>
+            <label class="settings-switch" for="toggle-animaciones">
+              <input id="toggle-animaciones" type="checkbox">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- ITEM 3: Volumen -->
+        <div class="settings-card-item settings-card-vertical">
+          <div class="settings-card-top-row">
+            <div class="settings-card-icon-wrap" style="--sc-color: #34d399;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              </svg>
+            </div>
+            <div class="settings-card-text" style="flex:1;">
+              <strong>Volumen de la aplicación</strong>
+              <small>Música de ambiente y efectos de sonido</small>
+            </div>
+            <output id="settings-volume-value" class="settings-vol-badge">65%</output>
+          </div>
+          <div class="settings-slider-wrapper">
+            <input id="settings-volume" type="range" min="0" max="1" step="0.01" value="0.65"
+              class="settings-range-slider" aria-label="Volumen general">
+          </div>
+        </div>
+
+        <!-- ITEM 4: Censura -->
+        <div class="settings-card-item">
+          <div class="settings-card-icon-wrap" style="--sc-color: #ec4899;">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <div class="settings-card-content">
+            <div class="settings-card-text">
+              <strong>Filtro de palabras inapropiadas</strong>
+              <small>Revisa y suaviza los mensajes nuevos del chat</small>
+            </div>
+            <label class="settings-switch" for="toggle-censura">
+              <input id="toggle-censura" type="checkbox">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions settings-modal-actions">
+        <button type="button" class="btn-primary settings-btn-done" data-close-settings>
+          <span>Listo</span>
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LOGIN -->
+  <div id="auth-modal" class="modal auth-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-auth></div>
+    <div class="auth-card">
+      <div class="auth-tape"></div>
+      <button class="auth-close" data-close-auth aria-label="Cerrar">×</button>
+      <div class="auth-flower" data-icono="girasol"></div>
+      <h2 id="auth-title" class="auth-title">Bienvenido</h2>
+      <p id="auth-subtitle" class="auth-subtitle">Inicia sesión para ver el álbum</p>
+      <form id="auth-form" class="auth-form">
+        <label class="auth-field"><span class="auth-label">Usuario</span><input type="text" id="auth-username"
+            placeholder="tu usuario" autocomplete="username" minlength="3" maxlength="20" required></label>
+        <label class="auth-field"><span class="auth-label">Contraseña</span>
+          <div class="auth-password-wrap"><input type="password" id="auth-password" placeholder="Mínimo 6 caracteres"
+              autocomplete="current-password" minlength="6"><button type="button" class="auth-password-toggle"
+              data-toggle-pass="auth-password" aria-label="Mostrar contraseña"><span data-icono="globo"></span></button>
+          </div>
+        </label>
+        <label class="auth-field" id="confirm-password-field" style="display:none"><span class="auth-label">Repite la
+            contraseña</span>
+          <div class="auth-password-wrap"><input type="password" id="auth-password-confirm"
+              placeholder="Repite tu contraseña" minlength="6"><button type="button" class="auth-password-toggle"
+              data-toggle-pass="auth-password-confirm" aria-label="Mostrar contraseña"><span
+                data-icono="globo"></span></button></div>
+        </label>
+        <label class="auth-remember"><input type="checkbox" id="auth-recordar"><span>Recordar mi usuario</span></label>
+        <p id="auth-error" class="auth-error" style="display:none"></p>
+        <button type="submit" id="auth-submit" class="btn-auth-submit">Entrar</button>
+      </form>
+      <p class="auth-forgot"><a href="#" id="auth-forgot-link">¿Olvidaste tu contraseña?</a></p>
+      <p class="auth-toggle"><span id="auth-toggle-text">¿Aún no tienes cuenta?</span><button type="button"
+          id="auth-toggle-btn" class="auth-link">Crear cuenta</button></p>
+    </div>
+  </div>
+
+  <!-- MODAL FOTO -->
+  <div id="photo-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-content photo-modal-content">
+      <h3 id="modal-title" class="modal-title">Nuevo recuerdo</h3>
+      <form id="photo-form" class="modal-form">
+        <div class="photo-editor-layout">
+          <div class="photo-editor-fields">
+            <label class="form-field"><span class="form-label">La foto</span><input type="file" id="input-photo"
+                accept="image/*" required></label>
+            <label class="form-field"><span class="form-label">¿Cuándo fue?</span><input type="date"
+                id="input-date"></label>
+            <label class="form-field"><span class="form-label">¿Qué quieres recordar?</span><textarea id="input-note"
+                rows="3" maxlength="200" placeholder="Cuéntame algo bonito..."></textarea></label>
+            <label class="form-field form-location-field"><span class="form-label">Ubicación (opcional)</span><button
+                type="button" id="btn-photo-location" class="btn-secondary">Usar mi ubicación</button><small
+                id="photo-location-status" class="photo-location-status">No se guardará hasta que tú lo
+                elijas.</small><input type="hidden" id="input-lat"><input type="hidden" id="input-lng"></label>
+          </div>
+          <div class="photo-preview-column"><span class="form-label">Vista previa</span>
+            <div id="photo-preview" class="photo-preview"></div>
+            <p id="photo-preview-info" class="photo-preview-info" hidden></p>
+          </div>
+        </div>
+        <div class="modal-actions"><button type="button" class="btn-secondary" data-close-modal>Mejor
+            luego</button><button type="submit" class="btn-primary">Guardar recuerdo</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CANCIONES PANELES -->
+  <div class="cancion-panel" data-panel="pegar">
+    <div class="cancion-pegar">
+      <p class="cancion-pegar-hint">Pega tu lista o carga un archivo (.txt, .csv, .m3u):</p>
+      <pre class="cancion-pegar-ejemplos">Canción - Artista
+Artista - Canción
+1. Canción - Artista</pre>
+      <div class="cancion-pegar-cargar"><input type="file" id="cancion-pegar-archivo"
+          accept=".txt,.csv,.m3u,.m3u8,text/plain" multiple hidden><button type="button" id="btn-cargar-archivo"
+          class="btn-secondary">Cargar archivo(s)</button></div>
+      <textarea id="cancion-pegar-texto" class="cancion-pegar-textarea" placeholder="Pega aquí tus canciones..."
+        rows="8"></textarea>
+      <div class="cancion-pegar-opciones"><span class="form-label" style="margin:0">Orden:</span><label><input
+            type="radio" name="pegar-orden" value="titulo-artista" checked> Título - Artista</label><label><input
+            type="radio" name="pegar-orden" value="artista-titulo"> Artista - Título</label></div>
+      <div id="cancion-pegar-preview" class="cancion-pegar-preview"></div>
+      <button type="button" id="btn-importar-canciones" class="btn-primary">Importar todas</button>
+    </div>
+  </div>
+
+  <div class="cancion-panel" data-panel="subir">
+    <div class="cancion-subir">
+      <p class="cancion-pegar-hint">Sube tus canciones (MP3, MP4, M4A, WAV, OGG, FLAC...).</p>
+      <div class="cancion-subir-dropzone" id="cancion-subir-dropzone">
+        <div class="cancion-subir-icon" data-icono="musica"></div>
+        <p class="cancion-subir-text">Arrastra aquí tus archivos</p>
+        <input type="file" id="cancion-subir-archivo" accept="audio/*,video/mp4,.mp3,.mp4,.m4a,.wav,.ogg,.flac,.aac"
+          multiple hidden>
+        <button type="button" id="btn-seleccionar-archivos" class="btn-secondary">Seleccionar archivos</button>
+      </div>
+      <div id="cancion-subir-lista" class="cancion-subir-lista"></div>
+      <button type="button" id="btn-subir-canciones" class="btn-primary" disabled>Subir todas</button>
+    </div>
+  </div>
+
+  <div class="modal-actions" style="margin-top:1rem"><button type="button" class="btn-secondary"
+      data-close-canciones-modal>Cerrar</button></div>
+
+  <!-- MODAL MASCOTA -->
+  <div id="mascota-modal" class="modal mascota-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-mascota></div>
+    <div class="mascota-modal-content">
+      <button class="mascota-modal-close" data-close-mascota aria-label="Cerrar">×</button>
+      <div class="mm-header">
+        <div class="mm-avatar"><img id="mm-avatar-img" src="" alt=""></div>
+        <div class="mm-header-info">
+          <div class="mm-header-top-row">
+            <span class="mm-nombre" id="mm-nombre-txt">—</span>
+            <span class="mm-rol-badge" id="mm-rol-badge">Soporte</span>
+          </div>
+          <span class="mm-estado" id="mm-estado">—</span>
+        </div>
+      </div>
+
+      <!-- Vínculo de Amor Banner -->
+      <div class="mm-vinculo-card" id="mm-vinculo-card">
+        <div class="mm-vinculo-header">
+          <div class="mm-vinculo-info">
+            <span class="mm-vinculo-icono" data-icono="corazon"></span>
+            <div>
+              <div class="mm-vinculo-titulo">Vínculo: <strong id="mm-vinculo-nivel-txt">Nivel 1 · Recién
+                  Llegado</strong></div>
+              <div class="mm-vinculo-sub" id="mm-vinculo-desc-txt">Tu mascota aún te está conociendo.</div>
+            </div>
+          </div>
+          <span class="mm-vinculo-xp" id="mm-vinculo-xp-txt">0 XP</span>
+        </div>
+        <div class="mm-vinculo-track">
+          <span class="mm-vinculo-fill" id="mm-vinculo-fill" style="width:0%"></span>
+        </div>
+        <div class="mm-pasiva-box" id="mm-pasiva-box">
+          <span class="mm-pasiva-badge">Habilidad Pasiva</span>
+          <div class="mm-pasiva-cuerpo">
+            <strong id="mm-pasiva-nombre">—</strong>
+            <span id="mm-pasiva-desc">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mm-tabs" role="tablist">
+        <button type="button" class="mm-tab active" data-mm-tab="estado">
+          <span class="mm-tab-icon" data-icono="chispas"></span>
+          <span>Estado</span>
+        </button>
+        <button type="button" class="mm-tab" data-mm-tab="cuidado">
+          <span class="mm-tab-icon" data-icono="corazonManos"></span>
+          <span>Cuidados</span>
+        </button>
+        <button type="button" class="mm-tab" data-mm-tab="inventario">
+          <span class="mm-tab-icon" data-icono="cuenco"></span>
+          <span>Dieta</span>
+        </button>
+        <button type="button" class="mm-tab" data-mm-tab="cambiar">
+          <span class="mm-tab-icon" data-icono="huellaCorazon"></span>
+          <span>Amigos</span>
+        </button>
+      </div>
+
+      <!-- PANEL ESTADO -->
+      <div class="mm-panel active" data-mm-panel="estado">
+        <div class="mm-monedero"><span class="mm-monedero-icon" data-icono="moneda"></span><span
+            class="mm-monedero-label">SunCoins</span><span class="mm-monedero-valor" id="mm-monedas">0</span></div>
+        <div class="mm-stats">
+          <div class="mm-stat"><span class="mm-stat-emoji" data-icono="manzana"></span>
+            <div class="mm-stat-body">
+              <div class="mm-stat-top"><span>Hambre</span><span id="mm-stat-hambre-val">0%</span></div>
+              <div class="mm-stat-barra hambre"><span id="mm-stat-hambre"></span></div>
+            </div>
+          </div>
+          <div class="mm-stat"><span class="mm-stat-emoji" data-icono="corazon"></span>
+            <div class="mm-stat-body">
+              <div class="mm-stat-top"><span>Felicidad</span><span id="mm-stat-felicidad-val">0%</span></div>
+              <div class="mm-stat-barra felicidad"><span id="mm-stat-felicidad"></span></div>
+            </div>
+          </div>
+          <div class="mm-stat"><span class="mm-stat-emoji" data-icono="rayo"></span>
+            <div class="mm-stat-body">
+              <div class="mm-stat-top"><span>Energía</span><span id="mm-stat-energia-val">0%</span></div>
+              <div class="mm-stat-barra energia"><span id="mm-stat-energia"></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="mm-acciones-rapidas">
+          <button type="button" class="mm-accion mm-accion-mimos" data-accion="mimos"><span class="mm-accion-icono"
+              data-icono="mimar"></span><span>Dar Mimos (+8 Amor XP)</span><span class="mascota-accion-progreso"
+              data-progreso="mimos"></span></button>
+          <button type="button" class="mm-accion mm-accion-dormir" data-accion="dormir"><span class="mm-accion-icono"
+              data-icono-dormir></span><span data-txt-dormir>Dormir</span><span class="mascota-accion-progreso"
+              data-progreso="dormir"></span></button>
+        </div>
+      </div>
+
+      <!-- PANEL CUIDADOS -->
+      <div class="mm-panel" data-mm-panel="cuidado" hidden>
+        <div class="cuidado-diario" id="mm-cuidado-diario"></div>
+        <div class="mm-actividades-box">
+          <button type="button" class="mm-actividad-card mm-actividad-jugar" data-accion="jugar">
+            <div class="mm-actividad-icon-wrap" data-icono="jugar"></div>
+            <div class="mm-actividad-body">
+              <div class="mm-actividad-tit-row">
+                <strong>Atrapa el girasol</strong>
+                <span class="mm-actividad-badge">+15 Amor XP</span>
+              </div>
+              <p>Minijuego ágil para entrenar reflejos y subir la felicidad de tu mascota.</p>
+            </div>
+          </button>
+          <button type="button" class="mm-actividad-card mm-actividad-amistad" data-accion="amistad">
+            <div class="mm-actividad-icon-wrap" data-icono="corazonAlas"></div>
+            <div class="mm-actividad-body">
+              <div class="mm-actividad-tit-row">
+                <strong>Vínculo entre Mascotas</strong>
+                <span class="mm-actividad-badge amistad">Compañerismo</span>
+              </div>
+              <p>Revisa la amistad mutua entre todas tus mascotas adoptadas.</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- PANEL DIETA & SNACKS -->
+      <div class="mm-panel" data-mm-panel="inventario" hidden>
+        <div class="mm-seccion-titulo">
+          <span>Dieta & Snacks</span>
+          <span class="mm-seccion-hint">Toca o arrastra para alimentar (+Amor XP)</span>
+        </div>
+        <div class="mascota-inventario" id="mm-inventario"></div>
+      </div>
+
+      <!-- PANEL CAMBIAR / ADOPCIÓN -->
+      <div class="mm-panel" data-mm-panel="cambiar" hidden>
+        <div class="mm-seccion-titulo"><span>Mis Compañeros & Adopción</span><span class="mm-seccion-hint">Equipa a tu
+            fiel amigo</span></div>
+        <div class="mm-cambiar-lista" id="mm-cambiar-lista"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PERFIL -->
+  <div id="perfil-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-perfil></div>
+    <div class="modal-content perfil-modal-content">
+      <h3 class="modal-title">Mi perfil</h3>
+      <div class="perfil-editor">
+        <div class="perfil-avatar-grande">
+          <img id="perfil-avatar-preview" src="" alt="" style="display:none">
+          <span class="perfil-avatar-fallback" data-icono="persona"></span>
+          <button type="button" class="perfil-avatar-cambiar" id="perfil-avatar-btn" title="Cambiar foto"><span
+              data-icono="camara"></span></button>
+          <input type="file" id="perfil-avatar-input" accept="image/*" hidden>
+        </div>
+        <label class="form-field" style="width:100%"><span class="form-label">Nombre de usuario</span><input type="text"
+            id="perfil-username" maxlength="20" placeholder="tu_nombre"></label>
+        <div class="perfil-stats">
+          <div class="perfil-stat"><strong id="perfil-stat-fotos">0</strong><span>Fotos</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-notas">0</strong><span>Notas</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-canciones">0</strong><span>Canciones</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-logros">0</strong><span>Logros</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-xp">0</strong><span class="perfil-stat-label"><img
+                class="xp-icon" src="img/items%20de%20aventura/estrella.webp" alt="XP" width="14" height="14"
+                loading="lazy" decoding="async">XP</span></div>
+          <div class="perfil-stat"><strong id="perfil-stat-mon">0</strong><span class="perfil-stat-label"><img
+                class="coin-icon" src="img/items%20de%20aventura/icon.webp" alt="SunCoins" width="14" height="14"
+                loading="lazy" decoding="async">SunCoins</span></div>
+        </div>
+        <div class="modal-actions" style="width:100%"><button type="button" class="btn-secondary"
+            data-close-perfil>Cancelar</button><button type="button" class="btn-primary" id="perfil-guardar">Guardar
+            cambios</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="site-footer" style="display:none !important;" aria-hidden="true"></footer>
+
+  <!-- LOADING -->
+  <div id="loading-screen" class="loading-screen" aria-hidden="true">
+    <div class="loading-content">
+      <div class="loading-flower"><img src="img/girasol-loading.webp" alt="Cargando..." width="80" height="80"
+          fetchpriority="high" decoding="async"></div>
+      <p id="loading-text" class="loading-text">Entrando...</p>
+    </div>
+  </div>
+
+  <!-- PLAYER -->
+  <div id="player-bar" class="player-bar" aria-hidden="true">
+    <button id="player-close" class="player-close" title="Cerrar">×</button>
+    <div class="player-info">
+      <div class="player-cover"><span id="player-cover-icon" data-icono="musica"></span></div>
+      <div class="player-meta"><span class="player-title" id="player-bar-title">—</span><span class="player-artist"
+          id="player-bar-artist"></span></div>
+    </div>
+    <div class="player-controls">
+      <button id="player-shuffle" class="player-btn-sm" title="Aleatorio">⤨</button>
+      <button id="player-prev" class="player-btn" title="Anterior">⏮</button>
+      <button id="player-play" class="player-btn player-btn-play" title="Reproducir">▶</button>
+      <button id="player-next" class="player-btn" title="Siguiente">⏭</button>
+      <button id="player-repeat" class="player-btn-sm" title="Repetir">↻</button>
+    </div>
+    <div id="provider-player" class="provider-player" hidden></div>
+    <div class="player-progress"><span class="player-time" id="player-current">0:00</span><input type="range"
+        id="player-seek" class="player-seek" min="0" max="100" value="0" step="0.1"><span class="player-time"
+        id="player-duration">0:00</span></div>
+    <div class="player-volume"><button id="player-volume-btn" class="player-btn-sm" title="Silenciar">♪</button><input
+        type="range" id="player-volume" class="player-volume-slider" min="0" max="1" step="0.01" value="0.65"></div>
+    <audio id="global-audio" preload="metadata"></audio>
+  </div>
+
+  <!-- MASCOTA FLOTANTE -->
+  <div class="mascota-wrapper" id="mascota-wrapper">
+    <div class="mascota" id="mascota" role="img" aria-label="Tu mascota"><img class="mascota-img" id="mascota-img"
+        src="img/mapache.webp" alt="Mapache" width="96" height="96" decoding="async">
+      <div class="mascota-burbuja" id="mascota-burbuja" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <!-- TIENDA -->
+  <button id="shop-bubble" class="shop-bubble" type="button" aria-label="Abrir tienda"><img class="shop-bubble-icon"
+      src="img/items%20de%20aventura/tienda.webp" alt="Tienda" width="28" height="28" decoding="async"><span
+      class="shop-bubble-text">Tienda</span></button>
+
+  <!-- MODAL RECUPERAR -->
+  <div id="recuperar-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-recuperar></div>
+    <div class="modal-content recuperar-content">
+      <button class="recuperar-close" data-close-recuperar aria-label="Cerrar">×</button>
+      <div class="recuperar-flower" data-icono="girasol"></div>
+      <div class="recuperar-paso active" data-paso="1">
+        <h3 class="recuperar-title">Recuperar contraseña</h3>
+        <p class="recuperar-sub">Escribe tu nombre de usuario y te generaremos un código.</p>
+        <label class="form-field"><span class="form-label">Usuario</span><input type="text" id="recuperar-usuario"
+            placeholder="tu usuario" maxlength="20" autocomplete="username"></label>
+        <p class="recuperar-error" id="recuperar-error-1"></p>
+        <div class="modal-actions"><button type="button" class="btn-secondary"
+            data-close-recuperar>Cancelar</button><button type="button" class="btn-primary" id="recuperar-btn-1">Generar
+            código</button></div>
+      </div>
+      <div class="recuperar-paso" data-paso="2">
+        <h3 class="recuperar-title">Introduce el código</h3>
+        <p class="recuperar-sub">Escribe el código de 6 dígitos.</p>
+        <label class="form-field"><span class="form-label">Código</span><input type="text" id="recuperar-codigo"
+            placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code"></label>
+        <p class="recuperar-error" id="recuperar-error-2"></p>
+        <div class="modal-actions"><button type="button" class="btn-secondary"
+            id="recuperar-volver-1">Atrás</button><button type="button" class="btn-primary"
+            id="recuperar-btn-2">Continuar</button></div>
+      </div>
+      <div class="recuperar-paso" data-paso="3">
+        <h3 class="recuperar-title">Nueva contraseña</h3>
+        <p class="recuperar-sub">Elige una contraseña segura (mínimo 6 caracteres).</p>
+        <label class="form-field"><span class="form-label">Nueva contraseña</span>
+          <div class="auth-password-wrap"><input type="password" id="recuperar-pass1" placeholder="Mínimo 6 caracteres"
+              minlength="6"><button type="button" class="auth-password-toggle" data-toggle-pass="recuperar-pass1"
+              aria-label="Mostrar contraseña"><span data-icono="globo"></span></button></div>
+        </label>
+        <label class="form-field"><span class="form-label">Repite la contraseña</span>
+          <div class="auth-password-wrap"><input type="password" id="recuperar-pass2" placeholder="Repite la contraseña"
+              minlength="6"><button type="button" class="auth-password-toggle" data-toggle-pass="recuperar-pass2"
+              aria-label="Mostrar contraseña"><span data-icono="globo"></span></button></div>
+        </label>
+        <p class="recuperar-error" id="recuperar-error-3"></p>
+        <div class="modal-actions"><button type="button" class="btn-secondary"
+            id="recuperar-volver-2">Atrás</button><button type="button" class="btn-primary" id="recuperar-btn-3">Cambiar
+            contraseña</button></div>
+      </div>
+      <div class="recuperar-paso" data-paso="ok">
+        <div class="recuperar-ok-icon" data-icono="ok"></div>
+        <h3 class="recuperar-title">¡Listo!</h3>
+        <p class="recuperar-sub">Tu contraseña se ha actualizado.</p>
+        <div class="modal-actions"><button type="button" class="btn-primary" data-close-recuperar>Entendido</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+     SCRIPTS — ORDEN CRÍTICO
+     1) Librerías externas
+     2) sprites-names ANTES que rpg-items-dinamicos
+     3) rpg-loot ANTES que rpg-items-dinamicos
+     4) rpg-items-dinamicos
+     5) rpg-loadout
+     6) rpg.js
+     ============================================================ -->
+  <script src="supabase.js"></script>
+  <script src="leaflet.js"></script>
+  <script src="icons-emojis.js"></script>
+  <script src="ds.js"></script>
+  <script src="offline.js"></script>
+  <script src="sun-modal.js"></script>
+  <script src="preferences.js?v=2"></script>
+  <script src="sprites-config.js"></script>
+  <script src="sprites-names.js?v=2"></script>
+  <script src="src/modules/album-core.js"></script>
+  <script src="src/modules/album-grupo.js"></script>
+  <script src="src/modules/album-logros.js?v=2"></script>
+  <script src="src/modules/album-fotos.js?v=2"></script>
+  <script src="src/modules/album-chat.js?v=13"></script>
+  <script src="src/modules/album-notas.js"></script>
+  <script src="src/modules/album-auth.js"></script>
+  <script src="src/modules/album-eventos.js?v=1"></script>
+  <script src="diccionario.js?v=5"></script>
+  <script src="recetas.js?v=10"></script>
+  <script src="src/modules/album-router.js"></script>
+  <script src="album.js?v=121"></script>
+
+  <!-- RPG — Orden crítico (cargados con defer para no bloquear el hilo de renderizado inicial) -->
+  <script src="rpg-loot.js?v=8" defer></script>
+  <script src="rpg-items-dinamicos.js?v=8" defer></script>
+  <script src="rpg-loadout.js?v=8" defer></script>
+  <script src="rpg-data.js?v=1" defer></script>
+  <script src="rpg.js?v=20" defer></script>
+  <script src="rpg-postgame.js?v=1" defer></script>
+  <script src="rpg-habilidades.js" defer></script>
+  <script src="rpg-minimap.js" defer></script>
+  <script src="rpg-canvas.js" defer></script>
+  <script src="rpg-roguelike.js?v=5" defer></script>
+
+  <!-- Resto de la app -->
+  <script src="tienda.js" defer></script>
+  <script src="script.js" defer></script>
+  <script src="perfil.js" defer></script>
+  <script src="logros-extra.js" defer></script>
+  <script src="juegos.js" defer></script>
+  <script src="desafios-diarios.js" defer></script>
+  <script src="mejoras.js" defer></script>
+  <script src="efectos.js" defer></script>
+  <script src="parches-v2.js" defer></script>
+  <script src="watch-party.js" defer></script>
+  <script src="parches-v3.js" defer></script>
+  <script src="youtube-spotify-metadata.js" defer></script>
+  <script src="player-extras.js?v=1" defer></script>
+  <script src="finanzas.js?v=11" defer></script>
+  <script src="capsula-tiempo.js?v=1" defer></script>
+  <script src="pareja-sistema.js?v=1" defer></script>
+
+  <!-- FEATURES EXTRA RPG (descomenta cuando confirmes que la base funciona) -->
+  <!--
+<script src="rpg-sonidos-rareza.js"></script>
+<script src="rpg-particulas-loot.js"></script>
+<script src="rpg-filtros-coleccion.js"></script>
+<script src="rpg-forja.js"></script>
+<script src="rpg-set-bonus.js"></script>
+<script src="rpg-encantamiento.js"></script>
+-->
+
+  <!-- FIX NAV -->
+  <script>
+    (function () {
+      "use strict";
+      function toggleNavMenu(force) {
+        var btn = document.getElementById("nav-hamburger");
+        var nav = document.getElementById("main-nav-links");
+        if (!nav) return;
+        var isOpen = force !== undefined ? force : !nav.classList.contains("mobile-open");
+
+        // Optimización compositor: will-change temporal
+        nav.classList.add("is-animating");
+        var onEnd = function () {
+          nav.classList.remove("is-animating");
+          nav.removeEventListener("transitionend", onEnd);
+        };
+        nav.addEventListener("transitionend", onEnd);
+        setTimeout(function () {
+          nav.classList.remove("is-animating");
+          nav.removeEventListener("transitionend", onEnd);
+        }, 260);
+
+        nav.classList.toggle("mobile-open", isOpen);
+        if (btn) {
+          btn.classList.toggle("active", isOpen);
+          btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        }
+      }
+      window.toggleNavMenu = toggleNavMenu;
+
+      var hamburgerBtn = document.getElementById("nav-hamburger");
+      if (hamburgerBtn) {
+        hamburgerBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleNavMenu();
+        });
+      }
+
+      function activarVista(v) {
+        if (window.AlbumApp?.modules?.router?.mostrarVista) {
+          window.AlbumApp.modules.router.mostrarVista(v);
+        } else {
+          document.querySelectorAll("[data-view]").forEach(function (el) {
+            el.classList.toggle("active", el.dataset.view === v);
+          });
+          document.querySelectorAll("[data-view-link]").forEach(function (el) {
+            el.classList.toggle("active", el.dataset.viewLink === v);
+          });
+          document.getElementById("user-dropdown")?.classList.remove("open");
+          document.getElementById("user-info")?.classList.remove("open");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          window.dispatchEvent(new CustomEvent("sunad:view-change", { detail: { view: v } }));
+        }
+      }
+      window.activarVista = activarVista;
+
+      function navegarHacia(v) {
+        if (!v) return;
+        activarVista(v);
+        if (location.hash !== "#" + v) {
+          location.hash = v;
+        } else {
+          window.dispatchEvent(new Event("hashchange"));
+        }
+        setTimeout(function () {
+          toggleNavMenu(false);
+          document.getElementById("user-dropdown")?.classList.remove("open");
+          document.getElementById("user-info")?.classList.remove("open");
+        }, 80);
+      }
+      window.navegarHacia = navegarHacia;
+
+      // Cerrar al hacer clic fuera del menú
+      var cerrarNavSiTocaFuera = function (e) {
+        var nav = document.getElementById("main-nav-links");
+        var btn = document.getElementById("nav-hamburger");
+        if (nav && nav.classList.contains("mobile-open")) {
+          if (!nav.contains(e.target) && (!btn || !btn.contains(e.target))) {
+            toggleNavMenu(false);
+          }
+        }
+      };
+      document.addEventListener("click", cerrarNavSiTocaFuera);
+
+      // Manejador centralizado y directo para [data-view-link]
+      var onLinkTrigger = function (e) {
+        var link = e.target.closest("[data-view-link]");
+        if (!link) return;
+        if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+        var v = link.dataset.viewLink;
+        if (!v) return;
+        e.preventDefault();
+        e.stopPropagation();
+        navegarHacia(v);
+      };
+
+      document.addEventListener("click", onLinkTrigger, true);
+
+      // ===== FIX TÁCTIL DEFINITIVO =====
+      // Busca el elemento del menú bajo el dedo con elementsFromPoint (ignora capas
+      // invisibles que tapen el menú) y ejecuta la acción en el mismo touchend.
+      var tStart = null, ignorarClickHasta = 0;
+      function menusAbiertos() {
+        var nav = document.getElementById("main-nav-links");
+        var dd = document.getElementById("user-dropdown");
+        return (nav && nav.classList.contains("mobile-open")) || (dd && dd.classList.contains("open"));
+      }
+      function itemBajoDedo(x, y) {
+        var els = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [document.elementFromPoint(x, y)];
+        for (var i = 0; i < els.length; i++) {
+          var el = els[i];
+          if (!el || !el.closest) continue;
+          var it = el.closest("#main-nav-links [data-view-link], #main-nav-links [data-action], #user-dropdown [data-view-link], #user-dropdown [data-action]");
+          if (it) return it;
+        }
+        return null;
+      }
+      function forzarVista(v) {
+        var destino = document.querySelector('[data-view="' + v + '"]');
+        if (!destino) return;
+        if (!destino.classList.contains("active")) {
+          document.querySelectorAll("[data-view]").forEach(function (el) { el.classList.toggle("active", el === destino); });
+          document.querySelectorAll("[data-view-link]").forEach(function (el) { el.classList.toggle("active", el.dataset.viewLink === v); });
+        }
+      }
+      window.addEventListener("touchstart", function (e) {
+        if (!menusAbiertos() || !e.touches[0]) { tStart = null; return; }
+        tStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }, { capture: true, passive: true });
+      window.addEventListener("touchend", function (e) {
+        if (!tStart || !e.changedTouches[0]) return;
+        var t = e.changedTouches[0];
+        var movido = Math.abs(t.clientX - tStart.x) > 12 || Math.abs(t.clientY - tStart.y) > 12;
+        tStart = null;
+        if (movido) return;
+        var it = itemBajoDedo(t.clientX, t.clientY);
+        if (!it) return;
+        if (e.cancelable) e.preventDefault();
+        e.stopPropagation();
+        ignorarClickHasta = Date.now() + 700;
+        if (it.dataset.viewLink) {
+          var v = it.dataset.viewLink;
+          navegarHacia(v);
+          setTimeout(function () { forzarVista(v); }, 150);
+        } else if (it.dataset.action === "descargar" || it.dataset.action === "descargar-directo") {
+          toggleNavMenu(false);
+          document.getElementById("user-dropdown")?.classList.remove("open");
+          document.getElementById("user-info")?.classList.remove("open");
+          if (typeof window.abrirDescarga === "function") window.abrirDescarga();
+          else if (typeof window.descargarApkDirecta === "function") window.descargarApkDirecta();
+        } else {
+          it.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+        }
+      }, { capture: true, passive: false });
+      // Bloquear el click "fantasma" posterior al touchend (evita que cierre/reabra menús)
+      window.addEventListener("click", function (e) {
+        if (Date.now() < ignorarClickHasta && e.isTrusted) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+        }
+      }, true);
+
+      // Sincronizar Breadcrumb dinámico con la vista actual
+      var NOMBRES_VISTAS = {
+        "inicio": "Panel Principal",
+        "album": "Álbum de Recuerdos",
+        "notas": "Notitas para Ti",
+        "mascotas": "Nuestras Mascotas",
+        "calendario": "Nuestro Calendario",
+        "rpg": "Modo Aventura RPG",
+        "roguelike": "Falla Astral Roguelike",
+        "minijuegos": "Salón de Minijuegos",
+        "logros": "Salón de Logros",
+        "recetas": "Recetario Mágico",
+        "finanzas": "Finanzas & Ahorro",
+        "diccionario": "Diccionario de Palabras",
+        "chat": "Chat Privado"
+      };
+
+      function actualizarBreadcrumb(v) {
+        var txt = document.getElementById("nav-breadcrumb-text");
+        if (txt) {
+          txt.textContent = NOMBRES_VISTAS[v] || (v ? v.charAt(0).toUpperCase() + v.slice(1) : "Panel Principal");
+        }
+      }
+
+      window.addEventListener("sunad:view-change", function (e) {
+        if (e.detail && e.detail.view) actualizarBreadcrumb(e.detail.view);
+      });
+
+      // Configurar Buscador Rápido del TopBar
+      function setupTopBarSearch() {
+        var input = document.getElementById("nav-global-search");
+        if (!input) return;
+        input.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            var q = (input.value || "").trim().toLowerCase();
+            if (!q) return;
+            var destinos = [
+              { term: "album", v: "album" }, { term: "foto", v: "album" }, { term: "recuerdo", v: "album" },
+              { term: "nota", v: "notas" }, { term: "carta", v: "notas" },
+              { term: "mascota", v: "mascotas" }, { term: "animal", v: "mascotas" },
+              { term: "calendario", v: "calendario" }, { term: "cita", v: "calendario" }, { term: "plan", v: "calendario" },
+              { term: "rpg", v: "rpg" }, { term: "aventura", v: "rpg" }, { term: "espada", v: "rpg" }, { term: "jefe", v: "rpg" },
+              { term: "falla", v: "roguelike" }, { term: "astral", v: "roguelike" }, { term: "roguelike", v: "roguelike" },
+              { term: "juego", v: "minijuegos" }, { term: "minijuego", v: "minijuegos" },
+              { term: "logro", v: "logros" }, { term: "trofeo", v: "logros" }, { term: "medalla", v: "logros" },
+              { term: "receta", v: "recetas" }, { term: "cocina", v: "recetas" }, { term: "comida", v: "recetas" },
+              { term: "finanza", v: "finanzas" }, { term: "ahorro", v: "finanzas" }, { term: "dinero", v: "finanzas" },
+              { term: "diccionario", v: "diccionario" }, { term: "palabra", v: "diccionario" },
+              { term: "chat", v: "chat" }, { term: "mensaje", v: "chat" },
+              { term: "inicio", v: "inicio" }, { term: "hub", v: "inicio" }, { term: "lobby", v: "inicio" }, { term: "panel", v: "inicio" }
+            ];
+            var hallado = destinos.find(function (d) { return q.includes(d.term); });
+            if (hallado) {
+              navegarHacia(hallado.v);
+              input.value = "";
+              input.blur();
+            }
+          }
+        });
+      }
+
+      // Configurar botones de Acciones Rápidas (Campana, Chat, Ajustes)
+      function setupQuickActions() {
+        var btnSettings = document.getElementById("nav-btn-quick-settings");
+        if (btnSettings && !btnSettings.dataset.bound) {
+          btnSettings.dataset.bound = "true";
+          btnSettings.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.AlbumApp?.modules?.grupo?.abrirAjustes) {
+              window.AlbumApp.modules.grupo.abrirAjustes();
+            } else {
+              var m = document.getElementById("settings-modal");
+              if (m) {
+                m.classList.add("active");
+                m.setAttribute("aria-hidden", "false");
+                document.body.style.overflow = "hidden";
+              }
+            }
+          });
+        }
+
+        var btnNotif = document.getElementById("nav-btn-quick-notif");
+        if (btnNotif && !btnNotif.dataset.bound) {
+          btnNotif.dataset.bound = "true";
+          btnNotif.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof window._activarNotificacionesPush === "function") {
+              window._activarNotificacionesPush().catch(function () { });
+            } else if ("Notification" in window) {
+              Notification.requestPermission().then(function (perm) {
+                if (window.AlbumApp?.alertar) {
+                  if (perm === "granted") {
+                    window.AlbumApp.alertar({ title: "¡Notificaciones activadas!", message: "Recibirás avisos de eventos, mensajes y retos.", variant: "success", icon: "🔔" });
+                  } else {
+                    window.AlbumApp.alertar({ title: "Notificaciones", message: "Estado actual: " + perm, variant: "warning", icon: "🔕" });
+                  }
+                }
+              });
+            } else if (window.AlbumApp?.alertar) {
+              window.AlbumApp.alertar({ title: "Notificaciones", message: "Tu dispositivo no soporta notificaciones de sistema.", icon: "🔕" });
+            }
+          });
+        }
+
+        // Toggle robusto para píldora de usuario
+        var pill = document.getElementById("user-menu-toggle");
+        if (pill && !pill.dataset.boundPill) {
+          pill.dataset.boundPill = "true";
+          pill.addEventListener("click", function (e) {
+            e.stopPropagation();
+            var dd = document.getElementById("user-dropdown");
+            var info = document.getElementById("user-info");
+            if (!dd) return;
+            var open = dd.classList.contains("open");
+            if (open) {
+              dd.classList.remove("open");
+              dd.setAttribute("aria-hidden", "true");
+              pill.setAttribute("aria-expanded", "false");
+              if (info) info.classList.remove("open");
+            } else {
+              dd.classList.add("open");
+              dd.setAttribute("aria-hidden", "false");
+              pill.setAttribute("aria-expanded", "true");
+              if (info) info.classList.add("open");
+            }
+          });
+        }
+      }
+
+      function init() {
+        var h = (location.hash || "").replace(/^#/, "").trim();
+        if (h && document.querySelector('[data-view="' + h + '"]')) {
+          activarVista(h);
+          actualizarBreadcrumb(h);
+        } else {
+          actualizarBreadcrumb("inicio");
+        }
+        setupTopBarSearch();
+        setupQuickActions();
+      }
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+      else setTimeout(init, 50);
+    })();
+  </script>
+
+  <!-- LIMPIEZA -->
+  <script>
+    (function () {
+      "use strict";
+      const MOD = ".modal,.offline-overlay,.tienda-overlay,.amistad-overlay,.minijuego-overlay,.mascota-modal,.rpg-loot-modal,.loot-cofre-modal,.ml-modal,.rpg-rl-recompensa,.ml-video-box";
+      function limpiar() {
+        document.querySelectorAll("button,a").forEach(el => {
+          const t = (el.textContent || "").trim();
+          if (t !== "Cerrar" && t !== "Cerrar ×" && t !== "Cerrar ✕") return;
+          if (el.closest(MOD)) return;
+          const s = getComputedStyle(el), p = el.parentElement, ps = p ? getComputedStyle(p) : null;
+          if (s.position === "fixed" || s.position === "absolute" || (ps && (ps.position === "fixed" || ps.position === "absolute")) || el.closest("body > *")) {
+            el.style.setProperty("display", "none", "important");
+            el.dataset.cerrarHuerfano = "1";
+            console.warn("[limpieza] Botón 'Cerrar' huérfano ocultado:", el);
+          }
+        });
+      }
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => { limpiar(); setTimeout(limpiar, 800); setTimeout(limpiar, 2500); });
+      else { limpiar(); setTimeout(limpiar, 800); setTimeout(limpiar, 2500); }
+      window.addEventListener("hashchange", () => setTimeout(limpiar, 400));
+      setInterval(() => {
+        const h = [...document.querySelectorAll("body button")].some(b => (b.textContent || "").trim() === "Cerrar" && !b.closest(MOD) && getComputedStyle(b).position === "fixed");
+        if (h) limpiar();
+      }, 3000);
+      window._limpiarBotonesHuerfanos = limpiar;
+    })();
+  </script>
+
+  <!-- FIX POLAROID & GESTOS RESPONSIVE (TAP ABRIR / LONG-PRESS MENSAJE / SWIPE FULLSCREEN) -->
+  <script>
+    (function () {
+      "use strict";
+
+      // --- NAVEGACIÓN ENTRE FOTOS EN FULLSCREEN ---
+      function obtenerPolaroidFullscreen() {
+        const fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+        return fsEl && fsEl.classList.contains("polaroid") ? fsEl : null;
+      }
+
+      function cambiarFotoFullscreen(direccion) {
+        const actual = obtenerPolaroidFullscreen();
+        if (!actual) return;
+        const grid = document.getElementById("album-grid");
+        if (!grid) return;
+        const polaroids = Array.from(grid.querySelectorAll(".polaroid:not([data-capsula-activa='true'])"));
+        if (polaroids.length <= 1) return;
+
+        const idx = polaroids.indexOf(actual);
+        if (idx === -1) return;
+
+        let nuevoIdx = idx + direccion;
+        if (nuevoIdx < 0) nuevoIdx = polaroids.length - 1;
+        else if (nuevoIdx >= polaroids.length) nuevoIdx = 0;
+
+        const siguiente = polaroids[nuevoIdx];
+        if (!siguiente || siguiente === actual) return;
+
+        // Asegurar que la imagen siguiente esté cargada
+        if (siguiente.dataset.fotoPath) {
+          const img = siguiente.querySelector(".polaroid-visual img");
+          if (img && (!img.src || img.src.includes("data:image/svg") || img.src === window.location.href)) {
+            try {
+              window.AlbumApp?.modules?.fotos?.cargarFotoVisible?.(siguiente);
+            } catch (_) { }
+          }
+        }
+
+        // Animación suave de transición
+        const outCls = direccion > 0 ? "fs-slide-left-out" : "fs-slide-right-out";
+        const inCls = direccion > 0 ? "fs-slide-left-in" : "fs-slide-right-in";
+
+        actual.classList.add(outCls);
+        setTimeout(() => {
+          actual.classList.remove(outCls);
+          const btnFull = siguiente.querySelector(".polaroid-fullscreen");
+          const api = siguiente.requestFullscreen || siguiente.webkitRequestFullscreen || siguiente.msRequestFullscreen;
+          if (api) {
+            api.call(siguiente).catch(() => { });
+          }
+          siguiente.classList.add(inCls);
+          actualizarControlesFullscreen(siguiente, nuevoIdx, polaroids.length);
+          setTimeout(() => siguiente.classList.remove(inCls), 280);
+        }, 120);
+      }
+
+      function actualizarControlesFullscreen(pol, idx, total) {
+        if (!pol) return;
+        // Eliminar controles previos si los hubiere
+        pol.querySelectorAll(".polaroid-nav-arrow, .polaroid-counter-badge").forEach(el => el.remove());
+
+        if (total <= 1) return;
+
+        // Flecha Anterior (Izquierda)
+        const btnPrev = document.createElement("button");
+        btnPrev.type = "button";
+        btnPrev.className = "polaroid-nav-arrow nav-prev";
+        btnPrev.setAttribute("aria-label", "Foto anterior");
+        btnPrev.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>`;
+        btnPrev.addEventListener("click", e => {
+          e.preventDefault(); e.stopPropagation();
+          cambiarFotoFullscreen(-1);
+        });
+
+        // Flecha Siguiente (Derecha)
+        const btnNext = document.createElement("button");
+        btnNext.type = "button";
+        btnNext.className = "polaroid-nav-arrow nav-next";
+        btnNext.setAttribute("aria-label", "Foto siguiente");
+        btnNext.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>`;
+        btnNext.addEventListener("click", e => {
+          e.preventDefault(); e.stopPropagation();
+          cambiarFotoFullscreen(1);
+        });
+
+        // Badge indicador: ej. "3 / 12"
+        const badge = document.createElement("div");
+        badge.className = "polaroid-counter-badge";
+        badge.textContent = `${idx + 1} / ${total}`;
+
+        pol.append(btnPrev, btnNext, badge);
+      }
+
+      // Evento de entrada/salida a fullscreen
+      const onFullscreenChange = () => {
+        const pol = obtenerPolaroidFullscreen();
+        if (pol) {
+          const grid = document.getElementById("album-grid");
+          const polaroids = grid ? Array.from(grid.querySelectorAll(".polaroid:not([data-capsula-activa='true'])")) : [];
+          const idx = polaroids.indexOf(pol);
+          actualizarControlesFullscreen(pol, idx >= 0 ? idx : 0, polaroids.length);
+        } else {
+          document.querySelectorAll(".polaroid-nav-arrow, .polaroid-counter-badge").forEach(el => el.remove());
+        }
+      };
+      document.addEventListener("fullscreenchange", onFullscreenChange);
+      document.addEventListener("webkitfullscreenchange", onFullscreenChange);
+
+      // Navegación con teclado en Fullscreen (Flecha Izq / Der)
+      document.addEventListener("keydown", function (e) {
+        if (!obtenerPolaroidFullscreen()) return;
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          cambiarFotoFullscreen(-1);
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          cambiarFotoFullscreen(1);
+        }
+      });
+
+      // --- GESTIÓN DE CLICKS EN BOTONES DE POLAROID ---
+      document.addEventListener("click", function (e) {
+        const pol = e.target.closest(".polaroid");
+        if (!pol) return;
+        if (e.target.closest("button")) return;
+        if (document.fullscreenElement === pol) return;
+        const r = pol.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        const enZona = (bx, by, w = 36, h = 36) => x >= bx && x <= bx + w && y >= by && y <= by + h;
+        // Delete (arriba a la derecha)
+        if (enZona(r.width - 44, 4)) { e.preventDefault(); pol.querySelector(".polaroid-delete")?.click(); }
+        // Edit (arriba a la izquierda)
+        else if (enZona(4, 4)) { e.preventDefault(); pol.querySelector(".polaroid-edit")?.click(); }
+        // Fullscreen (arriba a la derecha, al lado de delete)
+        else if (enZona(r.width - 80, 4)) { e.preventDefault(); pol.querySelector(".polaroid-fullscreen")?.click(); }
+        // Cápsula (abajo a la izquierda, sin ningún solape)
+        else if (enZona(4, r.height - 44)) { e.preventDefault(); pol.querySelector(".polaroid-capsula")?.click(); }
+      }, true);
+
+      // --- GESTOS TÁCTILES: SWIPE EN FULLSCREEN & TAP/LONG-PRESS EN RESPONSIVE ---
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchStartTime = 0;
+      let longPressTimer = null;
+      let targetPolaroid = null;
+      let fueLongPress = false;
+      let touchMoved = false;
+      let esFullscreenGesture = false;
+
+      const limpiarLongPress = () => {
+        if (longPressTimer) {
+          clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+        if (targetPolaroid) {
+          targetPolaroid.classList.remove("presionando");
+        }
+      };
+
+      document.addEventListener("touchstart", function (e) {
+        const fsPol = obtenerPolaroidFullscreen();
+        if (fsPol) {
+          // Gesto táctil dentro de pantalla completa (Swipe para cambiar fotos)
+          if (e.target.closest("button")) return;
+          esFullscreenGesture = true;
+          const touch = e.touches[0];
+          touchStartX = touch.clientX;
+          touchStartY = touch.clientY;
+          touchStartTime = Date.now();
+          touchMoved = false;
+          return;
+        }
+
+        esFullscreenGesture = false;
+        if (window.innerWidth > 768) return;
+        const pol = e.target.closest(".polaroid");
+        if (!pol) return;
+        if (e.target.closest("button")) return;
+
+        targetPolaroid = pol;
+        fueLongPress = false;
+        touchMoved = false;
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchStartTime = Date.now();
+
+        pol.classList.add("presionando");
+
+        // Temporizador para detectar Long-Press (dejar presionado)
+        longPressTimer = setTimeout(() => {
+          if (touchMoved || !targetPolaroid) return;
+          fueLongPress = true;
+          try {
+            if (navigator.vibrate) navigator.vibrate(40);
+          } catch (_) { }
+
+          // Alternar o activar la nota de la foto
+          targetPolaroid.classList.toggle("nota-activa");
+          targetPolaroid.classList.remove("presionando");
+        }, 420);
+      }, { passive: true });
+
+      document.addEventListener("touchmove", function (e) {
+        if (esFullscreenGesture) {
+          touchMoved = true;
+          return;
+        }
+        if (!targetPolaroid || touchMoved) return;
+        const touch = e.touches[0];
+        const dx = Math.abs(touch.clientX - touchStartX);
+        const dy = Math.abs(touch.clientY - touchStartY);
+        if (dx > 10 || dy > 10) {
+          touchMoved = true;
+          limpiarLongPress();
+        }
+      }, { passive: true });
+
+      document.addEventListener("touchend", function (e) {
+        if (esFullscreenGesture) {
+          const fsPol = obtenerPolaroidFullscreen();
+          esFullscreenGesture = false;
+          if (!fsPol) return;
+          const changedTouch = e.changedTouches ? e.changedTouches[0] : null;
+          if (!changedTouch) return;
+
+          const dx = changedTouch.clientX - touchStartX;
+          const dy = changedTouch.clientY - touchStartY;
+          const dur = Date.now() - touchStartTime;
+
+          // Detección de Swipe Horizontal:
+          // Movimiento de al menos 40px en X, más horizontal que vertical, y en menos de 600ms
+          if (Math.abs(dx) >= 40 && Math.abs(dx) > Math.abs(dy) * 1.2 && dur < 650) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (dx < 0) {
+              // Deslizó hacia la izquierda -> Siguiente foto
+              cambiarFotoFullscreen(1);
+            } else {
+              // Deslizó hacia la derecha -> Foto anterior
+              cambiarFotoFullscreen(-1);
+            }
+          }
+          return;
+        }
+
+        if (!targetPolaroid) return;
+        const pol = targetPolaroid;
+        const duration = Date.now() - touchStartTime;
+        limpiarLongPress();
+
+        if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+          targetPolaroid = null;
+          return;
+        }
+
+        // Si fue un toque corto (Tap) sin desplazamiento y sin ser long-press
+        if (!touchMoved && !fueLongPress && duration < 380) {
+          // Si el toque fue cerca de las zonas de botones superiores o dentro de los márgenes de controles, no abrir fullscreen aquí
+          const r = pol.getBoundingClientRect();
+          const changedTouch = e.changedTouches ? e.changedTouches[0] : null;
+          if (changedTouch) {
+            const x = changedTouch.clientX - r.left;
+            const y = changedTouch.clientY - r.top;
+            const esZonaBotonSuperior = y <= 56 && (x <= 90 || x >= r.width - 90);
+            if (esZonaBotonSuperior) {
+              if (x >= r.width - 50 && y <= 50) {
+                const btnDel = pol.querySelector(".polaroid-delete");
+                if (btnDel) btnDel.click();
+              }
+              targetPolaroid = null;
+              return;
+            }
+          }
+
+          // Es un tap normal sobre la foto en responsive: abrir fullscreen / visualizador
+          e.preventDefault();
+          const btnFull = pol.querySelector(".polaroid-fullscreen");
+          if (btnFull) {
+            btnFull.click();
+          } else {
+            pol.click();
+          }
+        }
+
+        targetPolaroid = null;
+      }, { passive: false });
+
+      document.addEventListener("touchcancel", function () {
+        limpiarLongPress();
+        targetPolaroid = null;
+        esFullscreenGesture = false;
+      }, { passive: true });
+    })();
+  </script>
+
+  <!-- DIAGNÓSTICO -->
+  <script>
+    setTimeout(() => {
+      console.log("%c🔍 DIAGNÓSTICO", "color:#ffd93d;font-weight:900;font-size:14px");
+      console.log("SPRITE_NAMES:", window.SPRITE_NAMES ? Object.keys(window.SPRITE_NAMES).length + " items" : "❌");
+      console.log("RpgLoot:", window.RpgLoot ? "✅" : "❌", "| POOL:", window.RpgLoot?.POOL?.length || 0);
+      console.log("RpgItems:", typeof window.RpgItems);
+      console.log("RpgLoadout:", typeof window.RpgLoadout);
+      console.log("Rpg:", typeof window.Rpg);
+    }, 2000);
+  </script>
+
+</body>
+
+</html>

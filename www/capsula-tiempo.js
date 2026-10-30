@@ -17,25 +17,38 @@
   const SVG_LOCK_INLINE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;display:inline-block;vertical-align:-2px;margin-right:5px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
   const SVG_SPARKLE_MEDAL = '<svg viewBox="0 0 24 24" fill="#ffd93d" stroke="#ffd93d" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:34px;height:34px;display:block;"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"/></svg>';
 
-  // Sprites pixel-art del juego (estrella, calendario, corazón, reloj de arena)
-  const SPRITE_ESTRELLA = (size = 36) => `<img src="img/items%20de%20aventura/estrella.png" alt="Estrella" class="sprite-capsula" style="width:${size}px;height:${size}px;object-fit:contain;image-rendering:pixelated;display:inline-block;vertical-align:middle;">`;
-  const SPRITE_CALENDARIO = (size = 18) => `<img src="img/sprites%20complementarios/calendario.png" alt="Calendario" class="sprite-capsula" style="width:${size}px;height:${size}px;object-fit:contain;image-rendering:pixelated;display:inline-block;vertical-align:middle;margin-right:4px;">`;
-  const SPRITE_CORAZON = (size = 20) => `<img src="img/sprites%20complementarios/corazon.png" alt="Corazón" class="sprite-capsula" style="width:${size}px;height:${size}px;object-fit:contain;image-rendering:pixelated;display:inline-block;vertical-align:middle;margin-right:6px;">`;
-  const SPRITE_RELOJ_ARENA = (size = 20) => `<img src="img/sprites%20complementarios/reloj%20de%20arena.png" alt="Reloj de Arena" class="sprite-capsula" style="width:${size}px;height:${size}px;object-fit:contain;image-rendering:pixelated;display:inline-block;vertical-align:middle;margin-right:4px;">`;
+  // IconografÃ­a vectorial unificada (estilo dashboard plano con sombreado suave)
+  const SPRITE_ESTRELLA = (size = 36) => `<svg viewBox="0 0 160 160" width="${size}" height="${size}" style="display:inline-block;vertical-align:middle;filter:drop-shadow(0 2px 6px rgba(255,217,61,0.5));" aria-hidden="true"><polygon points="80,14 98,56 144,60 108,90 118,136 80,112 42,136 52,90 16,60 62,56" fill="#ffd93d"/><polygon points="80,14 98,56 144,60 108,90 118,136 80,112" fill="#f59e0b" opacity="0.45"/><circle cx="68" cy="58" r="8" fill="#ffffff" opacity="0.6"/></svg>`;
+  const SPRITE_CALENDARIO = (size = 18) => `<svg viewBox="0 0 160 160" width="${size}" height="${size}" style="display:inline-block;vertical-align:middle;margin-right:4px;" aria-hidden="true"><rect x="20" y="32" width="120" height="108" rx="20" fill="#fffdf7"/><path d="M20 52 C20 38 30 32 42 32 L118 32 C130 32 140 38 140 52 L140 66 L20 66 Z" fill="#ef4444"/><rect x="44" y="18" width="14" height="28" rx="7" fill="#cbd5e1"/><rect x="102" y="18" width="14" height="28" rx="7" fill="#cbd5e1"/><circle cx="80" cy="104" r="22" fill="#fee2e2"/><path d="M80 116 C80 116 64 104 64 94 C64 88 69 84 74 84 C77 84 79 86 80 88 C81 86 83 84 86 84 C91 84 96 88 96 94 C96 104 80 116 80 116 Z" fill="#ef4444"/></svg>`;
+  const SPRITE_CORAZON = (size = 20) => `<svg viewBox="0 0 160 160" width="${size}" height="${size}" style="display:inline-block;vertical-align:middle;margin-right:6px;filter:drop-shadow(0 2px 5px rgba(244,63,94,0.45));" aria-hidden="true"><path d="M80 138 C80 138 20 96 20 54 C20 32 38 18 56 18 C68 18 76 24 80 32 C84 24 92 18 104 18 C122 18 140 32 140 54 C140 96 80 138 80 138 Z" fill="#f43f5e"/><path d="M80 138 C80 138 140 96 140 54 C140 32 122 18 104 18 C92 18 84 24 80 32 Z" fill="#e11d48" opacity="0.45"/><ellipse cx="52" cy="46" rx="12" ry="7" transform="rotate(-25 52 46)" fill="#ffffff" opacity="0.55"/></svg>`;
+  const SPRITE_RELOJ_ARENA = (size = 20) => `<svg viewBox="0 0 160 160" width="${size}" height="${size}" style="display:inline-block;vertical-align:middle;margin-right:4px;filter:drop-shadow(0 2px 5px rgba(251,191,36,0.4));" aria-hidden="true"><rect x="32" y="16" width="96" height="14" rx="7" fill="#d97706"/><rect x="32" y="130" width="96" height="14" rx="7" fill="#d97706"/><path d="M44 30 L116 30 L88 76 L116 130 L44 130 L72 76 Z" fill="#38bdf8" opacity="0.28"/><path d="M52 42 L108 42 L84 74 L76 74 Z" fill="#fbbf24"/><path d="M50 126 L110 126 L92 94 L68 94 Z" fill="#f59e0b"/><circle cx="80" cy="84" r="4" fill="#fbbf24"/></svg>`;
 
   const getStorageKey = () => {
     const uid = window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || "local";
     return `${STORAGE_KEY_PREFIX}${uid}`;
   };
+  const getGroupStorageKey = () => {
+    const gid = window._getGrupoActivo?.()?.id || localStorage.getItem("grupo_activo");
+    return gid ? `${STORAGE_KEY_PREFIX}grupo_${gid}` : null;
+  };
 
   const cargarCapsulas = () => {
     try {
       const primaryKey = getStorageKey();
+      const groupKey = getGroupStorageKey();
+      let combined = {};
+      if (groupKey) {
+        try {
+          const gRaw = localStorage.getItem(groupKey);
+          if (gRaw && gRaw !== "{}") combined = Object.assign(combined, JSON.parse(gRaw));
+        } catch (_) {}
+      }
       let raw = localStorage.getItem(primaryKey);
       if (raw && raw !== "{}") {
-        return JSON.parse(raw);
+        combined = Object.assign(combined, JSON.parse(raw));
+        return combined;
       }
-      // Si la clave primaria está vacía (por ejemplo antes de que cargue el user id o si se guardó bajo 'local'), buscar cualquier clave de cápsulas que contenga datos
+      if (Object.keys(combined).length > 0) return combined;
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
         if (k && k.startsWith(STORAGE_KEY_PREFIX)) {
@@ -44,7 +57,6 @@
             try {
               const parsed = JSON.parse(val);
               if (parsed && Object.keys(parsed).length > 0) {
-                // Migrar a la clave actual si difiere
                 if (k !== primaryKey) {
                   localStorage.setItem(primaryKey, val);
                 }
@@ -67,19 +79,64 @@
     return !!(c && !c.abierta);
   };
 
-  // Exponer inmediatamente helper para el módulo de fotos
+  const sincronizarRemotas = (remotas) => {
+    if (!remotas || typeof remotas !== "object") return;
+    try {
+      const actuales = cargarCapsulas();
+      let huboCambio = false;
+      Object.entries(remotas).forEach(([fId, cap]) => {
+        if (!actuales[fId]) {
+          actuales[fId] = cap;
+          huboCambio = true;
+        } else if (cap.abierta && !actuales[fId].abierta) {
+          actuales[fId] = cap;
+          huboCambio = true;
+        }
+      });
+      if (huboCambio) {
+        const json = JSON.stringify(actuales);
+        localStorage.setItem(getStorageKey(), json);
+        const gk = getGroupStorageKey();
+        if (gk) localStorage.setItem(gk, json);
+        window.SunCapsulaTiempo?.actualizar?.();
+      }
+    } catch (e) {
+      console.warn("sincronizarRemotas capsulas:", e);
+    }
+  };
+
+  // Exponer inmediatamente helper para el mÃ³dulo de fotos
   window.SunCapsulaTiempo = window.SunCapsulaTiempo || {};
   window.SunCapsulaTiempo.cargarCapsulas = cargarCapsulas;
   window.SunCapsulaTiempo.esFotoCapsulaActiva = esFotoCapsulaActiva;
+  window.SunCapsulaTiempo.sincronizarRemotas = sincronizarRemotas;
 
   const guardarCapsulas = (capsulas) => {
     try {
-      localStorage.setItem(getStorageKey(), JSON.stringify(capsulas));
+      const json = JSON.stringify(capsulas);
+      localStorage.setItem(getStorageKey(), json);
+      const gk = getGroupStorageKey();
+      if (gk) localStorage.setItem(gk, json);
+
+      // Sincronizar con la pareja / grupo en Supabase
+      const sb = window._supabase;
+      const grupo = window._getGrupoActivo?.();
+      if (sb && grupo?.id) {
+        sb.auth.getSession().then(({ data: { session } }) => {
+          if (!session) return;
+          sb.from("mensajes").insert({
+            room_id: grupo.id,
+            grupo_id: grupo.id,
+            user_id: session.user.id,
+            destinatario_id: window.ParejaSistema?.getPareja?.()?.id || null,
+            contenido: `â³_CAPSULA_SYNC_:${json}`
+          }).then(() => {}).catch(() => {});
+        }).catch(() => {});
+      }
     } catch (e) {
       console.warn("guardarCapsulas error:", e);
     }
   };
-
   const esHoyOMas = (fechaISO) => {
     if (!fechaISO) return false;
     const ahora = new Date();

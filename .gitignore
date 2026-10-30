@@ -9,3 +9,6 @@ android/.idea/
 www/tools.zip
 www/tools/*.apk
 www/tools/mapeador-apk/
+
+assets/originals/
+www/assets/originals/

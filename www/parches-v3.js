@@ -122,10 +122,14 @@
   /* ============================================================
    8) 🔧 FORZAR ancho del dropdown en runtime (anti-cualquier-cosa)
    ============================================================ */
-  function forzarDropdown() {
+  let _lastDropdownWidth = "";
+  let _dropdownChildrenStyled = false;
+  function forzarDropdown(forzar = false) {
     const dd = document.getElementById("user-dropdown");
     if (!dd) return;
     const W = window.innerWidth < 600 ? "250px" : "290px";
+    if (!forzar && _lastDropdownWidth === W && _dropdownChildrenStyled) return;
+    _lastDropdownWidth = W;
 
     dd.style.setProperty("width", W, "important");
     dd.style.setProperty("min-width", W, "important");
@@ -143,6 +147,7 @@
       el.style.setProperty("width", "20px", "important");
       el.style.setProperty("height", "20px", "important");
     });
+    _dropdownChildrenStyled = true;
   }
 
   /* ============================================================
@@ -395,15 +400,28 @@
     limpiarArtefactosMascota();
   }
 
-  const cambiosDOM = new MutationObserver(() => {
+  const cambiosDOM = new MutationObserver(muts => {
     if (refreshTimer !== null) return;
+    let relevante = false;
+    for (const m of muts) {
+      if (m.addedNodes.length) {
+        for (const n of m.addedNodes) {
+          if (n.nodeType === 1 && !n.classList.contains("fx-particle") && !n.classList.contains("rpg-fx-canvas")) {
+            relevante = true;
+            break;
+          }
+        }
+      }
+      if (relevante) break;
+    }
+    if (!relevante) return;
     refreshTimer = setTimeout(() => {
       refreshTimer = null;
       actualizarElementosDinamicos();
-    }, 100);
+    }, 180);
   });
   cambiosDOM.observe(document.body, { childList: true, subtree: true });
-  window.addEventListener("resize", forzarDropdown, { passive: true });
+  window.addEventListener("resize", () => forzarDropdown(true), { passive: true });
   actualizarElementosDinamicos();
 
   /* ============================================================

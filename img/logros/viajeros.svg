@@ -1,0 +1,66 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF275"/>
+      <stop offset="50%" stop-color="#FFD93D"/>
+      <stop offset="100%" stop-color="#E67E22"/>
+    </linearGradient>
+    <linearGradient id="coral" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB8B8"/>
+      <stop offset="50%" stop-color="#FF7675"/>
+      <stop offset="100%" stop-color="#D63031"/>
+    </linearGradient>
+    <linearGradient id="pink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FD79A8"/>
+      <stop offset="100%" stop-color="#E84393"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#81ECEC"/>
+      <stop offset="50%" stop-color="#74B9FF"/>
+      <stop offset="100%" stop-color="#0984E3"/>
+    </linearGradient>
+    <linearGradient id="mint" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#55EFC4"/>
+      <stop offset="100%" stop-color="#00B894"/>
+    </linearGradient>
+    <linearGradient id="purple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A29BFE"/>
+      <stop offset="50%" stop-color="#6C5CE7"/>
+      <stop offset="100%" stop-color="#341F97"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#DFE6E9"/>
+      <stop offset="100%" stop-color="#636E72"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFEAA7"/>
+      <stop offset="50%" stop-color="#FDCB6E"/>
+      <stop offset="100%" stop-color="#E17055"/>
+    </linearGradient>
+    <linearGradient id="dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D3436"/>
+      <stop offset="100%" stop-color="#181926"/>
+    </linearGradient>
+    <filter id="sh" x="-18%" y="-18%" width="136%" height="136%">
+      <feDropShadow dx="2" dy="7" stdDeviation="5" flood-color="#000" flood-opacity="0.34"/>
+    </filter>
+  </defs>
+  <g transform="translate(80, 88) rotate(-4)" filter="url(#sh)">
+    <!-- Handle -->
+    <path d="M-18 -38 V-52 C-18 -56 18 -56 18 -52 V-38" fill="none" stroke="#2D3436" stroke-width="6" stroke-linecap="round"/>
+    <!-- Suitcase Body -->
+    <rect x="-50" y="-38" width="100" height="76" rx="14" fill="url(#coral)" stroke="#B71540" stroke-width="2.5"/>
+    <!-- Leather Straps -->
+    <rect x="-32" y="-38" width="10" height="76" fill="url(#gold)" stroke="#B76006" stroke-width="1.5"/>
+    <rect x="22" y="-38" width="10" height="76" fill="url(#gold)" stroke="#B76006" stroke-width="1.5"/>
+    <!-- Travel Stickers -->
+    <circle cx="0" cy="-10" r="12" fill="url(#sky)" stroke="#FFFFFF" stroke-width="2"/>
+    <polygon points="0,12 4,20 12,21 6,26 8,34 0,29 -8,34 -6,26 -12,21 -4,20" fill="#FFF275" stroke="#E67E22" stroke-width="1.2"/>
+  </g>
+  <!-- Paper Plane soaring above -->
+  <g transform="translate(114, 34) rotate(-18)" filter="url(#sh)">
+    <polygon points="-28,4 24,-14 -4,20 -8,8" fill="#FFFFFF" stroke="#74B9FF" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="-8,8 24,-14 -4,20" fill="#DFE6E9"/>
+  </g>
+</svg>

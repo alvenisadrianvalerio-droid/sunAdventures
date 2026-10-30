@@ -1,0 +1,61 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF275"/>
+      <stop offset="50%" stop-color="#FFD93D"/>
+      <stop offset="100%" stop-color="#E67E22"/>
+    </linearGradient>
+    <linearGradient id="coral" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB8B8"/>
+      <stop offset="50%" stop-color="#FF7675"/>
+      <stop offset="100%" stop-color="#D63031"/>
+    </linearGradient>
+    <linearGradient id="pink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FD79A8"/>
+      <stop offset="100%" stop-color="#E84393"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#81ECEC"/>
+      <stop offset="50%" stop-color="#74B9FF"/>
+      <stop offset="100%" stop-color="#0984E3"/>
+    </linearGradient>
+    <linearGradient id="mint" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#55EFC4"/>
+      <stop offset="100%" stop-color="#00B894"/>
+    </linearGradient>
+    <linearGradient id="purple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A29BFE"/>
+      <stop offset="50%" stop-color="#6C5CE7"/>
+      <stop offset="100%" stop-color="#341F97"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#DFE6E9"/>
+      <stop offset="100%" stop-color="#636E72"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFEAA7"/>
+      <stop offset="50%" stop-color="#FDCB6E"/>
+      <stop offset="100%" stop-color="#E17055"/>
+    </linearGradient>
+    <linearGradient id="dark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D3436"/>
+      <stop offset="100%" stop-color="#181926"/>
+    </linearGradient>
+    <filter id="sh" x="-18%" y="-18%" width="136%" height="136%">
+      <feDropShadow dx="2" dy="7" stdDeviation="5" flood-color="#000" flood-opacity="0.34"/>
+    </filter>
+  </defs>
+  <g transform="translate(80, 78)" filter="url(#sh)">
+    <!-- Giant Brilliant Diamond -->
+    <polygon points="-32,-38 32,-38 56,-10 0,56 -56,-10" fill="url(#sky)" stroke="#FFFFFF" stroke-width="2.5" stroke-linejoin="round"/>
+    <polygon points="-32,-38 32,-38 20,-10 -20,-10" fill="#FFFFFF" opacity="0.5"/>
+    <polygon points="-20,-10 20,-10 0,56" fill="#74B9FF" opacity="0.6"/>
+    <line x1="-56" y1="-10" x2="56" y2="-10" stroke="#FFFFFF" stroke-width="2"/>
+    <!-- Gold Coins around base -->
+    <circle cx="-36" cy="36" r="16" fill="url(#gold)" stroke="#B76006" stroke-width="2"/>
+    <circle cx="36" cy="36" r="16" fill="url(#gold)" stroke="#B76006" stroke-width="2"/>
+  </g>
+  <polygon points="80,12 84,20 92,24 84,28 80,36 76,28 68,24 76,20" fill="#FFF275"/>
+  <polygon points="138,40 141,47 148,50 141,53 138,60 135,53 128,50 135,47" fill="#FFF275"/>
+</svg>

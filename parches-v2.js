@@ -50,7 +50,7 @@
     wrap.querySelector(".rpg-shield-val").textContent = v;
   }
   let _escTimer = null;
-  new MutationObserver((muts) => {
+  const _escObs = new MutationObserver((muts) => {
     let touched = false;
     for (const m of muts) {
       for (const n of m.addedNodes) {
@@ -63,7 +63,17 @@
     if (touched) {
       if (!_escTimer) _escTimer = setTimeout(() => { _escTimer = null; pintarEsc(); }, 100);
     }
-  }).observe(document.body, { childList: true, subtree: true });
+  });
+  function attachEscObserver() {
+    const bat = $("rpg-batalla") || $("rpg-content") || $("rpg");
+    if (bat && !bat._escObsBound) {
+      bat._escObsBound = true;
+      _escObs.observe(bat, { childList: true, subtree: true });
+    }
+  }
+  attachEscObserver();
+  window.addEventListener("hashchange", attachEscObserver, { passive: true });
+  window.addEventListener("sunad:view-change", attachEscObserver, { passive: true });
   window.addEventListener("rpg:stats-cambiados", pintarEsc, { passive: true });
 
   /* ============================================================
@@ -594,6 +604,7 @@
     if (!menu) return;
     clean(menu);
     menu.classList.add("mjs-ready");
+    try { obs.disconnect(); } catch {}
   }
 
   // Observer que limpia SÍNCRONAMENTE cada vez que aparezca un botón
@@ -602,7 +613,7 @@
     if (!menu) return;
     clean(menu);
     clearTimeout(menu._mjsTimer);
-    menu._mjsTimer = setTimeout(() => menu.classList.add("mjs-ready"), 250);
+    menu._mjsTimer = setTimeout(() => marcarListo(menu), 250);
   });
 
   function start() {

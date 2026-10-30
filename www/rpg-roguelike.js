@@ -1061,6 +1061,7 @@ function sustituirEmojis(root) {
       shield: 0
     };
     state.enBatalla = true;
+    state.apoyoParejaUsadoPiso = false;
     state.turno = 'jugador';
     state.cd = 0;
     state.log = [];
@@ -1214,6 +1215,22 @@ function sustituirEmojis(root) {
     }
     state.hp = Math.max(0, state.hp - recibido);
     return recibido;
+  }
+
+  function accionParejaApoyo(animador) {
+    state.apoyoParejaUsadoPiso = true;
+    const parejaNom = window.ParejaSistema?.getPareja?.()?.username || 'tu Pareja';
+    const nivPar = Math.max(1, Number(window._nivelParejaActual) || 1);
+    const dmg = Math.round(calcularDmgBase() * (2.3 + nivPar * 0.15));
+    const cura = Math.round(state.hpMax * 0.25);
+    state.enemigo.shield = 0;
+    state.enemigo.hp = Math.max(0, state.enemigo.hp - dmg);
+    state.hp = clamp(state.hp + cura, 0, state.hpMax);
+    animador.playAttack('slash', dmg, true);
+    SND('victoria');
+    logBatalla(ðŸ’– Â¡Golpe Astral en Pareja con @${parejaNom}! Destruye escudos, inflige ${dmg} de daÃ±o y cura +${cura} HP);
+    actualizarBarraHeroe();
+    setTimeout(() => afterPlayerAction(), 650);
   }
 
   function accionGuardia() {

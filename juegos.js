@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    JUEGOS.JS — 20 minijuegos únicos, optimizados y divertidos
    Con power-ups, rachas, dificultad progresiva y variedad
    ============================================================ */
@@ -1678,41 +1678,69 @@ function programarIntervalo(overlay, fn, delay) {
   // REGISTRO
   // ============================================================
   const JUEGOS = [
-    { id:"dados", nombre:"Dados locos", fn:juegoDados, icon:ICONO.dado },
-    { id:"cartas", nombre:"Cartas giratorias", fn:juegoCartas, icon:ICONO.carta },
-    { id:"siluetas", nombre:"Luz y sombra", fn:juegoSiluetas, icon:ICONO.rayoDoble },
-    { id:"mariposas", nombre:"Mariposas del jardín", fn:juegoMariposas, icon:ICONO.mariposa },
-    { id:"pocion", nombre:"Poción mágica", fn:juegoPocion, icon:ICONO.pocion },
-    { id:"pinguino", nombre:"Pingüino resbaladizo", fn:juegoPinguino, icon:ICONO.montaña },
-    { id:"castillo", nombre:"Castillo de naipes", fn:juegoCastillo, icon:ICONO.castillo },
-    { id:"laberinto", nombre:"Laberinto de hojas", fn:juegoLaberinto, icon:ICONO.bosque },
-    { id:"cofre", nombre:"Cofre del tesoro", fn:juegoCofre, icon:ICONO.cofre },
-    { id:"arcoiris", nombre:"Arcoíris", fn:juegoArcoiris, icon:ICONO.arcoiris },
-    { id:"gotas", nombre:"Gotas de lluvia", fn:juegoGotas, icon:ICONO.gota },
-    { id:"cristales", nombre:"Cristales de hielo", fn:juegoCristales, icon:ICONO.copo },
-    { id:"abeja", nombre:"Vuelo de la abeja", fn:juegoAbeja, icon:ICONO.abeja },
-    { id:"caracoles", nombre:"Carrera de caracoles", fn:juegoCaracoles, icon:ICONO.caracol },
-    { id:"nubes", nombre:"Nubes y sol", fn:juegoNubes, icon:ICONO.nube },
-    { id:"globo", nombre:"Globo aerostático", fn:juegoGlobo, icon:ICONO.globo },
-    { id:"molino", nombre:"Molino de viento", fn:juegoMolino, icon:ICONO.diana },
-    { id:"fuente", nombre:"Fuente de los deseos", fn:juegoFuente, icon:ICONO.estrellaDoble },
-    { id:"bosque", nombre:"Bosque encantado", fn:juegoBosque, icon:ICONO.bosque },
-    { id:"adivina", nombre:"Adivina la mascota", fn:juegoAdivina, icon:ICONO.globo }
+    { id:"dados", nombre:"Dados locos", desc:"Lanza los dados y busca combinaciones con bonus por racha", fn:juegoDados, svg:"img/juegos/dados.svg", icon:ICONO.dado },
+    { id:"cartas", nombre:"Cartas giratorias", desc:"Encuentra los 4 ases ocultos antes de que acabe el tiempo", fn:juegoCartas, svg:"img/juegos/cartas.svg", icon:ICONO.carta },
+    { id:"siluetas", nombre:"Luz y sombra", desc:"Descubre quÃ© mascota proyecta cada silueta misteriosa", fn:juegoSiluetas, svg:"img/juegos/siluetas.svg", icon:ICONO.rayoDoble },
+    { id:"mariposas", nombre:"Mariposas del jardÃ­n", desc:"Atrapa las mariposas de colores y evita las avispas", fn:juegoMariposas, svg:"img/juegos/mariposas.svg", icon:ICONO.mariposa },
+    { id:"pocion", nombre:"PociÃ³n mÃ¡gica", desc:"Mezcla los ingredientes alquÃ­micos en el orden exacto", fn:juegoPocion, svg:"img/juegos/pocion.svg", icon:ICONO.pocion },
+    { id:"pinguino", nombre:"PingÃ¼ino resbaladizo", desc:"DeslÃ­zate por el hielo esquivando obstÃ¡culos y recogiendo peces", fn:juegoPinguino, svg:"img/juegos/pinguino.svg", icon:ICONO.montaÃ±a },
+    { id:"castillo", nombre:"Castillo de naipes", desc:"Apila las cartas con precisiÃ³n milimÃ©trica sin que caigan", fn:juegoCastillo, svg:"img/juegos/castillo.svg", icon:ICONO.castillo },
+    { id:"laberinto", nombre:"Laberinto de hojas", desc:"GuÃ­a tus pasos por el sendero secreto del jardÃ­n", fn:juegoLaberinto, svg:"img/juegos/laberinto.svg", icon:ICONO.bosque },
+    { id:"cofre", nombre:"Cofre del tesoro", desc:"Elige la llave correcta y abre los cofres dorados", fn:juegoCofre, svg:"img/juegos/cofre.svg", icon:ICONO.cofre },
+    { id:"arcoiris", nombre:"ArcoÃ­ris", desc:"Completa las franjas de luz y color a toda velocidad", fn:juegoArcoiris, svg:"img/juegos/arcoiris.svg", icon:ICONO.arcoiris },
+    { id:"gotas", nombre:"Gotas de lluvia", desc:"Recoge las gotas cristalinas antes de que toquen el suelo", fn:juegoGotas, svg:"img/juegos/gotas.svg", icon:ICONO.gota },
+    { id:"cristales", nombre:"Cristales de hielo", desc:"Rompe los cristales brillantes en cadena para ganar combos", fn:juegoCristales, svg:"img/juegos/cristales.svg", icon:ICONO.copo },
+    { id:"abeja", nombre:"Vuelo de la abeja", desc:"Vuela entre las flores recolectando nÃ©ctar dorado", fn:juegoAbeja, svg:"img/juegos/abeja.svg", icon:ICONO.abeja },
+    { id:"caracoles", nombre:"Carrera de caracoles", desc:"Impulsa a tu caracol favorito hacia la meta final", fn:juegoCaracoles, svg:"img/juegos/caracoles.svg", icon:ICONO.caracol },
+    { id:"nubes", nombre:"Nubes y sol", desc:"Despeja las nubes grises para que brille el sol radiante", fn:juegoNubes, svg:"img/juegos/nubes.svg", icon:ICONO.nube },
+    { id:"globo", nombre:"Globo aerostÃ¡tico", desc:"MantÃ©n el globo en el aire navegando entre corrientes", fn:juegoGlobo, svg:"img/juegos/globo.svg", icon:ICONO.globo },
+    { id:"molino", nombre:"Molino de viento", desc:"Sincroniza tu toque con el giro de las aspas doradas", fn:juegoMolino, svg:"img/juegos/molino.svg", icon:ICONO.diana },
+    { id:"fuente", nombre:"Fuente de los deseos", desc:"Lanza monedas al centro de la fuente en movimiento", fn:juegoFuente, svg:"img/juegos/fuente.svg", icon:ICONO.estrellaDoble },
+    { id:"bosque", nombre:"Bosque encantado", desc:"Encuentra al duende mÃ¡gico escondido entre los Ã¡rboles", fn:juegoBosque, svg:"img/juegos/bosque.svg", icon:ICONO.bosque },
+    { id:"adivina", nombre:"Adivina la mascota", desc:"Identifica quiÃ©n dijo cada frase antes de quedarte sin tiempo", fn:juegoAdivina, svg:"img/juegos/adivina.svg", icon:ICONO.globo }
   ];
-  const JUEGOS_PERMITIDOS = new Set(["dados"]);
-  const JUEGOS_FILTRADOS = JUEGOS.filter(j => JUEGOS_PERMITIDOS.has(j.id));
+  const JUEGOS_FILTRADOS = JUEGOS.filter(j => j.id !== "adivina");
 
   function inyectarBotones() {
     const menu = qs(".minijuegos-menu");
-    if (!menu || menu.dataset.extras === "1") return;
-    menu.dataset.extras = "1";
-    JUEGOS_FILTRADOS.forEach(j => {
-      const b = document.createElement("button");
-      b.type = "button"; b.className = "btn-minijuego"; b.dataset.juegoExtra = j.id; b.dataset.juego = j.id;
-      b.innerHTML = `<span class="btn-minijuego-icon">${j.icon || ""}</span><span class="btn-minijuego-text">${j.nombre}</span>`;
-      b.addEventListener("click", () => j.fn());
-      menu.appendChild(b);
-    });
+    if (menu && menu.dataset.extras !== "1") {
+      menu.dataset.extras = "1";
+      JUEGOS_FILTRADOS.forEach(j => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "btn-minijuego"; b.dataset.juegoExtra = j.id; b.dataset.juego = j.id;
+        b.innerHTML = `<span class="btn-minijuego-icon"><img src="${j.svg}" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="btn-minijuego-text">${j.nombre}</span>`;
+        b.addEventListener("click", () => j.fn());
+        menu.appendChild(b);
+      });
+    }
+
+    const hubGrid = $("minijuegos-hub-grid") || qs(".minijuegos-hub-grid");
+    if (hubGrid && hubGrid.dataset.extrasHub !== "1") {
+      hubGrid.dataset.extrasHub = "1";
+      JUEGOS.forEach(j => {
+        if (hubGrid.querySelector(`[data-launch-juego="${j.id}"]`)) return;
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "minijuego-hub-card";
+        card.dataset.launchJuego = j.id;
+        card.innerHTML = `
+          <div class="minijuego-hub-icon-wrap icon-${j.id}">
+            <img src="${j.svg}" alt="${j.nombre}" width="44" height="44" loading="lazy" decoding="async">
+          </div>
+          <div class="minijuego-hub-info">
+            <strong class="minijuego-hub-nombre">${j.nombre}</strong>
+            <span class="minijuego-hub-desc">${j.desc}</span>
+          </div>
+          <span class="minijuego-hub-arrow">â†’</span>
+        `;
+        card.addEventListener("click", () => {
+          $("modal-minijuegos-hub")?.classList.remove("active");
+          try { snd("pop"); } catch {}
+          j.fn();
+        });
+        hubGrid.appendChild(card);
+      });
+    }
   }
   setTimeout(inyectarBotones, 800);
   window.addEventListener("hashchange", () => setTimeout(inyectarBotones, 300));

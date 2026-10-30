@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bladeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="50%" stop-color="#DFE6E9"/>
+      <stop offset="100%" stop-color="#74B9FF"/>
+    </linearGradient>
+    <linearGradient id="goldHilt" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF275"/>
+      <stop offset="100%" stop-color="#E67E22"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFD93D"/>
+      <stop offset="100%" stop-color="#FF9F3D"/>
+    </radialGradient>
+    <filter id="swordShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="2" dy="8" stdDeviation="6" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Glowing Sun Compass / Shield Backdrop -->
+  <g transform="translate(80, 80)" filter="url(#swordShadow)">
+    <circle cx="0" cy="0" r="48" fill="#181926" stroke="#F1C40F" stroke-width="2.5" opacity="0.9"/>
+    <!-- Compass points -->
+    <polygon points="0,-44 6,-18 -6,-18" fill="#F1C40F"/>
+    <polygon points="0,44 6,18 -6,18" fill="#F1C40F" opacity="0.6"/>
+    <polygon points="-44,0 -18,6 -18,-6" fill="#F1C40F" opacity="0.6"/>
+    <polygon points="44,0 18,6 18,-6" fill="#F1C40F" opacity="0.6"/>
+    <circle cx="0" cy="0" r="32" fill="none" stroke="#FFEAA7" stroke-dasharray="3,3" stroke-width="1.5" opacity="0.5"/>
+  </g>
+
+  <!-- Golden Adventure Sword slanted -->
+  <g transform="translate(80, 80) rotate(-45)" filter="url(#swordShadow)">
+    <!-- Blade tip to hilt -->
+    <polygon points="0,-64 10,-52 8,24 -8,24 -10,-52" fill="url(#bladeGrad)" stroke="#B2BEC3" stroke-width="1"/>
+    <!-- Blade center groove line -->
+    <line x1="0" y1="-56" x2="0" y2="20" stroke="#0984E3" stroke-width="2" opacity="0.7"/>
+    <!-- Crossguard -->
+    <rect x="-24" y="24" width="48" height="10" rx="4" fill="url(#goldHilt)" stroke="#B71540" stroke-width="1.5"/>
+    <circle cx="-22" cy="29" r="3.5" fill="#E84393"/>
+    <circle cx="22" cy="29" r="3.5" fill="#E84393"/>
+    <!-- Grip -->
+    <rect x="-5" y="34" width="10" height="22" rx="2" fill="#2C3E50"/>
+    <line x1="-5" y1="40" x2="5" y2="40" stroke="#F1C40F" stroke-width="1.5"/>
+    <line x1="-5" y1="46" x2="5" y2="46" stroke="#F1C40F" stroke-width="1.5"/>
+    <line x1="-5" y1="52" x2="5" y2="52" stroke="#F1C40F" stroke-width="1.5"/>
+    <!-- Pommel with gem -->
+    <circle cx="0" cy="62" r="7" fill="url(#goldHilt)"/>
+    <circle cx="0" cy="62" r="3.5" fill="#E74C3C"/>
+  </g>
+
+  <!-- Sparkles -->
+  <polygon points="124,30 128,38 136,42 128,46 124,54 120,46 112,42 120,38" fill="#FFF275"/>
+  <polygon points="34,120 37,126 43,128 37,131 34,138 31,131 25,128 31,126" fill="#FFF275" opacity="0.8"/>
+</svg>

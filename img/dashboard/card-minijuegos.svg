@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="padGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFEAA7"/>
+      <stop offset="50%" stop-color="#FDCB6E"/>
+      <stop offset="100%" stop-color="#E17055"/>
+    </linearGradient>
+    <linearGradient id="diceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#DFE6E9"/>
+    </linearGradient>
+    <filter id="gameShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="2" dy="8" stdDeviation="6" flood-color="#000" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+
+  <!-- Rolling 3D Dice in background -->
+  <g transform="translate(108, 44) rotate(18)" filter="url(#gameShadow)">
+    <rect x="-16" y="-16" width="32" height="32" rx="7" fill="url(#diceGrad)" stroke="#B2BEC3" stroke-width="1.5"/>
+    <!-- Dice dots (5) -->
+    <circle cx="-9" cy="-9" r="2.8" fill="#E74C3C"/>
+    <circle cx="9" cy="-9" r="2.8" fill="#2C3E50"/>
+    <circle cx="0" cy="0" r="3.2" fill="#E74C3C"/>
+    <circle cx="-9" cy="9" r="2.8" fill="#2C3E50"/>
+    <circle cx="9" cy="9" r="2.8" fill="#E74C3C"/>
+  </g>
+
+  <!-- Retro Gamepad -->
+  <g transform="translate(74, 94)" filter="url(#gameShadow)">
+    <!-- Controller Chassis -->
+    <path d="M-52 -18 C-52 -34 -20 -36 0 -24 C20 -36 52 -34 52 -18 C52 14 36 28 22 28 C12 28 8 20 0 20 C-8 20 -12 28 -22 28 C-36 28 -52 14 -52 -18 Z" fill="url(#padGrad)" stroke="#D35400" stroke-width="2.5"/>
+    
+    <!-- Grip textured accents -->
+    <ellipse cx="-34" cy="2" rx="10" ry="14" fill="#E67E22" opacity="0.3"/>
+    <ellipse cx="34" cy="2" rx="10" ry="14" fill="#E67E22" opacity="0.3"/>
+
+    <!-- D-Pad (Left) -->
+    <g transform="translate(-28, -6)">
+      <rect x="-4" y="-14" width="8" height="28" rx="2" fill="#2D3436"/>
+      <rect x="-14" y="-4" width="28" height="8" rx="2" fill="#2D3436"/>
+      <circle cx="0" cy="0" r="3" fill="#636E72"/>
+    </g>
+
+    <!-- Action Buttons (Right) Diamond layout -->
+    <g transform="translate(28, -6)">
+      <circle cx="0" cy="-9" r="4.5" fill="#E84393" stroke="#C0392B" stroke-width="1"/>
+      <circle cx="9" cy="0" r="4.5" fill="#0984E3" stroke="#2980B9" stroke-width="1"/>
+      <circle cx="0" cy="9" r="4.5" fill="#00B894" stroke="#27AE60" stroke-width="1"/>
+      <circle cx="-9" cy="0" r="4.5" fill="#F1C40F" stroke="#F39C12" stroke-width="1"/>
+    </g>
+
+    <!-- Middle Select & Start buttons -->
+    <rect x="-8" y="-4" width="6" height="3" rx="1" fill="#636E72" transform="rotate(-20 -5 -2)"/>
+    <rect x="2" y="-4" width="6" height="3" rx="1" fill="#636E72" transform="rotate(-20 5 -2)"/>
+
+    <!-- Sun Sunflower Center Logo -->
+    <circle cx="0" cy="-14" r="5" fill="#FFD93D"/>
+    <circle cx="0" cy="-14" r="2.5" fill="#8B4513"/>
+  </g>
+</svg>

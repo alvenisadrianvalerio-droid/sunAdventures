@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    TIENDA.JS — Tienda de SunAd
    · Pestaña embebida (Tienda.montar) + overlay (Tienda.abrir)
    · Soporta sprite sheets con fallback automático a SVG
@@ -67,7 +67,7 @@
     }
     if (cat === "fondos") {
       const clsFondo = `tienda-preview-fondo-${id}`;
-      return `<div class="tienda-item-preview tienda-item-preview-fondo ${clsFondo}">${ICONO[item.icono] || ICONO.estrella || ""}</div>`;
+      return `<div class="tienda-item-preview tienda-item-preview-fondo ${clsFondo}"><img src="img/fondos/${id}.svg" alt="${item.nombre}" style="width:68px;height:68px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.45));" loading="lazy" decoding="async" onerror="this.style.display='none'"></div>`;
     }
     if (item.spriteFile) {
       return `<div class="tienda-item-preview tienda-item-preview-fondo"><img class="tienda-item-sprite-custom" src="${item.spriteFile}" alt="${item.nombre}" loading="lazy" decoding="async"></div>`;
@@ -87,21 +87,21 @@
 
   /* ---------- Items Míticos / Reliquias Míticas ---------- */
   const ITEMS_MITICOS = {
-    "item-6-0": { nombre: "Espada Fauna", precio: 300000, sprite: [6, 0], sheet: "loot1", rar: "mitico", desc: "Drena el alma enemiga. +10 ATK, +10 Lifesteal, +50 HP, +10 Veneno." },
-    "item-7-0": { nombre: "Espada Girasol", precio: 450000, sprite: [7, 0], sheet: "loot1", rar: "mitico", desc: "El poder absoluto sobre todo lo vivo. +20 ATK, +20 DEF, +50 HP, Regen, Lifesteal, Thorns." },
-    "item-7-1": { nombre: "Rebanadora", precio: 280000, sprite: [7, 1], sheet: "loot1", rar: "mitico", desc: "Rebana el viento a gran velocidad. +10 ATK, +10 Esq, +100 Regen, +100 HP." },
-    "item-5-2": { nombre: "Naturaleza", precio: 320000, sprite: [5, 2], sheet: "loot1", rar: "mitico", desc: "Hace temblar el suelo. +10 ATK, +100 Veneno, +100 Thorns, +200 HP." },
-    "item-6-2": { nombre: "Astrología", precio: 350000, sprite: [6, 2], sheet: "loot1", rar: "mitico", desc: "Poder cósmico ancestral. +20 ATK, +20 Crit, +20 Esq, +200 HP." },
-    "item-0-4": { nombre: "Colgante de Escudo", precio: 280000, sprite: [0, 4], sheet: "loot1", rar: "mitico", desc: "Lágrima de girasol encapsulada. +50 DEF y genera 300 escudo por turno." },
-    "item-1-4": { nombre: "Estrella Encapsulada", precio: 340000, sprite: [1, 4], sheet: "loot1", rar: "mitico", desc: "Energía astronómica incontrolable. +20 ATK, +20 XP, +10 Lifesteal." },
-    "item-2-4": { nombre: "Colmillo Ancestral", precio: 320000, sprite: [2, 4], sheet: "loot1", rar: "mitico", desc: "Colmillo de vampiro milenario. +50 Lifesteal y robo de vida masivo." },
-    "item-3-4": { nombre: "Calavera Encapsulada", precio: 300000, sprite: [3, 4], sheet: "loot1", rar: "mitico", desc: "Aura de putrefacción letal. +500 Veneno y reduce ataque del rival." },
-    "item-4-4": { nombre: "Pergamino de Escudo", precio: 330000, sprite: [4, 4], sheet: "loot1", rar: "mitico", desc: "Conocimiento arcano de defensa. +100 DEF, +40 XP y esquiva." },
-    "item-7-5": { nombre: "Oda a la Incertidumbre", precio: 350000, sprite: [7, 5], sheet: "loot1", rar: "mitico", desc: "Compañera de la guerra. +300 HP, +50 DEF, +300 Thorns, +20 Esq." },
-    "item-3-6": { nombre: "Zapatos de Mago", precio: 310000, sprite: [3, 6], sheet: "loot1", rar: "mitico", desc: "Pasos mágicos imperceptibles. +50 Esq, +50 DEF, +100 HP." },
-    "item-2-7": { nombre: "Oda a la Miseria", precio: 360000, sprite: [2, 7], sheet: "loot1", rar: "mitico", desc: "Daño indirecto demoledor. +40 Esq, +200 Thorns, +100 Veneno, +10 Lifesteal." },
-    "item-4-7": { nombre: "Mano de Mono", precio: 290000, sprite: [4, 7], sheet: "loot1", rar: "mitico", desc: "Fortuna y tesoros sin fin. +100% Oro droppeado." },
-    "item-1-8": { nombre: "Queso para Dragones", precio: 250000, sprite: [1, 8], sheet: "loot1", rar: "mitico", desc: "Manjar divino para bestias. +500 HP, +25 ATK." }
+    "item-6-0": { nombre: "Espada Fauna", precio: 2500, sprite: [6, 0], sheet: "loot1", rar: "mitico", desc: "Drena el alma enemiga. +10 ATK, +10 Lifesteal, +50 HP, +10 Veneno." },
+    "item-7-0": { nombre: "Espada Girasol", precio: 4500, sprite: [7, 0], sheet: "loot1", rar: "mitico", desc: "El poder absoluto sobre todo lo vivo. +20 ATK, +20 DEF, +50 HP, Regen, Lifesteal, Thorns." },
+    "item-7-1": { nombre: "Rebanadora", precio: 2200, sprite: [7, 1], sheet: "loot1", rar: "mitico", desc: "Rebana el viento a gran velocidad. +10 ATK, +10 Esq, +100 Regen, +100 HP." },
+    "item-5-2": { nombre: "Naturaleza", precio: 2800, sprite: [5, 2], sheet: "loot1", rar: "mitico", desc: "Hace temblar el suelo. +10 ATK, +100 Veneno, +100 Thorns, +200 HP." },
+    "item-6-2": { nombre: "Astrología", precio: 3200, sprite: [6, 2], sheet: "loot1", rar: "mitico", desc: "Poder cósmico ancestral. +20 ATK, +20 Crit, +20 Esq, +200 HP." },
+    "item-0-4": { nombre: "Colgante de Escudo", precio: 2400, sprite: [0, 4], sheet: "loot1", rar: "mitico", desc: "Lágrima de girasol encapsulada. +50 DEF y genera 300 escudo por turno." },
+    "item-1-4": { nombre: "Estrella Encapsulada", precio: 3000, sprite: [1, 4], sheet: "loot1", rar: "mitico", desc: "Energía astronómica incontrolable. +20 ATK, +20 XP, +10 Lifesteal." },
+    "item-2-4": { nombre: "Colmillo Ancestral", precio: 2800, sprite: [2, 4], sheet: "loot1", rar: "mitico", desc: "Colmillo de vampiro milenario. +50 Lifesteal y robo de vida masivo." },
+    "item-3-4": { nombre: "Calavera Encapsulada", precio: 2600, sprite: [3, 4], sheet: "loot1", rar: "mitico", desc: "Aura de putrefacción letal. +500 Veneno y reduce ataque del rival." },
+    "item-4-4": { nombre: "Pergamino de Escudo", precio: 2900, sprite: [4, 4], sheet: "loot1", rar: "mitico", desc: "Conocimiento arcano de defensa. +100 DEF, +40 XP y esquiva." },
+    "item-7-5": { nombre: "Oda a la Incertidumbre", precio: 3200, sprite: [7, 5], sheet: "loot1", rar: "mitico", desc: "Compañera de la guerra. +300 HP, +50 DEF, +300 Thorns, +20 Esq." },
+    "item-3-6": { nombre: "Zapatos de Mago", precio: 2700, sprite: [3, 6], sheet: "loot1", rar: "mitico", desc: "Pasos mágicos imperceptibles. +50 Esq, +50 DEF, +100 HP." },
+    "item-2-7": { nombre: "Oda a la Miseria", precio: 3400, sprite: [2, 7], sheet: "loot1", rar: "mitico", desc: "Daño indirecto demoledor. +40 Esq, +200 Thorns, +100 Veneno, +10 Lifesteal." },
+    "item-4-7": { nombre: "Mano de Mono", precio: 2500, sprite: [4, 7], sheet: "loot1", rar: "mitico", desc: "Fortuna y tesoros sin fin. +100% Oro droppeado." },
+    "item-1-8": { nombre: "Queso para Dragones", precio: 2000, sprite: [1, 8], sheet: "loot1", rar: "mitico", desc: "Manjar divino para bestias. +500 HP, +25 ATK." }
   };
 
   /* ---------- HTML interno ---------- */

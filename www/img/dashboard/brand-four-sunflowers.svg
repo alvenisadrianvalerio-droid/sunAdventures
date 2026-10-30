@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 130" width="100%" height="100%">
+  <defs>
+    <linearGradient id="goldPetal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF275"/>
+      <stop offset="50%" stop-color="#FFB800"/>
+      <stop offset="100%" stop-color="#E67E00"/>
+    </linearGradient>
+    <radialGradient id="centerCore" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#8B4513"/>
+      <stop offset="70%" stop-color="#4A2508"/>
+      <stop offset="100%" stop-color="#261102"/>
+    </radialGradient>
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <g id="flower">
+      <!-- 12 Petals -->
+      <g filter="url(#softGlow)">
+        <ellipse cx="0" cy="-28" rx="8" ry="17" fill="url(#goldPetal)"/>
+        <ellipse cx="14" cy="-24" rx="8" ry="17" fill="url(#goldPetal)" transform="rotate(30 14 -24)"/>
+        <ellipse cx="24" cy="-14" rx="8" ry="17" fill="url(#goldPetal)" transform="rotate(60 24 -14)"/>
+        <ellipse cx="28" cy="0" rx="8" ry="17" fill="url(#goldPetal)" transform="rotate(90 28 0)"/>
+        <ellipse cx="24" cy="14" rx="8" ry="17" fill="url(#goldPetal)" transform="rotate(120 24 14)"/>
+        <ellipse cx="14" cy="24" rx="8" ry="17" fill="url(#goldPetal)" transform="rotate(150 14 24)"/>
+        <ellipse cx="0" cy="28" rx="8" ry="17" fill="url(#goldPetal)"/>
+        <ellipse cx="-14" cy="24" rx="8" ry="17" fill="url(#goldPetal)" transform="rotate(-150 -14 24)"/>
+        <ellipse cx="-24" cy="14" rx="8" ry="17" fill="url(#goldPetal)" transform="rotate(-120 -24 14)"/>
+        <ellipse cx="-28" cy="0" rx="8" ry="17" fill="url(#goldPetal)" transform="rotate(-90 -28 0)"/>
+        <ellipse cx="-24" cy="-14" rx="8" ry="17" fill="url(#goldPetal)" transform="rotate(-60 -24 -14)"/>
+        <ellipse cx="-14" cy="-24" rx="8" ry="17" fill="url(#goldPetal)" transform="rotate(-30 -14 -24)"/>
+      </g>
+      <!-- Center Seed Core -->
+      <circle cx="0" cy="0" r="16" fill="url(#centerCore)"/>
+      <circle cx="-3" cy="-3" r="13" fill="none" stroke="#D2691E" stroke-dasharray="2,3" stroke-width="1.5" opacity="0.6"/>
+      <!-- Core highlights -->
+      <circle cx="-5" cy="-6" r="2.5" fill="#FFE082" opacity="0.7"/>
+    </g>
+  </defs>
+
+  <!-- 4 Sunflowers clustered rhythmically -->
+  <g transform="translate(62, 65) scale(0.85)">
+    <use href="#flower" transform="rotate(-12)"/>
+  </g>
+  <g transform="translate(108, 48) scale(1.05)">
+    <use href="#flower" transform="rotate(15)"/>
+  </g>
+  <g transform="translate(156, 75) scale(0.9)">
+    <use href="#flower" transform="rotate(-8)"/>
+  </g>
+  <g transform="translate(198, 54) scale(0.78)">
+    <use href="#flower" transform="rotate(22)"/>
+  </g>
+
+  <!-- Typography Brand Accent -->
+  <text x="238" y="58" font-family="'Outfit', 'Inter', system-ui, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" letter-spacing="-0.5px">four</text>
+  <text x="238" y="90" font-family="'Outfit', 'Inter', system-ui, sans-serif" font-size="34" font-weight="900" fill="url(#goldPetal)" letter-spacing="-1px">Sunflowers</text>
+</svg>

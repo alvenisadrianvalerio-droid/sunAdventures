@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    RPG-FORJA.JS — Fusiona 3 items iguales en 1 de rareza superior
    ============================================================ */
 (function () {
@@ -23,11 +23,11 @@
 
     // ---------- Coste de forja (en oro) ----------
     const COSTO_FORJA = {
-        comun: 500,        // 3 comunes → 1 raro
-        raro: 2000,        // 3 raros → 1 épico
-        epico: 10000,      // 3 épicos → 1 legendario
-        legendario: 50000, // 3 legendarios → 1 mítico
-        mitico: 500000     // 3 míticos → 1 tornasol
+        comun: 50,
+        raro: 150,
+        epico: 400,
+        legendario: 1000,
+        mitico: 2500
     };
 
     // ---------- Forjar ----------
