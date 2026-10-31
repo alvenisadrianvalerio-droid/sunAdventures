@@ -26,7 +26,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="leaflet.css" media="print" onload="this.media='all'">
   <script src="https://js.puter.com/v2/" defer></script>
-  <link rel="stylesheet" href="styles.css?v=126">
+  <link rel="stylesheet" href="styles.css?v=127">
   <link rel="stylesheet" href="album.css?v=124">
   <link rel="stylesheet" href="juegos.css?v=120" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="rpg.css?v=8">
@@ -342,6 +342,209 @@
         -webkit-tap-highlight-color: transparent;
       }
     /* Fallback crÃ­tico para el Modal de Rangos y Hub de Minijuegos */
+    /* Fallback crÃ­tico completo para Modal de Rangos y Beneficios */
+    .modal-rangos-content {
+      background: linear-gradient(150deg, #181b2a 0%, #0f111a 100%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      border-radius: 24px !important;
+      width: 95% !important;
+      max-width: 580px !important;
+      max-height: 88vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+      padding: 1.5rem !important;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 40px rgba(255, 107, 168, 0.08) !important;
+      position: relative !important;
+      box-sizing: border-box !important;
+      color: #f1f5f9 !important;
+    }
+    .modal-rangos-header {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+      padding-bottom: 0.95rem !important;
+      margin-bottom: 0.95rem !important;
+    }
+    .modal-rangos-title-wrap {
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.85rem !important;
+    }
+    .modal-rangos-icon-badge {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 44px !important;
+      height: 44px !important;
+      border-radius: 14px !important;
+      background: radial-gradient(circle at 35% 35%, rgba(255, 107, 168, 0.25), rgba(255, 107, 168, 0.05)) !important;
+      color: #ff6ba8 !important;
+      border: 1px solid rgba(255, 107, 168, 0.35) !important;
+      box-shadow: 0 4px 14px rgba(255, 107, 168, 0.2) !important;
+      flex-shrink: 0 !important;
+    }
+    .modal-rangos-title {
+      margin: 0 !important;
+      font-size: 1.22rem !important;
+      font-weight: 900 !important;
+      color: #ffffff !important;
+      letter-spacing: -0.015em !important;
+    }
+    .modal-rangos-sub {
+      font-size: 0.8rem !important;
+      color: #94a3b8 !important;
+      display: block !important;
+      margin-top: 0.15rem !important;
+    }
+    .modal-rangos-tabs {
+      display: flex !important;
+      gap: 0.5rem !important;
+      margin-bottom: 1rem !important;
+      background: rgba(0, 0, 0, 0.35) !important;
+      padding: 0.35rem !important;
+      border-radius: 14px !important;
+      border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    }
+    .modal-rangos-tab {
+      flex: 1 !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.5rem !important;
+      padding: 0.6rem 0.85rem !important;
+      border-radius: 11px !important;
+      border: 1px solid transparent !important;
+      background: transparent !important;
+      color: #94a3b8 !important;
+      font-size: 0.84rem !important;
+      font-weight: 700 !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    }
+    .modal-rangos-tab.active {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)) !important;
+      border-color: rgba(255, 255, 255, 0.16) !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
+    }
+    .modal-rangos-body {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.85rem !important;
+      overflow-y: auto !important;
+      padding-right: 0.35rem !important;
+      max-height: 56vh !important;
+    }
+    .modal-rango-item {
+      display: flex !important;
+      align-items: center !important;
+      gap: 1rem !important;
+      padding: 0.95rem 1.15rem !important;
+      border-radius: 18px !important;
+      background: rgba(255, 255, 255, 0.035) !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      position: relative !important;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+    }
+    .modal-rango-item:hover {
+      transform: translateY(-2px) !important;
+      border-color: rgba(255, 255, 255, 0.18) !important;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
+    }
+    .modal-rango-item.rango-actual {
+      border-color: rgba(255, 217, 61, 0.6) !important;
+      background: linear-gradient(135deg, rgba(255, 217, 61, 0.12) 0%, rgba(24, 27, 40, 0.85) 100%) !important;
+      box-shadow: 0 0 24px rgba(255, 217, 61, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    }
+    .modal-rango-item.item-pareja.rango-actual {
+      border-color: rgba(255, 107, 168, 0.65) !important;
+      background: linear-gradient(135deg, rgba(255, 107, 168, 0.15) 0%, rgba(24, 27, 40, 0.85) 100%) !important;
+      box-shadow: 0 0 24px rgba(255, 107, 168, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    }
+    .modal-rango-icono-col {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 0.4rem !important;
+      width: 52px !important;
+      flex-shrink: 0 !important;
+    }
+    .modal-rango-emblem-img {
+      width: 48px !important;
+      height: 48px !important;
+      object-fit: contain !important;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45)) !important;
+      transition: transform 0.2s ease !important;
+    }
+    .modal-rango-actual-tag {
+      font-size: 0.6rem !important;
+      font-weight: 900 !important;
+      letter-spacing: 0.06em !important;
+      padding: 0.15rem 0.45rem !important;
+      border-radius: 6px !important;
+      background: linear-gradient(135deg, #ffd93d, #f59e0b) !important;
+      color: #1a1306 !important;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4) !important;
+    }
+    .modal-rango-actual-tag.tag-pink {
+      background: linear-gradient(135deg, #ff6ba8, #ec4899) !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 6px rgba(236, 72, 153, 0.4) !important;
+    }
+    .modal-rango-info-col {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.35rem !important;
+      flex: 1 !important;
+      min-width: 0 !important;
+    }
+    .modal-rango-top-row {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 0.5rem !important;
+    }
+    .modal-rango-nombre {
+      font-size: 0.96rem !important;
+      font-weight: 800 !important;
+      color: #ffffff !important;
+    }
+    .modal-rango-req {
+      font-size: 0.74rem !important;
+      font-weight: 700 !important;
+      color: #ffd93d !important;
+      background: rgba(255, 217, 61, 0.1) !important;
+      padding: 0.15rem 0.45rem !important;
+      border-radius: 6px !important;
+    }
+    .modal-rango-item.item-pareja .modal-rango-req {
+      color: #ff6ba8 !important;
+      background: rgba(255, 107, 168, 0.1) !important;
+    }
+    .modal-rango-beneficio {
+      margin: 0.1rem 0 0.25rem !important;
+      font-size: 0.8rem !important;
+      color: #cbd5e1 !important;
+      line-height: 1.35 !important;
+    }
+    .modal-rango-status-pill {
+      align-self: flex-start !important;
+      font-size: 0.68rem !important;
+      font-weight: 700 !important;
+      padding: 0.15rem 0.5rem !important;
+      border-radius: 999px !important;
+    }
+    .pill-ok {
+      background: rgba(16, 185, 129, 0.15) !important;
+      color: #34d399 !important;
+      border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    }
+    .pill-lock {
+      background: rgba(255, 255, 255, 0.05) !important;
+      color: #94a3b8 !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
     .modal-rangos-overlay, .modal-hub-overlay {
       position: fixed;
       inset: 0;
