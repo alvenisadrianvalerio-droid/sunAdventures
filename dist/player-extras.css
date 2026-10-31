@@ -1,0 +1,6 @@
+/* player-extras.css - deshabilitado */
+#player-bar, .player-bar {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}

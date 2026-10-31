@@ -1,4 +1,4 @@
-/* ============================================
+﻿/* ============================================
    MODALES
    ============================================ */
 .modal {
@@ -12848,3 +12848,6 @@ body.light .mascotas-hogar-barra-track {
   object-fit: contain;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .35));
 }
+
+/* Ocultar reproductor por completo */
+#player-bar, .player-bar { display: none !important; visibility: hidden !important; pointer-events: none !important; }
