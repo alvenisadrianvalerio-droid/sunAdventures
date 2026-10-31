@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    JUEGOS.JS — 20 minijuegos únicos, optimizados y divertidos
    Con power-ups, rachas, dificultad progresiva y variedad
    ============================================================ */
@@ -62,7 +62,7 @@ function programarIntervalo(overlay, fn, delay) {
     document.getElementById(id)?.remove();
     const o = document.createElement("div");
     o.id = id; o.className = "minijuego-overlay";
-    o.innerHTML = `<div class="minijuego-panel"><button class="minijuego-cerrar" data-close-juego aria-label="Cerrar">×</button>${html}</div>`;
+    o.innerHTML = `<div class="minijuego-panel"><button type="button" class="minijuego-cerrar" data-close-juego aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;pointer-events:none;"><path d="M18 6L6 18M6 6l12 12"/></svg></button>${html}</div>`;
     document.body.appendChild(o);
 
     const cerrar = () => {
@@ -73,7 +73,7 @@ function programarIntervalo(overlay, fn, delay) {
     };
 
     o.addEventListener("click", e => {
-      if (e.target === o || e.target.hasAttribute("data-close-juego")) cerrar();
+      if (e.target === o || e.target.closest("[data-close-juego]")) cerrar();
     });
 
     // Auto-limpieza si el elemento es removido directamente del DOM
@@ -101,15 +101,26 @@ function programarIntervalo(overlay, fn, delay) {
     const p = qs(".minijuego-panel", o);
     const r = document.createElement("div");
     r.className = "minijuego-mensaje jm-final";
+    const salirIcon = window.ICONO?.salir || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>`;
+    const reintentarIcon = window.ICONO?.reintentar || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>`;
     r.innerHTML = `
       <div class="jg-final-emoji">${emoji || ICONO.trofeo || ""}</div>
       <h2>${titulo}</h2>
-      ${subtitulo ? `<p>${subtitulo}</p>` : ""}
+      ${subtitulo ? `<p class="jm-final-subtitulo">${subtitulo}</p>` : ""}
       ${num !== undefined ? `<span class="minijuego-mensaje-num">${num}</span>` : ""}
-      ${extra ? `<p style="color:#ffd93d;font-weight:bold;">${extra}</p>` : ""}
-      <div class="minijuego-botones"><button type="button" class="btn-primary" id="mini-otra">${botonTxt}</button></div>`;
+      ${extra ? `<div class="jm-recompensa-badge">${extra}</div>` : ""}
+      <div class="minijuego-botones">
+        <button type="button" class="btn-primary" id="mini-otra">${reintentarIcon} <span>${botonTxt}</span></button>
+        <button type="button" class="btn-secondary btn-minijuego-salir" id="mini-salir">${salirIcon} <span>Salir</span></button>
+      </div>`;
     p.appendChild(r);
-    qs("#mini-otra", r).addEventListener("click", () => { o.remove(); onReiniciar?.(); });
+    qs("#mini-otra", r)?.addEventListener("click", () => { o.remove(); onReiniciar?.(); });
+    qs("#mini-salir", r)?.addEventListener("click", () => {
+      limpiarTimers(o);
+      clearTimeout(window._casTO);
+      o.classList.remove("active");
+      setTimeout(() => o.remove(), 250);
+    });
     return r;
   };
 
@@ -1667,9 +1678,16 @@ function programarIntervalo(overlay, fn, delay) {
       const p = qs(".minijuego-panel", o), rr = document.createElement("div");
       rr.className = "minijuego-mensaje ja-final";
       const nivel = a >= 17 ? "¡Perfecto!" : a >= 13 ? "¡Excelente!" : a >= 8 ? "¡Bien!" : "¡Sigue así!";
-      rr.innerHTML = `<div class="jg-final-emoji">${a>=17?(ICONO.trofeo||""):a>=13?(ICONO.estrella||""):a>=8?(ICONO.corazon||""):(ICONO.girasol||"")}</div><h2>${nivel}</h2><p>Acertaste</p><span class="minijuego-mensaje-num">${a} / ${TOTAL}</span><p style="color:#ffd93d;font-weight:bold;">+${m}</p><div class="minijuego-botones"><button type="button" class="btn-primary" id="ja-otra">Otra vez</button></div>`;
+      const salirIcon = window.ICONO?.salir || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>`;
+      const reintentarIcon = window.ICONO?.reintentar || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>`;
+      rr.innerHTML = `<div class="jg-final-emoji">${a>=17?(ICONO.trofeo||""):a>=13?(ICONO.estrella||""):a>=8?(ICONO.corazon||""):(ICONO.girasol||"")}</div><h2>${nivel}</h2><p class="jm-final-subtitulo">Acertaste</p><span class="minijuego-mensaje-num">${a} / ${TOTAL}</span><div class="jm-recompensa-badge">+${m} SunCoins</div><div class="minijuego-botones"><button type="button" class="btn-primary" id="ja-otra">${reintentarIcon} <span>Otra vez</span></button><button type="button" class="btn-secondary btn-minijuego-salir" id="ja-salir">${salirIcon} <span>Salir</span></button></div>`;
       p.appendChild(rr);
-      qs("#ja-otra", rr).addEventListener("click", () => { o.remove(); juegoAdivina(); });
+      qs("#ja-otra", rr)?.addEventListener("click", () => { o.remove(); juegoAdivina(); });
+      qs("#ja-salir", rr)?.addEventListener("click", () => {
+        limpiarTimers(o);
+        o.classList.remove("active");
+        setTimeout(() => o.remove(), 250);
+      });
     };
     nR();
   }

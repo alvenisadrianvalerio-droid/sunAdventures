@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    SCRIPT.JS — SunAd · v5 compacto
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
@@ -1241,13 +1241,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById(id)?.remove();
     const o = document.createElement("div");
     o.id = id; o.className = "minijuego-overlay";
-    o.innerHTML = `<div class="minijuego-panel"><button class="minijuego-cerrar" data-close-juego>×</button>${html}</div>`;
+    o.innerHTML = `<div class="minijuego-panel"><button type="button" class="minijuego-cerrar" data-close-juego aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;pointer-events:none;"><path d="M18 6L6 18M6 6l12 12"/></svg></button>${html}</div>`;
     document.body.appendChild(o);
     const cleanups = new Set();
     let cerrado = false;
     o._registrarCleanup = fn => { if (typeof fn === "function") cleanups.add(fn); };
     o.addEventListener("click", e => {
-      if (e.target === o || e.target.hasAttribute("data-close-juego")) {
+      if (e.target === o || e.target.closest("[data-close-juego]")) {
         if (!cerrado) {
           cerrado = true;
           cleanups.forEach(fn => fn());
@@ -1325,10 +1325,13 @@ document.addEventListener("DOMContentLoaded", () => {
       darPremio(m, f, `¡Atrapaste ${pts} girasoles! +${m}`);
       const p = qs(".minijuego-panel", o);
       const r = document.createElement("div");
-      r.className = "minijuego-mensaje";
-      r.innerHTML = `<div class="jg-final-emoji">${pts >= 25 ? (ICONO.trofeo || "") : pts >= 15 ? (ICONO.estrella || "") : (ICONO.girasol || "")}</div><h2>${pts > 0 ? "¡Bien jugado!" : "¡Casi!"}</h2><p>Atrapaste</p><span class="minijuego-mensaje-num">${pts}</span><p>girasoles</p><p style="color:#ffd93d;font-weight:bold;">+${m} · +${f}</p><div class="minijuego-botones"><button type="button" class="btn-primary" id="jg-otra">Otra vez</button></div>`;
+      r.className = "minijuego-mensaje jm-final";
+      const salirIcon = window.ICONO?.salir || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>`;
+      const reintentarIcon = window.ICONO?.reintentar || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>`;
+      r.innerHTML = `<div class="jg-final-emoji">${pts >= 25 ? (ICONO.trofeo || "") : pts >= 15 ? (ICONO.estrella || "") : (ICONO.girasol || "")}</div><h2>${pts > 0 ? "¡Bien jugado!" : "¡Casi!"}</h2><p class="jm-final-subtitulo">Atrapaste</p><span class="minijuego-mensaje-num">${pts}</span><p class="jm-final-label">girasoles</p><div class="jm-recompensa-badge">+${m} SunCoins · +${f} XP</div><div class="minijuego-botones"><button type="button" class="btn-primary" id="jg-otra">${reintentarIcon} <span>Otra vez</span></button><button type="button" class="btn-secondary btn-minijuego-salir" id="jg-salir">${salirIcon} <span>Salir</span></button></div>`;
       p.appendChild(r);
-      qs("#jg-otra", r).addEventListener("click", () => { o.remove(); setTimeout(juegoGirasol, 100); });
+      qs("#jg-otra", r)?.addEventListener("click", () => { o.remove(); setTimeout(juegoGirasol, 100); });
+      qs("#jg-salir", r)?.addEventListener("click", () => { o.classList.remove("active"); setTimeout(() => o.remove(), 250); });
     };
 
     const emp = () => {
@@ -1395,11 +1398,14 @@ document.addEventListener("DOMContentLoaded", () => {
         : `¡Se acabó! ${pa}/${eleg.length} parejas`);
       const p = qs(".minijuego-panel", o), r = document.createElement("div");
       r.className = "minijuego-mensaje jm-final";
+      const salirIcon = window.ICONO?.salir || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>`;
+      const reintentarIcon = window.ICONO?.reintentar || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>`;
       r.innerHTML = completado
-        ? `<div class="jg-final-emoji">${it <= 12 ? (ICONO.trofeo || "") : it <= 20 ? (ICONO.estrella || "") : (ICONO.imagen || "")}</div><h2>¡Lo lograste!</h2><p>En <strong>${it}</strong> intentos con <strong>${tr}s</strong> restantes</p><p class="jm-recompensa">+${m} · +15 XP</p><div class="minijuego-botones"><button type="button" class="btn-primary" id="jm-otra">Otra vez</button></div>`
-        : `<div class="jg-final-emoji">${ICONO.reintentar || ""}</div><h2>¡Se acabó!</h2><p>Encontraste <strong>${pa}</strong> de <strong>${eleg.length}</strong> parejas</p><p class="jm-recompensa">+${m}</p><div class="minijuego-botones"><button type="button" class="btn-primary" id="jm-otra">Otra vez</button></div>`;
+        ? `<div class="jg-final-emoji">${it <= 12 ? (ICONO.trofeo || "") : it <= 20 ? (ICONO.estrella || "") : (ICONO.imagen || "")}</div><h2>¡Lo lograste!</h2><p class="jm-final-subtitulo">En <strong>${it}</strong> intentos con <strong>${tr}s</strong> restantes</p><div class="jm-recompensa-badge">+${m} SunCoins · +15 XP</div><div class="minijuego-botones"><button type="button" class="btn-primary" id="jm-otra">${reintentarIcon} <span>Otra vez</span></button><button type="button" class="btn-secondary btn-minijuego-salir" id="jm-salir">${salirIcon} <span>Salir</span></button></div>`
+        : `<div class="jg-final-emoji">${ICONO.reintentar || ""}</div><h2>¡Se acabó!</h2><p class="jm-final-subtitulo">Encontraste <strong>${pa}</strong> de <strong>${eleg.length}</strong> parejas</p><div class="jm-recompensa-badge">+${m} SunCoins</div><div class="minijuego-botones"><button type="button" class="btn-primary" id="jm-otra">${reintentarIcon} <span>Otra vez</span></button><button type="button" class="btn-secondary btn-minijuego-salir" id="jm-salir">${salirIcon} <span>Salir</span></button></div>`;
       p.appendChild(r);
-      qs("#jm-otra", r).addEventListener("click", () => { o.remove(); juegoMemoria(); });
+      qs("#jm-otra", r)?.addEventListener("click", () => { o.remove(); juegoMemoria(); });
+      qs("#jm-salir", r)?.addEventListener("click", () => { o.classList.remove("active"); setTimeout(() => o.remove(), 250); });
     }
 
     ivT = setInterval(() => {
@@ -1561,9 +1567,12 @@ sprite.style.opacity = "0.25";
       const p = qs(".minijuego-panel", o), rr = document.createElement("div");
       rr.className = "minijuego-mensaje ja-final";
       const nivel = a >= 17 ? "¡Perfecto!" : a >= 13 ? "¡Excelente!" : a >= 8 ? "¡Bien!" : "¡Sigue así!";
-      rr.innerHTML = `<div class="jg-final-emoji">${a >= 17 ? (ICONO.trofeo || "") : a >= 13 ? (ICONO.estrella || "") : a >= 8 ? (ICONO.corazon || "") : (ICONO.girasol || "")}</div><h2>${nivel}</h2><p>Acertaste</p><span class="minijuego-mensaje-num">${a} / ${TOTAL}</span><p style="color:#ffd93d;font-weight:bold;">+${m}</p><div class="minijuego-botones"><button type="button" class="btn-primary" id="ja-otra">Otra vez</button></div>`;
+      const salirIcon = window.ICONO?.salir || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>`;
+      const reintentarIcon = window.ICONO?.reintentar || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>`;
+      rr.innerHTML = `<div class="jg-final-emoji">${a >= 17 ? (ICONO.trofeo || "") : a >= 13 ? (ICONO.estrella || "") : a >= 8 ? (ICONO.corazon || "") : (ICONO.girasol || "")}</div><h2>${nivel}</h2><p class="jm-final-subtitulo">Acertaste</p><span class="minijuego-mensaje-num">${a} / ${TOTAL}</span><div class="jm-recompensa-badge">+${m} SunCoins</div><div class="minijuego-botones"><button type="button" class="btn-primary" id="ja-otra">${reintentarIcon} <span>Otra vez</span></button><button type="button" class="btn-secondary btn-minijuego-salir" id="ja-salir">${salirIcon} <span>Salir</span></button></div>`;
       p.appendChild(rr);
-      qs("#ja-otra", rr).addEventListener("click", () => { o.remove(); juegoAdivina(); });
+      qs("#ja-otra", rr)?.addEventListener("click", () => { o.remove(); juegoAdivina(); });
+      qs("#ja-salir", rr)?.addEventListener("click", () => { o.classList.remove("active"); setTimeout(() => o.remove(), 250); });
     };
     nR();
   }

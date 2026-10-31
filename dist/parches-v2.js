@@ -325,7 +325,7 @@
     o.className = "minijuego-overlay";
     o.innerHTML = `
       <div class="minijuego-panel">
-        <button class="minijuego-cerrar" data-close-snake>×</button>
+        <button type="button" class="minijuego-cerrar" data-close-snake aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;pointer-events:none;"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
         <h2 class="minijuego-titulo">Serpiente del Jardín</h2>
         <p class="minijuego-desc">Come hamburguesas · Crece · ¡No choques!</p>
         <div class="snake-hud">
@@ -346,7 +346,7 @@
     document.body.appendChild(o);
     o.classList.add("active");
     o.addEventListener("click", (e) => {
-      if (e.target === o || e.target.hasAttribute("data-close-snake")) {
+      if (e.target === o || e.target.closest("[data-close-snake]")) {
         clearInterval(o._tk);
         o.classList.remove("active");
         setTimeout(() => o.remove(), 250);
@@ -495,22 +495,34 @@
       const panel = o.querySelector(".minijuego-panel");
       const r = document.createElement("div");
       r.className = "minijuego-mensaje jm-final";
+      const iconSnake = window.ICONO?.serpiente || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:40px;height:40px;"><path d="M4 5h4a3 3 0 0 1 0 6H7a3 3 0 0 0 0 6h7a3 3 0 0 0 0-6h-1a3 3 0 0 1 0-6h4"/><circle cx="19" cy="5" r="2"/></svg>`;
+      const iconTrofeo = window.ICONO?.trofeo || iconSnake;
+      const iconEstrella = window.ICONO?.estrella || iconSnake;
+      const salirIcon = window.ICONO?.salir || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>`;
+      const reintentarIcon = window.ICONO?.reintentar || `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>`;
       r.innerHTML = `
-        <div style="font-size:3.5rem;">${puntos >= 20 ? "🏆" : puntos >= 10 ? "🌟" : "🐍"}</div>
+        <div class="jg-final-emoji">${puntos >= 20 ? iconTrofeo : puntos >= 10 ? iconEstrella : iconSnake}</div>
         <h2>${puntos >= 20 ? "¡Maestro serpiente!" : puntos >= 10 ? "¡Buen bocado!" : "¡Ups!"}</h2>
-        <p>Comiste</p>
+        <p class="jm-final-subtitulo">Comiste</p>
         <span class="minijuego-mensaje-num">${puntos}</span>
-        <p>hamburguesas</p>
-        <p style="color:#4dd48e;font-weight:bold;">+${m} 🪙</p>
+        <p class="jm-final-label">hamburguesas</p>
+        <div class="jm-recompensa-badge">+${m} SunCoins</div>
         <div class="minijuego-botones">
-          <button type="button" class="btn-primary" id="snk-otra">Otra vez</button>
+          <button type="button" class="btn-primary" id="snk-otra">${reintentarIcon} <span>Otra vez</span></button>
+          <button type="button" class="btn-secondary btn-minijuego-salir" id="snk-salir">${salirIcon} <span>Salir</span></button>
         </div>`;
       panel.appendChild(r);
-      r.querySelector("#snk-otra").addEventListener("click", () => {
+      r.querySelector("#snk-otra")?.addEventListener("click", () => {
         clearInterval(intervalo);
         clearInterval(o._tk);
         o.remove();
         setTimeout(juegoSnake, 100);
+      });
+      r.querySelector("#snk-salir")?.addEventListener("click", () => {
+        clearInterval(intervalo);
+        clearInterval(o._tk);
+        o.classList.remove("active");
+        setTimeout(() => o.remove(), 250);
       });
     }
 
