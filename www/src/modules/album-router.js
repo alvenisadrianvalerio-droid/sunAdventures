@@ -1,13 +1,20 @@
-/* ============================================================
+﻿/* ============================================================
    MÓDULO: NAVEGACIÓN, RUTAS Y DRAG & DROP (album-router.js)
    ============================================================ */
 (function() {
   const { $, ocultarLoading } = window.AlbumApp;
 
-  const VISTAS = () => ["inicio", "album", "chat", "logros", "notas", "mascotas", "finanzas", ...(window._extraVistas || [])];
+  const VISTAS = () => ["inicio", "album", "chat", "logros", "notas", "mascotas", "finanzas", "calendario", "rpg", ...(window._extraVistas || [])];
   const rutaDesdeHash = () => {
     const h = (location.hash || "").replace(/^#/, "").trim();
     if (h === "mapa") return "inicio";
+    if (h === "minijuegos") {
+      try {
+        const hub = document.getElementById("modal-minijuegos-hub");
+        if (hub) hub.classList.add("active");
+      } catch {}
+      return "inicio";
+    }
     return VISTAS().includes(h) ? h : "inicio";
   };
 
@@ -46,6 +53,8 @@
         window._renderMascotasGrid();
       } else if (nombre === "calendario") {
         window.AlbumApp.modules.eventos?.renderCalendario?.();
+      } else if (nombre === "rpg") {
+        try { window._rpgRender?.(); } catch {}
       }
       
       // Notificar ciclo de vida SPA para que módulos secundarios liberen memoria/pausen animaciones

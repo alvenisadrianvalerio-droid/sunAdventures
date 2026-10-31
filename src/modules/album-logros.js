@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    MÓDULO: LOGROS Y EXPERIENCIA (album-logros.js)
    ============================================================ */
 (function() {
@@ -744,7 +744,7 @@
         const uidJardin = getUserIdSafe();
         const regadoHoy = localStorage.getItem(`sa_jardin_regado_${uidJardin}`) === hoyKey;
 
-        const svgMiniGirasol = `<svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;margin-right:3px;flex-shrink:0;"><g fill="#fbbf24"><circle cx="12" cy="4.5" r="2.3"/><circle cx="12" cy="19.5" r="2.3"/><circle cx="4.5" cy="12" r="2.3"/><circle cx="19.5" cy="12" r="2.3"/><circle cx="6.7" cy="6.7" r="2.2"/><circle cx="17.3" cy="6.7" r="2.2"/><circle cx="6.7" cy="17.3" r="2.2"/><circle cx="17.3" cy="17.3" r="2.2"/></g><circle cx="12" cy="12" r="4.6" fill="#78350f" stroke="#fde047" stroke-width="1.2"/></svg>`;
+        const svgMiniGirasol = `<svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;margin-right:6px;flex-shrink:0;"><g fill="#fbbf24"><circle cx="12" cy="4.5" r="2.3"/><circle cx="12" cy="19.5" r="2.3"/><circle cx="4.5" cy="12" r="2.3"/><circle cx="19.5" cy="12" r="2.3"/><circle cx="6.7" cy="6.7" r="2.2"/><circle cx="17.3" cy="6.7" r="2.2"/><circle cx="6.7" cy="17.3" r="2.2"/><circle cx="17.3" cy="17.3" r="2.2"/></g><circle cx="12" cy="12" r="4.6" fill="#78350f" stroke="#fde047" stroke-width="1.2"/></svg>`;
         const svgMiniGota = `<svg viewBox="0 0 24 24" width="13" height="13" style="vertical-align:-2px;margin-right:3px;"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" fill="#38bdf8" stroke="#bae6fd" stroke-width="1.5"/></svg>`;
         const svgMiniMoneda = `<svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align:-1px;margin:0 1px;"><circle cx="12" cy="12" r="9" fill="#fbbf24" stroke="#fef08a" stroke-width="1.8"/><circle cx="12" cy="12" r="5" fill="#d97706"/></svg>`;
         const svgMiniCorazon = `<svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align:-1px;margin:0 1px;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#fb7185"/></svg>`;
@@ -755,7 +755,7 @@
               ${etapaActual.svg}
             </div>
             <div style="min-width:0;">
-              <div style="display:flex;align-items:center;font-size:0.8rem;font-weight:800;color:#ffe4e6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${svgMiniGirasol}<span style="overflow:hidden;text-overflow:ellipsis;">${etapaActual.nombre}</span></div>
+              <div style="display:flex;align-items:center;font-size:0.8rem;font-weight:800;color:#ffe4e6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${svgMiniGirasol}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;max-width:130px;">${etapaActual.nombre}</span></div>
               <div style="font-size:0.69rem;color:#fda4af;opacity:0.9;">${etapaActual.sub}</div>
             </div>
           </div>

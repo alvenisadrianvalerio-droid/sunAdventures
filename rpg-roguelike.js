@@ -1228,7 +1228,7 @@ function sustituirEmojis(root) {
     state.hp = clamp(state.hp + cura, 0, state.hpMax);
     animador.playAttack('slash', dmg, true);
     SND('victoria');
-    logBatalla(ðŸ’– Â¡Golpe Astral en Pareja con @${parejaNom}! Destruye escudos, inflige ${dmg} de daÃ±o y cura +${cura} HP);
+    logBatalla(`💖 ¡Golpe Astral en Pareja con @${parejaNom}! Destruye escudos, inflige ${dmg} de daño y cura +${cura} HP`);
     actualizarBarraHeroe();
     setTimeout(() => afterPlayerAction(), 650);
   }

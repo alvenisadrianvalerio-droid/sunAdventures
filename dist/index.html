@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -26,10 +26,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="leaflet.css" media="print" onload="this.media='all'">
   <script src="https://js.puter.com/v2/" defer></script>
-  <link rel="stylesheet" href="styles.css?v=125">
+  <link rel="stylesheet" href="styles.css?v=126">
   <link rel="stylesheet" href="album.css?v=124">
   <link rel="stylesheet" href="juegos.css?v=120" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="rpg.css?v=7" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="rpg.css?v=8">
   <link rel="stylesheet" href="rpg-loot.css?v=4" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="temas.css?v=1">
   <link rel="stylesheet" href="finanzas.css?v=9" media="print" onload="this.media='all'">
@@ -341,6 +341,169 @@
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
       }
+    /* Fallback crÃ­tico para el Modal de Rangos y Hub de Minijuegos */
+    .modal-rangos-overlay, .modal-hub-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(6, 8, 14, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+    .modal-rangos-overlay.active, .modal-hub-overlay.active {
+      display: flex !important;
+    }
+    .modal-hub-content {
+      background: #12141e !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      border-radius: 20px !important;
+      width: 92% !important;
+      max-width: 540px !important;
+      max-height: 85vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+      padding: 1.4rem !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+      position: relative !important;
+      box-sizing: border-box !important;
+      color: #f1f5f9 !important;
+    }
+    .modal-hub-header {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+      padding-bottom: 0.85rem !important;
+      margin-bottom: 0.95rem !important;
+    }
+    .modal-hub-title-wrap {
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.75rem !important;
+    }
+    .modal-hub-icon-badge {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 42px !important;
+      height: 42px !important;
+      border-radius: 12px !important;
+      background: rgba(255, 217, 61, 0.14) !important;
+      color: #ffd93d !important;
+      border: 1px solid rgba(255, 217, 61, 0.3) !important;
+      flex-shrink: 0 !important;
+    }
+    .modal-hub-title {
+      margin: 0 !important;
+      font-size: 1.15rem !important;
+      font-weight: 800 !important;
+      color: #ffffff !important;
+    }
+    .modal-hub-sub {
+      font-size: 0.78rem !important;
+      color: #94a3b8 !important;
+      display: block !important;
+      margin-top: 0.15rem !important;
+    }
+    .minijuegos-hub-grid {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.65rem !important;
+      overflow-y: auto !important;
+      padding-right: 0.2rem !important;
+    }
+    .minijuego-hub-card {
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.85rem !important;
+      padding: 0.75rem 1rem !important;
+      background: #171926 !important;
+      border: 1px solid rgba(255, 255, 255, 0.07) !important;
+      border-radius: 14px !important;
+      cursor: pointer !important;
+      text-align: left !important;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.4, 1) !important;
+      font-family: inherit !important;
+      color: inherit !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .minijuego-hub-card:hover {
+      background: #202336 !important;
+      border-color: rgba(255, 217, 61, 0.4) !important;
+      transform: translateX(4px) !important;
+    }
+    .minijuego-hub-icon-wrap {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 44px !important;
+      height: 44px !important;
+      border-radius: 12px !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+      flex-shrink: 0 !important;
+    }
+    .minijuego-hub-icon-wrap img {
+      width: 32px !important;
+      height: 32px !important;
+      display: block !important;
+      object-fit: contain !important;
+    }
+    .minijuego-hub-info {
+      display: flex !important;
+      flex-direction: column !important;
+      flex: 1 !important;
+      min-width: 0 !important;
+    }
+    .minijuego-hub-nombre {
+      font-size: 0.92rem !important;
+      font-weight: 800 !important;
+      color: #f1f5f9 !important;
+    }
+    .minijuego-hub-desc {
+      font-size: 0.74rem !important;
+      color: #94a3b8 !important;
+      margin-top: 0.15rem !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+    .minijuego-hub-arrow {
+      font-size: 1.15rem !important;
+      color: #64748b !important;
+      font-weight: 800 !important;
+      margin-left: auto !important;
+      transition: transform 0.2s ease, color 0.2s ease !important;
+    }
+    .minijuego-hub-card:hover .minijuego-hub-arrow {
+      color: #ffd93d !important;
+      transform: translateX(3px) !important;
+    }
+    .modal-rangos-close-btn {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      color: #cbd5e1 !important;
+      width: 34px !important;
+      height: 34px !important;
+      border-radius: 50% !important;
+      font-size: 0.95rem !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+    }
+    .modal-rangos-close-btn:hover {
+      background: rgba(239, 68, 68, 0.25) !important;
+      border-color: rgba(239, 68, 68, 0.5) !important;
+      color: #fca5a5 !important;
+      transform: rotate(90deg) !important;
+    }
     </style>
   <script>
     /* Detección de APK nativa (Capacitor / WebView / Standalone / TWA / Custom Scheme) */
@@ -698,7 +861,7 @@
                 <span class="bento-tool-name">Falla Astral</span>
               </a>
 
-              <a href="#minijuegos" class="bento-tool-item" id="dash-btn-minijuegos" data-view-link="minijuegos"
+              <a href="#minijuegos" class="bento-tool-item" id="dash-btn-minijuegos"
                 aria-label="Minijuegos">
                 <div class="bento-tool-icon-wrap">
                   <img src="img/dashboard/card-minijuegos.svg" alt="Mando Minijuegos" class="bento-tool-img" width="160"
@@ -770,8 +933,7 @@
                 nivel</span>
             </div>
           </div>
-          <button type="button" class="modal-rangos-close-btn" id="btn-cerrar-modal-rangos"
-            aria-label="Cerrar modal">✕</button>
+          <button type="button" class="modal-rangos-close-btn" id="btn-cerrar-modal-rangos" aria-label="Cerrar modal"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         </div>
 
         <!-- Tabs para alternar entre Rango Individual y Pareja -->
@@ -818,8 +980,7 @@
               <span class="modal-hub-sub">Elige un minijuego, diviértete y completa tu reto diario</span>
             </div>
           </div>
-          <button type="button" class="modal-rangos-close-btn" id="btn-cerrar-modal-minijuegos"
-            aria-label="Cerrar selección de minijuegos">✕</button>
+          <button type="button" class="modal-rangos-close-btn" id="btn-cerrar-modal-minijuegos" aria-label="Cerrar seleccin de minijuegos"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         </div>
 
         <div class="minijuegos-hub-grid" id="minijuegos-hub-grid">
@@ -2006,6 +2167,12 @@
         </div>
       </aside>
     </div>
+  </section>
+
+  <!-- VISTA RPG (Modo Aventura) -->
+  <section id="rpg" class="rpg-section view" data-view="rpg">
+    <div class="rpg-header"><p class="rpg-subtitle">Aventura RPG</p></div>
+    <div id="rpg-content"></div>
   </section>
 
   <!-- MODAL FECHA / PLAN ROMÁNTICO -->

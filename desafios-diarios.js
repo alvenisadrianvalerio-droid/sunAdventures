@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    DESAFIOS-DIARIOS.JS — Sistema de Misiones Diarias Rotativas + Racha Semanal
    · Pool dinámico de 9 misiones que rotan según el día
    · Cofre Bonus Diario al completar las 3 misiones del día
@@ -411,7 +411,7 @@
         title: `¡${misionLista.titulo} Completada!`,
         message: `Recibiste <strong>+${misionLista.monedas} SunCoins</strong> y <strong>+${misionLista.xp} XP</strong>.`,
         variant: "success",
-        icon: `<img src="img/dashboard/card-logros.svg" alt="Trofeo" style="width:42px;height:42px;display:block;object-fit:contain;">`,
+        icon: `<svg viewBox="0 0 48 48" width="46" height="46" style="display:block;filter:drop-shadow(0 4px 12px rgba(255,217,61,0.5));"><defs><linearGradient id="smTrofeoGold" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fffbeb"/><stop offset="45%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#d97706"/></linearGradient></defs><path d="M14 10h20v14c0 6-4 10-10 10s-10-4-10-10V10z" fill="url(#smTrofeoGold)" stroke="#b45309" stroke-width="1.5"/><path d="M14 14H8a4 4 0 0 0-4 4c0 4 3 7 7 7h3" fill="none" stroke="url(#smTrofeoGold)" stroke-width="3" stroke-linecap="round"/><path d="M34 14h6a4 4 0 0 1 4 4c0 4-3 7-7 7h-3" fill="none" stroke="url(#smTrofeoGold)" stroke-width="3" stroke-linecap="round"/><path d="M21 34h6v5h-6z" fill="#d97706" stroke="#b45309" stroke-width="1.2"/><path d="M15 39h18v4a2 2 0 0 1-2 2H17a2 2 0 0 1-2-2v-4z" fill="#78350f" stroke="#451a03" stroke-width="1.2"/><polygon points="24,14 26,18 30,19 27,22 28,26 24,24 20,26 21,22 18,19 22,18" fill="#fff" opacity="0.95"/></svg>`,
         confirmText: "¡Genial!"
       });
       return;

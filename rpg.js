@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    RPG.JS v12 — Balance + Loadout + Pasivas
    ============================================================ */
 window._extraVistas = window._extraVistas || [];
@@ -393,7 +393,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     f ? f.parentNode.insertBefore(sec, f) : document.body.appendChild(sec);
   }
   function tieneSesion() {
-    return !!(window._sunUserId || localStorage.getItem("sunad_uid"));
+    return true;
   }
 
   function inyectarNav() {
@@ -408,6 +408,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     a.style.display = tieneSesion() ? "" : "none";
   }
 
+  window._rpgRender = () => { try { activarVistaRpg(); render(); } catch(e){} };
   function render() {
     inyectarNav(); inyectarSeccion();
     const c = $("rpg-content"); if (!c) return;
@@ -2807,7 +2808,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
   }
 
   function activarVistaRpg() {
-    if (!tieneSesion()) {
+    inyectarSeccion(); inyectarNav(); if (false) {
       if (location.hash === "#rpg") {
         location.hash = "#album";
       }

@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    SUN-MODAL.JS — Modales custom del juego
    Reemplaza window.confirm() y window.alert()
    ============================================================ */
@@ -17,7 +17,7 @@
     .sun-modal-card.success{border-color:rgba(77,212,142,.45);box-shadow:0 35px 90px rgba(0,0,0,.8),0 0 50px rgba(77,212,142,.2),inset 0 1px 0 rgba(255,255,255,.12)}
     .sun-modal-card.success::before{background:linear-gradient(90deg,transparent,#4dd48e,#2bb874,transparent)}
     .sun-modal-icon{width:68px;height:68px;margin:0 auto 1.2rem;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,217,61,.25),rgba(255,217,61,.04));border:2px solid rgba(255,217,61,.45);box-shadow:0 8px 25px rgba(255,217,61,.25);font-size:2.1rem;animation:sunModalPulse 2.2s ease-in-out infinite;color:#ffd93d}
-    .sun-modal-icon svg{width:36px;height:36px;display:block;color:inherit}
+    .sun-modal-icon svg{width:36px;height:36px;display:block;color:inherit}.sun-modal-icon img{width:44px;height:44px;display:block;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))}.sun-modal-card.success .sun-modal-icon{background:radial-gradient(circle at 35% 35%,rgba(77,212,142,.32),rgba(16,185,129,.12));border:2px solid rgba(77,212,142,.65);box-shadow:0 0 28px rgba(77,212,142,.4),inset 0 1px 0 rgba(255,255,255,.2);color:#4dd48e}
     @keyframes sunModalPulse{0%,100%{transform:scale(1);box-shadow:0 8px 25px rgba(255,217,61,.25)}50%{transform:scale(1.07);box-shadow:0 12px 35px rgba(255,217,61,.45)}}
     .sun-modal-card.danger .sun-modal-icon{background:radial-gradient(circle at 35% 35%,rgba(255,84,112,.3),rgba(255,84,112,.05));border-color:rgba(255,84,112,.55);box-shadow:0 8px 25px rgba(255,84,112,.3);color:#ff7a9c}
     .sun-modal-card.warning .sun-modal-icon{background:radial-gradient(circle at 35% 35%,rgba(255,174,61,.3),rgba(255,174,61,.05));border-color:rgba(255,174,61,.55);box-shadow:0 8px 25px rgba(255,174,61,.3)}

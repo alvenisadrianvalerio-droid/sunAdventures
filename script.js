@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    SCRIPT.JS — SunAd · v5 compacto
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
@@ -2396,7 +2396,7 @@ sprite.style.opacity = "0.25";
   const btnCerrarMinijuegos = $("btn-cerrar-modal-minijuegos");
 
   function abrirModalMinijuegos(e) {
-    if (e) e.preventDefault();
+    if (e) { e.preventDefault(); e.stopPropagation(); }
     if (!modalMinijuegos) {
       location.hash = "#mascotas";
       return;
