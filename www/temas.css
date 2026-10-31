@@ -400,8 +400,18 @@ body[class*="tema-fondo-"] .chat-message-nombre { color: var(--accent); }
 body[class*="tema-fondo-"] .chat-message.propio .chat-message-nombre { color: var(--text); }
 
 /* ---------- CALENDARIO ---------- */
-body[class*="tema-fondo-"] .calendario-wrapper {
+body[class*="tema-fondo-"] .calendario-wrapper,
+body[class*="tema-fondo-"] .cal-dia-panel,
+body[class*="tema-fondo-"] .calendario-proximos-card {
   background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+}
+body[class*="tema-fondo-"] .cal-countdown-banner {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 15%, transparent) 0%, color-mix(in srgb, var(--accent-dark, var(--accent)) 10%, transparent) 50%, var(--tema-panel-bg) 100%);
+  border-color: var(--tema-card-border);
+}
+body[class*="tema-fondo-"] .cal-countdown-badge {
+  background: var(--tema-panel-bg);
   border-color: var(--tema-card-border);
 }
 body[class*="tema-fondo-"] .cal-dia {
@@ -416,7 +426,14 @@ body[class*="tema-fondo-"] .cal-dia.hoy {
   background: color-mix(in srgb, var(--accent) 28%, var(--tema-card-bg));
   border-color: var(--accent);
 }
-body[class*="tema-fondo-"] .cal-proximo-item { background: var(--tema-card-bg); }
+body[class*="tema-fondo-"] .cal-card-evento,
+body[class*="tema-fondo-"] .cal-agenda-item,
+body[class*="tema-fondo-"] .cal-proximo-item {
+  background: var(--tema-card-bg);
+  border-color: var(--tema-card-border);
+}
+body[class*="tema-fondo-"] .cal-card-evento:hover,
+body[class*="tema-fondo-"] .cal-agenda-item:hover,
 body[class*="tema-fondo-"] .cal-proximo-item:hover {
   background: color-mix(in srgb, var(--accent) 15%, var(--tema-card-bg));
 }

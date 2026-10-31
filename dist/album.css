@@ -8327,6 +8327,415 @@ body.light .logro-card.desbloqueado .logro-contenido h3 {
   }
 }
 
+/* ============================================================
+   NUESTRO TIEMPO (CALENDARIO) — SOPORTE MODO CLARO & TEMAS
+   ============================================================ */
+body.light .calendario-title,
+body.tema-claro .calendario-title {
+  color: #1e293b;
+}
+
+body.light .calendario-subtitle,
+body.tema-claro .calendario-subtitle {
+  color: #64748b;
+}
+
+body.light .calendario-header-badge,
+body.tema-claro .calendario-header-badge {
+  background: rgba(244, 114, 182, 0.15);
+  border-color: rgba(244, 114, 182, 0.35);
+  color: #db2777;
+}
+
+body.light .cal-countdown-banner,
+body.tema-claro .cal-countdown-banner {
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.85) 0%, rgba(253, 230, 138, 0.6) 45%, rgba(255, 255, 255, 0.95) 100%);
+  border-color: rgba(245, 158, 11, 0.35);
+  box-shadow: 0 10px 30px rgba(180, 83, 9, 0.08), 0 2px 10px rgba(180, 83, 9, 0.04);
+}
+
+body.light .cal-countdown-icon,
+body.tema-claro .cal-countdown-icon {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #d97706;
+}
+
+body.light .cal-countdown-label,
+body.tema-claro .cal-countdown-label {
+  color: #b45309;
+}
+
+body.light .cal-countdown-title,
+body.tema-claro .cal-countdown-title {
+  color: #1e293b;
+}
+
+body.light .cal-countdown-desc,
+body.tema-claro .cal-countdown-desc {
+  color: #64748b;
+}
+
+body.light .cal-countdown-badge,
+body.tema-claro .cal-countdown-badge {
+  background: #ffffff;
+  border-color: rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4px 16px rgba(180, 83, 9, 0.1);
+}
+
+body.light .cal-countdown-number,
+body.tema-claro .cal-countdown-number {
+  color: #d97706;
+  text-shadow: none;
+}
+
+body.light .cal-countdown-unit,
+body.tema-claro .cal-countdown-unit {
+  color: #64748b;
+}
+
+body.light .calendario-wrapper,
+body.tema-claro .calendario-wrapper,
+body.light .cal-dia-panel,
+body.tema-claro .cal-dia-panel,
+body.light .calendario-proximos-card,
+body.tema-claro .calendario-proximos-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(139, 90, 20, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+body.light .cal-mes-actual,
+body.tema-claro .cal-mes-actual,
+body.light .cal-panel-fecha-texto,
+body.tema-claro .cal-panel-fecha-texto,
+body.light .cal-proximos-titulo,
+body.tema-claro .cal-proximos-titulo {
+  color: #1e293b;
+}
+
+body.light .cal-panel-header,
+body.tema-claro .cal-panel-header {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+body.light .cal-panel-diasemana,
+body.tema-claro .cal-panel-diasemana {
+  color: #d97706;
+}
+
+body.light .cal-panel-vacio-txt,
+body.tema-claro .cal-panel-vacio-txt {
+  color: #1e293b;
+}
+
+body.light .cal-panel-vacio-sub,
+body.tema-claro .cal-panel-vacio-sub {
+  color: #64748b;
+}
+
+body.light .cal-dias-semana span,
+body.tema-claro .cal-dias-semana span {
+  color: #64748b;
+  opacity: 0.9;
+}
+
+body.light .cal-dias-semana span.fin-semana,
+body.tema-claro .cal-dias-semana span.fin-semana {
+  color: #db2777;
+}
+
+body.light .cal-dia,
+body.tema-claro .cal-dia {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.04);
+  color: #1e293b;
+}
+
+body.light .cal-dia.cal-dia-finsemana,
+body.tema-claro .cal-dia.cal-dia-finsemana {
+  background: #f1f5f9;
+}
+
+body.light .cal-dia:hover,
+body.tema-claro .cal-dia:hover {
+  background: #fffbeb;
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 4px 14px rgba(180, 83, 9, 0.1);
+}
+
+body.light .cal-dia.hoy,
+body.tema-claro .cal-dia.hoy {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+body.light .cal-dia.hoy .cal-dia-numero,
+body.tema-claro .cal-dia.hoy .cal-dia-numero {
+  color: #b45309;
+}
+
+body.light .cal-dia.dia-seleccionado,
+body.tema-claro .cal-dia.dia-seleccionado {
+  border-color: #ec4899;
+  background: #fdf2f8;
+}
+
+body.light .cal-dia.cal-dia-en-rango,
+body.tema-claro .cal-dia.cal-dia-en-rango {
+  background: rgba(254, 243, 199, 0.7);
+}
+
+body.light .cal-dia.otro-mes,
+body.tema-claro .cal-dia.otro-mes {
+  opacity: 0.35;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+body.light .cal-btn-hoy,
+body.tema-claro .cal-btn-hoy {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #b45309;
+}
+
+body.light .cal-btn-hoy:hover,
+body.tema-claro .cal-btn-hoy:hover {
+  background: rgba(245, 158, 11, 0.22);
+}
+
+body.light .cal-nav-btn,
+body.tema-claro .cal-nav-btn {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  color: #334155;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+body.light .cal-nav-btn:hover,
+body.tema-claro .cal-nav-btn:hover {
+  background: #fffbeb;
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #b45309;
+}
+
+body.light .cal-view-selector,
+body.tema-claro .cal-view-selector {
+  background: #f1f5f9;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+body.light .cal-view-btn,
+body.tema-claro .cal-view-btn {
+  color: #64748b;
+}
+
+body.light .cal-view-btn:hover,
+body.tema-claro .cal-view-btn:hover {
+  color: #1e293b;
+}
+
+body.light .cal-view-btn.active,
+body.tema-claro .cal-view-btn.active {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #b45309;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+body.light .cal-chip,
+body.tema-claro .cal-chip {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  color: #475569;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+body.light .cal-chip:hover,
+body.tema-claro .cal-chip:hover {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+body.light .cal-chip.active,
+body.tema-claro .cal-chip.active {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #b45309;
+}
+
+body.light .cal-chip.cat-cita.active,
+body.tema-claro .cal-chip.cat-cita.active {
+  background: #fce7f3;
+  border-color: #ec4899;
+  color: #be185d;
+}
+
+body.light .cal-chip.cat-viaje.active,
+body.tema-claro .cal-chip.cat-viaje.active {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #b45309;
+}
+
+body.light .cal-chip.cat-comida.active,
+body.tema-claro .cal-chip.cat-comida.active {
+  background: #ffedd5;
+  border-color: #f97316;
+  color: #c2410c;
+}
+
+body.light .cal-chip.cat-aniversario.active,
+body.tema-claro .cal-chip.cat-aniversario.active {
+  background: #fef3c7;
+  border-color: #d97706;
+  color: #92400e;
+}
+
+body.light .cal-chip.cat-nota.active,
+body.tema-claro .cal-chip.cat-nota.active {
+  background: #dbeafe;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+body.light #btn-ruleta-cita,
+body.tema-claro #btn-ruleta-cita {
+  background: #fdf2f8 !important;
+  border-color: rgba(236, 72, 153, 0.4) !important;
+  color: #be185d !important;
+  box-shadow: 0 1px 3px rgba(236, 72, 153, 0.1) !important;
+}
+
+body.light #btn-ruleta-cita:hover,
+body.tema-claro #btn-ruleta-cita:hover {
+  background: #fce7f3 !important;
+  color: #9d174d !important;
+}
+
+body.light .cal-card-evento,
+body.tema-claro .cal-card-evento {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.07);
+}
+
+body.light .cal-card-evento:hover,
+body.tema-claro .cal-card-evento:hover {
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+body.light .cal-card-titulo,
+body.tema-claro .cal-card-titulo {
+  color: #1e293b;
+}
+
+body.light .cal-card-desc,
+body.tema-claro .cal-card-desc,
+body.light .cal-card-meta-hora,
+body.tema-claro .cal-card-meta-hora,
+body.light .cal-card-meta-lugar,
+body.tema-claro .cal-card-meta-lugar {
+  color: #64748b;
+}
+
+body.light .cal-card-btn,
+body.tema-claro .cal-card-btn {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #64748b;
+}
+
+body.light .cal-card-btn:hover,
+body.tema-claro .cal-card-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+body.light .cal-card-btn.reaccion-activa,
+body.tema-claro .cal-card-btn.reaccion-activa {
+  background: #fce7f3;
+  border-color: #ec4899;
+  color: #be185d;
+}
+
+body.light .cal-agenda-separador,
+body.tema-claro .cal-agenda-separador {
+  color: #b45309;
+}
+
+body.light .cal-agenda-item,
+body.tema-claro .cal-agenda-item,
+body.light .cal-proximo-item,
+body.tema-claro .cal-proximo-item {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+body.light .cal-agenda-item:hover,
+body.tema-claro .cal-agenda-item:hover,
+body.light .cal-proximo-item:hover,
+body.tema-claro .cal-proximo-item:hover {
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+body.light .cal-agenda-item.es-hoy,
+body.tema-claro .cal-agenda-item.es-hoy {
+  background: #fef3c7;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+body.light .cal-agenda-dia-num,
+body.tema-claro .cal-agenda-dia-num,
+body.light .cal-proximo-titulo,
+body.tema-claro .cal-proximo-titulo {
+  color: #1e293b;
+}
+
+body.light .cal-agenda-dia-sem,
+body.tema-claro .cal-agenda-dia-sem,
+body.light .cal-agenda-desc,
+body.tema-claro .cal-agenda-desc,
+body.light .cal-agenda-meta,
+body.tema-claro .cal-agenda-meta,
+body.light .cal-proximo-desc,
+body.tema-claro .cal-proximo-desc {
+  color: #64748b;
+}
+
+body.light .cal-proximo-cuando,
+body.tema-claro .cal-proximo-cuando {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+body.light .cal-proximo-cuando.hoy,
+body.tema-claro .cal-proximo-cuando.hoy {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+body.light .cal-proximo-cat,
+body.tema-claro .cal-proximo-cat {
+  background: rgba(0, 0, 0, 0.06);
+  color: #475569;
+}
+
+@media (max-width: 860px) {
+  body.light .cal-dia-panel,
+  body.tema-claro .cal-dia-panel {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  body.light .cal-panel-handle,
+  body.tema-claro .cal-panel-handle {
+    background: rgba(0, 0, 0, 0.2);
+  }
+}
+
 /* ============================================
    CANCIONES
    ============================================ */
