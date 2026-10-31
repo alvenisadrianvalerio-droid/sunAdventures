@@ -379,7 +379,7 @@
       <div style="position:absolute;top:16px;left:20px;right:20px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
         <div style="display:flex;align-items:center;gap:8px;">
           <img src="img/dashboard/card-album.svg" alt="" width="28" height="28">
-          <strong style="font-size:1rem;color:#ffd93d;">🎬 Nuestra Película de Recuerdos</strong>
+          <strong style="font-size:1rem;color:#ffd93d;display:inline-flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#ffd93d;"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg> Nuestra Película de Recuerdos</strong>
           <span id="slideshow-counter" style="font-size:0.8rem;opacity:0.75;margin-left:6px;">1 / ${disponibles.length}</span>
         </div>
         <div style="display:flex;gap:8px;">
@@ -453,12 +453,22 @@
     bar.style.cssText = "display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 auto 1.2rem;max-width:1100px;padding:0.7rem 1rem;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);";
     bar.innerHTML = `
       <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-        <button type="button" class="btn-secondary album-filter-chip active" data-album-filter="todas" style="padding:0.38rem 0.85rem;font-size:0.78rem;border-radius:999px;">📸 Todas</button>
-        <button type="button" class="btn-secondary album-filter-chip" data-album-filter="favs" style="padding:0.38rem 0.85rem;font-size:0.78rem;border-radius:999px;border-color:rgba(244,63,94,0.45);color:#fda4af;">❤️ Favoritas</button>
-        <button type="button" id="btn-album-slideshow" class="btn-primary" style="padding:0.38rem 0.9rem;font-size:0.78rem;border-radius:999px;">🎬 Película de Recuerdos</button>
+        <button type="button" class="btn-secondary album-filter-chip active" data-album-filter="todas" style="display:inline-flex;align-items:center;gap:6px;padding:0.38rem 0.85rem;font-size:0.78rem;font-weight:600;border-radius:999px;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#60a5fa;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Todas
+        </button>
+        <button type="button" class="btn-secondary album-filter-chip" data-album-filter="favs" style="display:inline-flex;align-items:center;gap:6px;padding:0.38rem 0.85rem;font-size:0.78rem;font-weight:600;border-radius:999px;border-color:rgba(244,63,94,0.45);color:#fda4af;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="#f43f5e"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          Favoritas
+        </button>
+        <button type="button" id="btn-album-slideshow" class="btn-primary" style="display:inline-flex;align-items:center;gap:6px;padding:0.38rem 0.95rem;font-size:0.78rem;font-weight:700;border-radius:999px;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#78350f;"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+          Película de Recuerdos
+        </button>
       </div>
-      <div style="flex:1;min-width:190px;max-width:300px;">
-        <input type="search" id="album-buscador-input" placeholder="🔍 Buscar por nota o fecha..." style="width:100%;padding:0.42rem 0.8rem;border-radius:999px;border:1px solid rgba(255,255,255,0.16);background:rgba(0,0,0,0.28);color:#fff;font-size:0.82rem;">
+      <div style="flex:1;min-width:190px;max-width:320px;position:relative;display:flex;align-items:center;">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:12px;color:rgba(255,255,255,0.45);pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="album-buscador-input" placeholder="Buscar por nota o fecha..." style="width:100%;padding:0.45rem 0.8rem 0.45rem 2.2rem;border-radius:999px;border:1px solid rgba(255,255,255,0.16);background:rgba(0,0,0,0.28);color:#fff;font-size:0.82rem;outline:none;">
       </div>
     `;
     sec.insertBefore(bar, grid);
