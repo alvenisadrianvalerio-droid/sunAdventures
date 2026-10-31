@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    DICCIONARIO MULTILINGÜE — SunAdventures
    Búsqueda y definición de palabras en español, japonés (日本語),
    coreano (한국어), inglés, francés, alemán, chino y más.
@@ -1200,8 +1200,10 @@ if (!window._extraVistas.includes("diccionario")) {
         <p style="margin:0;font-size:0.86rem;opacity:0.85;">${pDia.significado}</p>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button type="button" id="btn-dic-explorar-dia" class="btn-secondary" style="padding:0.45rem 0.9rem;font-size:0.8rem;border-color:rgba(255,217,61,0.45);color:#ffd93d;">
-          ${yaReclamado ? "🔍 Consultar palabra" : "✨ Aprender (+20 🪙 · +15 XP)"}
+        <button type="button" id="btn-dic-explorar-dia" class="btn-secondary" style="display:inline-flex;align-items:center;gap:6px;padding:0.45rem 0.9rem;font-size:0.8rem;font-weight:600;border-color:rgba(255,217,61,0.45);color:#ffd93d;">
+          ${yaReclamado 
+            ? `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Consultar palabra`
+            : `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#fbbf24;"><path d="M12 2l2.4 5 5.6.8-4 4 1 5.7L12 15l-5 2.5 1-5.7-4-4 5.6-.8z"/></svg> Aprender (+20 <svg viewBox="0 0 24 24" width="13" height="13" fill="#fbbf24" style="vertical-align:middle;display:inline-block;"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5a2.5 2.5 0 0 0-5 0c0 3 5 2 5 5a2.5 2.5 0 0 1-5 0" stroke="#78350f" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg> · +15 XP)`}
         </button>
       </div>
     `;
@@ -1209,8 +1211,14 @@ if (!window._extraVistas.includes("diccionario")) {
     const tabsNav = document.createElement("div");
     tabsNav.style.cssText = "display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;";
     tabsNav.innerHTML = `
-      <button type="button" id="tab-dic-consulta" class="btn-primary" style="padding:0.45rem 1rem;font-size:0.82rem;border-radius:999px;">🌍 Diccionario Multilingüe</button>
-      <button type="button" id="tab-dic-lexico" class="btn-secondary" style="padding:0.45rem 1rem;font-size:0.82rem;border-radius:999px;border-color:rgba(244,114,182,0.45);color:#fbcfe8;">💕 Nuestro Léxico de Pareja</button>
+      <button type="button" id="tab-dic-consulta" class="btn-primary" style="display:inline-flex;align-items:center;gap:6px;padding:0.45rem 1rem;font-size:0.82rem;font-weight:600;border-radius:999px;">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Diccionario Multilingüe
+      </button>
+      <button type="button" id="tab-dic-lexico" class="btn-secondary" style="display:inline-flex;align-items:center;gap:6px;padding:0.45rem 1rem;font-size:0.82rem;font-weight:600;border-radius:999px;border-color:rgba(244,114,182,0.45);color:#fbcfe8;">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="#f43f5e" style="display:inline-block;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        Nuestro Léxico de Pareja
+      </button>
     `;
 
     const lexicoPanel = document.createElement("section");
@@ -1218,7 +1226,10 @@ if (!window._extraVistas.includes("diccionario")) {
     lexicoPanel.style.cssText = "display:none;background:rgba(255,255,255,0.04);border:1px solid rgba(244,114,182,0.28);border-radius:18px;padding:1.2rem;margin-bottom:1.2rem;";
     lexicoPanel.innerHTML = `
       <div style="margin-bottom:1rem;">
-        <h3 style="margin:0 0 4px;color:#fbcfe8;font-size:1.05rem;">💕 Nuestro Propio Diccionario</h3>
+        <h3 style="margin:0 0 4px;color:#fbcfe8;font-size:1.05rem;display:inline-flex;align-items:center;gap:6px;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="#f43f5e"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          Nuestro Propio Diccionario
+        </h3>
         <p style="margin:0;font-size:0.84rem;opacity:0.8;">Guarda sus apodos, bromas internas, frases favoritas o palabras que hayan descubierto juntos (sincronizado con tu pareja).</p>
       </div>
       <form id="dic-lexico-form" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:1rem;">
@@ -1272,7 +1283,7 @@ if (!window._extraVistas.includes("diccionario")) {
       const terminoLimpio = pDia.palabra.split(" (")[0].trim();
       const gano = otorgarRecompensaPalabraDia();
       if (gano) {
-        ev.currentTarget.textContent = "✓ Recompensa obtenida (+20 🪙)";
+        ev.currentTarget.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Recompensa obtenida (+20 <svg viewBox="0 0 24 24" width="13" height="13" fill="#fbbf24" style="vertical-align:middle;display:inline-block;"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5a2.5 2.5 0 0 0-5 0c0 3 5 2 5 5a2.5 2.5 0 0 1-5 0" stroke="#78350f" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>)`;
         try { window._snd?.("victoria") || window._snd?.("pop"); } catch {}
       }
       buscar(terminoLimpio);
