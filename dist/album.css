@@ -7692,7 +7692,9 @@ body.light .logro-card.desbloqueado .logro-contenido h3 {
 
 .cal-panel-vacio-icon {
   font-size: 1.8rem;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 0.5rem;
 }
 

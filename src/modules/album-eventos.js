@@ -610,7 +610,7 @@
       if (!evs.length) {
         calPanelEventosLista.innerHTML = `
           <div class="cal-panel-vacio">
-            <span class="cal-panel-vacio-icon">✨</span>
+            <span class="cal-panel-vacio-icon"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);filter:drop-shadow(0 2px 8px rgba(255,217,61,0.3));"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg></span>
             <p class="cal-panel-vacio-txt">No hay planes registrados para este día.</p>
             <span class="cal-panel-vacio-sub">¿Planeamos una cita, cena o escapada juntos?</span>
           </div>
@@ -1004,11 +1004,12 @@
       const idea = CITAS_SORPRESA_POOL[Math.floor(Math.random() * CITAS_SORPRESA_POOL.length)];
       try { window._snd?.("victoria") || window._snd?.("pop"); } catch {}
       const cat = CATEGORIAS[idea.categoria] || CATEGORIAS.cita;
+      const dadoSvg = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline-block;"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="16" cy="8" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="8" cy="16" r="1.2" fill="currentColor"/><circle cx="16" cy="16" r="1.2" fill="currentColor"/></svg>`;
       const ok = await confirmar({
-        title: "🎲 ¡Ruleta de Cita Ideal!",
-        message: `<div style="text-align:center;padding:6px 0;"><div style="margin-bottom:8px;">${cat.iconoHtml || "❤️"} <strong>${cat.nombre}</strong></div><h4 style="margin:0 0 6px;color:#ffd93d;font-size:1.05rem;">${idea.titulo}</h4><p style="margin:0;font-size:0.88rem;opacity:0.88;">${idea.descripcion}</p><p style="margin:10px 0 0;font-size:0.78rem;color:#f472b6;">✨ Agendar juntos otorga <strong>+20 Amor XP</strong> y <strong>+25 🪙 SunCoins</strong></p></div>`,
-        confirmText: "📅 Agendar para este día",
-        cancelText: "🔄 Otra idea"
+        title: `${dadoSvg} ¡Ruleta de Cita Ideal!`,
+        message: `<div style="text-align:center;padding:6px 0;"><div style="margin-bottom:8px;">${cat.iconoHtml || ""} <strong>${cat.nombre}</strong></div><h4 style="margin:0 0 6px;color:#ffd93d;font-size:1.05rem;">${idea.titulo}</h4><p style="margin:0;font-size:0.88rem;opacity:0.88;">${idea.descripcion}</p><p style="margin:10px 0 0;font-size:0.78rem;color:#f472b6;">Agendar juntos otorga <strong>+20 Amor XP</strong> y <strong>+25 SunCoins</strong></p></div>`,
+        confirmText: "Agendar para este día",
+        cancelText: "Otra idea"
       });
       if (!ok) return;
       abrirEventoModal(diaSeleccionadoISO || hoyISO());
