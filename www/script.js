@@ -784,7 +784,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="cuidado-tit-icon" data-icono="corazonManos"></span>
             <span>Rutina de Cuidado Diario</span>
           </div>
-          <span class="cuidado-diario-racha">🔥 ${cu.racha || 0} ${cu.racha === 1 ? "día seguido" : "días seguidos"}</span>
+          <span class="cuidado-diario-racha" style="display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="13" height="13" style="vertical-align:-1px;display:inline-block;"><path d="M12 2c-.5 2.5-3 5-3 8 0 3.3 2.7 6 6 6s6-2.7 6-6c0-2-.5-3.5-1.5-5-.5 2-2 3-3.5 3-2.5 0-4-3-4-6z" fill="#f97316"/><path d="M12 9c-1 1-1.5 2.2-1.5 3.5 0 1.9 1.6 3.5 3.5 3.5s3.5-1.6 3.5-3.5c0-.8-.3-1.6-.8-2.2-.4 1.2-1.5 2.2-2.7 2.2s-2-1.5-2-3.5z" fill="#fde047"/></svg> ${cu.racha || 0} ${cu.racha === 1 ? "día seguido" : "días seguidos"}</span>
         </div>
         <div class="cuidado-diario-tareas">
           ${t.map(x => {
@@ -802,7 +802,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }).join("")}
         </div>
         <div class="cuidado-diario-premio-hint">
-          <span>🎁 Completa los 3 para ganar <strong>+${20 + (cu.racha || 0) * 2} 🪙</strong> y <strong>+25 Amor XP</strong></span>
+          <span style="display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#fbbf24;"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 4.8 0 0 1 12 8a4.8 4.8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg> Completa los 3 para ganar <strong>+${20 + (cu.racha || 0) * 2} <svg viewBox="0 0 24 24" width="13" height="13" fill="#fbbf24" style="vertical-align:middle;display:inline-block;"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5a2.5 2.5 0 0 0-5 0c0 3 5 2 5 5a2.5 2.5 0 0 1-5 0" stroke="#78350f" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></strong> y <strong>+25 Amor XP</strong></span>
         </div>`;
       if (typeof window.hidratarIconos === "function") window.hidratarIconos(c);
       else {

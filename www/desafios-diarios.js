@@ -324,7 +324,12 @@
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
         </svg>
-        Misiones (${totalReclamadas}/3) · 🔥 Racha ${rachaInfo.dias}d
+        <span>Misiones (${totalReclamadas}/3)</span>
+        <span style="opacity:0.4;">·</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;">
+          <svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-1px;display:inline-block;"><path d="M12 2c-.5 2.5-3 5-3 8 0 3.3 2.7 6 6 6s6-2.7 6-6c0-2-.5-3.5-1.5-5-.5 2-2 3-3.5 3-2.5 0-4-3-4-6z" fill="#f97316"/><path d="M12 9c-1 1-1.5 2.2-1.5 3.5 0 1.9 1.6 3.5 3.5 3.5s3.5-1.6 3.5-3.5c0-.8-.3-1.6-.8-2.2-.4 1.2-1.5 2.2-2.7 2.2s-2-1.5-2-3.5z" fill="#fde047"/></svg>
+          Racha ${rachaInfo.dias}d
+        </span>
       `;
     }
 
