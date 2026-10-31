@@ -1,24 +1,67 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
   <defs>
-    <filter id="sh" x="-20%" y="-20%" width="140%" height="145%">
-      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#080612" flood-opacity="0.48"/>
+    <filter id="glow-cyber" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#a21caf" flood-opacity="0.5"/>
     </filter>
-    <linearGradient id="goldG" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FFF3A8"/>
-      <stop offset="50%" stop-color="#FFD93D"/>
-      <stop offset="100%" stop-color="#E08E00"/>
+    <radialGradient id="sky-cyber" cx="50%" cy="25%" r="85%">
+      <stop offset="0%" stop-color="#2e0854"/>
+      <stop offset="50%" stop-color="#140226"/>
+      <stop offset="100%" stop-color="#07000d"/>
+    </radialGradient>
+    <linearGradient id="neonSun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="60%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#fde047"/>
     </linearGradient>
-        <linearGradient id="bg_cyberpunk" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1E1B4B"/>
-      <stop offset="100%" stop-color="#C026D3"/>
+    <linearGradient id="gridG" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00fff0" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#00fff0" stop-opacity="0.65"/>
     </linearGradient>
   </defs>
-  <ellipse cx="80" cy="144" rx="46" ry="8" fill="#000" opacity="0.32"/>
-  <g filter="url(#sh)">
-        <rect x="26" y="26" width="108" height="104" rx="24" fill="url(#bg_cyberpunk)" stroke="#22D3EE" stroke-width="3.5"/>
-    <rect x="48" y="56" width="20" height="54" fill="#22D3EE"/><rect x="72" y="42" width="22" height="68" fill="#F472B6"/><rect x="98" y="64" width="16" height="46" fill="#FACC15"/>
+  <ellipse cx="80" cy="148" rx="52" ry="7" fill="#000" opacity="0.45"/>
+  <g filter="url(#glow-cyber)">
+    <!-- Base de la postal -->
+    <rect x="18" y="16" width="124" height="124" rx="28" fill="url(#sky-cyber)" stroke="rgba(0,255,240,0.45)" stroke-width="2"/>
+    <rect x="22" y="20" width="116" height="116" rx="24" stroke="rgba(255,0,180,0.25)" stroke-width="1"/>
+    
+    <!-- Sol retro synthwave gigante -->
+    <g>
+      <circle cx="80" cy="68" r="28" fill="url(#neonSun)" filter="drop-shadow(0 0 16px rgba(244,63,94,0.75))"/>
+      <!-- Cortes horizontales de synthwave -->
+      <line x1="52" y1="62" x2="108" y2="62" stroke="#140226" stroke-width="1.8"/>
+      <line x1="53" y1="68" x2="107" y2="68" stroke="#140226" stroke-width="2.6"/>
+      <line x1="56" y1="75" x2="104" y2="75" stroke="#140226" stroke-width="3.6"/>
+      <line x1="62" y1="83" x2="98" y2="83" stroke="#140226" stroke-width="4.8"/>
+    </g>
+    
+    <!-- Skylines de rascacielos con luces neón -->
+    <!-- Capa trasera -->
+    <rect x="30" y="74" width="16" height="42" fill="#1e1035"/>
+    <rect x="52" y="66" width="14" height="50" fill="#261042"/>
+    <rect x="94" y="70" width="18" height="46" fill="#1e1035"/>
+    <rect x="114" y="78" width="16" height="38" fill="#261042"/>
+    
+    <!-- Capa frontal con detalles brillantes -->
+    <rect x="42" y="80" width="18" height="40" fill="#0a0014" stroke="#ff00b4" stroke-width="1"/>
+    <line x1="51" y1="84" x2="51" y2="106" stroke="#ff00b4" stroke-width="1.2" opacity="0.8"/>
+    
+    <rect x="70" y="72" width="22" height="48" fill="#0a0014" stroke="#00fff0" stroke-width="1"/>
+    <line x1="75" y1="76" x2="75" y2="108" stroke="#00fff0" stroke-width="1.2" opacity="0.8"/>
+    <line x1="86" y1="76" x2="86" y2="108" stroke="#00fff0" stroke-width="1.2" opacity="0.8"/>
+    
+    <rect x="100" y="84" width="16" height="36" fill="#0a0014" stroke="#ffde59" stroke-width="1"/>
+    
+    <!-- Rejilla Cyberpunk en perspectiva en el suelo -->
+    <path d="M18 116h124v24H18z" fill="#06000c"/>
+    <line x1="18" y1="122" x2="142" y2="122" stroke="#00fff0" stroke-width="0.8" opacity="0.5"/>
+    <line x1="18" y1="130" x2="142" y2="130" stroke="#00fff0" stroke-width="1.2" opacity="0.75"/>
+    <line x1="18" y1="139" x2="142" y2="139" stroke="#00fff0" stroke-width="1.6" opacity="0.95"/>
+    
+    <!-- Rayos de perspectiva vertical -->
+    <line x1="80" y1="116" x2="80" y2="140" stroke="#00fff0" stroke-width="1"/>
+    <line x1="70" y1="116" x2="52" y2="140" stroke="#00fff0" stroke-width="1"/>
+    <line x1="90" y1="116" x2="108" y2="140" stroke="#00fff0" stroke-width="1"/>
+    <line x1="60" y1="116" x2="26" y2="140" stroke="#00fff0" stroke-width="0.8"/>
+    <line x1="100" y1="116" x2="134" y2="140" stroke="#00fff0" stroke-width="0.8"/>
   </g>
-  <path d="M28 34l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#FFF3A8" opacity="0.9"/>
-  <path d="M132 28l2.2 6 6 2.2-6 2.2-2.2 6-2.2-6-6-2.2 6-2.2z" fill="#FFD93D" opacity="0.85"/>
-  <circle cx="128" cy="122" r="3" fill="#FFF3A8" opacity="0.8"/>
 </svg>

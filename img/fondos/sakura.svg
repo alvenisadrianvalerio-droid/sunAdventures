@@ -1,24 +1,75 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
   <defs>
-    <filter id="sh" x="-20%" y="-20%" width="140%" height="145%">
-      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#080612" flood-opacity="0.48"/>
+    <filter id="glow-sakura" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#f43f5e" flood-opacity="0.35"/>
     </filter>
-    <linearGradient id="goldG" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#FFF3A8"/>
-      <stop offset="50%" stop-color="#FFD93D"/>
-      <stop offset="100%" stop-color="#E08E00"/>
+    <radialGradient id="sky-sakura" cx="50%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#fff1f5"/>
+      <stop offset="50%" stop-color="#fed7e2"/>
+      <stop offset="100%" stop-color="#fbcfe8"/>
+    </radialGradient>
+    <linearGradient id="sunSakura" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
     </linearGradient>
-        <linearGradient id="bg_sakura" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#831843"/>
-      <stop offset="100%" stop-color="#F472B6"/>
+    <linearGradient id="petalG" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="70%" stop-color="#fda4af"/>
+      <stop offset="100%" stop-color="#fb7185"/>
     </linearGradient>
   </defs>
-  <ellipse cx="80" cy="144" rx="46" ry="8" fill="#000" opacity="0.32"/>
-  <g filter="url(#sh)">
-        <rect x="26" y="26" width="108" height="104" rx="24" fill="url(#bg_sakura)" stroke="#FBCFE8" stroke-width="3.5"/>
-    <circle cx="80" cy="76" r="22" fill="#FBCFE8"/><circle cx="80" cy="76" r="7" fill="#F43F5E"/>
+  <ellipse cx="80" cy="148" rx="52" ry="7" fill="#000" opacity="0.25"/>
+  <g filter="url(#glow-sakura)">
+    <!-- Base de la postal -->
+    <rect x="18" y="16" width="124" height="124" rx="28" fill="url(#sky-sakura)" stroke="rgba(251,113,133,0.4)" stroke-width="2"/>
+    <rect x="22" y="20" width="116" height="116" rx="24" stroke="rgba(255,255,255,0.45)" stroke-width="1"/>
+    
+    <!-- Sol naciente japonés suave de fondo -->
+    <circle cx="80" cy="74" r="32" fill="url(#sunSakura)" opacity="0.35" filter="drop-shadow(0 0 16px rgba(244,63,94,0.4))"/>
+    
+    <!-- Silueta del Monte Fuji al fondo -->
+    <path d="M42 120l24-34h28l24 34H42z" fill="#f472b6" opacity="0.4"/>
+    <path d="M66 86h28l4 6h-36l4-6z" fill="#ffffff" opacity="0.8"/>
+    
+    <!-- Rama sinuosa de cerezo en flor -->
+    <path d="M18 36c18 4 28 14 42 12s22-8 36-2" stroke="#500724" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <path d="M42 45c6 6 12 8 18 6" stroke="#500724" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+    <path d="M72 43c4-6 10-8 14-8" stroke="#500724" stroke-width="2" stroke-linecap="round" fill="none"/>
+    
+    <!-- Flores de sakura detalladas en la rama -->
+    <!-- Flor 1 -->
+    <g transform="translate(62,48)">
+      <circle cx="-5" cy="0" r="4.5" fill="url(#petalG)"/>
+      <circle cx="5" cy="0" r="4.5" fill="url(#petalG)"/>
+      <circle cx="0" cy="-5" r="4.5" fill="url(#petalG)"/>
+      <circle cx="0" cy="5" r="4.5" fill="url(#petalG)"/>
+      <circle cx="0" cy="0" r="2.5" fill="#f43f5e"/>
+    </g>
+    <!-- Flor 2 -->
+    <g transform="translate(86,44)">
+      <circle cx="-4" cy="0" r="3.8" fill="url(#petalG)"/>
+      <circle cx="4" cy="0" r="3.8" fill="url(#petalG)"/>
+      <circle cx="0" cy="-4" r="3.8" fill="url(#petalG)"/>
+      <circle cx="0" cy="4" r="3.8" fill="url(#petalG)"/>
+      <circle cx="0" cy="0" r="2.2" fill="#e11d48"/>
+    </g>
+    <!-- Flor 3 -->
+    <g transform="translate(38,38)">
+      <circle cx="-4" cy="0" r="3.5" fill="url(#petalG)"/>
+      <circle cx="4" cy="0" r="3.5" fill="url(#petalG)"/>
+      <circle cx="0" cy="-4" r="3.5" fill="url(#petalG)"/>
+      <circle cx="0" cy="4" r="3.5" fill="url(#petalG)"/>
+      <circle cx="0" cy="0" r="2" fill="#be123c"/>
+    </g>
+    
+    <!-- Pétalos flotando con gracia -->
+    <ellipse cx="48" cy="74" rx="4.5" ry="2.5" transform="rotate(25 48 74)" fill="url(#petalG)"/>
+    <ellipse cx="78" cy="98" rx="4" ry="2" transform="rotate(-35 78 98)" fill="url(#petalG)"/>
+    <ellipse cx="112" cy="72" rx="4.8" ry="2.4" transform="rotate(45 112 72)" fill="url(#petalG)"/>
+    <ellipse cx="124" cy="96" rx="3.5" ry="1.8" transform="rotate(-15 124 96)" fill="url(#petalG)"/>
+    <ellipse cx="98" cy="116" rx="4.2" ry="2.2" transform="rotate(30 98 116)" fill="url(#petalG)"/>
+    
+    <!-- Suelo suave con torii o silueta zen -->
+    <path d="M18 132c32-6 74-6 124 0v8a24 24 0 0 1-24 24H42a24 24 0 0 1-24-24v-8z" fill="#9d174d" opacity="0.25"/>
   </g>
-  <path d="M28 34l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#FFF3A8" opacity="0.9"/>
-  <path d="M132 28l2.2 6 6 2.2-6 2.2-2.2 6-2.2-6-6-2.2 6-2.2z" fill="#FFD93D" opacity="0.85"/>
-  <circle cx="128" cy="122" r="3" fill="#FFF3A8" opacity="0.8"/>
 </svg>
