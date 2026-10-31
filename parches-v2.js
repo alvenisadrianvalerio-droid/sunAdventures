@@ -183,6 +183,65 @@
   };
 
   /* ============================================================
+     5.1) 🌌 DESBLOQUEAR TODOS LOS FONDOS AUTOMÁTICAMENTE
+     ============================================================ */
+  function autoDesbloquearFondos() {
+    const fondosList = [
+      "noche", "arcoiris", "fuego", "bosque", "oceano", "desierto",
+      "aurora", "sakura", "cyberpunk", "tormenta", "volcan",
+      "galaxia", "neon", "claro"
+    ];
+    const uids = new Set([
+      getUser(),
+      window._sunUserId,
+      localStorage.getItem("sunad_uid"),
+      localStorage.getItem("sunadventures_uid"),
+      "local"
+    ].filter(Boolean));
+
+    // Agregar también cualquier ID almacenado en claves de mascota_skins_
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith("mascota_skins_") && !k.startsWith("mascota_skins_eq_")) {
+          const id = k.replace("mascota_skins_", "");
+          if (id) uids.add(id);
+        }
+      }
+    } catch {}
+
+    let cambio = false;
+    uids.forEach(uid => {
+      try {
+        const key = `mascota_skins_${uid}`;
+        const compradas = JSON.parse(localStorage.getItem(key) || "[]");
+        let modified = false;
+        fondosList.forEach(fId => {
+          if (!compradas.includes(fId)) {
+            compradas.push(fId);
+            modified = true;
+            cambio = true;
+          }
+        });
+        if (modified) {
+          localStorage.setItem(key, JSON.stringify(compradas));
+        }
+      } catch {}
+    });
+
+    if (cambio) {
+      window.dispatchEvent(new Event("sunad:tienda-compra"));
+      window.dispatchEvent(new Event("sunad:progress"));
+    }
+  }
+
+  // Ejecutar inmediatamente y al inicializar usuario / tienda
+  autoDesbloquearFondos();
+  window.addEventListener("sunad:user-ready", autoDesbloquearFondos);
+  window.addEventListener("sunad:api-ready", autoDesbloquearFondos);
+  window.desbloquearTodosLosFondos = autoDesbloquearFondos;
+
+  /* ============================================================
      6) 🎁 RECOMPENSA DIARIA
      (Centralizada en mejoras.js para evitar llamadas y modales duplicados)
      ============================================================ */
