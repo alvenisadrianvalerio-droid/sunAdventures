@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    RESET + VARIABLES + SVGs
    ============================================ */
 *,
@@ -3589,6 +3589,12 @@ body.tema-fondo-neon .lobby-title-accent {
   background: radial-gradient(circle at 35% 30%, #4a0050, #0a0014) !important;
   border-color: rgba(255, 0, 255, .55) !important;
   color: #ff00ff !important;
+}
+
+.tienda-preview-fondo-claro {
+  background: radial-gradient(circle at 40% 30%, #fffbe8, #fed7aa 60%, #fdba74) !important;
+  border-color: rgba(245, 158, 11, .55) !important;
+  color: #d97706 !important;
 }
 
 /* ============================================
@@ -7261,4 +7267,4 @@ body.light .evento-btn-cancel:hover {
 
 .evento-btn-save:active {
   transform: translateY(0);
-}
+}

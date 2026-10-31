@@ -160,8 +160,12 @@
   function addTemaClaro() {
     const T = window._TiendaAPI?.TIENDA_ITEMS;
     if (!T?.fondos) return false;
-    if (T.fondos.claro) return true;
-    T.fondos.claro = { nombre:"Modo Claro", precio:500, icono:"sol", sheet:"tienda", sprite:[3,5], desc:"Cambia toda la web", bonus:{ tipo:"tema_claro", val:1, desc:"Tema claro luminoso y cálido" } };
+    if (T.fondos.claro) {
+      delete T.fondos.claro.sprite;
+      delete T.fondos.claro.sheet;
+      return true;
+    }
+    T.fondos.claro = { nombre:"Modo Claro", precio:500, icono:"sol", desc:"Cambia toda la web", bonus:{ tipo:"tema_claro", val:1, desc:"Tema claro luminoso y cálido" } };
     return true;
   }
   let _tc=0; const _tci=setInterval(()=>{ if (addTemaClaro() || ++_tc>40) clearInterval(_tci); }, 300);

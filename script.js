@@ -241,6 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
       volcan:{nombre:"Fondo Volcán",precio:9500,icono:"volcanErupcion",desc:"Cambia toda la web",bonus:{tipo:"tema_volcan",val:1,desc:"Temática volcánica ardiente"}},
       galaxia:{nombre:"Fondo Galaxia",precio:14000,icono:"galaxiaEspacial",desc:"Cambia toda la web",bonus:{tipo:"tema_galaxia",val:1,desc:"Temática cósmica"}},
       neon:{nombre:"Fondo Neón",precio:20000,icono:"neonGlow",desc:"Cambia toda la web",bonus:{tipo:"tema_neon",val:1,desc:"Temática cyberpunk neón"}},
+      claro:{nombre:"Modo Claro",precio:500,icono:"sol",desc:"Cambia toda la web",bonus:{tipo:"tema_claro",val:1,desc:"Tema claro luminoso y cálido"}}
     },
     efectos: {
       chispas:{nombre:"Chispas",precio:150,icono:"rayoDoble",sheet:"tienda",sprite:[1,4],desc:"Al hacer clic",bonus:{tipo:"stun_pct",val:8,desc:"8% aturdimiento en ataque"}},
