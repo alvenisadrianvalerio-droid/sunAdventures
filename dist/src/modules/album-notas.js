@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    MÓDULO: NOTAS (album-notas.js)
    ============================================================ */
 (function() {
@@ -213,8 +213,8 @@
       btnPin.type = "button";
       btnPin.className = "nota-pin-btn";
       btnPin.title = estaFijada ? "Desfijar nota" : "Fijar arriba";
-      btnPin.style.cssText = `position:absolute;top:8px;left:8px;z-index:4;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;background:${estaFijada ? "rgba(255,217,61,0.9)" : "rgba(0,0,0,0.22)"};color:${estaFijada ? "#111" : "#fff"};font-size:0.82rem;display:inline-flex;align-items:center;justify-content:center;`;
-      btnPin.textContent = "📌";
+      btnPin.style.cssText = `position:absolute;top:8px;left:40px;z-index:4;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;background:${estaFijada ? "rgba(255,217,61,0.95)" : "rgba(0,0,0,0.28)"};color:${estaFijada ? "#2b2118" : "#fff"};display:inline-flex;align-items:center;justify-content:center;transition:transform 0.2s, background 0.2s;box-shadow:0 2px 6px rgba(0,0,0,0.25);`;
+      btnPin.innerHTML = estaFijada ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M16 12V4H17V2H7V4H8V12L6 14V16H11V22L12 23L13 22V16H18V14L16 12Z"/></svg>` : `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 12V4H17V2H7V4H8V12L6 14V16H11V22L12 23L13 22V16H18V14L16 12Z"/></svg>`;
       btnPin.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); toggleNotaFijada(nota.id); });
 
       article.append(btnDel, btnFull, btnEdit, btnPin);

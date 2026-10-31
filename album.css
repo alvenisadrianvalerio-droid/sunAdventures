@@ -3392,6 +3392,18 @@ body.light .ja-final {
 
 .nota:hover .nota-delete,
 .nota:hover .nota-fullscreen,
+.nota-pin-btn:hover {
+  transform: scale(1.15) !important;
+}
+
+@media (hover: none) {
+  .nota:not(:fullscreen) .nota-delete,
+  .nota:not(:fullscreen) .nota-edit,
+  .nota:not(:fullscreen) .nota-fullscreen,
+  .nota:not(:fullscreen) .nota-pin-btn {
+    opacity: 0.9 !important;
+  }
+}
 .nota:hover .nota-edit {
   opacity: 1
 }
