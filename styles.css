@@ -3797,6 +3797,16 @@ body.light {
   color: #3d2c1e !important;
 }
 
+body.tema-claro::before,
+body.light::before {
+  display: none !important;
+}
+
+body.tema-claro::after,
+body.light::after {
+  display: none !important;
+}
+
 body.tema-claro .nav-container,
 body.light .nav-container {
   background: rgba(255, 248, 235, .9) !important;

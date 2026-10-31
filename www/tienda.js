@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    TIENDA.JS — Tienda de SunAd
    · Pestaña embebida (Tienda.montar) + overlay (Tienda.abrir)
    · Soporta sprite sheets con fallback automático a SVG
@@ -502,6 +502,7 @@
     else e[zona] = id;
     setSkinsE(getMascota(), e);
     aplicarSkins?.();
+    try { window._aplicarTemaFondo?.(); } catch {}
     window._snd?.("blip");
     render();
   }

@@ -2134,6 +2134,12 @@ sprite.style.opacity = "0.25";
       const mascota = localStorage.getItem("mascota_actual") || "mapache";
       const eq = JSON.parse(localStorage.getItem(`mascota_skins_eq_${userId}_${mascota}`) || "{}");
       const fondoId = eq.fondos;
+      if (fondoId === "claro") {
+        document.body.classList.add("light", "tema-claro");
+        return;
+      } else {
+        document.body.classList.remove("light", "tema-claro");
+      }
       if (!fondoId) return;
       const f = TIENDA_ITEMS.fondos?.[fondoId];
       if (f?.bonus?.tipo?.startsWith("tema_")) {

@@ -179,10 +179,44 @@ body[class*="tema-fondo-"] .user-dropdown {
 body[class*="tema-fondo-"] .user-dropdown-divider { background: var(--tema-panel-border); }
 body[class*="tema-fondo-"] .user-dropdown-item:hover { background: color-mix(in srgb, var(--accent) 15%, transparent); }
 
-/* ---------- LOBBY ---------- */
-body[class*="tema-fondo-"] .experiencia-card {
-  background: var(--tema-card-bg);
-  border-color: var(--tema-card-border);
+/* ---------- LOBBY & BENTO DASHBOARD ---------- */
+body[class*="tema-fondo-"] .experiencia-card,
+body[class*="tema-fondo-"] .bento-card {
+  background: var(--tema-card-bg) !important;
+  border-color: var(--tema-card-border) !important;
+  color: var(--text) !important;
+}
+body[class*="tema-fondo-"] .bento-individual {
+  background: linear-gradient(180deg, color-mix(in srgb, #ffd93d 10%, var(--tema-card-bg)) 0%, var(--tema-card-bg) 40%) !important;
+  border-top-color: #ffd93d !important;
+}
+body[class*="tema-fondo-"] .bento-pareja {
+  background: linear-gradient(180deg, color-mix(in srgb, #ff6ba8 10%, var(--tema-card-bg)) 0%, var(--tema-card-bg) 40%) !important;
+  border-top-color: #ff6ba8 !important;
+}
+body[class*="tema-fondo-"] .bento-reto-card {
+  background: linear-gradient(180deg, color-mix(in srgb, #38bdf8 10%, var(--tema-card-bg)) 0%, var(--tema-card-bg) 40%) !important;
+  border-top-color: #38bdf8 !important;
+}
+body[class*="tema-fondo-"] .bento-modules-card {
+  background: var(--tema-card-bg) !important;
+  border-color: var(--tema-card-border) !important;
+}
+body[class*="tema-fondo-"] .bento-rank-name {
+  color: var(--text) !important;
+}
+body[class*="tema-fondo-"] .bento-section-title {
+  color: var(--text) !important;
+}
+body[class*="tema-fondo-"] .bento-card-footer,
+body[class*="tema-fondo-"] .bento-sig-text {
+  color: var(--tema-soft-text) !important;
+}
+body[class*="tema-fondo-"] .bento-tool-name {
+  color: var(--text) !important;
+}
+body[class*="tema-fondo-"] .bento-card-clickable:hover {
+  background: var(--tema-card-bg-hover) !important;
 }
 body[class*="tema-fondo-"] .experiencia-barra { background: var(--tema-input-bg); }
 body[class*="tema-fondo-"] .lobby-btn {

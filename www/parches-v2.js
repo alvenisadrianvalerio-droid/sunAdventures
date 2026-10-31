@@ -176,8 +176,9 @@
     try {
       const u = getUser(), m = localStorage.getItem("mascota_actual") || "mapache";
       const eq = JSON.parse(localStorage.getItem(`mascota_skins_eq_${u}_${m}`) || "{}");
-      document.body.classList.toggle("light", eq.fondos === "claro");
-      document.body.classList.toggle("tema-claro", eq.fondos === "claro");
+      const esClaro = eq.fondos === "claro";
+      document.body.classList.toggle("light", esClaro);
+      document.body.classList.toggle("tema-claro", esClaro);
     } catch {}
   };
 
