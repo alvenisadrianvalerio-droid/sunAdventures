@@ -121,14 +121,27 @@
     bar.id = "notas-toolbar-filtros";
     bar.style.cssText = "display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin:0 auto 1.2rem;max-width:1100px;padding:0.7rem 1rem;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);";
     bar.innerHTML = `
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button type="button" class="btn-secondary nota-chip-filtro active" data-nota-cat="todas" style="padding:0.35rem 0.8rem;font-size:0.78rem;border-radius:999px;">✨ Todas</button>
-        <button type="button" class="btn-secondary nota-chip-filtro" data-nota-cat="lacre" style="padding:0.35rem 0.8rem;font-size:0.78rem;border-radius:999px;border-color:rgba(244,63,94,0.45);color:#fda4af;">💌 Cartas Lacradas</button>
-        <button type="button" class="btn-secondary nota-chip-filtro" data-nota-cat="fijadas" style="padding:0.35rem 0.8rem;font-size:0.78rem;border-radius:999px;border-color:rgba(255,217,61,0.45);color:#ffd93d;">📌 Fijadas</button>
-        <button type="button" class="btn-secondary nota-chip-filtro" data-nota-cat="listas" style="padding:0.35rem 0.8rem;font-size:0.78rem;border-radius:999px;">☑️ Listas</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        <button type="button" class="btn-secondary nota-chip-filtro active" data-nota-cat="todas" style="display:inline-flex;align-items:center;gap:6px;padding:0.38rem 0.85rem;font-size:0.78rem;font-weight:600;border-radius:999px;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#fbbf24;"><path d="M12 2l2.4 5 5.6.8-4 4 1 5.7L12 15l-5 2.5 1-5.7-4-4 5.6-.8z"/></svg>
+          Todas
+        </button>
+        <button type="button" class="btn-secondary nota-chip-filtro" data-nota-cat="lacre" style="display:inline-flex;align-items:center;gap:6px;padding:0.38rem 0.85rem;font-size:0.78rem;font-weight:600;border-radius:999px;border-color:rgba(244,63,94,0.45);color:#fda4af;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#f43f5e;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/><circle cx="12" cy="13" r="2.5" fill="#f43f5e"/></svg>
+          Cartas Lacradas
+        </button>
+        <button type="button" class="btn-secondary nota-chip-filtro" data-nota-cat="fijadas" style="display:inline-flex;align-items:center;gap:6px;padding:0.38rem 0.85rem;font-size:0.78rem;font-weight:600;border-radius:999px;border-color:rgba(255,217,61,0.45);color:#ffd93d;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#ffd93d;"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-2l-2-3V5a1 1 0 0 0-1-1h-8a1 1 0 0 0-1 1v7l-2 3v2z"/></svg>
+          Fijadas
+        </button>
+        <button type="button" class="btn-secondary nota-chip-filtro" data-nota-cat="listas" style="display:inline-flex;align-items:center;gap:6px;padding:0.38rem 0.85rem;font-size:0.78rem;font-weight:600;border-radius:999px;border-color:rgba(168,85,247,0.45);color:#d8b4fe;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#c084fc;"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Listas
+        </button>
       </div>
-      <div style="flex:1;min-width:190px;max-width:300px;">
-        <input type="search" id="notas-buscador-input" placeholder="🔍 Buscar en nuestras notas..." style="width:100%;padding:0.42rem 0.8rem;border-radius:999px;border:1px solid rgba(255,255,255,0.16);background:rgba(0,0,0,0.28);color:#fff;font-size:0.82rem;">
+      <div style="flex:1;min-width:190px;max-width:320px;position:relative;display:flex;align-items:center;">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:12px;color:rgba(255,255,255,0.45);pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="notas-buscador-input" placeholder="Buscar en nuestras notas..." style="width:100%;padding:0.45rem 0.8rem 0.45rem 2.2rem;border-radius:999px;border:1px solid rgba(255,255,255,0.16);background:rgba(0,0,0,0.28);color:#fff;font-size:0.82rem;outline:none;">
       </div>
     `;
     sec.insertBefore(bar, notasGrid);
