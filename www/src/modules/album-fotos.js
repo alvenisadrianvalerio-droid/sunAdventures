@@ -209,32 +209,32 @@
     {
       key: "heart",
       label: "Me encanta",
-      svg: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#f43f5e"/></svg>`
+      svg: `<svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#f43f5e"/></svg>`
     },
     {
       key: "love",
       label: "Enamorado/a",
-      svg: `<svg viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10" fill="#fbbf24"/><circle cx="12" cy="12" r="9" fill="#f59e0b"/><path d="M7.5 10c-.8 0-1.5-.6-1.5-1.4 0-1.1 1.5-2 1.5-2s1.5.9 1.5 2c0 .8-.7 1.4-1.5 1.4zm9 0c-.8 0-1.5-.6-1.5-1.4 0-1.1 1.5-2 1.5-2s1.5.9 1.5 2c0 .8-.7 1.4-1.5 1.4z" fill="#e11d48"/><path d="M8 15s1.5 2.5 4 2.5 4-2.5 4-2.5" stroke="#78350f" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`
+      svg: `<svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="10" fill="#fbbf24"/><circle cx="12" cy="12" r="9" fill="#f59e0b"/><path d="M7.5 10c-.8 0-1.5-.6-1.5-1.4 0-1.1 1.5-2 1.5-2s1.5.9 1.5 2c0 .8-.7 1.4-1.5 1.4zm9 0c-.8 0-1.5-.6-1.5-1.4 0-1.1 1.5-2 1.5-2s1.5.9 1.5 2c0 .8-.7 1.4-1.5 1.4z" fill="#e11d48"/><path d="M8 15s1.5 2.5 4 2.5 4-2.5 4-2.5" stroke="#78350f" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`
     },
     {
       key: "fire",
-      label: "IncreÃ­ble",
-      svg: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2c-.5 2.5-3 5-3 8 0 3.3 2.7 6 6 6s6-2.7 6-6c0-2-.5-3.5-1.5-5-.5 2-2 3-3.5 3-2.5 0-4-3-4-6z" fill="#f97316"/><path d="M12 9c-1 1-1.5 2.2-1.5 3.5 0 1.9 1.6 3.5 3.5 3.5s3.5-1.6 3.5-3.5c0-.8-.3-1.6-.8-2.2-.4 1.2-1.5 2.2-2.7 2.2s-2-1.5-2-3.5z" fill="#fde047"/></svg>`
+      label: "Increíble",
+      svg: `<svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2c-.5 2.5-3 5-3 8 0 3.3 2.7 6 6 6s6-2.7 6-6c0-2-.5-3.5-1.5-5-.5 2-2 3-3.5 3-2.5 0-4-3-4-6z" fill="#f97316"/><path d="M12 9c-1 1-1.5 2.2-1.5 3.5 0 1.9 1.6 3.5 3.5 3.5s3.5-1.6 3.5-3.5c0-.8-.3-1.6-.8-2.2-.4 1.2-1.5 2.2-2.7 2.2s-2-1.5-2-3.5z" fill="#fde047"/></svg>`
     },
     {
       key: "sunflower",
       label: "Nuestro sol",
-      svg: `<svg viewBox="0 0 24 24" width="16" height="16"><g fill="#f59e0b"><circle cx="12" cy="4" r="2.4"/><circle cx="12" cy="20" r="2.4"/><circle cx="4" cy="12" r="2.4"/><circle cx="20" cy="12" r="2.4"/><circle cx="6.3" cy="6.3" r="2.3"/><circle cx="17.7" cy="6.3" r="2.3"/><circle cx="6.3" cy="17.7" r="2.3"/><circle cx="17.7" cy="17.7" r="2.3"/></g><circle cx="12" cy="12" r="4.8" fill="#78350f" stroke="#fde047" stroke-width="1.3"/></svg>`
+      svg: `<svg viewBox="0 0 24 24" width="22" height="22"><g fill="#f59e0b"><circle cx="12" cy="4" r="2.4"/><circle cx="12" cy="20" r="2.4"/><circle cx="4" cy="12" r="2.4"/><circle cx="20" cy="12" r="2.4"/><circle cx="6.3" cy="6.3" r="2.3"/><circle cx="17.7" cy="6.3" r="2.3"/><circle cx="6.3" cy="17.7" r="2.3"/><circle cx="17.7" cy="17.7" r="2.3"/></g><circle cx="12" cy="12" r="4.8" fill="#78350f" stroke="#fde047" stroke-width="1.3"/></svg>`
     },
     {
       key: "star",
-      label: "MÃ¡gico",
-      svg: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2l2.9 6.6L22 9.5l-5.3 4.8 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.5l7.1-.9L12 2z" fill="#fbbf24" stroke="#fef08a" stroke-width="1.2"/></svg>`
+      label: "Mágico",
+      svg: `<svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2l2.9 6.6L22 9.5l-5.3 4.8 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.5l7.1-.9L12 2z" fill="#fbbf24" stroke="#fef08a" stroke-width="1.2"/></svg>`
     },
     {
       key: "sparkles",
       label: "Brillante",
-      svg: `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z" fill="#ec4899"/></svg>`
+      svg: `<svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z" fill="#ec4899"/></svg>`
     }
   ];
 
@@ -283,7 +283,7 @@
       chip.type = "button";
       chip.className = "polaroid-reac-chip";
       chip.title = `${r.label} (${count})`;
-      chip.style.cssText = `padding:3px 7px;border-radius:999px;border:1px solid ${esMia ? "rgba(244,63,94,0.7)" : "rgba(255,255,255,0.2)"};background:${esMia ? "rgba(244,63,94,0.3)" : "rgba(15,23,42,0.75)"};color:#fff;display:inline-flex;align-items:center;gap:4px;cursor:pointer;backdrop-filter:blur(6px);transition:transform 0.15s ease;`;
+      chip.style.cssText = `padding:4px 9px;border-radius:999px;border:1px solid ${esMia ? "rgba(244,63,94,0.7)" : "rgba(255,255,255,0.2)"};background:${esMia ? "rgba(244,63,94,0.3)" : "rgba(15,23,42,0.75)"};color:#fff;display:inline-flex;align-items:center;gap:6px;cursor:pointer;backdrop-filter:blur(6px);transition:transform 0.15s ease;`;
       chip.innerHTML = `<span style="display:inline-flex;align-items:center;">${r.svg}</span><span style="font-size:0.72rem;font-weight:800;">${count}</span>`;
       chip.addEventListener("click", e => {
         e.preventDefault();
@@ -297,8 +297,8 @@
     btnAddReac.type = "button";
     btnAddReac.className = "polaroid-reac-add";
     btnAddReac.title = "AÃ±adir reacciÃ³n";
-    btnAddReac.style.cssText = "padding:3px 7px;border-radius:999px;border:1px solid rgba(255,255,255,0.25);background:rgba(15,23,42,0.7);color:#fde68a;cursor:pointer;display:inline-flex;align-items:center;gap:3px;backdrop-filter:blur(6px);";
-    btnAddReac.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="#fbbf24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg><span style="font-size:0.75rem;font-weight:800;">+</span>`;
+    btnAddReac.style.cssText = "padding:4px 9px;border-radius:999px;border:1px solid rgba(255,255,255,0.25);background:rgba(15,23,42,0.7);color:#fde68a;cursor:pointer;display:inline-flex;align-items:center;gap:4px;backdrop-filter:blur(6px);";
+    btnAddReac.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="#fbbf24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg><span style="font-size:0.82rem;font-weight:800;">+</span>`;
 
     btnAddReac.addEventListener("click", e => {
       e.preventDefault();
@@ -308,13 +308,13 @@
 
       const picker = document.createElement("div");
       picker.className = "polaroid-reac-picker";
-      picker.style.cssText = "position:absolute;bottom:calc(100% + 8px);left:0;z-index:40;display:flex;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(15,23,42,0.96);border:1px solid rgba(251,191,36,0.45);box-shadow:0 10px 28px rgba(0,0,0,0.7);backdrop-filter:blur(12px);";
+      picker.style.cssText = "position:absolute;bottom:calc(100% + 8px);left:0;z-index:40;display:flex;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(15,23,42,0.96);border:1px solid rgba(251,191,36,0.45);box-shadow:0 12px 32px rgba(0,0,0,0.75);backdrop-filter:blur(12px);";
       REACCIONES_ALBUM.forEach(r => {
         const b = document.createElement("button");
         b.type = "button";
         b.title = r.label;
         b.innerHTML = r.svg;
-        b.style.cssText = "border:none;background:transparent;cursor:pointer;padding:4px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;transition:transform 0.15s ease;";
+        b.style.cssText = "border:none;background:transparent;cursor:pointer;padding:6px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;transition:transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);";
         b.addEventListener("mouseenter", () => { b.style.transform = "scale(1.3)"; });
         b.addEventListener("mouseleave", () => { b.style.transform = "scale(1)"; });
         b.addEventListener("click", ev => {
