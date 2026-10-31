@@ -1211,11 +1211,11 @@ if (!window._extraVistas.includes("diccionario")) {
     const tabsNav = document.createElement("div");
     tabsNav.style.cssText = "display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;";
     tabsNav.innerHTML = `
-      <button type="button" id="tab-dic-consulta" class="btn-primary" style="display:inline-flex;align-items:center;gap:6px;padding:0.45rem 1rem;font-size:0.82rem;font-weight:600;border-radius:999px;">
+      <button type="button" id="tab-dic-consulta" class="btn-primary" style="display:inline-flex;align-items:center;gap:6px;padding:0.45rem 1rem;font-size:0.82rem;font-weight:600;border-radius:999px;transition:all 0.25s ease;">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
         Diccionario Multilingüe
       </button>
-      <button type="button" id="tab-dic-lexico" class="btn-secondary" style="display:inline-flex;align-items:center;gap:6px;padding:0.45rem 1rem;font-size:0.82rem;font-weight:600;border-radius:999px;border-color:rgba(244,114,182,0.45);color:#fbcfe8;">
+      <button type="button" id="tab-dic-lexico" class="btn-secondary" style="display:inline-flex;align-items:center;gap:6px;padding:0.45rem 1rem;font-size:0.82rem;font-weight:600;border-radius:999px;border-color:rgba(244,114,182,0.45);color:#fbcfe8;transition:all 0.25s ease;">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="#f43f5e" style="display:inline-block;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
         Nuestro Léxico de Pareja
       </button>
@@ -1289,20 +1289,50 @@ if (!window._extraVistas.includes("diccionario")) {
       buscar(terminoLimpio);
     });
 
-    $("tab-dic-consulta")?.addEventListener("click", () => {
+    const btnTabConsulta = $("tab-dic-consulta");
+    const btnTabLexico = $("tab-dic-lexico");
+
+    const activarTabConsulta = () => {
       lexicoPanel.style.display = "none";
       if (searchBox) searchBox.style.display = "";
       if (histBox) histBox.style.display = "";
       if (resBox) resBox.style.display = "";
-    });
 
-    $("tab-dic-lexico")?.addEventListener("click", () => {
+      if (btnTabConsulta && btnTabLexico) {
+        // Tab Consulta activo (amarillo / btn-primary)
+        btnTabConsulta.className = "btn-primary";
+        btnTabConsulta.style.borderColor = "";
+        btnTabConsulta.style.color = "";
+
+        // Tab Léxico inactivo (secundario romántico con borde rosa suave)
+        btnTabLexico.className = "btn-secondary";
+        btnTabLexico.style.borderColor = "rgba(244,114,182,0.45)";
+        btnTabLexico.style.color = "#fbcfe8";
+      }
+    };
+
+    const activarTabLexico = () => {
       lexicoPanel.style.display = "block";
       if (searchBox) searchBox.style.display = "none";
       if (histBox) histBox.style.display = "none";
       if (resBox) resBox.style.display = "none";
       renderListaLexico();
-    });
+
+      if (btnTabConsulta && btnTabLexico) {
+        // Tab Léxico pasa a activo (btn-primary estilo romántico o accent activo)
+        btnTabLexico.className = "btn-primary";
+        btnTabLexico.style.borderColor = "transparent";
+        btnTabLexico.style.color = "#2b2118";
+
+        // Tab Consulta pasa a secundario inactivo
+        btnTabConsulta.className = "btn-secondary";
+        btnTabConsulta.style.borderColor = "rgba(255,255,255,0.2)";
+        btnTabConsulta.style.color = "";
+      }
+    };
+
+    btnTabConsulta?.addEventListener("click", activarTabConsulta);
+    btnTabLexico?.addEventListener("click", activarTabLexico);
 
     $("dic-lexico-form")?.addEventListener("submit", e => {
       e.preventDefault();
