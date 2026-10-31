@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    RPG-SET-BONUS.JS — Bonus por equipar 3 items del mismo tipo
    ============================================================ */
 (function () {
@@ -93,21 +93,31 @@
 
     // ---------- Aplicar/actualizar sets en localStorage ----------
     const resolveUid = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || localStorage.getItem("sunadventures_uid") || "local";
-    function aplicarSets() {
-        const sets = setsActivos();
-        const u = resolveUid();
-        const key = `sa_rpg_sets_${u}`;
+    let _aplicandoSets = false;
+    function aplicarSets(emitirEvento = true) {
+        if (_aplicandoSets) return;
+        _aplicandoSets = true;
+        try {
+            const sets = setsActivos();
+            const u = resolveUid();
+            const key = `sa_rpg_sets_${u}`;
 
-        // Guardar sets activos
-        localStorage.setItem(key, JSON.stringify(sets));
+            // Guardar sets activos
+            localStorage.setItem(key, JSON.stringify(sets));
 
-        window.dispatchEvent(new Event("rpg:stats-cambiados"));
-        return sets;
+            if (emitirEvento) {
+                // Solo emitir si no venimos de rpg:stats-cambiados para evitar bucle infinito
+                window.dispatchEvent(new Event("rpg:stats-cambiados"));
+            }
+            return sets;
+        } finally {
+            _aplicandoSets = false;
+        }
     }
 
     // ---------- Recalcular cuando cambia el inventario ----------
-    window.addEventListener("rpg:victoria", () => setTimeout(aplicarSets, 500));
-    window.addEventListener("rpg:stats-cambiados", () => setTimeout(aplicarSets, 100));
+    window.addEventListener("rpg:victoria", () => setTimeout(() => aplicarSets(true), 500));
+    window.addEventListener("rpg:stats-cambiados", () => setTimeout(() => aplicarSets(false), 200));
 
     // ---------- UI: panel de sets activos ----------
     function inyectarPanelSets() {

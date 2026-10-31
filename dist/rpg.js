@@ -408,7 +408,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     a.style.display = tieneSesion() ? "" : "none";
   }
 
-  window._rpgRender = () => { try { activarVistaRpg(); render(); } catch(e){} };
+  window._rpgRender = () => { try { if (window._rpgRenderSeguro) window._rpgRenderSeguro(); else { activarVistaRpg(); render(); } } catch(e){} };
   function render() {
     inyectarNav(); inyectarSeccion();
     const c = $("rpg-content"); if (!c) return;
@@ -2827,7 +2827,16 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
     qsa("[data-view-link]").forEach(el => el.classList.toggle("active", el.dataset.viewLink === "rpg"));
     document.body.style.overflow = "";
   }
-  window.addEventListener("hashchange", () => { if (location.hash === "#rpg") { activarVistaRpg(); if (tieneSesion()) render(); } });
+  let _ultimoRpgRender = 0;
+  window._rpgRenderSeguro = () => {
+    activarVistaRpg();
+    const ahora = Date.now();
+    if (ahora - _ultimoRpgRender > 250) {
+      _ultimoRpgRender = ahora;
+      if (tieneSesion()) render();
+    }
+  };
+  window.addEventListener("hashchange", () => { if (location.hash === "#rpg") window._rpgRenderSeguro(); });
   document.addEventListener("click", e => {
     if (!e.target.closest('[data-view-link="rpg"]')) return;
     if (!tieneSesion()) {
@@ -2835,7 +2844,7 @@ if (!window._extraVistas.includes("rpg")) window._extraVistas.push("rpg");
       activarVistaRpg();
       return;
     }
-    setTimeout(() => { activarVistaRpg(); render(); }, 0);
+    // No disparamos renders duplicados aquí, el router centralizado y hashchange se encargan
   });
   window.addEventListener("rpg:stats-cambiados", () => {
     state.hp = Math.min(state.hp, hpMax());
