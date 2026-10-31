@@ -87,21 +87,21 @@
 
   /* ---------- Items Míticos / Reliquias Míticas ---------- */
   const ITEMS_MITICOS = {
-    "item-6-0": { nombre: "Espada Fauna", precio: 2500, sprite: [6, 0], sheet: "loot1", rar: "mitico", desc: "Drena el alma enemiga. +10 ATK, +10 Lifesteal, +50 HP, +10 Veneno." },
-    "item-7-0": { nombre: "Espada Girasol", precio: 4500, sprite: [7, 0], sheet: "loot1", rar: "mitico", desc: "El poder absoluto sobre todo lo vivo. +20 ATK, +20 DEF, +50 HP, Regen, Lifesteal, Thorns." },
-    "item-7-1": { nombre: "Rebanadora", precio: 2200, sprite: [7, 1], sheet: "loot1", rar: "mitico", desc: "Rebana el viento a gran velocidad. +10 ATK, +10 Esq, +100 Regen, +100 HP." },
-    "item-5-2": { nombre: "Naturaleza", precio: 2800, sprite: [5, 2], sheet: "loot1", rar: "mitico", desc: "Hace temblar el suelo. +10 ATK, +100 Veneno, +100 Thorns, +200 HP." },
-    "item-6-2": { nombre: "Astrología", precio: 3200, sprite: [6, 2], sheet: "loot1", rar: "mitico", desc: "Poder cósmico ancestral. +20 ATK, +20 Crit, +20 Esq, +200 HP." },
-    "item-0-4": { nombre: "Colgante de Escudo", precio: 2400, sprite: [0, 4], sheet: "loot1", rar: "mitico", desc: "Lágrima de girasol encapsulada. +50 DEF y genera 300 escudo por turno." },
-    "item-1-4": { nombre: "Estrella Encapsulada", precio: 3000, sprite: [1, 4], sheet: "loot1", rar: "mitico", desc: "Energía astronómica incontrolable. +20 ATK, +20 XP, +10 Lifesteal." },
-    "item-2-4": { nombre: "Colmillo Ancestral", precio: 2800, sprite: [2, 4], sheet: "loot1", rar: "mitico", desc: "Colmillo de vampiro milenario. +50 Lifesteal y robo de vida masivo." },
-    "item-3-4": { nombre: "Calavera Encapsulada", precio: 2600, sprite: [3, 4], sheet: "loot1", rar: "mitico", desc: "Aura de putrefacción letal. +500 Veneno y reduce ataque del rival." },
-    "item-4-4": { nombre: "Pergamino de Escudo", precio: 2900, sprite: [4, 4], sheet: "loot1", rar: "mitico", desc: "Conocimiento arcano de defensa. +100 DEF, +40 XP y esquiva." },
-    "item-7-5": { nombre: "Oda a la Incertidumbre", precio: 3200, sprite: [7, 5], sheet: "loot1", rar: "mitico", desc: "Compañera de la guerra. +300 HP, +50 DEF, +300 Thorns, +20 Esq." },
-    "item-3-6": { nombre: "Zapatos de Mago", precio: 2700, sprite: [3, 6], sheet: "loot1", rar: "mitico", desc: "Pasos mágicos imperceptibles. +50 Esq, +50 DEF, +100 HP." },
-    "item-2-7": { nombre: "Oda a la Miseria", precio: 3400, sprite: [2, 7], sheet: "loot1", rar: "mitico", desc: "Daño indirecto demoledor. +40 Esq, +200 Thorns, +100 Veneno, +10 Lifesteal." },
-    "item-4-7": { nombre: "Mano de Mono", precio: 2500, sprite: [4, 7], sheet: "loot1", rar: "mitico", desc: "Fortuna y tesoros sin fin. +100% Oro droppeado." },
-    "item-1-8": { nombre: "Queso para Dragones", precio: 2000, sprite: [1, 8], sheet: "loot1", rar: "mitico", desc: "Manjar divino para bestias. +500 HP, +25 ATK." }
+    "item-6-0": { nombre: "Espada Fauna", precio: 5800, sprite: [6, 0], sheet: "loot1", rar: "mitico", desc: "Drena el alma enemiga. +10 ATK, +10 Lifesteal, +50 HP, +10 Veneno." },
+    "item-7-0": { nombre: "Espada Girasol", precio: 9500, sprite: [7, 0], sheet: "loot1", rar: "mitico", desc: "El poder absoluto sobre todo lo vivo. +20 ATK, +20 DEF, +50 HP, Regen, Lifesteal, Thorns." },
+    "item-7-1": { nombre: "Rebanadora", precio: 5200, sprite: [7, 1], sheet: "loot1", rar: "mitico", desc: "Rebana el viento a gran velocidad. +10 ATK, +10 Esq, +100 Regen, +100 HP." },
+    "item-5-2": { nombre: "Naturaleza", precio: 6200, sprite: [5, 2], sheet: "loot1", rar: "mitico", desc: "Hace temblar el suelo. +10 ATK, +100 Veneno, +100 Thorns, +200 HP." },
+    "item-6-2": { nombre: "Astrología", precio: 7200, sprite: [6, 2], sheet: "loot1", rar: "mitico", desc: "Poder cósmico ancestral. +20 ATK, +20 Crit, +20 Esq, +200 HP." },
+    "item-0-4": { nombre: "Colgante de Escudo", precio: 5500, sprite: [0, 4], sheet: "loot1", rar: "mitico", desc: "Lágrima de girasol encapsulada. +50 DEF y genera 300 escudo por turno." },
+    "item-1-4": { nombre: "Estrella Encapsulada", precio: 6800, sprite: [1, 4], sheet: "loot1", rar: "mitico", desc: "Energía astronómica incontrolable. +20 ATK, +20 XP, +10 Lifesteal." },
+    "item-2-4": { nombre: "Colmillo Ancestral", precio: 6400, sprite: [2, 4], sheet: "loot1", rar: "mitico", desc: "Colmillo de vampiro milenario. +50 Lifesteal y robo de vida masivo." },
+    "item-3-4": { nombre: "Calavera Encapsulada", precio: 5900, sprite: [3, 4], sheet: "loot1", rar: "mitico", desc: "Aura de putrefacción letal. +500 Veneno y reduce ataque del rival." },
+    "item-4-4": { nombre: "Pergamino de Escudo", precio: 6500, sprite: [4, 4], sheet: "loot1", rar: "mitico", desc: "Conocimiento arcano de defensa. +100 DEF, +40 XP y esquiva." },
+    "item-7-5": { nombre: "Oda a la Incertidumbre", precio: 7500, sprite: [7, 5], sheet: "loot1", rar: "mitico", desc: "Compañera de la guerra. +300 HP, +50 DEF, +300 Thorns, +20 Esq." },
+    "item-3-6": { nombre: "Zapatos de Mago", precio: 6000, sprite: [3, 6], sheet: "loot1", rar: "mitico", desc: "Pasos mágicos imperceptibles. +50 Esq, +50 DEF, +100 HP." },
+    "item-2-7": { nombre: "Oda a la Miseria", precio: 7800, sprite: [2, 7], sheet: "loot1", rar: "mitico", desc: "Daño indirecto demoledor. +40 Esq, +200 Thorns, +100 Veneno, +10 Lifesteal." },
+    "item-4-7": { nombre: "Mano de Mono", precio: 5800, sprite: [4, 7], sheet: "loot1", rar: "mitico", desc: "Fortuna y tesoros sin fin. +100% Oro droppeado." },
+    "item-1-8": { nombre: "Queso para Dragones", precio: 4800, sprite: [1, 8], sheet: "loot1", rar: "mitico", desc: "Manjar divino para bestias. +500 HP, +25 ATK." }
   };
 
   /* ---------- HTML interno ---------- */
@@ -135,8 +135,8 @@
   }
 
   const labelCat = c => ({
-    mascotas:"🐾 Mascotas",
-    miticos:"🔮 Míticos",
+    mascotas:`<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="vertical-align:-1px;margin-right:4px;"><path d="M12 12c-2.2 0-4 1.8-4 4 0 1.9 1.5 3.5 3.5 3.9.3.1.7.1 1 0 2-.4 3.5-2 3.5-3.9 0-2.2-1.8-4-4-4zm-4.5-2c1.4 0 2.5-1.1 2.5-2.5S8.9 5 7.5 5 5 6.1 5 7.5 6.1 10 7.5 10zm9 0c1.4 0 2.5-1.1 2.5-2.5S17.9 5 16.5 5 14 6.1 14 7.5s1.1 2.5 2.5 2.5zm-13 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm17 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>Mascotas`,
+    miticos:`<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px;color:#ff6b9d;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Míticos`,
     comida:"Comida", cabeza:"Cabeza", cuello:"Cuello",
     ojos:"Ojos", fondos:"Fondos", efectos:"Efectos"
   })[c] || (c[0].toUpperCase() + c.slice(1));
@@ -345,9 +345,15 @@
       : `<span class="tienda-item-precio" style="color:var(--accent);">✓ Desbloqueada</span>`;
 
     const bonusBadge = esMiticos
-      ? `<span class="tienda-item-efecto" style="background:rgba(255,107,157,0.15);border:1px solid rgba(255,107,157,0.4);color:#ff6b9d;">✨ Reliquia Mítica</span>`
+      ? `<span class="tienda-item-efecto" style="background:rgba(255,107,157,0.15);border:1px solid rgba(255,107,157,0.4);color:#ff6b9d;display:inline-flex;align-items:center;gap:4px;">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:#ff6b9d;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Reliquia Mítica
+        </span>`
       : (!esComida && !esMascotas && item.bonus?.desc)
-      ? `<span class="tienda-item-efecto">⚡ ${item.bonus.desc}</span>`
+      ? `<span class="tienda-item-efecto" style="display:inline-flex;align-items:center;gap:4px;">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:#fbbf24;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          ${item.bonus.desc}
+        </span>`
       : "";
 
     it.innerHTML = `
