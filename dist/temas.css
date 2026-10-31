@@ -202,6 +202,10 @@ body[class*="tema-fondo-"] .bento-modules-card {
   background: var(--tema-card-bg) !important;
   border-color: var(--tema-card-border) !important;
 }
+body[class*="tema-fondo-"] #pareja-jardin-widget {
+  background: color-mix(in srgb, var(--tema-card-bg) 80%, rgba(244,63,94,0.15)) !important;
+  border-color: color-mix(in srgb, var(--tema-card-border) 70%, rgba(251,113,133,0.35)) !important;
+}
 body[class*="tema-fondo-"] .bento-rank-name {
   color: var(--text) !important;
 }
@@ -299,6 +303,11 @@ body[class*="tema-fondo-"] .tienda-buscador input {
 body[class*="tema-fondo-"] .tienda-categorias {
   background: var(--tema-card-bg);
   border-color: var(--tema-card-border);
+  scrollbar-color: var(--accent) transparent;
+}
+body[class*="tema-fondo-"] .tienda-categoria {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 body[class*="tema-fondo-"] .tienda-categoria:hover:not(.active) {
   background: color-mix(in srgb, var(--accent) 15%, transparent);

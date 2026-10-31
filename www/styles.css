@@ -2504,10 +2504,16 @@ html.animations-disabled .rpg-rl-recompensa.active {
 
 .tienda-embed .tienda-categorias {
   padding: .25rem;
-  gap: .3rem
+  gap: .35rem;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
 }
 
 .tienda-embed .tienda-categoria {
+  flex-shrink: 0;
+  white-space: nowrap;
   padding: .4rem .7rem;
   font-size: .72rem
 }
@@ -2658,14 +2664,24 @@ body.light ::-webkit-scrollbar-thumb:hover {
 }
 
 .tienda-categorias {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 217, 61, .3) transparent;
   scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
 }
 
 .tienda-categorias::-webkit-scrollbar {
-  display: none
+  height: 4px;
+}
+
+.tienda-categorias::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tienda-categorias::-webkit-scrollbar-thumb {
+  background: rgba(255, 217, 61, .35);
+  border-radius: 999px;
 }
 
 /* ============================================
@@ -5526,10 +5542,19 @@ body.light .player-close {
   position: relative;
 }
 
-body.light .bento-card {
-  background: #ffffff;
-  border-color: rgba(139, 90, 20, 0.16);
-  box-shadow: 0 4px 14px rgba(139, 90, 20, 0.08);
+body.light .bento-card,
+body.tema-claro .bento-card {
+  background: #ffffff !important;
+  border-color: rgba(139, 90, 20, 0.16) !important;
+  box-shadow: 0 4px 14px rgba(139, 90, 20, 0.08) !important;
+  color: #3d2c1e !important;
+}
+
+body.light .bento-modules-card,
+body.tema-claro .bento-modules-card {
+  background: #ffffff !important;
+  border-color: rgba(139, 90, 20, 0.16) !important;
+  box-shadow: 0 4px 18px rgba(139, 90, 20, 0.08) !important;
 }
 
 /* TARJETAS DE PROGRESO Y RETO DIARIO (Estructura interna flexible y limpia) */
@@ -6497,16 +6522,35 @@ body.light .modal-rango-beneficio {
   background: linear-gradient(180deg, rgba(56, 189, 248, 0.03) 0%, rgba(19, 21, 31, 1) 40%);
 }
 
-body.light .bento-individual {
-  background: linear-gradient(180deg, rgba(255, 217, 61, 0.05) 0%, #ffffff 40%);
+body.light .bento-individual,
+body.tema-claro .bento-individual {
+  background: linear-gradient(180deg, rgba(255, 217, 61, 0.12) 0%, #ffffff 45%) !important;
+  color: #3d2c1e !important;
 }
 
-body.light .bento-pareja {
-  background: linear-gradient(180deg, rgba(255, 107, 168, 0.05) 0%, #ffffff 40%);
+body.light .bento-pareja,
+body.tema-claro .bento-pareja {
+  background: linear-gradient(180deg, rgba(255, 107, 168, 0.12) 0%, #ffffff 45%) !important;
+  color: #3d2c1e !important;
 }
 
-body.light .bento-reto-card {
-  background: linear-gradient(180deg, rgba(56, 189, 248, 0.05) 0%, #ffffff 40%);
+body.light .bento-reto-card,
+body.tema-claro .bento-reto-card {
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.12) 0%, #ffffff 45%) !important;
+  color: #3d2c1e !important;
+}
+
+body.light #pareja-jardin-widget,
+body.tema-claro #pareja-jardin-widget {
+  background: linear-gradient(135deg, rgba(255, 237, 213, 0.8), rgba(254, 226, 226, 0.7)) !important;
+  border-color: rgba(251, 113, 133, 0.35) !important;
+}
+
+body.light #pareja-jardin-widget span,
+body.tema-claro #pareja-jardin-widget span,
+body.light #pareja-jardin-widget div,
+body.tema-claro #pareja-jardin-widget div {
+  color: #881337 !important;
 }
 
 /* ============================================================

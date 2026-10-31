@@ -1379,22 +1379,31 @@ body.light .tienda-monedero {
 
 .tienda-categorias {
   display: flex;
-  gap: .4rem;
+  gap: .5rem;
   margin-bottom: 1rem;
-  padding: .3rem;
+  padding: .35rem .45rem;
   background: rgba(255, 255, 255, .04);
   border: 1px solid rgba(255, 255, 255, .08);
   border-radius: 12px;
-  overflow-x: auto
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 217, 61, .3) transparent;
+  touch-action: pan-x;
 }
 
 body.light .tienda-categorias {
   background: rgba(139, 90, 20, .05);
-  border-color: rgba(139, 90, 20, .12)
+  border-color: rgba(139, 90, 20, .12);
+  scrollbar-color: rgba(212, 148, 30, .4) transparent;
 }
 
 .tienda-categoria {
-  padding: .55rem 1rem;
+  flex-shrink: 0;
+  padding: .55rem 1.05rem;
   border-radius: 999px;
   border: none;
   background: transparent;
@@ -1405,7 +1414,8 @@ body.light .tienda-categorias {
   cursor: pointer;
   white-space: nowrap;
   opacity: .65;
-  transition: all .25s cubic-bezier(.34, 1.56, .64, 1)
+  transition: all .25s cubic-bezier(.34, 1.56, .64, 1);
+  user-select: none;
 }
 
 .tienda-categoria:hover:not(.active) {
@@ -1693,13 +1703,19 @@ body.light .tienda-item-precio {
 
   .tienda-categorias {
     margin-bottom: 0.65rem !important;
-    padding: 0.2rem !important;
-    gap: 0.25rem !important;
+    padding: 0.25rem 0.35rem !important;
+    gap: 0.35rem !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-x !important;
   }
 
   .tienda-categoria {
-    padding: 0.4rem 0.75rem !important;
+    flex-shrink: 0 !important;
+    padding: 0.4rem 0.8rem !important;
     font-size: 0.76rem !important;
+    white-space: nowrap !important;
   }
 
   .tienda-grid {
@@ -10958,10 +10974,20 @@ body.light .tienda-buscador input {
 .tienda-filtros {
   display: flex;
   gap: .35rem;
-  flex-wrap: wrap;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  scrollbar-width: none;
+}
+
+.tienda-filtros::-webkit-scrollbar {
+  display: none;
 }
 
 .tienda-filtro {
+  flex-shrink: 0;
+  white-space: nowrap;
   padding: .35rem .75rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, .1);
