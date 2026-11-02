@@ -211,21 +211,11 @@
       animation-play-state: paused !important;
     }
 
-    /* Fondos animados de temas: sin animacion en moviles para ahorrar GPU */
-    @media (max-width: 768px) {
-      body[class*="tema-fondo-"]::before,
-      body[class*="tema-fondo-"]::after {
-        animation: none !important;
-        filter: none !important;
-      }
-      body[class*="tema-fondo-"] .bento-card,
-      body[class*="tema-fondo-"] .experiencia-card,
-      body[class*="tema-fondo-"] .tienda-panel,
-      body[class*="tema-fondo-"] .modal-content,
-      body[class*="tema-fondo-"] .amistad-panel {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-      }
+    /* Fondos animados de temas: quietos solo en equipos de gama baja */
+    html.gama-baja body[class*="tema-fondo-"]::before,
+    html.gama-baja body[class*="tema-fondo-"]::after {
+      animation: none !important;
+      filter: none !important;
     }
 
     /* Reducir consumo de memoria en dispositivos con preferencia de ahorro o baja potencia */
