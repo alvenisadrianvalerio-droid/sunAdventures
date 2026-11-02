@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    MÓDULO: FOTOS / POLAROIDS / MAPA (album-fotos.js)
    ============================================================ */
 (function() {
@@ -747,14 +747,16 @@
 
   async function abrirModal(fotoParaEditar = null) {
     try {
-      if (!modal) return;
+      const modalEl = modal || $("photo-modal");
+      if (!modalEl) { console.warn('abrirModal: no modal'); return; }
       if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
         await cerrarFullscreen();
         // Breve pausa para permitir que el navegador restaure el viewport
         await new Promise(r => setTimeout(r, 60));
       }
       fotoEditando = fotoParaEditar;
-      modal.classList.add("active"); modal.setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden";
+      const modalEl = modal || $("photo-modal");
+      modalEl.classList.add('active'); modalEl.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden';
       form?.reset();
       if (inputPhoto) inputPhoto.required = !fotoParaEditar;
       if (inputPhotoCampo) inputPhotoCampo.hidden = Boolean(fotoParaEditar);
@@ -769,8 +771,8 @@
 
   function cerrarModal() {
     try {
-      if (!modal) return;
-      modal.classList.remove("active"); modal.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
+      const modalEl = modal || $("photo-modal");
+      modalEl.classList.remove("active"); modalEl.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
       fotoEditando = null;
       if (inputPhoto) inputPhoto.required = true;
       if (inputPhotoCampo) inputPhotoCampo.hidden = false;
@@ -813,6 +815,14 @@
 
   /* Listeners modal y previews */
   if (btnAdd) btnAdd.addEventListener("click", () => abrirModal());
+  document.addEventListener('click', function(e) {
+    const btn = e.target && e.target.closest && e.target.closest('#btn-add-photo');
+    if (btn) {
+      e.preventDefault();
+      abrirModal();
+    }
+  });
+  window.abrirModalRecuerdo = function() { abrirModal(); };
   modal?.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", cerrarModal));
 
   inputPhoto?.addEventListener("change", () => { mostrarVistaPreviaFoto(inputPhoto.files?.[0] || null); actualizarVistaPreviaFotoInfo(); });
