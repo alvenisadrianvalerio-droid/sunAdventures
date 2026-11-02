@@ -2908,44 +2908,6 @@
     </div>
   </div>
 
-  <!-- CANCIONES PANELES -->
-  <div class="cancion-panel" data-panel="pegar">
-    <div class="cancion-pegar">
-      <p class="cancion-pegar-hint">Pega tu lista o carga un archivo (.txt, .csv, .m3u):</p>
-      <pre class="cancion-pegar-ejemplos">Canción - Artista
-Artista - Canción
-1. Canción - Artista</pre>
-      <div class="cancion-pegar-cargar"><input type="file" id="cancion-pegar-archivo"
-          accept=".txt,.csv,.m3u,.m3u8,text/plain" multiple hidden><button type="button" id="btn-cargar-archivo"
-          class="btn-secondary">Cargar archivo(s)</button></div>
-      <textarea id="cancion-pegar-texto" class="cancion-pegar-textarea" placeholder="Pega aquí tus canciones..."
-        rows="8"></textarea>
-      <div class="cancion-pegar-opciones"><span class="form-label" style="margin:0">Orden:</span><label><input
-            type="radio" name="pegar-orden" value="titulo-artista" checked> Título - Artista</label><label><input
-            type="radio" name="pegar-orden" value="artista-titulo"> Artista - Título</label></div>
-      <div id="cancion-pegar-preview" class="cancion-pegar-preview"></div>
-      <button type="button" id="btn-importar-canciones" class="btn-primary">Importar todas</button>
-    </div>
-  </div>
-
-  <div class="cancion-panel" data-panel="subir">
-    <div class="cancion-subir">
-      <p class="cancion-pegar-hint">Sube tus canciones (MP3, MP4, M4A, WAV, OGG, FLAC...).</p>
-      <div class="cancion-subir-dropzone" id="cancion-subir-dropzone">
-        <div class="cancion-subir-icon" data-icono="musica"></div>
-        <p class="cancion-subir-text">Arrastra aquí tus archivos</p>
-        <input type="file" id="cancion-subir-archivo" accept="audio/*,video/mp4,.mp3,.mp4,.m4a,.wav,.ogg,.flac,.aac"
-          multiple hidden>
-        <button type="button" id="btn-seleccionar-archivos" class="btn-secondary">Seleccionar archivos</button>
-      </div>
-      <div id="cancion-subir-lista" class="cancion-subir-lista"></div>
-      <button type="button" id="btn-subir-canciones" class="btn-primary" disabled>Subir todas</button>
-    </div>
-  </div>
-
-  <div class="modal-actions" style="margin-top:1rem"><button type="button" class="btn-secondary"
-      data-close-canciones-modal>Cerrar</button></div>
-
   <!-- MODAL MASCOTA -->
   <div id="mascota-modal" class="modal mascota-modal" aria-hidden="true">
     <div class="modal-backdrop" data-close-mascota></div>

@@ -25,8 +25,8 @@ body[class*="tema-fondo-"] .experiencia-card,
 body[class*="tema-fondo-"] .tienda-panel,
 body[class*="tema-fondo-"] .modal-content,
 body[class*="tema-fondo-"] .amistad-panel {
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 /* ============================================================
@@ -996,7 +996,7 @@ body.tema-fondo-aurora::before {
     radial-gradient(ellipse 75% 35% at 50% 12%, rgba(56, 189, 248, .2), transparent 70%),
     linear-gradient(180deg, #031326 0%, #010712 100%);
   animation: auroraOndula 14s ease-in-out infinite alternate;
-  filter: blur(24px);
+  filter: blur(8px); transform: translate3d(0,0,0); will-change: transform;
 }
 
 @keyframes auroraOndula {
