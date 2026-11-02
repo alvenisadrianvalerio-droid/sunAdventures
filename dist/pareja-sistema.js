@@ -637,7 +637,7 @@
 
     // Mejoras de chat y botón RPG cada vez que se navega o carga
     mejorarChatUI();
-    setInterval(inyectarBotonRpgCoop, 1500);
+    setInterval(() => { if (!document.hidden && document.getElementById("rpg-acciones")) inyectarBotonRpgCoop(); }, 3000);
 
     // Sincronización automática de fotos/notas de pareja al arrancar o cambiar usuario/grupo
     parejaActual = cargarParejaLocal();

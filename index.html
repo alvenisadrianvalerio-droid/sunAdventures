@@ -167,14 +167,8 @@
     }
 
     /* Acelerar GPU en modales y overlays sin degradar FPS */
-    .modal,
-    .modal-content,
-    .polaroid,
-    .nav-container,
-    .rpg-horda-item {
-      will-change: auto;
+    .nav-container {
       transform: translateZ(0);
-      -webkit-transform: translateZ(0);
     }
 
     /* Desplazamiento fluido nativo en teléfonos con contención de overscroll */
@@ -198,7 +192,40 @@
 
     /* Optimización de decodificación y renderizado de imágenes */
     img {
+      content-visibility: visible;
+    }
+
+    /* Saltar render de tarjetas fuera de pantalla */
+    .album-grid .polaroid,
+    .tienda-item,
+    .receta-card,
+    .nota-card {
       content-visibility: auto;
+      contain-intrinsic-size: auto 320px;
+    }
+
+    /* Pausar todas las animaciones cuando la pestana no esta visible */
+    html.pagina-oculta *,
+    html.pagina-oculta *::before,
+    html.pagina-oculta *::after {
+      animation-play-state: paused !important;
+    }
+
+    /* Fondos animados de temas: sin animacion en moviles para ahorrar GPU */
+    @media (max-width: 768px) {
+      body[class*="tema-fondo-"]::before,
+      body[class*="tema-fondo-"]::after {
+        animation: none !important;
+        filter: none !important;
+      }
+      body[class*="tema-fondo-"] .bento-card,
+      body[class*="tema-fondo-"] .experiencia-card,
+      body[class*="tema-fondo-"] .tienda-panel,
+      body[class*="tema-fondo-"] .modal-content,
+      body[class*="tema-fondo-"] .amistad-panel {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
     }
 
     /* Reducir consumo de memoria en dispositivos con preferencia de ahorro o baja potencia */
@@ -727,6 +754,7 @@
     })();
 
     /* Detección automática de hardware gama baja (<= 4 núcleos o <= 4GB RAM) y modo de ahorro */
+    document.addEventListener("visibilitychange", function () { document.documentElement.classList.toggle("pagina-oculta", document.hidden); });
     (function () {
       try {
         var cores = navigator.hardwareConcurrency || 4;
