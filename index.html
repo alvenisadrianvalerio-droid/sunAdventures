@@ -172,6 +172,23 @@
     }
 
     /* Desplazamiento fluido nativo en teléfonos con contención de overscroll */
+    /* Evitar scroll innecesario y recortar vacÃ­o inferior en el Panel Principal (inicio) */
+    html:has(.lobby[data-view="inicio"].active) {
+      overflow-y: hidden;
+    }
+    @media (max-width: 900px) {
+      html:has(.lobby[data-view="inicio"].active) {
+        overflow-y: auto;
+      }
+    }
+    .lobby[data-view="inicio"].active {
+      min-height: auto !important;
+      padding-bottom: 0.5rem !important;
+    }
+    .cozy-bento-lobby {
+      margin-bottom: 0 !important;
+      padding-bottom: 0 !important;
+    }
     html,
     body {
       overscroll-behavior-y: none;
