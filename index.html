@@ -172,7 +172,6 @@
     }
 
     /* Desplazamiento fluido nativo en teléfonos con contención de overscroll */
-    .tienda-items-grid, .recetas-grid, .notas-grid, .chat-messages { contain: layout style; }
     html,
     body {
       overscroll-behavior-y: none;
@@ -194,15 +193,6 @@
     /* Optimización de decodificación y renderizado de imágenes */
     img {
       content-visibility: visible;
-    }
-
-    /* Saltar render de tarjetas fuera de pantalla */
-    .album-grid .polaroid,
-    .tienda-item,
-    .receta-card,
-    .nota-card {
-      content-visibility: auto;
-      contain-intrinsic-size: auto 320px;
     }
 
     /* Pausar todas las animaciones cuando la pestana no esta visible */
