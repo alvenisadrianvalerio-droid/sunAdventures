@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    MÓDULO: NAVEGACIÓN, RUTAS Y DRAG & DROP (album-router.js)
    ============================================================ */
 (function() {
@@ -34,6 +34,13 @@
       }
 
       const grupoActivo = window.AlbumApp.modules.grupo?.getGrupoActivo();
+      if (nombre === "album") {
+        window.AlbumApp.modules.fotos?.cargarFotos?.().then(() => {
+          window.AlbumApp.modules.fotos?.render?.();
+        }).catch(() => {
+          window.AlbumApp.modules.fotos?.render?.();
+        });
+      }
       if (nombre === "chat") {
         window.AlbumApp.modules.chat?.marcarChatComoLeido?.();
         if (!grupoActivo) {

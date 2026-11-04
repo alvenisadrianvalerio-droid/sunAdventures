@@ -48,8 +48,25 @@
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { fotos = []; return; }
-      const grupoActivo = window.AlbumApp.modules.grupo?.getGrupoActivo() || await window.AlbumApp.modules.grupo?.asegurarGrupoActivo();
       const uid = session.user.id;
+      const cacheKey = `sunad_fotos_cache_${uid}`;
+
+      // 1. Mostrar fotos desde cache local inmediatamente si aun no estan en memoria
+      if (!fotos.length) {
+        try {
+          const cached = localStorage.getItem(cacheKey);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length) {
+              fotos = parsed;
+              window._fotos = fotos;
+            }
+          }
+        } catch (_) {}
+      }
+
+      const grupoActivo = window.AlbumApp.modules.grupo?.getGrupoActivo() || await window.AlbumApp.modules.grupo?.asegurarGrupoActivo();
+      
       let query = supabase.from("fotos")
         .select("id,path,fecha,nota,lat,lng,lugar,grupo_id,user_id")
         .order("created_at", { ascending: false })
@@ -74,11 +91,53 @@
         query = query.eq("user_id", uid);
       }
       
-      const { data, error } = await query;
-      if (error) { console.warn("cargarFotos error:", error); fotos = []; return; }
-      fotos = (data || []).map(f => ({ id: f.id, path: f.path, fecha: f.fecha, nota: f.nota, lat: f.lat, lng: f.lng, lugar: f.lugar, grupo_id: f.grupo_id, user_id: f.user_id }));
-      window._fotos = fotos;
-    } catch (err) { console.warn("cargarFotos:", err); fotos = []; }
+      let { data, error } = await query;
+
+      // Fallback 1: Si la consulta con OR falla o devuelve vacio, consultar directamente por user_id
+      if (error || !data || !data.length) {
+        try {
+          const fbUser = await supabase.from("fotos")
+            .select("id,path,fecha,nota,lat,lng,lugar,grupo_id,user_id")
+            .eq("user_id", uid)
+            .order("created_at", { ascending: false })
+            .limit(5000);
+          if (fbUser.data && fbUser.data.length) {
+            data = fbUser.data;
+            error = null;
+          }
+        } catch (_) {}
+      }
+
+      // Fallback 2: Si aun no hay datos y hay grupo activo, consultar directamente por grupo_id
+      if ((!data || !data.length) && grupoActivo?.id) {
+        try {
+          const fbGrupo = await supabase.from("fotos")
+            .select("id,path,fecha,nota,lat,lng,lugar,grupo_id,user_id")
+            .eq("grupo_id", grupoActivo.id)
+            .order("created_at", { ascending: false })
+            .limit(5000);
+          if (fbGrupo.data && fbGrupo.data.length) {
+            data = fbGrupo.data;
+            error = null;
+          }
+        } catch (_) {}
+      }
+
+      if (error) {
+        console.warn("cargarFotos error final:", error);
+        if (!fotos.length) fotos = [];
+        return;
+      }
+
+      if (data && Array.isArray(data)) {
+        fotos = data.map(f => ({ id: f.id, path: f.path, fecha: f.fecha, nota: f.nota, lat: f.lat, lng: f.lng, lugar: f.lugar, grupo_id: f.grupo_id, user_id: f.user_id }));
+        window._fotos = fotos;
+        try { localStorage.setItem(cacheKey, JSON.stringify(fotos)); } catch (_) {}
+      }
+    } catch (err) {
+      console.warn("cargarFotos exception:", err);
+      if (!fotos.length) fotos = [];
+    }
   }
 
   const añadirFotoTabla = async (path, fecha, nota, lat, lng) => {
