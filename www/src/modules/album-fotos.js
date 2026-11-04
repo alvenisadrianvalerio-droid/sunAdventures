@@ -814,7 +814,7 @@
         await new Promise(r => setTimeout(r, 60));
       }
       fotoEditando = fotoParaEditar;
-      const modalEl = modal || $("photo-modal");
+      
       modalEl.classList.add('active'); modalEl.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden';
       form?.reset();
       if (inputPhoto) inputPhoto.required = !fotoParaEditar;
