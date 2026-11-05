@@ -544,31 +544,31 @@
     }
     const overlay = document.createElement("div");
     overlay.id = "album-slideshow-overlay";
-    overlay.style.cssText = "position:fixed;inset:0;z-index:99999;background:radial-gradient(circle at center,rgba(24,16,38,0.96),rgba(6,8,16,0.99));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.2rem;color:#fff;";
+    overlay.className = "album-slideshow-overlay";
     overlay.innerHTML = `
-      <div style="position:absolute;top:16px;left:20px;right:20px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <img src="img/dashboard/card-album.svg" alt="" width="28" height="28">
-          <strong style="font-size:1rem;color:#ffd93d;display:inline-flex;align-items:center;gap:6px;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#ffd93d;"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg> Nuestra Película de Recuerdos</strong>
-          <span id="slideshow-counter" style="font-size:0.8rem;opacity:0.75;margin-left:6px;">1 / ${disponibles.length}</span>
+      <div class="slideshow-header">
+        <div class="slideshow-header-title">
+          <img src="img/dashboard/card-album.svg" alt="" width="26" height="26">
+          <strong class="slideshow-title-text"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#ffd93d;"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg> Película de Recuerdos</strong>
+          <span id="slideshow-counter" class="slideshow-counter">1 / ${disponibles.length}</span>
         </div>
-        <div style="display:flex;gap:8px;">
-          <button type="button" id="slideshow-btn-pause" class="btn-secondary" style="padding:0.4rem 0.85rem;font-size:0.8rem;border-radius:999px;">⏸ Pausar</button>
-          <button type="button" id="slideshow-btn-close" class="btn-primary" style="padding:0.4rem 0.9rem;font-size:0.8rem;border-radius:999px;">✕ Salir</button>
-        </div>
-      </div>
-      <div id="slideshow-stage" style="max-width:520px;width:100%;background:#fffdf9;color:#1e293b;padding:14px 14px 22px;border-radius:18px;box-shadow:0 20px 50px rgba(0,0,0,0.65);text-align:center;transition:opacity 0.35s ease, transform 0.35s ease;">
-        <div style="width:100%;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#0f172a;display:flex;align-items:center;justify-content:center;">
-          <img id="slideshow-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;">
-        </div>
-        <div style="margin-top:12px;">
-          <span id="slideshow-date" style="font-size:0.78rem;font-weight:700;color:#e11d48;text-transform:uppercase;letter-spacing:0.04em;"></span>
-          <p id="slideshow-note" style="margin:6px 0 0;font-size:0.98rem;font-weight:600;color:#1e293b;"></p>
+        <div class="slideshow-header-btns">
+          <button type="button" id="slideshow-btn-pause" class="btn-secondary slideshow-btn">⏸ Pausar</button>
+          <button type="button" id="slideshow-btn-close" class="btn-primary slideshow-btn">✕ Salir</button>
         </div>
       </div>
-      <div style="margin-top:16px;display:flex;gap:12px;">
-        <button type="button" id="slideshow-prev" class="btn-secondary" style="padding:0.45rem 1.1rem;border-radius:999px;">← Anterior</button>
-        <button type="button" id="slideshow-next" class="btn-secondary" style="padding:0.45rem 1.1rem;border-radius:999px;">Siguiente →</button>
+      <div id="slideshow-stage" class="slideshow-stage">
+        <div class="slideshow-media-container">
+          <img id="slideshow-img" src="" alt="Recuerdo" class="slideshow-img">
+        </div>
+        <div class="slideshow-info">
+          <span id="slideshow-date" class="slideshow-date"></span>
+          <p id="slideshow-note" class="slideshow-note"></p>
+        </div>
+      </div>
+      <div class="slideshow-controls">
+        <button type="button" id="slideshow-prev" class="btn-secondary slideshow-ctrl-btn">← Anterior</button>
+        <button type="button" id="slideshow-next" class="btn-secondary slideshow-ctrl-btn">Siguiente →</button>
       </div>
     `;
     document.body.appendChild(overlay);
@@ -584,9 +584,12 @@
     const mostrarSlide = async (i) => {
       idx = (i + disponibles.length) % disponibles.length;
       const f = disponibles[idx];
-      if (stageEl) { stageEl.style.opacity = "0.3"; stageEl.style.transform = "scale(0.97)"; }
-      const u = await obtenerUrlFirmada(f.path);
-      if (imgEl && u) imgEl.src = u;
+      if (stageEl) { stageEl.style.opacity = "0.35"; stageEl.style.transform = "scale(0.97)"; }
+      
+      if (imgEl && f.path) {
+        // Asignar imagen con fallback automático resiliente
+        asignarUrlImagen(imgEl, f.path);
+      }
       if (dateEl) dateEl.textContent = f.fecha ? fmtFecha(f.fecha) : "Recuerdo inolvidable";
       if (noteEl) noteEl.textContent = f.nota || "Un momento especial juntos ✨";
       if (countEl) countEl.textContent = `${idx + 1} / ${disponibles.length}`;

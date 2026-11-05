@@ -5324,9 +5324,236 @@ body.light #cancion-form input::placeholder {
 }
 
 /* ============================================================
-/* ============================================================
-   BENTO GRID COZY ADVENTURE (DISEÑO ARMONIOSO Y CÁLIDO)
+   ESTILOS SLIDESHOW / PELÍCULA DE RECUERDOS (RESPONSIVE)
    ============================================================ */
+.album-slideshow-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 100005 !important;
+  background: radial-gradient(circle at center, rgba(24, 16, 38, 0.98), rgba(6, 8, 16, 0.99)) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: clamp(0.75rem, 3vw, 1.5rem) !important;
+  box-sizing: border-box !important;
+  color: #fff !important;
+}
+
+.slideshow-header {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top, 12px));
+  left: max(12px, env(safe-area-inset-left, 12px));
+  right: max(12px, env(safe-area-inset-right, 12px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  z-index: 10;
+}
+
+.slideshow-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.slideshow-title-text {
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  color: #ffd93d;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slideshow-counter {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+.slideshow-header-btns {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.slideshow-btn {
+  padding: 0.4rem 0.85rem !important;
+  font-size: 0.8rem !important;
+  border-radius: 999px !important;
+  white-space: nowrap !important;
+}
+
+.slideshow-stage {
+  max-width: 520px;
+  width: min(100%, 520px);
+  max-height: calc(100dvh - 140px);
+  background: #fffdf9;
+  color: #1e293b;
+  padding: clamp(10px, 2.5vw, 16px) clamp(10px, 2.5vw, 16px) clamp(14px, 3vw, 22px);
+  border-radius: 20px;
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.75), 0 0 35px rgba(255, 217, 61, 0.15);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  margin: auto 0;
+}
+
+.slideshow-media-container {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 52vh;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.slideshow-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+.slideshow-info {
+  margin-top: 10px;
+  overflow-y: auto;
+  max-height: 120px;
+}
+
+.slideshow-date {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #e11d48;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: block;
+}
+
+.slideshow-note {
+  margin: 5px 0 0;
+  font-size: clamp(0.85rem, 2.2vw, 0.98rem);
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.slideshow-controls {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  z-index: 10;
+}
+
+.slideshow-ctrl-btn {
+  padding: 0.45rem 1.1rem !important;
+  font-size: 0.85rem !important;
+  border-radius: 999px !important;
+}
+
+@media (max-width: 600px) {
+  .slideshow-stage {
+    padding: 10px 10px 14px;
+    border-radius: 16px;
+    max-height: calc(100dvh - 120px);
+  }
+  .slideshow-media-container {
+    max-height: 48vh;
+  }
+  .slideshow-title-text svg {
+    display: none;
+  }
+}
+
+/* ============================================================
+   REGLAS UNIVERSALES DE RESPONSIVIDAD PARA TODOS LOS MODALES
+   ============================================================ */
+.modal,
+.receta-modal,
+.rpg-loot-modal,
+.loot-cofre-modal,
+.rpg-rl-recompensa,
+.sun-modal-overlay {
+  box-sizing: border-box !important;
+  padding: max(0.5rem, env(safe-area-inset-top, 0.5rem)) max(0.5rem, env(safe-area-inset-right, 0.5rem)) max(0.5rem, env(safe-area-inset-bottom, 0.5rem)) max(0.5rem, env(safe-area-inset-left, 0.5rem)) !important;
+}
+
+.modal-content,
+.photo-modal-content,
+.nota-modal-content,
+.evento-modal-content,
+.friends-modal-content,
+.settings-modal-content,
+.modal-rangos-content,
+.modal-hub-content,
+.receta-modal-content,
+.rpg-loot-modal-panel,
+.loot-cofre-panel,
+.rpg-rl-recompensa-card,
+.sun-modal-card {
+  max-width: min(94vw, 760px) !important;
+  width: 95% !important;
+  max-height: calc(100dvh - 2rem - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+@media (max-width: 600px) {
+  .modal-content,
+  .photo-modal-content,
+  .nota-modal-content,
+  .evento-modal-content,
+  .friends-modal-content,
+  .settings-modal-content,
+  .modal-rangos-content,
+  .modal-hub-content,
+  .receta-modal-content,
+  .rpg-loot-modal-panel,
+  .loot-cofre-panel,
+  .rpg-rl-recompensa-card,
+  .sun-modal-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: clamp(0.9rem, 4vw, 1.25rem) !important;
+    border-radius: 18px !important;
+  }
+
+  /* Toolbar de filtros del álbum (Todas, Favoritas, Película de recuerdos) */
+  #album-extras-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 0.6rem !important;
+  }
+
+  #album-extras-toolbar > div {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  #album-extras-toolbar input[type="search"] {
+    width: 100% !important;
+  }
+}
 .cozy-bento-lobby {
   display: flex;
 /* ============================================================
