@@ -390,7 +390,33 @@
       color: #f1f5f9 !important;
     }
 
-    /* Regla crÃ­tica inline para Modal de Fotos (#photo-modal) */
+    /* Regla crítica para #user-dropdown y menú de perfil */
+    .user-info {
+      position: relative !important;
+      z-index: 10000 !important;
+    }
+    #user-dropdown {
+      display: none;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10001 !important;
+    }
+    #user-dropdown.open {
+      display: flex !important;
+      flex-direction: column !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      transform: translateY(0) scale(1) !important;
+    }
+    .user-info.open #user-dropdown {
+      display: flex !important;
+      flex-direction: column !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      transform: translateY(0) scale(1) !important;
+    }
     #photo-modal {
       position: fixed !important;
       inset: 0 !important;
@@ -3940,6 +3966,48 @@
   </script>
 
   <script>
+    /* Toggle universal autónomo para el menú de perfil de usuario */
+    window.sunToggleUserDropdown = function (ev) {
+      try {
+        if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+        var dd = document.getElementById("user-dropdown");
+        var toggle = document.getElementById("user-menu-toggle");
+        var info = document.getElementById("user-info");
+        if (!dd) return;
+        var estaAbierto = dd.classList.contains("open") || dd.style.display === "flex";
+        if (estaAbierto) {
+          dd.classList.remove("open");
+          dd.setAttribute("aria-hidden", "true");
+          dd.style.setProperty("display", "none", "important");
+          dd.style.setProperty("opacity", "0", "important");
+          dd.style.setProperty("pointer-events", "none", "important");
+          toggle?.setAttribute("aria-expanded", "false");
+          info?.classList.remove("open");
+        } else {
+          dd.classList.add("open");
+          dd.setAttribute("aria-hidden", "false");
+          dd.style.setProperty("display", "flex", "important");
+          dd.style.setProperty("flex-direction", "column", "important");
+          dd.style.setProperty("opacity", "1", "important");
+          dd.style.setProperty("visibility", "visible", "important");
+          dd.style.setProperty("pointer-events", "auto", "important");
+          dd.style.setProperty("z-index", "10001", "important");
+          toggle?.setAttribute("aria-expanded", "true");
+          info?.classList.add("open");
+        }
+      } catch (err) {
+        console.error("[sunToggleUserDropdown]", err);
+      }
+    };
+
+    document.addEventListener("click", function (e) {
+      var dd = document.getElementById("user-dropdown");
+      var toggle = document.getElementById("user-menu-toggle");
+      if (!dd || !dd.classList.contains("open")) return;
+      if (dd.contains(e.target) || (toggle && toggle.contains(e.target))) return;
+      window.sunToggleUserDropdown();
+    });
+
     /* Apertura autosuficiente del modal de foto (no depende de CSS/JS externos) */
     window.sunAbrirModalFoto = function (ev) {
       try {
