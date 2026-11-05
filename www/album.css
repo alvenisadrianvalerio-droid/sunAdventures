@@ -43,12 +43,177 @@ body.light .modal-content {
 .photo-modal-content,
 .nota-modal-content {
   max-width: 780px;
-  background: rgba(18, 20, 29, 0.96) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 217, 61, 0.1) !important;
+  background: #141724 !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 25px rgba(255, 217, 61, 0.12) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   border-radius: 24px !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+#photo-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 100000 !important;
+  display: none;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+}
+
+#photo-modal.active {
+  display: flex !important;
+}
+
+#photo-modal .modal-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(4, 6, 12, 0.82) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  z-index: 1 !important;
+}
+
+#photo-modal .photo-modal-content {
+  position: relative !important;
+  z-index: 10 !important;
+  background: #161928 !important;
+  background-image: radial-gradient(circle at top right, rgba(255, 217, 61, 0.12), transparent 45%),
+                    radial-gradient(circle at bottom left, rgba(244, 114, 182, 0.08), transparent 50%) !important;
+  border: 1.5px solid rgba(255, 217, 61, 0.35) !important;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 25px 65px -10px rgba(0, 0, 0, 0.95), 0 0 30px rgba(255, 217, 61, 0.18) !important;
+  border-radius: 24px !important;
+  max-width: 780px !important;
+  width: 95% !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  padding: 1.8rem !important;
+  color: #f8fafc !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+#photo-modal .modal-title {
+  color: #ffffff !important;
+  font-size: 1.4rem !important;
+  font-weight: 800 !important;
+  margin-top: 0 !important;
+  margin-bottom: 1.2rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+#photo-modal .form-label {
+  color: #fde68a !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+}
+
+#photo-modal .form-field input,
+#photo-modal .form-field textarea {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+  font-size: 0.92rem !important;
+  padding: 0.7rem 0.9rem !important;
+  transition: all 0.2s ease !important;
+}
+
+#photo-modal .form-field input:focus,
+#photo-modal .form-field textarea:focus {
+  border-color: #ffd93d !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(255, 217, 61, 0.25) !important;
+}
+
+#photo-modal .photo-preview {
+  background: rgba(0, 0, 0, 0.35) !important;
+  border: 1.5px dashed rgba(255, 217, 61, 0.45) !important;
+  border-radius: 16px !important;
+}
+
+#photo-modal .modal-actions {
+  margin-top: 1.2rem !important;
+  padding-top: 1rem !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.85rem !important;
+}
+
+#photo-modal .btn-secondary {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #e2e8f0 !important;
+  padding: 0.65rem 1.35rem !important;
+  border-radius: 999px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+#photo-modal .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+#photo-modal .btn-primary {
+  background: linear-gradient(135deg, #ffd93d 0%, #f59e0b 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: #1a1608 !important;
+  padding: 0.65rem 1.6rem !important;
+  border-radius: 999px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.38) !important;
+  transition: all 0.2s ease !important;
+}
+
+#photo-modal .btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 24px rgba(245, 158, 11, 0.5) !important;
+}
+
+body.light #photo-modal .photo-modal-content {
+  background: #fffdfa !important;
+  color: #1e293b !important;
+  border-color: rgba(217, 119, 6, 0.3) !important;
+  box-shadow: 0 25px 65px -10px rgba(139, 90, 20, 0.25) !important;
+}
+
+body.light #photo-modal .modal-title {
+  color: #0f172a !important;
+}
+
+body.light #photo-modal .form-label {
+  color: #b45309 !important;
+}
+
+body.light #photo-modal .form-field input,
+body.light #photo-modal .form-field textarea {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  color: #0f172a !important;
+}
+
+body.light #photo-modal .photo-preview {
+  background: rgba(254, 243, 199, 0.4) !important;
+  border-color: rgba(217, 119, 6, 0.35) !important;
+}
+
+body.light #photo-modal .btn-secondary {
+  background: rgba(0, 0, 0, 0.06) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #334155 !important;
 }
 
 body.light .photo-modal-content,
