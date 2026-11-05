@@ -1030,12 +1030,39 @@
       if (!aventurasMap || typeof window.L === "undefined") return;
       const ubicadas = fotos.filter(f => f.lat != null && f.lng != null && f.lat !== "" && f.lng !== "" && Number.isFinite(Number(f.lat)) && Number.isFinite(Number(f.lng)));
       mapaEmpty?.classList.toggle("hidden", ubicadas.length > 0);
-      if (!mapaLeaflet) { mapaLeaflet = L.map(aventurasMap).setView([20, 0], 2); L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© OpenStreetMap" }).addTo(mapaLeaflet); }
+      if (!mapaLeaflet) {
+        mapaLeaflet = L.map(aventurasMap, { zoomControl: true }).setView([20, 0], 2);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap contributors",
+          maxZoom: 19
+        }).addTo(mapaLeaflet);
+      }
       mapaLeaflet.eachLayer(l => { if (l instanceof L.Marker) mapaLeaflet.removeLayer(l); });
       const puntos = [];
-      ubicadas.forEach(f => { const lat = Number(f.lat), lng = Number(f.lng); L.marker([lat, lng]).addTo(mapaLeaflet).bindPopup(`<strong>${f.fecha ? fmtFecha(f.fecha) : "Recuerdo"}</strong><br>${escapeHtml(f.nota || "Sin nota")}`); puntos.push([lat, lng]); });
-      if (puntos.length) mapaLeaflet.fitBounds(L.latLngBounds(puntos), { padding: [30, 30], maxZoom: 12 });
-      setTimeout(() => mapaLeaflet?.invalidateSize(), 100);
+      
+      const pinIcon = L.divIcon({
+        className: "custom-sun-pin",
+        html: `<div style="background:linear-gradient(135deg,#ffd93d,#f59e0b);color:#1e1b18;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:2.5px solid #fff;box-shadow:0 4px 14px rgba(0,0,0,0.45);font-size:16px;">📍</div>`,
+        iconSize: [34, 34],
+        iconAnchor: [17, 34],
+        popupAnchor: [0, -32]
+      });
+
+      ubicadas.forEach(f => {
+        const lat = Number(f.lat), lng = Number(f.lng);
+        const marker = L.marker([lat, lng], { icon: pinIcon }).addTo(mapaLeaflet);
+        marker.bindPopup(`
+          <div style="font-family:system-ui,-apple-system,sans-serif;min-width:160px;padding:2px;">
+            <strong style="color:#d97706;font-size:0.85rem;display:block;margin-bottom:4px;">${f.fecha ? fmtFecha(f.fecha) : "Recuerdo"}</strong>
+            <p style="margin:0;font-size:0.9rem;color:#1e293b;line-height:1.35;">${escapeHtml(f.nota || "Sin nota")}</p>
+          </div>
+        `);
+        puntos.push([lat, lng]);
+      });
+      if (puntos.length) {
+        mapaLeaflet.fitBounds(L.latLngBounds(puntos), { padding: [35, 35], maxZoom: 13 });
+      }
+      setTimeout(() => mapaLeaflet?.invalidateSize(), 150);
     } catch (err) { console.warn("renderMapa:", err); }
   }
 

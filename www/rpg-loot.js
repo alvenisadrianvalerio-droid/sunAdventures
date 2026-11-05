@@ -1096,6 +1096,7 @@
       </div>`;
     m.classList.add("active");
     if (window.hidratarIconos) window.hidratarIconos(m);
+    try { window._snd?.("fanfare") || window._snd?.("pop"); } catch {}
     m.onclick = e => { if (e.target === m || e.target.classList.contains("rpg-loot-modal-close") || e.target.id === "btn-cerrar-cofre") m.classList.remove("active"); };
   }
 
