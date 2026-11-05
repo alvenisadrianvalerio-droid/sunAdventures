@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    MÓDULO: AUTENTICACIÓN Y SESIÓN (album-auth.js)
    ============================================================ */
 (function() {
@@ -276,21 +276,9 @@
     userDropdown.classList.remove("open"); userDropdown.setAttribute("aria-hidden", "true");
     userMenuToggle.setAttribute("aria-expanded", "false"); userInfo?.classList.remove("open");
   };
-  let ultimoToggleUserMenu = 0;
-  const toggleMenu = e => {
-    const ahora = Date.now();
-    if (ahora - ultimoToggleUserMenu < 350) {
-      if (e.cancelable) e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-    ultimoToggleUserMenu = ahora;
-    if (e.cancelable && e.type !== "click") e.preventDefault();
-    e.stopPropagation();
-    userDropdown?.classList.contains("open") ? cerrarMenuPerfil() : abrirMenuPerfil();
-  };
-  userMenuToggle?.addEventListener("click", toggleMenu);
-  userMenuToggle?.addEventListener("touchend", toggleMenu, { passive: false });
+  // Toggle único y robusto sin colisiones ni condiciones de carrera
+  userMenuToggle?.addEventListener("click", e => window.sunToggleUserDropdown(e));
+  userMenuToggle?.addEventListener("touchend", e => window.sunToggleUserDropdown(e), { passive: false });
 
   // Cerrar menú al tocar fuera
   const cerrarSiTocaFuera = e => {
@@ -361,10 +349,30 @@
     }
   });
 
+  window.sunToggleUserDropdown = function(ev) {
+    if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+    const dd = document.getElementById("user-dropdown");
+    const toggle = document.getElementById("user-menu-toggle");
+    const info = document.getElementById("user-info");
+    if (!dd) return;
+    const estaAbierto = dd.classList.contains("open");
+    if (estaAbierto) {
+      dd.classList.remove("open");
+      dd.setAttribute("aria-hidden", "true");
+      toggle?.setAttribute("aria-expanded", "false");
+      info?.classList.remove("open");
+    } else {
+      dd.classList.add("open");
+      dd.setAttribute("aria-hidden", "false");
+      toggle?.setAttribute("aria-expanded", "true");
+      info?.classList.add("open");
+    }
+  };
   window.AlbumApp.modules.auth = {
     updateAuthUI,
     abrirAuthModal,
     cerrarAuthModal,
-    cerrarMenuPerfil
+    cerrarMenuPerfil,
+    abrirMenuPerfil
   };
 })();

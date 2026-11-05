@@ -905,7 +905,7 @@
               src="img/items%20de%20aventura/corona.webp" alt="" width="18" height="18" decoding="async"></span><span
             class="btn-auth-text">Entrar</span></button>
         <div id="user-info" class="user-info" style="display:none">
-          <button id="user-menu-toggle" class="user-pill" aria-haspopup="true"><span class="user-avatar"
+          <button id="user-menu-toggle" class="user-pill" type="button" aria-haspopup="true" onclick="window.sunToggleUserDropdown && window.sunToggleUserDropdown(event)"><span class="user-avatar"
               data-icono="persona"></span><span id="user-email" class="user-email"></span><span
               class="user-chevron">▾</span></button>
           <div id="user-dropdown" class="user-dropdown" aria-hidden="true">
@@ -3271,7 +3271,7 @@
   <script src="src/modules/album-fotos.js?v=12"></script>
   <script src="src/modules/album-chat.js?v=15"></script>
   <script src="src/modules/album-notas.js?v=2"></script>
-  <script src="src/modules/album-auth.js"></script>
+  <script src="src/modules/album-auth.js?v=5"></script>
   <script src="src/modules/album-eventos.js?v=2"></script>
   <script src="diccionario.js?v=6"></script>
   <script src="recetas.js?v=11"></script>
@@ -3586,36 +3586,13 @@
           });
         }
 
-        // Toggle robusto para píldora de usuario (con soporte táctil directo y debounce)
+        // Toggle centralizado para píldora de usuario
         var pill = document.getElementById("user-menu-toggle");
         if (pill && !pill.dataset.boundPill) {
           pill.dataset.boundPill = "true";
-          var lastPillToggle = 0;
           var onPillToggle = function (e) {
-            var now = Date.now();
-            if (now - lastPillToggle < 350) {
-              if (e.cancelable) e.preventDefault();
-              e.stopPropagation();
-              return;
-            }
-            lastPillToggle = now;
-            if (e.cancelable && e.type !== "click") e.preventDefault();
-            e.stopPropagation();
-            ignorarClickHasta = now + 450;
-            var dd = document.getElementById("user-dropdown");
-            var info = document.getElementById("user-info");
-            if (!dd) return;
-            var open = dd.classList.contains("open");
-            if (open) {
-              dd.classList.remove("open");
-              dd.setAttribute("aria-hidden", "true");
-              pill.setAttribute("aria-expanded", "false");
-              if (info) info.classList.remove("open");
-            } else {
-              dd.classList.add("open");
-              dd.setAttribute("aria-hidden", "false");
-              pill.setAttribute("aria-expanded", "true");
-              if (info) info.classList.add("open");
+            if (typeof window.sunToggleUserDropdown === "function") {
+              window.sunToggleUserDropdown(e);
             }
           };
           pill.addEventListener("click", onPillToggle);
