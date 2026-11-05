@@ -391,15 +391,31 @@
     }
 
     /* Regla crítica para #user-dropdown y menú de perfil */
+    .nav-container,
+    .nav-actions {
+      overflow: visible !important;
+      contain: none !important;
+    }
     .user-info {
       position: relative !important;
+      overflow: visible !important;
+      contain: none !important;
       z-index: 10000 !important;
     }
     #user-dropdown {
+      position: absolute !important;
+      top: calc(100% + 8px) !important;
+      right: 0 !important;
       display: none;
       opacity: 0;
       pointer-events: none;
       z-index: 10001 !important;
+      background: #141724 !important;
+      border: 1px solid rgba(255, 217, 61, 0.35) !important;
+      border-radius: 16px !important;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 20px rgba(255, 217, 61, 0.1) !important;
+      min-width: 250px !important;
+      padding: 0.6rem !important;
     }
     #user-dropdown.open {
       display: flex !important;
@@ -416,6 +432,17 @@
       visibility: visible !important;
       pointer-events: auto !important;
       transform: translateY(0) scale(1) !important;
+    }
+    #user-dropdown .user-dropdown-item {
+      color: #f8fafc !important;
+      display: flex !important;
+      align-items: center !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    #user-dropdown .user-dropdown-name {
+      color: #f8fafc !important;
+      font-weight: 700 !important;
     }
     #photo-modal {
       position: fixed !important;
