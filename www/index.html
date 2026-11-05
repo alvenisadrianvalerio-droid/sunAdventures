@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="leaflet.css" media="print" onload="this.media='all'">
   <script src="https://js.puter.com/v2/" defer></script>
   <link rel="stylesheet" href="styles.css?v=128">
-  <link rel="stylesheet" href="album.css?v=129">
+  <link rel="stylesheet" href="album.css?v=130">
   <link rel="stylesheet" href="juegos.css?v=120" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="rpg.css?v=8">
   <link rel="stylesheet" href="rpg-loot.css?v=4" media="print" onload="this.media='all'">
@@ -388,6 +388,47 @@
       position: relative !important;
       box-sizing: border-box !important;
       color: #f1f5f9 !important;
+    }
+
+    /* Regla crÃ­tica inline para Modal de Fotos (#photo-modal) */
+    #photo-modal {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 100000 !important;
+      display: none;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 1rem !important;
+    }
+    #photo-modal.active {
+      display: flex !important;
+    }
+    #photo-modal .modal-backdrop {
+      position: fixed !important;
+      inset: 0 !important;
+      background: rgba(4, 6, 14, 0.82) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      z-index: 1 !important;
+    }
+    #photo-modal .photo-modal-content {
+      position: relative !important;
+      z-index: 10 !important;
+      background: #161928 !important;
+      background-image: radial-gradient(circle at top right, rgba(255, 217, 61, 0.12), transparent 45%),
+                        radial-gradient(circle at bottom left, rgba(244, 114, 182, 0.08), transparent 50%) !important;
+      border: 1.5px solid rgba(255, 217, 61, 0.4) !important;
+      border-radius: 24px !important;
+      max-width: 780px !important;
+      width: 95% !important;
+      max-height: 90vh !important;
+      overflow-y: auto !important;
+      padding: 1.8rem !important;
+      color: #f8fafc !important;
+      box-shadow: 0 25px 65px -10px rgba(0, 0, 0, 0.95), 0 0 30px rgba(255, 217, 61, 0.18) !important;
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
     .modal-rangos-header {
       display: flex !important;
@@ -1525,7 +1566,7 @@
       <p class="album-subtitle">Cada foto guarda un momento que no queremos olvidar.</p>
     </div>
     <div class="album-actions">
-      <button id="btn-add-photo" class="btn-primary"><span>+</span> Añadir un recuerdo</button>
+      <button id="btn-add-photo" class="btn-primary" type="button" onclick="if(typeof window.abrirModalRecuerdo === 'function') { window.abrirModalRecuerdo(); } else if(window.AlbumApp && window.AlbumApp.modules && window.AlbumApp.modules.fotos) { window.AlbumApp.modules.fotos.abrirModal(); }"><span>+</span> Añadir un recuerdo</button>
       <button id="btn-paste-photos" class="btn-secondary"
         title="Pega fotos del portapapeles o selecciona múltiples archivos para guardarlos como polaroids">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
@@ -3227,7 +3268,7 @@
   <script src="src/modules/album-core.js"></script>
   <script src="src/modules/album-grupo.js"></script>
   <script src="src/modules/album-logros.js?v=7"></script>
-  <script src="src/modules/album-fotos.js?v=11"></script>
+  <script src="src/modules/album-fotos.js?v=12"></script>
   <script src="src/modules/album-chat.js?v=15"></script>
   <script src="src/modules/album-notas.js?v=2"></script>
   <script src="src/modules/album-auth.js"></script>
