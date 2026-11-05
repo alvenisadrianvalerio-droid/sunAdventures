@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -328,22 +328,29 @@
       -webkit-backdrop-filter: none !important;
     }
 
-    /* Ocultar botones de descargar app cuando se ejecuta dentro de la APK */
-    html.en-apk [data-action="descargar"],
-    html.en-apk [data-action="descargar-directo"],
-    html.en-apk #descarga-app-modal,
-      html.en-apk button.lobby-btn[data-action="descargar"],
-      html.en-apk .user-dropdown-item[data-action="descargar"],
-      body.en-apk [data-action="descargar"],
-      body.en-apk #descarga-app-modal {
-        display: none !important;
-        visibility: hidden !important;
-        pointer-events: none !important;
-        height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        opacity: 0 !important;
-      }
+    /* Ocultar botones de descargar app cuando se ejecuta dentro de la APK con máxima especificidad */
+    html.en-apk [data-action=" descargar\],
+ html.en-apk [data-action=\descargar-directo\],
+ html.en-apk #descarga-app-modal,
+ html.en-apk #user-dropdown [data-action=\descargar\],
+ html.en-apk #user-dropdown .user-dropdown-item[data-action=\descargar\],
+ html.en-apk .user-info .user-dropdown .user-dropdown-item[data-action=\descargar\],
+ html.en-apk button.lobby-btn[data-action=\descargar\],
+ html.en-apk .user-dropdown-item[data-action=\descargar\],
+ body.en-apk [data-action=\descargar\],
+ body.en-apk [data-action=\descargar-directo\],
+ body.en-apk #descarga-app-modal,
+ body.en-apk #user-dropdown [data-action=\descargar\],
+ body.en-apk #user-dropdown .user-dropdown-item[data-action=\descargar\],
+ body.en-apk .user-info .user-dropdown .user-dropdown-item[data-action=\descargar\] {
+ display: none !important;
+ visibility: hidden !important;
+ pointer-events: none !important;
+ height: 0 !important;
+ margin: 0 !important;
+ padding: 0 !important;
+ opacity: 0 !important;
+ }
 
       /* Optimización de renderizado y aislamiento de vistas SPA */
       .view:not(.active) {
@@ -733,23 +740,36 @@
     }
     </style>
   <script>
-    /* Detección de APK nativa (Capacitor / WebView / Standalone / TWA / Custom Scheme) */
-    (function () {
+        /* Detección de APK nativa (Capacitor / WebView / Custom Scheme) */
+    function esEntornoApk() {
       try {
-        var ua = navigator.userAgent || "";
-        var esCapacitor = !!(window.Capacitor && (window.Capacitor.isNative || (typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform())));
-        var esAndroidAsset = window.location.protocol === 'capacitor:' || window.location.protocol === 'file:' || (window.location.hostname === 'localhost' && window.location.port === '' && /Android/i.test(ua));
-        var esStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-        var esApkUserAgent = /SunAdventures|SunAd|wv|WebView|Capacitor|Crosswalk|Android.*Version\/[0-9.]+/i.test(ua);
-        var esPackageParam = window.location.search.indexOf("app=1") !== -1 || window.location.search.indexOf("platform=apk") !== -1 || localStorage.getItem("sunad_es_apk") === "true";
-
-        if (esCapacitor || esAndroidAsset || esApkUserAgent || esStandalone || esPackageParam) {
-          document.documentElement.classList.add("en-apk");
-          if (document.body) document.body.classList.add("en-apk");
-          localStorage.setItem("sunad_es_apk", "true");
-        }
-      } catch (e) { }
-    })();
+        if (localStorage.getItem( sunad_es_apk) === true) return true;
+        var ua = navigator.userAgent || ;
+ var esCapacitor = !!(window.Capacitor && (window.Capacitor.isNative || (typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform())));
+ var esAndroidAsset = window.location.protocol === 'capacitor:' || window.location.protocol === 'file:' || (window.location.hostname === 'localhost' && (window.location.port === '' || window.location.port === '80' || window.location.port === '443') && /Android/i.test(ua));
+ var esApkUserAgent = /SunAdventures|SunAd|Capacitor|Crosswalk/i.test(ua) || (/Android/i.test(ua) && /wv|Version\/[0-9.]+/i.test(ua));
+ var esPackageParam = window.location.search.indexOf(app=1) !== -1 || window.location.search.indexOf(platform=apk) !== -1;
+ return !!(esCapacitor || esAndroidAsset || esApkUserAgent || esPackageParam);
+ } catch (e) { return false; }
+ }
+ window.esEntornoApk = esEntornoApk;
+ (function () {
+ try {
+ if (esEntornoApk()) {
+ document.documentElement.classList.add(en-apk);
+ if (document.body) document.body.classList.add(en-apk);
+ localStorage.setItem(sunad_es_apk, true);
+ }
+ } catch (e) { }
+ })();
+ document.addEventListener(DOMContentLoaded, function () {
+ if (document.documentElement.classList.contains(en-apk) || (typeof window.esEntornoApk === function && window.esEntornoApk())) {
+ document.body && document.body.classList.add(en-apk);
+ document.querySelectorAll('[data-action=\descargar\], [data-action=\descargar-directo\], #btn-descargar-apk, #btn-descarga-inmediata-apk').forEach(function (el) {
+ el.remove();
+ });
+ }
+ });
 
     /* Detección automática de hardware gama baja (<= 4 núcleos o <= 4GB RAM) y modo de ahorro */
     document.addEventListener("visibilitychange", function () { document.documentElement.classList.toggle("pagina-oculta", document.hidden); });
@@ -3403,6 +3423,7 @@
           toggleNavMenu(false);
           document.getElementById("user-dropdown")?.classList.remove("open");
           document.getElementById("user-info")?.classList.remove("open");
+          if (document.documentElement.classList.contains("en-apk") || document.body?.classList.contains("en-apk") || (typeof window.esEntornoApk === "function" && window.esEntornoApk())) { return; }
           if (typeof window.abrirDescarga === "function") window.abrirDescarga();
           else if (typeof window.descargarApkDirecta === "function") window.descargarApkDirecta();
         } else {

@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    MÓDULO: AUTENTICACIÓN Y SESIÓN (album-auth.js)
    ============================================================ */
 (function() {
@@ -323,6 +323,7 @@
         window.AlbumApp.modules.grupo?.abrirAmigosModal?.();
       }
       else if (a === "descargar") {
+        if (document.documentElement.classList.contains("en-apk") || document.body?.classList.contains("en-apk") || (typeof window.esEntornoApk === "function" && window.esEntornoApk())) { return; }
         if (typeof window.abrirDescarga === "function") window.abrirDescarga();
         else if (typeof window.descargarApkDirecta === "function") window.descargarApkDirecta();
         else {

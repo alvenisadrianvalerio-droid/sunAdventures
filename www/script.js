@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    SCRIPT.JS — SunAd · v5 compacto
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
@@ -1784,11 +1784,42 @@ sprite.style.opacity = "0.25";
   });
 
   /* ---------- Modal descarga app ---------- */
+  function esEntornoApk() {
+    try {
+      if (localStorage.getItem("sunad_es_apk") === "true") return true;
+      var ua = navigator.userAgent || "";
+      if (window.Capacitor && (window.Capacitor.isNative || (typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()))) return true;
+      if (window.Capacitor && typeof window.Capacitor.getPlatform === 'function' && window.Capacitor.getPlatform() === 'android') return true;
+      if (window.location.protocol === 'capacitor:' || window.location.protocol === 'file:') return true;
+      if (window.location.hostname === 'localhost' && (window.location.port === '' || window.location.port === '80' || window.location.port === '443') && /Android/i.test(ua)) return true;
+      if (/SunAdventures|SunAd|Capacitor|Crosswalk/i.test(ua) || (/Android/i.test(ua) && /wv|Version\/[0-9.]+/i.test(ua))) return true;
+      if (window.location.search.indexOf("app=1") !== -1 || window.location.search.indexOf("platform=apk") !== -1) return true;
+    } catch (_) {}
+    return false;
+  }
+  window.esEntornoApk = esEntornoApk;
+
+  // Bloqueo total si estamos dentro de la propia APK
+  if (esEntornoApk() || document.documentElement.classList.contains("en-apk") || document.body?.classList.contains("en-apk")) {
+    document.documentElement.classList.add("en-apk");
+    document.body && document.body.classList.add("en-apk");
+    document.querySelectorAll('[data-action="descargar"], [data-action="descargar-directo"], #btn-descargar-apk, #btn-descarga-inmediata-apk').forEach(el => el.remove());
+  }
+
+  function obtenerUrlDescargaApk() {
+    // Enlace directo del push en GitHub con cache-busting
+    return "https://raw.githubusercontent.com/alvenisadrianvalerio-droid/sunAdventures/dev_beta/app/sunad.apk?v=" + Date.now();
+  }
+  window.obtenerUrlDescargaApk = obtenerUrlDescargaApk;
+
   document.addEventListener("click", e => {
     const btn = e.target.closest('[data-action="descargar"], [data-action="descargar-directo"]');
     if (btn) {
       e.preventDefault();
-      if (document.documentElement.classList.contains("en-apk")) return;
+      if (esEntornoApk() || document.documentElement.classList.contains("en-apk") || document.body?.classList.contains("en-apk")) {
+        btn.remove();
+        return;
+      }
       if (typeof window.toggleNavMenu === "function") window.toggleNavMenu(false);
       document.getElementById("user-dropdown")?.classList.remove("open");
       document.getElementById("user-info")?.classList.remove("open");
@@ -1798,9 +1829,14 @@ sprite.style.opacity = "0.25";
 
   function descargarApkDirecta(e) {
     if (e) e.preventDefault();
+    if (esEntornoApk() || document.documentElement.classList.contains("en-apk") || document.body?.classList.contains("en-apk")) {
+      console.log("Descarga bloqueada dentro de la propia APK");
+      return;
+    }
+    const urlApk = obtenerUrlDescargaApk();
     try {
       const enlace = document.createElement("a");
-      enlace.href = "./app/sunad.apk";
+      enlace.href = urlApk;
       enlace.download = "SunAd-1.5.apk";
       enlace.target = "_blank";
       enlace.rel = "noopener noreferrer";
@@ -1808,16 +1844,21 @@ sprite.style.opacity = "0.25";
       enlace.click();
       setTimeout(() => enlace.remove(), 100);
     } catch {
-      window.open("./app/sunad.apk", "_blank");
+      window.open(urlApk, "_blank");
     }
   }
   window.descargarApkDirecta = descargarApkDirecta;
 
   function abrirDescarga() {
+    if (esEntornoApk() || document.documentElement.classList.contains("en-apk") || document.body?.classList.contains("en-apk")) {
+      console.log("Descarga bloqueada dentro de la propia APK");
+      return;
+    }
     try {
       const modalExistente = $("descarga-app-modal");
       if (modalExistente) modalExistente.remove();
 
+      const urlApk = obtenerUrlDescargaApk();
       const m = document.createElement("div");
       m.id = "descarga-app-modal";
       m.className = "modal active";
@@ -1825,22 +1866,22 @@ sprite.style.opacity = "0.25";
       m.innerHTML = `<div class="modal-backdrop" data-close></div>
         <div class="modal-content" style="max-width:440px">
           <h3 class="modal-title">Descargar SunAd</h3>
-          <p style="opacity:.8;margin-bottom:1rem;font-size:.9rem">Llévanos contigo a todas partes en tu dispositivo</p>
+          <p style="opacity:.8;margin-bottom:1rem;font-size:.9rem">LlÃ©vanos contigo a todas partes en tu dispositivo</p>
           <div class="download-grid">
-            <a class="download-option" id="btn-descargar-apk" href="./app/sunad.apk" download="SunAd-1.5.apk" target="_blank" rel="noopener">
-              <span class="download-option-icon">${SVG.android || "🤖"}</span>
+            <a class="download-option" id="btn-descargar-apk" href="${urlApk}" download="SunAd-1.5.apk" target="_blank" rel="noopener">
+              <span class="download-option-icon">${SVG.android || "ðŸ¤–"}</span>
               <span class="download-option-title">Android</span>
-              <span class="download-option-hint">Descargar APK directa</span>
+              <span class="download-option-hint">Descargar APK directa (del push)</span>
             </a>
             <button class="download-option" data-platform="windows" type="button">
-              <span class="download-option-icon">${SVG.windows || "💻"}</span>
+              <span class="download-option-icon">${SVG.windows || "ðŸ’»"}</span>
               <span class="download-option-title">Windows</span>
               <span class="download-option-hint">Instalar PWA</span>
             </button>
           </div>
           <div style="margin-top:1.2rem;text-align:center">
-            <a href="./app/sunad.apk" id="btn-descarga-inmediata-apk" download="SunAd-1.5.apk" style="display:inline-flex;align-items:center;justify-content:center;padding:.65rem 1.3rem;background:rgba(255,217,61,.2);color:#ffd93d;border:1px solid rgba(255,217,61,.45);border-radius:12px;font-size:.85rem;font-weight:bold;text-decoration:none;transition:all .2s ease;">
-              ${SVG.download} Descarga directa inmediata (APK)
+            <a href="${urlApk}" id="btn-descarga-inmediata-apk" download="SunAd-1.5.apk" style="display:inline-flex;align-items:center;justify-content:center;padding:.65rem 1.3rem;background:rgba(255,217,61,.2);color:#ffd93d;border:1px solid rgba(255,217,61,.45);border-radius:12px;font-size:.85rem;font-weight:bold;text-decoration:none;transition:all .2s ease;">
+              ${SVG.download} Descarga directa inmediata (APK del push)
             </a>
           </div>
           <div class="modal-actions" style="margin-top:1.2rem">
@@ -1867,13 +1908,13 @@ sprite.style.opacity = "0.25";
       });
 
       const a = {
-        windows: "En Windows: Abre Chrome o Edge → clic en el icono de instalar en la barra de direcciones o menú → 'Instalar SunAd'.",
-        linux: "Próximamente"
+        windows: "En Windows: Abre Chrome o Edge â†’ clic en el icono de instalar en la barra de direcciones o menÃº â†’ 'Instalar SunAd'.",
+        linux: "PrÃ³ximamente"
       };
       qsa("[data-platform]", m).forEach(b => b.addEventListener("click", () => {
-        const msg = a[b.dataset.platform] || "Próximamente";
+        const msg = a[b.dataset.platform] || "PrÃ³ximamente";
         if (window.SunModal) {
-          window.SunModal.alert({ title: "Instalación", message: msg, icon: "📲", confirmText: "Entendido" });
+          window.SunModal.alert({ title: "InstalaciÃ³n", message: msg, icon: "ðŸ“²", confirmText: "Entendido" });
         } else {
           alert(msg);
         }
