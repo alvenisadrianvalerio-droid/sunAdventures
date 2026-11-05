@@ -42,7 +42,20 @@ body.light .modal-content {
 
 .photo-modal-content,
 .nota-modal-content {
-  max-width: 780px
+  max-width: 780px;
+  background: rgba(18, 20, 29, 0.96) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 217, 61, 0.1) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-radius: 24px !important;
+}
+
+body.light .photo-modal-content,
+body.light .nota-modal-content {
+  background: rgba(255, 253, 248, 0.98) !important;
+  border-color: rgba(212, 148, 30, 0.25) !important;
+  box-shadow: 0 20px 50px rgba(139, 90, 20, 0.2) !important;
 }
 
 .friends-modal-content {

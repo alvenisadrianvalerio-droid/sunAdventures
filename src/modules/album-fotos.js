@@ -917,37 +917,90 @@
 
   async function abrirModal(fotoParaEditar = null) {
     try {
-      const modalEl = modal || $("photo-modal");
-      if (!modalEl) { console.warn('abrirModal: no modal'); return; }
+      const modalEl = document.getElementById("photo-modal") || modal;
+      if (!modalEl) {
+        console.warn('abrirModal: no modal');
+        return;
+      }
       if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
-        await cerrarFullscreen();
+        try { await cerrarFullscreen(); } catch (_) {}
         // Breve pausa para permitir que el navegador restaure el viewport
         await new Promise(r => setTimeout(r, 60));
       }
       fotoEditando = fotoParaEditar;
       
-      modalEl.classList.add('active'); modalEl.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden';
-      form?.reset();
-      if (inputPhoto) inputPhoto.required = !fotoParaEditar;
-      if (inputPhotoCampo) inputPhotoCampo.hidden = Boolean(fotoParaEditar);
-      if (fotoParaEditar) { if (inputDate) inputDate.value = fotoParaEditar.fecha || ""; if (inputNote) inputNote.value = fotoParaEditar.nota || ""; if (inputLat) inputLat.value = fotoParaEditar.lat || ""; if (inputLng) inputLng.value = fotoParaEditar.lng || ""; }
-      else if (inputDate) inputDate.value = new Date().toISOString().split("T")[0];
+      modalEl.classList.add('active');
+      modalEl.setAttribute('aria-hidden', 'false');
+      modalEl.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+
+      const fForm = document.getElementById("photo-form") || form;
+      fForm?.reset();
+
+      const fInputPhoto = document.getElementById("input-photo") || inputPhoto;
+      const fInputCampo = fInputPhoto?.closest(".form-field") || inputPhotoCampo;
+      if (fInputPhoto) fInputPhoto.required = !fotoParaEditar;
+      if (fInputCampo) fInputCampo.hidden = Boolean(fotoParaEditar);
+
+      const fInputDate = document.getElementById("input-date") || inputDate;
+      const fInputNote = document.getElementById("input-note") || inputNote;
+      const fInputLat = document.getElementById("input-lat") || inputLat;
+      const fInputLng = document.getElementById("input-lng") || inputLng;
+
+      if (fotoParaEditar) {
+        if (fInputDate) fInputDate.value = fotoParaEditar.fecha || "";
+        if (fInputNote) fInputNote.value = fotoParaEditar.nota || "";
+        if (fInputLat) fInputLat.value = fotoParaEditar.lat || "";
+        if (fInputLng) fInputLng.value = fotoParaEditar.lng || "";
+      } else if (fInputDate) {
+        fInputDate.value = new Date().toISOString().split("T")[0];
+      }
+
       actualizarEstadoUbicacion();
-      if (preview) mostrarContenidoVistaPrevia(fotoParaEditar ? await obtenerUrlFirmada(fotoParaEditar.path) : null);
-      if (modalTitle) modalTitle.textContent = fotoParaEditar ? "Editar recuerdo" : "Nuevo recuerdo";
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = fotoParaEditar ? "Actualizar recuerdo" : "Guardar recuerdo"; }
-    } catch (err) { console.warn("abrirModal:", err); }
+
+      const fPreview = document.getElementById("photo-preview") || preview;
+      if (fPreview) {
+        let prevUrl = null;
+        if (fotoParaEditar && fotoParaEditar.path) {
+          try { prevUrl = await obtenerUrlFirmada(fotoParaEditar.path); } catch (_) {}
+        }
+        mostrarContenidoVistaPrevia(prevUrl);
+      }
+
+      const fTitle = document.getElementById("modal-title") || modalTitle;
+      if (fTitle) fTitle.textContent = fotoParaEditar ? "Editar recuerdo" : "Nuevo recuerdo";
+
+      const fSubmit = fForm?.querySelector('button[type="submit"]') || submitBtn;
+      if (fSubmit) {
+        fSubmit.disabled = false;
+        fSubmit.textContent = fotoParaEditar ? "Actualizar recuerdo" : "Guardar recuerdo";
+      }
+    } catch (err) {
+      console.warn("abrirModal:", err);
+    }
   }
 
   function cerrarModal() {
     try {
-      const modalEl = modal || $("photo-modal");
-      modalEl.classList.remove("active"); modalEl.setAttribute("aria-hidden", "true"); document.body.style.overflow = "";
+      const modalEl = document.getElementById("photo-modal") || modal;
+      if (modalEl) {
+        modalEl.classList.remove("active");
+        modalEl.setAttribute("aria-hidden", "true");
+        modalEl.style.display = "";
+      }
+      document.body.style.overflow = "";
       fotoEditando = null;
-      if (inputPhoto) inputPhoto.required = true;
-      if (inputPhotoCampo) inputPhotoCampo.hidden = false;
-      if (modalTitle) modalTitle.textContent = "Nuevo recuerdo";
-    } catch (err) { console.warn("cerrarModal:", err); }
+
+      const fInputPhoto = document.getElementById("input-photo") || inputPhoto;
+      const fInputCampo = fInputPhoto?.closest(".form-field") || inputPhotoCampo;
+      if (fInputPhoto) fInputPhoto.required = true;
+      if (fInputCampo) fInputCampo.hidden = false;
+
+      const fTitle = document.getElementById("modal-title") || modalTitle;
+      if (fTitle) fTitle.textContent = "Nuevo recuerdo";
+    } catch (err) {
+      console.warn("cerrarModal:", err);
+    }
   }
 
   function actualizarEstadoUbicacion() {
@@ -993,6 +1046,13 @@
     }
   });
   window.abrirModalRecuerdo = function() { abrirModal(); };
+  document.addEventListener("click", function(e) {
+    const closeBtn = e.target && e.target.closest && e.target.closest("#photo-modal [data-close-modal]");
+    if (closeBtn) {
+      e.preventDefault();
+      cerrarModal();
+    }
+  });
   modal?.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", cerrarModal));
 
   inputPhoto?.addEventListener("change", () => { mostrarVistaPreviaFoto(inputPhoto.files?.[0] || null); actualizarVistaPreviaFotoInfo(); });
