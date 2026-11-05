@@ -268,32 +268,147 @@
     {
       key: "heart",
       label: "Me encanta",
-      svg: `<svg class="polaroid-reac-svg" viewBox="0 0 24 24" width="24" height="24" style="width:24px;height:24px;min-width:24px;min-height:24px;max-width:24px;max-height:24px;display:block;flex-shrink:0;"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#f43f5e" stroke="none"/></svg>`
+      svg: `<svg class="polaroid-reac-svg" viewBox="0 0 32 32" width="26" height="26">
+        <defs>
+          <linearGradient id="reacGradHeart" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff4b72"/>
+            <stop offset="60%" stop-color="#e11d48"/>
+            <stop offset="100%" stop-color="#be123c"/>
+          </linearGradient>
+          <radialGradient id="reacShineHeart" cx="35%" cy="30%" r="45%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <path d="M16 28.5C15.3 28.5 4 20.8 4 11.5 4 7 7.5 3.5 12 3.5c2.4 0 4.6 1.1 6 3 1.4-1.9 3.6-3 6-3 4.5 0 8 3.5 8 8 0 9.3-11.3 17-12 17z" fill="url(#reacGradHeart)" stroke="none"/>
+        <path d="M11 6.5C8 6.5 6 8.5 6 11.5c0 2 .8 4 2 5.5 1.5-3 3.5-5.5 6-7-1-2.2-2.5-3.5-3-3.5z" fill="url(#reacShineHeart)" stroke="none"/>
+      </svg>`
     },
     {
       key: "love",
       label: "Enamorado/a",
-      svg: `<svg class="polaroid-reac-svg" viewBox="0 0 24 24" width="24" height="24" style="width:24px;height:24px;min-width:24px;min-height:24px;max-width:24px;max-height:24px;display:block;flex-shrink:0;"><circle cx="12" cy="12" r="10" fill="#fbbf24" stroke="none"/><path d="M7 9.5c-.83 0-1.5-.67-1.5-1.5 0-1.1 1.5-2 1.5-2s1.5.9 1.5 2c0 .83-.67 1.5-1.5 1.5zm10 0c-.83 0-1.5-.67-1.5-1.5 0-1.1 1.5-2 1.5-2s1.5.9 1.5 2c0 .83-.67 1.5-1.5 1.5z" fill="#e11d48" stroke="none"/><path d="M8 14.5c1 2 2.5 3 4 3s3-1 4-3" stroke="#78350f" stroke-width="2" stroke-linecap="round" fill="none"/></svg>`
+      svg: `<svg class="polaroid-reac-svg" viewBox="0 0 32 32" width="26" height="26">
+        <defs>
+          <linearGradient id="reacGradLoveFace" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffe066"/>
+            <stop offset="100%" stop-color="#f59f00"/>
+          </linearGradient>
+          <linearGradient id="reacGradHeartEyes" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff4b72"/>
+            <stop offset="100%" stop-color="#d61f43"/>
+          </linearGradient>
+        </defs>
+        <circle cx="16" cy="16" r="14" fill="url(#reacGradLoveFace)" stroke="none"/>
+        <!-- Ojo izquierdo de corazón -->
+        <path d="M10.8 9.5c-1.6 0-2.8 1.2-2.8 2.8 0 3 4.3 5.4 4.8 5.7.5-.3 4.8-2.7 4.8-5.7 0-1.6-1.2-2.8-2.8-2.8-1 0-1.7.5-2 1.1-.3-.6-1-1.1-2-1.1z" fill="url(#reacGradHeartEyes)" stroke="none" transform="translate(-1.5, 0) scale(0.9)"/>
+        <!-- Ojo derecho de corazón -->
+        <path d="M21.2 9.5c-1.6 0-2.8 1.2-2.8 2.8 0 3 4.3 5.4 4.8 5.7.5-.3 4.8-2.7 4.8-5.7 0-1.6-1.2-2.8-2.8-2.8-1 0-1.7.5-2 1.1-.3-.6-1-1.1-2-1.1z" fill="url(#reacGradHeartEyes)" stroke="none" transform="translate(1.5, 0) scale(0.9)"/>
+        <!-- Sonrisa cálida -->
+        <path d="M10.5 20.5c1.3 2.8 3.3 4 5.5 4s4.2-1.2 5.5-4c-1.8.8-3.6 1.2-5.5 1.2s-3.7-.4-5.5-1.2z" fill="#78350f" stroke="none"/>
+        <!-- Mejillas sonrosadas -->
+        <circle cx="7.5" cy="18.5" r="2.2" fill="#ff6b81" opacity="0.55"/>
+        <circle cx="24.5" cy="18.5" r="2.2" fill="#ff6b81" opacity="0.55"/>
+      </svg>`
     },
     {
       key: "fire",
-      label: "IncreÃ­ble",
-      svg: `<svg class="polaroid-reac-svg" viewBox="0 0 24 24" width="24" height="24" style="width:24px;height:24px;min-width:24px;min-height:24px;max-width:24px;max-height:24px;display:block;flex-shrink:0;"><path d="M12 2c-.5 2.5-3 5-3 8 0 3.3 2.7 6 6 6s6-2.7 6-6c0-2-.5-3.5-1.5-5-.5 2-2 3-3.5 3-2.5 0-4-3-4-6z" fill="#f97316" stroke="none"/><path d="M12 9c-1 1-1.5 2.2-1.5 3.5 0 1.9 1.6 3.5 3.5 3.5s3.5-1.6 3.5-3.5c0-.8-.3-1.6-.8-2.2-.4 1.2-1.5 2.2-2.7 2.2s-2-1.5-2-3.5z" fill="#fde047" stroke="none"/></svg>`
+      label: "Increíble",
+      svg: `<svg class="polaroid-reac-svg" viewBox="0 0 32 32" width="26" height="26">
+        <defs>
+          <linearGradient id="reacGradFireOut" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ff3b30"/>
+            <stop offset="45%" stop-color="#ff9500"/>
+            <stop offset="100%" stop-color="#ff2d55"/>
+          </linearGradient>
+          <linearGradient id="reacGradFireIn" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fff566"/>
+            <stop offset="100%" stop-color="#ff9500"/>
+          </linearGradient>
+        </defs>
+        <!-- Fuego exterior -->
+        <path d="M16 2.5c-.8 3.5-4.2 7-4.2 12 0 4.8 3.8 8.8 8.4 8.8 3.6 0 6.6-2.4 7.6-5.8.5 6.5-4.7 11.5-11.2 11.5C9.8 29 4.5 23.8 4.5 17c0-6.8 5.2-12.8 11.5-14.5z" fill="url(#reacGradFireOut)" stroke="none"/>
+        <!-- Fuego núcleo cálido -->
+        <path d="M16.5 13.5c-.4 2.2-2.5 4.2-2.5 6.5 0 2.8 2.2 5 5 5 2.2 0 3.8-1.4 4.5-3.3.3 3.5-2.6 6.3-6.2 6.3-3.6 0-6.5-2.9-6.5-6.5 0-3.8 2.8-6.2 5.7-8z" fill="url(#reacGradFireIn)" stroke="none"/>
+      </svg>`
     },
     {
       key: "sunflower",
       label: "Nuestro sol",
-      svg: `<svg class="polaroid-reac-svg" viewBox="0 0 24 24" width="24" height="24" style="width:24px;height:24px;min-width:24px;min-height:24px;max-width:24px;max-height:24px;display:block;flex-shrink:0;"><g fill="#f59e0b" stroke="none"><circle cx="12" cy="3.5" r="2.5"/><circle cx="12" cy="20.5" r="2.5"/><circle cx="3.5" cy="12" r="2.5"/><circle cx="20.5" cy="12" r="2.5"/><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/></g><circle cx="12" cy="12" r="5" fill="#78350f" stroke="#fde047" stroke-width="1.5"/></svg>`
+      svg: `<svg class="polaroid-reac-svg" viewBox="0 0 32 32" width="26" height="26">
+        <defs>
+          <linearGradient id="reacGradPetal" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fde047"/>
+            <stop offset="100%" stop-color="#f59e0b"/>
+          </linearGradient>
+          <radialGradient id="reacGradCenter" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#92400e"/>
+            <stop offset="70%" stop-color="#5a2305"/>
+            <stop offset="100%" stop-color="#3d1400"/>
+          </radialGradient>
+        </defs>
+        <!-- Pétalos en corona -->
+        <g fill="url(#reacGradPetal)" stroke="#d97706" stroke-width="0.5">
+          <circle cx="16" cy="4.5" r="3.2"/>
+          <circle cx="16" cy="27.5" r="3.2"/>
+          <circle cx="4.5" cy="16" r="3.2"/>
+          <circle cx="27.5" cy="16" r="3.2"/>
+          <circle cx="7.8" cy="7.8" r="3.2"/>
+          <circle cx="24.2" cy="7.8" r="3.2"/>
+          <circle cx="7.8" cy="24.2" r="3.2"/>
+          <circle cx="24.2" cy="24.2" r="3.2"/>
+          <circle cx="11.2" cy="5.2" r="2.8"/>
+          <circle cx="20.8" cy="5.2" r="2.8"/>
+          <circle cx="11.2" cy="26.8" r="2.8"/>
+          <circle cx="20.8" cy="26.8" r="2.8"/>
+          <circle cx="5.2" cy="11.2" r="2.8"/>
+          <circle cx="5.2" cy="20.8" r="2.8"/>
+          <circle cx="26.8" cy="11.2" r="2.8"/>
+          <circle cx="26.8" cy="20.8" r="2.8"/>
+        </g>
+        <!-- Centro cálido con relieve y brillo -->
+        <circle cx="16" cy="16" r="6.8" fill="url(#reacGradCenter)" stroke="#f59e0b" stroke-width="1"/>
+        <circle cx="14.5" cy="14.5" r="1.8" fill="#fde047" opacity="0.35"/>
+      </svg>`
     },
     {
       key: "star",
-      label: "MÃ¡gico",
-      svg: `<svg class="polaroid-reac-svg" viewBox="0 0 24 24" width="24" height="24" style="width:24px;height:24px;min-width:24px;min-height:24px;max-width:24px;max-height:24px;display:block;flex-shrink:0;"><path d="M12 2l2.9 6.6L22 9.5l-5.3 4.8 1.6 7.2L12 17.8 5.7 21.5l1.6-7.2L2 9.5l7.1-.9L12 2z" fill="#fbbf24" stroke="#fef08a" stroke-width="1"/></svg>`
+      label: "Mágico",
+      svg: `<svg class="polaroid-reac-svg" viewBox="0 0 32 32" width="26" height="26">
+        <defs>
+          <linearGradient id="reacGradStar" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fff566"/>
+            <stop offset="40%" stop-color="#ffcc00"/>
+            <stop offset="100%" stop-color="#ff9500"/>
+          </linearGradient>
+        </defs>
+        <!-- Sombra sutil -->
+        <path d="M16 2.5l4.2 8.5 9.4 1.4-6.8 6.6 1.6 9.4L16 23.9 7.6 28.4l1.6-9.4-6.8-6.6 9.4-1.4L16 2.5z" fill="url(#reacGradStar)" stroke="#eab308" stroke-width="0.75" stroke-linejoin="round"/>
+        <!-- Reflejo interior brillante -->
+        <polygon points="16,4.5 19.5,11.5 27,12.6 21.5,18 22.8,25.5 16,21.8" fill="#ffffff" opacity="0.38"/>
+      </svg>`
     },
     {
       key: "sparkles",
       label: "Brillante",
-      svg: `<svg class="polaroid-reac-svg" viewBox="0 0 24 24" width="24" height="24" style="width:24px;height:24px;min-width:24px;min-height:24px;max-width:24px;max-height:24px;display:block;flex-shrink:0;"><path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z" fill="#ec4899" stroke="none"/><path d="M19 16l1 3 3 1-3 1-1 3-1-3-3-1 3-1z" fill="#fde047" stroke="none"/></svg>`
+      svg: `<svg class="polaroid-reac-svg" viewBox="0 0 32 32" width="26" height="26">
+        <defs>
+          <linearGradient id="reacGradSparkle1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff6b9d"/>
+            <stop offset="50%" stop-color="#c084fc"/>
+            <stop offset="100%" stop-color="#60a5fa"/>
+          </linearGradient>
+          <linearGradient id="reacGradSparkle2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fde047"/>
+            <stop offset="100%" stop-color="#f59e0b"/>
+          </linearGradient>
+        </defs>
+        <!-- Gran destello multicolor central -->
+        <path d="M14 2c.5 6 4.5 10 10.5 10.5-6 .5-10 4.5-10.5 10.5-.5-6-4.5-10-10.5-10.5 6-.5 10-4.5 10.5-10.5z" fill="url(#reacGradSparkle1)" stroke="none"/>
+        <!-- Destello dorado pequeño superior derecho -->
+        <path d="M25 15c.3 3.5 2.5 5.7 6 6-3.5.3-5.7 2.5-6 6-.3-3.5-2.5-5.7-6-6 3.5-.3 5.7-2.5 6-6z" fill="url(#reacGradSparkle2)" stroke="none" transform="translate(1, -2) scale(0.7)"/>
+        <!-- Mini chispita inferior izquierda -->
+        <circle cx="5" cy="24" r="1.5" fill="#fde047"/>
+      </svg>`
     }
   ];
 
@@ -321,7 +436,7 @@
         todas[id][reacKey] = actual + 1;
         todas[id][miKey] = true;
         const info = REACCIONES_ALBUM.find(r => r.key === reacKey);
-        window._sumarAmorPareja?.(4, `Reaccionaste (${info?.label || "ReacciÃ³n"}) a un recuerdo`);
+        window._sumarAmorPareja?.(4, `Reaccionaste (${info?.label || "Reacción"}) a un recuerdo`);
         try { window._snd?.("pop"); } catch {}
       }
       localStorage.setItem(STORAGE_FOTOS_REAC(), JSON.stringify(todas));
@@ -343,7 +458,7 @@
       chip.className = "polaroid-reac-chip";
       chip.title = `${r.label} (${count})`;
       chip.style.cssText = `padding:4px 9px;border-radius:999px;border:1px solid ${esMia ? "rgba(244,63,94,0.7)" : "rgba(255,255,255,0.2)"};background:${esMia ? "rgba(244,63,94,0.3)" : "rgba(15,23,42,0.75)"};color:#fff;display:inline-flex;align-items:center;gap:6px;cursor:pointer;backdrop-filter:blur(6px);transition:transform 0.15s ease;flex-shrink:0;`;
-      chip.innerHTML = `<span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;min-width:20px;min-height:20px;flex-shrink:0;">${r.svg}</span><span style="font-size:0.75rem;font-weight:800;line-height:1;">${count}</span>`;
+      chip.innerHTML = `<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;min-width:22px;min-height:22px;flex-shrink:0;">${r.svg}</span><span style="font-size:0.75rem;font-weight:800;line-height:1;">${count}</span>`;
       chip.addEventListener("click", e => {
         e.preventDefault();
         e.stopPropagation();
@@ -355,9 +470,9 @@
     const btnAddReac = document.createElement("button");
     btnAddReac.type = "button";
     btnAddReac.className = "polaroid-reac-add";
-    btnAddReac.title = "AÃ±adir reacciÃ³n";
-    btnAddReac.style.cssText = "padding:4px 9px;border-radius:999px;border:1px solid rgba(255,255,255,0.25);background:rgba(15,23,42,0.7);color:#fde68a;cursor:pointer;display:inline-flex;align-items:center;gap:5px;backdrop-filter:blur(6px);flex-shrink:0;";
-    btnAddReac.innerHTML = `<svg class="polaroid-reac-add-svg" viewBox="0 0 24 24" width="16" height="16" style="width:16px;height:16px;min-width:16px;min-height:16px;display:block;flex-shrink:0;fill:#fbbf24;" fill="#fbbf24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg><span style="font-size:0.85rem;font-weight:800;line-height:1;">+</span>`;
+    btnAddReac.title = "Añadir reacción";
+    btnAddReac.style.cssText = "padding:5px 10px;border-radius:999px;border:1px solid rgba(251,191,36,0.35);background:rgba(15,23,42,0.8);color:#fde68a;cursor:pointer;display:inline-flex;align-items:center;gap:6px;backdrop-filter:blur(8px);flex-shrink:0;";
+    btnAddReac.innerHTML = `<svg class="polaroid-reac-add-svg" viewBox="0 0 24 24" width="17" height="17" style="width:17px;height:17px;min-width:17px;min-height:17px;display:block;flex-shrink:0;" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg><span style="font-size:0.85rem;font-weight:800;line-height:1;color:#fbbf24;">+</span>`;
 
     btnAddReac.addEventListener("click", e => {
       e.preventDefault();
@@ -367,15 +482,11 @@
 
       const picker = document.createElement("div");
       picker.className = "polaroid-reac-picker";
-      picker.style.cssText = "position:absolute;bottom:calc(100% + 8px);left:0;z-index:40;display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(15,23,42,0.96);border:1px solid rgba(251,191,36,0.45);box-shadow:0 12px 32px rgba(0,0,0,0.75);backdrop-filter:blur(12px);width:max-content;max-width:none;white-space:nowrap;";
       REACCIONES_ALBUM.forEach(r => {
         const b = document.createElement("button");
         b.type = "button";
         b.title = r.label;
         b.innerHTML = r.svg;
-        b.style.cssText = "border:none;background:transparent;cursor:pointer;padding:4px;border-radius:50%;width:34px;height:34px;min-width:34px;min-height:34px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);";
-        b.addEventListener("mouseenter", () => { b.style.transform = "scale(1.35)"; });
-        b.addEventListener("mouseleave", () => { b.style.transform = "scale(1)"; });
         b.addEventListener("click", ev => {
           ev.preventDefault();
           ev.stopPropagation();
