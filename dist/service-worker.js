@@ -1,4 +1,4 @@
-const CACHE_NAME = "sunad-v289-pwa";
+const CACHE_NAME = "sunad-v290-pwa";
 const ASSETS_ESTATICOS = [
   "./", "./index.html", "./styles.css", "./album.css", "./juegos.css",
   "./rpg.css", "./rpg-loot.css", "./temas.css", "./finanzas.css", "./capsula-tiempo.css", "./pareja-chat.css", "./diccionario.css", "./recetas.css",
@@ -124,7 +124,7 @@ self.addEventListener("fetch", (event) => {
     const cached = await caches.match(req, { ignoreSearch: true });
 
     // Documentos y Scripts JS de la app: network-first (para tener código fresco en vivo)
-    if (req.destination === "document" || req.destination === "script" || url.pathname.endsWith(".js")) {
+    if (req.destination === "document" || req.destination === "script" || req.destination === "style" || url.pathname.endsWith(".js") || url.pathname.endsWith(".css")) {
       try {
         const red = await fetch(req);
         if (red && red.status === 200) {
