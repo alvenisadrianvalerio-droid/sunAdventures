@@ -475,6 +475,27 @@
     languageSelect?.addEventListener("change", () => setLanguage(languageSelect.value));
     animationToggle?.addEventListener("change", () => setAnimationsDisabled(animationToggle.checked));
     volumeSlider?.addEventListener("input", () => setVolume(volumeSlider.value));
+
+    // Selector de tema de fondo visual
+    const temaSelect = document.getElementById("settings-tema-fondo");
+    if (temaSelect) {
+      const temaGuardado = localStorage.getItem("sunad_tema_fondo_pref") || "default";
+      temaSelect.value = temaGuardado;
+      if (temaGuardado !== "default") {
+        document.body.classList.add(temaGuardado);
+      }
+      temaSelect.addEventListener("change", () => {
+        const val = temaSelect.value;
+        const clasesTema = ["tema-fondo-noche", "tema-fondo-sakura", "tema-fondo-bosque", "tema-fondo-aurora", "tema-fondo-oceano"];
+        clasesTema.forEach(c => document.body.classList.remove(c));
+        if (val !== "default") {
+          document.body.classList.add(val);
+          localStorage.setItem("sunad_tema_fondo_pref", val);
+        } else {
+          localStorage.removeItem("sunad_tema_fondo_pref");
+        }
+      });
+    }
     window.addEventListener("sunad:volume-change", event => {
       if (event.target === window && event.detail?.volume !== undefined) {
         const volume = Number(event.detail.volume);

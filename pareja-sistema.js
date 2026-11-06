@@ -498,6 +498,9 @@
             <button type="button" class="btn-pareja" id="btn-abrir-chat-pareja">
               💬 Abrir chat privado
             </button>
+            <button type="button" class="btn-pareja-sec" id="btn-cartas-amor-pareja">
+              💌 Cartas Secretas
+            </button>
             <button type="button" class="btn-pareja-sec" id="btn-cuidar-mascota-pareja">
               🐾 Cuidar mascota
             </button>
@@ -505,6 +508,9 @@
         </div>
       `;
       $("btn-desvincular-pareja")?.addEventListener("click", desvincularPareja);
+      $("btn-cartas-amor-pareja")?.addEventListener("click", () => {
+        abrirModalCartasSecretas();
+      });
       $("btn-guardar-aniversario-pareja")?.addEventListener("click", () => {
         const val = $("pareja-input-aniversario")?.value;
         if (!val) {
@@ -534,6 +540,164 @@
         window._abrirMascotaModal?.();
       });
     }
+  }
+
+  /* ------------------------------------------------------------
+     5.1 CARTAS DE AMOR SECRETAS CON FECHA DE APERTURA
+     ------------------------------------------------------------ */
+  const KEY_CARTAS = () => `sunad_cartas_pareja_${getUserId()}`;
+
+  function cargarCartasLocales() {
+    try {
+      return JSON.parse(localStorage.getItem(KEY_CARTAS()) || "[]");
+    } catch {
+      return [];
+    }
+  }
+
+  function guardarCartasLocales(cartas) {
+    try {
+      localStorage.setItem(KEY_CARTAS(), JSON.stringify(cartas));
+    } catch {}
+  }
+
+  function abrirModalCartasSecretas() {
+    let modal = $("modal-cartas-secretas");
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "modal-cartas-secretas";
+      modal.className = "modal";
+      modal.innerHTML = `
+        <div class="modal-backdrop" id="backdrop-cartas-secretas"></div>
+        <div class="modal-content" style="max-width:540px;border:2px solid rgba(255,107,168,0.4);background:linear-gradient(180deg,#17121b,#0e0a12);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;">
+            <h3 style="margin:0;color:#ff6ba8;display:inline-flex;align-items:center;gap:0.5rem;font-size:1.15rem;">
+              <span>💌</span> <span>Cartas Secretas de Amor</span>
+            </h3>
+            <button type="button" class="btn-secondary" id="btn-cerrar-cartas-secretas" style="padding:0.3rem 0.6rem;border-radius:50%;line-height:1;">✕</button>
+          </div>
+          <p style="font-size:0.82rem;opacity:0.8;margin:0 0 1rem;line-height:1.4;">
+            Escribe una carta a tu pareja que permanecerá sellada y secreta hasta la fecha que elijas (aniversario, cumpleaños o día especial).
+          </p>
+
+          <!-- FORMULARIO CREAR CARTA -->
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,107,168,0.25);border-radius:14px;padding:0.9rem;margin-bottom:1.2rem;">
+            <strong style="color:#ffd93d;font-size:0.85rem;display:block;margin-bottom:0.5rem;">✍️ Escribir nueva carta</strong>
+            <input type="text" id="carta-titulo-input" placeholder="Título de la carta (ej. Para nuestro 1er aniversario 💕)" style="width:100%;padding:0.5rem 0.75rem;margin-bottom:0.5rem;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.3);color:#fff;font-size:0.85rem;outline:none;">
+            <textarea id="carta-contenido-input" rows="3" placeholder="Escribe aquí tu mensaje de amor..." style="width:100%;padding:0.5rem 0.75rem;margin-bottom:0.6rem;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.3);color:#fff;font-size:0.85rem;outline:none;resize:vertical;"></textarea>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:0.75rem;opacity:0.85;">🔒 Fecha de apertura:</span>
+                <input type="date" id="carta-fecha-input" style="padding:0.35rem 0.5rem;border-radius:8px;border:1px solid rgba(255,107,168,0.4);background:rgba(0,0,0,0.3);color:#fff;font-size:0.8rem;">
+              </div>
+              <button type="button" class="btn-pareja" id="btn-sellar-carta" style="padding:0.45rem 1rem;font-size:0.82rem;">
+                💌 Sellar y Guardar
+              </button>
+            </div>
+          </div>
+
+          <!-- LISTA DE CARTAS -->
+          <strong style="color:#ff6ba8;font-size:0.85rem;display:block;margin-bottom:0.5rem;">📬 Buzón de Cartas</strong>
+          <div id="cartas-secretas-lista" style="max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      $("backdrop-cartas-secretas")?.addEventListener("click", () => modal.classList.remove("active"));
+      $("btn-cerrar-cartas-secretas")?.addEventListener("click", () => modal.classList.remove("active"));
+      $("btn-sellar-carta")?.addEventListener("click", () => {
+        const titulo = $("carta-titulo-input")?.value.trim();
+        const texto = $("carta-contenido-input")?.value.trim();
+        const fecha = $("carta-fecha-input")?.value;
+        if (!titulo || !texto || !fecha) {
+          alertar({ title: "Completa los campos", message: "Escribe un título, mensaje y elige la fecha de apertura." });
+          return;
+        }
+        const cartas = cargarCartasLocales();
+        const nueva = {
+          id: "carta_" + Date.now(),
+          titulo,
+          texto,
+          fecha_apertura: fecha,
+          creada: new Date().toISOString(),
+          abierta: false
+        };
+        cartas.unshift(nueva);
+        guardarCartasLocales(cartas);
+        $("carta-titulo-input").value = "";
+        $("carta-contenido-input").value = "";
+        $("carta-fecha-input").value = "";
+        lluviaCorazonesPareja(15);
+        try { window._snd?.("pop"); } catch {}
+        renderListaCartas();
+        alertar({
+          title: "💌 Carta sellada con amor",
+          message: `Tu carta secreta ha sido guardada. Podrá ser abierta a partir del <strong>${new Date(fecha + "T00:00:00").toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}</strong>.`,
+          variant: "success",
+          icon: "🔒"
+        });
+      });
+    }
+
+    renderListaCartas();
+    modal.classList.add("active");
+  }
+
+  function renderListaCartas() {
+    const cont = $("cartas-secretas-lista");
+    if (!cont) return;
+    const cartas = cargarCartasLocales();
+    if (!cartas.length) {
+      cont.innerHTML = `<p style="font-size:0.8rem;opacity:0.7;text-align:center;padding:1rem;">Aún no tienes cartas selladas. ¡Escribe la primera arriba!</p>`;
+      return;
+    }
+
+    const hoy = new Date().toISOString().slice(0, 10);
+    cont.innerHTML = cartas.map((c, idx) => {
+      const yaPuedeAbrir = hoy >= c.fecha_apertura;
+      const estadoColor = yaPuedeAbrir ? "#51cf66" : "#ffd93d";
+      const fechaFmt = new Date(c.fecha_apertura + "T00:00:00").toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
+      
+      return `
+        <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:0.75rem 0.9rem;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div>
+            <strong style="font-size:0.86rem;color:#fff;display:block;margin-bottom:2px;">${c.titulo}</strong>
+            <span style="font-size:0.75rem;color:${estadoColor};">
+              ${yaPuedeAbrir ? "✨ ¡Lista para leer!" : `🔒 Se abre el ${fechaFmt}`}
+            </span>
+          </div>
+          <button type="button" class="${yaPuedeAbrir ? 'btn-pareja' : 'btn-pareja-sec'}" data-abrir-carta="${c.id}" style="padding:0.35rem 0.75rem;font-size:0.78rem;">
+            ${yaPuedeAbrir ? "📖 Leer" : "⏳ Ver sello"}
+          </button>
+        </div>
+      `;
+    }).join("");
+
+    cont.querySelectorAll("[data-abrir-carta]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.abrirCarta;
+        const c = cartas.find(x => x.id === id);
+        if (!c) return;
+        const yaPuede = hoy >= c.fecha_apertura;
+        if (!yaPuede) {
+          const fFmt = new Date(c.fecha_apertura + "T00:00:00").toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+          alertar({
+            title: "🔒 Carta aún sellada",
+            message: `Esta carta tiene un sello mágico de amor y no podrá abrirse hasta el <strong>${fFmt}</strong>. ¡La espera valdrá la pena! 💕`,
+            icon: "⏳"
+          });
+        } else {
+          lluviaCorazonesPareja(20);
+          try { window._snd?.("fanfarria") || window._snd?.("victoria"); } catch {}
+          alertar({
+            title: `💌 ${c.titulo}`,
+            message: `<div style="font-size:0.95rem;line-height:1.5;padding:0.6rem 0;color:#fdfdfd;font-style:italic;">"${c.texto.replace(/\n/g, '<br>')}"</div><div style="font-size:0.78rem;opacity:0.75;text-align:right;margin-top:0.4rem;">💕 Sellada con amor</div>`,
+            variant: "success",
+            icon: "💖"
+          });
+        }
+      });
+    });
   }
 
   function actualizarWidgetLobbyPareja() {

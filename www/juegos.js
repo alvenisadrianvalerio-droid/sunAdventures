@@ -1693,6 +1693,85 @@ function programarIntervalo(overlay, fn, delay) {
   }
 
   // ============================================================
+  // MINIJUEGO: ATRAPA CORAZONES (COOPERATIVO DE PAREJA)
+  // ============================================================
+  function juegoAtrapaCorazones() {
+    let puntos = 0, tiempo = 20, timer = null, spawnTimer = null;
+    const hud = HUD([
+      { id:"ac-puntos", label:"Corazones", value:"0", icon:ICONO.corazon, cls:"hud-accent" },
+      { id:"ac-tiempo", label:"Tiempo", value:"20s", icon:ICONO.reloj }
+    ]);
+    const o = crearOverlay("overlay-corazones", `
+      <div class="minijuego-cabecera"><h2>Atrapa Corazones 💕</h2><p>¡Toca todos los corazones flotantes antes de que desaparezcan!</p></div>
+      ${hud}
+      <div id="ac-area" style="position:relative;width:100%;height:320px;background:rgba(255,107,168,0.06);border:2px dashed rgba(255,107,168,0.3);border-radius:18px;overflow:hidden;margin-top:12px;user-select:none;touch-action:manipulation;">
+      </div>
+    `);
+    setTimeout(() => o.classList.add("active"), 30);
+
+    const area = qs("#ac-area", o);
+    const puntosEl = qs("#ac-puntos", o);
+    const tiempoEl = qs("#ac-tiempo", o);
+
+    const spawnCorazon = () => {
+      if (!area || !o.isConnected) return;
+      const h = document.createElement("div");
+      const tipos = [
+        { emoji: "💖", pts: 1, scale: 1 },
+        { emoji: "💕", pts: 1, scale: 0.9 },
+        { emoji: "⭐", pts: 2, scale: 1.1 },
+        { emoji: "✨", pts: 3, scale: 1.2 }
+      ];
+      const tipo = randomDe(tipos);
+      const x = rnd(10, 85);
+      const y = rnd(10, 80);
+      h.style.cssText = `position:absolute;left:${x}%;top:${y}%;font-size:${28 * tipo.scale}px;cursor:pointer;transform:scale(0);transition:transform 0.2s cubic-bezier(.34,1.56,.64,1);filter:drop-shadow(0 4px 10px rgba(255,51,102,0.45));user-select:none;line-height:1;`;
+      h.innerHTML = tipo.emoji;
+      area.appendChild(h);
+
+      requestAnimationFrame(() => { h.style.transform = `scale(${tipo.scale})`; });
+
+      const clickHandler = (e) => {
+        e.stopPropagation();
+        puntos += tipo.pts;
+        if (puntosEl) puntosEl.textContent = String(puntos);
+        try { snd("pop"); } catch {}
+        h.style.transform = "scale(1.6)";
+        h.style.opacity = "0";
+        setTimeout(() => h.remove(), 160);
+      };
+
+      h.addEventListener("pointerdown", clickHandler);
+      setTimeout(() => { if (h.isConnected) { h.style.opacity = "0"; setTimeout(() => h.remove(), 200); } }, 1800);
+    };
+
+    spawnTimer = programarIntervalo(o, spawnCorazon, 480);
+    timer = programarIntervalo(o, () => {
+      tiempo--;
+      if (tiempoEl) tiempoEl.textContent = `${tiempo}s`;
+      if (tiempo <= 0) {
+        clearInterval(timer);
+        clearInterval(spawnTimer);
+        const premio = Math.max(15, puntos * 3);
+        const amorXp = Math.max(10, Math.floor(puntos * 1.5));
+        darPremio(premio, amorXp, `Atrapa Corazones: ${puntos} puntos`);
+        try { window._sumarAmorPareja?.(amorXp, `Minijuego Atrapa Corazones (${puntos} pts)`); } catch {}
+        try { window.ParejaSistema?.lluviaCorazones?.(18); } catch {}
+        
+        finalizar(o, {
+          titulo: puntos >= 20 ? "¡Amor Insuperable! 💖" : "¡Gran Equipo! 💕",
+          emoji: ICONO.corazon || "💖",
+          subtitulo: "Corazones atrapados",
+          num: `${puntos}`,
+          extra: `<div class="jm-recompensa-badge">+${premio} SunCoins · +${amorXp} Amor XP</div>`,
+          botonTxt: "Jugar de nuevo",
+          onReiniciar: () => { o._cerrar?.(); setTimeout(juegoAtrapaCorazones, 150); }
+        });
+      }
+    }, 1000);
+  }
+
+  // ============================================================
   // REGISTRO
   // ============================================================
   const JUEGOS = [
@@ -1715,6 +1794,7 @@ function programarIntervalo(overlay, fn, delay) {
     { id:"molino", nombre:"Molino de viento", desc:"Sincroniza tu toque con el giro de las aspas doradas", fn:juegoMolino, svg:"img/juegos/molino.svg", icon:ICONO.diana },
     { id:"fuente", nombre:"Fuente de los deseos", desc:"Lanza monedas al centro de la fuente en movimiento", fn:juegoFuente, svg:"img/juegos/fuente.svg", icon:ICONO.estrellaDoble },
     { id:"bosque", nombre:"Bosque encantado", desc:"Encuentra al duende mÃ¡gico escondido entre los Ã¡rboles", fn:juegoBosque, svg:"img/juegos/bosque.svg", icon:ICONO.bosque },
+    { id:"atrapa-corazones", nombre:"Atrapa Corazones 💕", desc:"Atrapa la mayor cantidad de corazones de amor flotantes con tu pareja", fn:juegoAtrapaCorazones, svg:"img/calendario/cita.svg", icon:ICONO.corazon },
     { id:"adivina", nombre:"Adivina la mascota", desc:"Identifica quiÃ©n dijo cada frase antes de quedarte sin tiempo", fn:juegoAdivina, svg:"img/juegos/adivina.svg", icon:ICONO.globo }
   ];
   const JUEGOS_FILTRADOS = JUEGOS.filter(j => j.id !== "adivina");
