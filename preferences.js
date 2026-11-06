@@ -478,21 +478,33 @@
 
     // Selector de tema de fondo visual
     const temaSelect = document.getElementById("settings-tema-fondo");
+    const clasesTema = ["tema-fondo-noche", "tema-fondo-sakura", "tema-fondo-bosque", "tema-fondo-aurora", "tema-fondo-oceano"];
+    function aplicarTemaVisual(val) {
+      clasesTema.forEach(c => document.body.classList.remove(c));
+      if (val && val !== "default") {
+        document.body.classList.add(val);
+      }
+      if (temaSelect) temaSelect.value = val || "default";
+    }
+
     if (temaSelect) {
       const temaGuardado = localStorage.getItem("sunad_tema_fondo_pref") || "default";
-      temaSelect.value = temaGuardado;
-      if (temaGuardado !== "default") {
-        document.body.classList.add(temaGuardado);
-      }
+      aplicarTemaVisual(temaGuardado);
       temaSelect.addEventListener("change", () => {
         const val = temaSelect.value;
-        const clasesTema = ["tema-fondo-noche", "tema-fondo-sakura", "tema-fondo-bosque", "tema-fondo-aurora", "tema-fondo-oceano"];
-        clasesTema.forEach(c => document.body.classList.remove(c));
+        aplicarTemaVisual(val);
         if (val !== "default") {
-          document.body.classList.add(val);
           localStorage.setItem("sunad_tema_fondo_pref", val);
         } else {
           localStorage.removeItem("sunad_tema_fondo_pref");
+        }
+        window.dispatchEvent(new CustomEvent("sunad:tema-fondo-change", { detail: { tema: val } }));
+      });
+
+      // Sincronización entre pestañas
+      window.addEventListener("storage", (e) => {
+        if (e.key === "sunad_tema_fondo_pref") {
+          aplicarTemaVisual(e.newValue || "default");
         }
       });
     }

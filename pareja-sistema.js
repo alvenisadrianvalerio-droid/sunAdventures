@@ -17,6 +17,7 @@
   const getUserId = () => window._getUserIdSafe?.() || window._sunUserId || localStorage.getItem("sunad_uid") || "local";
   const alertar = o => window.SunModal ? window.SunModal.alert(o) : (alert(o.message || o.title), Promise.resolve());
   const confirmar = o => window.SunModal ? window.SunModal.confirm(o) : Promise.resolve(confirm(o.message || o.title));
+  const esc = str => String(str ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
   const KEY_PAREJA = () => `sunad_pareja_${getUserId()}`;
 
@@ -24,12 +25,27 @@
   let parejaActual = null; // { id, username, avatar_url, fecha, fecha_inicio_relacion, sincronizado }
   let canalParejaRealtime = null;
 
+  function parseFechaLocal(str) {
+    if (!str) return null;
+    const partes = String(str).slice(0, 10).split("-");
+    if (partes.length === 3) {
+      const y = parseInt(partes[0], 10);
+      const m = parseInt(partes[1], 10) - 1;
+      const d = parseInt(partes[2], 10);
+      const dt = new Date(y, m, d, 0, 0, 0, 0);
+      return isNaN(dt.getTime()) ? null : dt;
+    }
+    const d = new Date(str);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
   function calcularTiempoPareja(fechaStr) {
     if (!fechaStr) return null;
     try {
-      const inicio = new Date(fechaStr);
-      if (isNaN(inicio.getTime())) return null;
+      const inicio = parseFechaLocal(fechaStr);
+      if (!inicio) return null;
       const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
       
       // Diferencia en días totales
       const diffMs = hoy.getTime() - inicio.getTime();
@@ -37,16 +53,16 @@
       
       // Próximo aniversario anual (mismo mes y día)
       const añoActual = hoy.getFullYear();
-      let prox = new Date(añoActual, inicio.getMonth(), inicio.getDate());
+      let prox = new Date(añoActual, inicio.getMonth(), inicio.getDate(), 0, 0, 0, 0);
       if (prox < hoy) {
-        prox = new Date(añoActual + 1, inicio.getMonth(), inicio.getDate());
+        prox = new Date(añoActual + 1, inicio.getMonth(), inicio.getDate(), 0, 0, 0, 0);
       }
       const diasParaAniversario = Math.max(0, Math.ceil((prox.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)));
       
       // Aniversario de meses (próximo día del mes)
-      let proxMes = new Date(añoActual, hoy.getMonth(), inicio.getDate());
+      let proxMes = new Date(añoActual, hoy.getMonth(), inicio.getDate(), 0, 0, 0, 0);
       if (proxMes < hoy) {
-        proxMes = new Date(añoActual, hoy.getMonth() + 1, inicio.getDate());
+        proxMes = new Date(añoActual, hoy.getMonth() + 1, inicio.getDate(), 0, 0, 0, 0);
       }
       const diasParaCumpleMes = Math.max(0, Math.ceil((proxMes.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)));
 
@@ -652,21 +668,22 @@
       return;
     }
 
-    const hoy = new Date().toISOString().slice(0, 10);
+    const hoyStr = new Date().toISOString().slice(0, 10);
     cont.innerHTML = cartas.map((c, idx) => {
-      const yaPuedeAbrir = hoy >= c.fecha_apertura;
+      const yaPuedeAbrir = hoyStr >= c.fecha_apertura;
       const estadoColor = yaPuedeAbrir ? "#51cf66" : "#ffd93d";
-      const fechaFmt = new Date(c.fecha_apertura + "T00:00:00").toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" });
+      const fechaObj = parseFechaLocal(c.fecha_apertura);
+      const fechaFmt = fechaObj ? fechaObj.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" }) : c.fecha_apertura;
       
       return `
         <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:0.75rem 0.9rem;display:flex;align-items:center;justify-content:space-between;gap:8px;">
           <div>
-            <strong style="font-size:0.86rem;color:#fff;display:block;margin-bottom:2px;">${c.titulo}</strong>
+            <strong style="font-size:0.86rem;color:#fff;display:block;margin-bottom:2px;">${esc(c.titulo)}</strong>
             <span style="font-size:0.75rem;color:${estadoColor};">
-              ${yaPuedeAbrir ? "✨ ¡Lista para leer!" : `🔒 Se abre el ${fechaFmt}`}
+              ${yaPuedeAbrir ? "✨ ¡Lista para leer!" : `🔒 Se abre el ${esc(fechaFmt)}`}
             </span>
           </div>
-          <button type="button" class="${yaPuedeAbrir ? 'btn-pareja' : 'btn-pareja-sec'}" data-abrir-carta="${c.id}" style="padding:0.35rem 0.75rem;font-size:0.78rem;">
+          <button type="button" class="${yaPuedeAbrir ? 'btn-pareja' : 'btn-pareja-sec'}" data-abrir-carta="${esc(c.id)}" style="padding:0.35rem 0.75rem;font-size:0.78rem;">
             ${yaPuedeAbrir ? "📖 Leer" : "⏳ Ver sello"}
           </button>
         </div>
@@ -678,20 +695,23 @@
         const id = btn.dataset.abrirCarta;
         const c = cartas.find(x => x.id === id);
         if (!c) return;
-        const yaPuede = hoy >= c.fecha_apertura;
+        const yaPuede = hoyStr >= c.fecha_apertura;
         if (!yaPuede) {
-          const fFmt = new Date(c.fecha_apertura + "T00:00:00").toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+          const fObj = parseFechaLocal(c.fecha_apertura);
+          const fFmt = fObj ? fObj.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" }) : c.fecha_apertura;
           alertar({
             title: "🔒 Carta aún sellada",
-            message: `Esta carta tiene un sello mágico de amor y no podrá abrirse hasta el <strong>${fFmt}</strong>. ¡La espera valdrá la pena! 💕`,
+            message: `Esta carta tiene un sello mágico de amor y no podrá abrirse hasta el <strong>${esc(fFmt)}</strong>. ¡La espera valdrá la pena! 💕`,
             icon: "⏳"
           });
         } else {
           lluviaCorazonesPareja(20);
           try { window._snd?.("fanfarria") || window._snd?.("victoria"); } catch {}
+          const safeTitulo = esc(c.titulo);
+          const safeTexto = esc(c.texto).replace(/\n/g, '<br>');
           alertar({
-            title: `💌 ${c.titulo}`,
-            message: `<div style="font-size:0.95rem;line-height:1.5;padding:0.6rem 0;color:#fdfdfd;font-style:italic;">"${c.texto.replace(/\n/g, '<br>')}"</div><div style="font-size:0.78rem;opacity:0.75;text-align:right;margin-top:0.4rem;">💕 Sellada con amor</div>`,
+            title: `💌 ${safeTitulo}`,
+            message: `<div style="font-size:0.95rem;line-height:1.5;padding:0.6rem 0;color:#fdfdfd;font-style:italic;">"${safeTexto}"</div><div style="font-size:0.78rem;opacity:0.75;text-align:right;margin-top:0.4rem;">💕 Sellada con amor</div>`,
             variant: "success",
             icon: "💖"
           });
@@ -1001,7 +1021,15 @@
 
     // Mejoras de chat y botón RPG cada vez que se navega o carga
     mejorarChatUI();
-    setInterval(() => { if (!document.hidden && document.getElementById("rpg-acciones")) inyectarBotonRpgCoop(); }, 3000);
+    let rpgTimer = null;
+    const chequearRpg = () => {
+      const vista = document.querySelector("[data-view].active")?.dataset.view;
+      if (vista === "rpg" && !document.hidden && document.getElementById("rpg-acciones")) {
+        inyectarBotonRpgCoop();
+      }
+    };
+    rpgTimer = setInterval(chequearRpg, 3000);
+    window.addEventListener("hashchange", () => setTimeout(chequearRpg, 200));
 
     // Sincronización automática de fotos/notas de pareja al arrancar o cambiar usuario/grupo
     parejaActual = cargarParejaLocal();
@@ -1029,6 +1057,14 @@
     });
   }
 
+  // Guarda para evitar doble ejecución de init()
+  let inicializado = false;
+  function safeInit() {
+    if (inicializado) return;
+    inicializado = true;
+    init();
+  }
+
   // API Global
   window.ParejaSistema = {
     getPareja: () => parejaActual,
@@ -1040,6 +1076,10 @@
     lluviaCorazones: lluviaCorazonesPareja
   };
 
-  document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", init) : init();
-  setTimeout(init, 600);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", safeInit);
+  } else {
+    safeInit();
+  }
+  setTimeout(safeInit, 400);
 })();

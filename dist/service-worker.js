@@ -1,4 +1,4 @@
-const CACHE_NAME = "sunad-v299-pwa";
+const CACHE_NAME = "sunad-v300-pwa";
 const ASSETS_ESTATICOS = [
   "./", "./index.html", "./styles.css", "./album.css", "./juegos.css",
   "./rpg.css", "./rpg-loot.css", "./temas.css", "./finanzas.css", "./capsula-tiempo.css", "./pareja-chat.css", "./diccionario.css", "./recetas.css",

@@ -1068,10 +1068,11 @@
       ubicadas.forEach(f => {
         const lat = Number(f.lat), lng = Number(f.lng);
         const marker = L.marker([lat, lng], { icon: pinIcon }).addTo(mapaLeaflet);
-        const imgThumb = f.url || (f.path ? `https://pub-28303b7c8dfb445585f9bb27efc92131.r2.dev/${f.path}` : "");
+        const rawUrl = f.url || (f.path ? `https://pub-28303b7c8dfb445585f9bb27efc92131.r2.dev/${f.path}` : "");
+        const safeUrl = rawUrl && /^https?:\/\//i.test(rawUrl) ? escapeHtml(rawUrl) : "";
         marker.bindPopup(`
           <div style="font-family:system-ui,-apple-system,sans-serif;min-width:180px;max-width:240px;padding:4px;">
-            ${imgThumb ? `<img src="${imgThumb}" alt="" style="width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:6px;display:block;">` : ""}
+            ${safeUrl ? `<img src="${safeUrl}" alt="" style="width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:6px;display:block;">` : ""}
             <strong style="color:#d97706;font-size:0.85rem;display:block;margin-bottom:3px;">${f.fecha ? fmtFecha(f.fecha) : "Recuerdo"}</strong>
             <p style="margin:0;font-size:0.88rem;color:#1e293b;line-height:1.35;word-break:break-word;">${escapeHtml(f.nota || "Sin nota")}</p>
           </div>
