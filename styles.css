@@ -5330,9 +5330,51 @@ body.light #cancion-form input::placeholder {
   }
 }
 
-/* ============================================================
-   ESTILOS SLIDESHOW / PELÍCULA DE RECUERDOS (RESPONSIVE)
-   ============================================================ */
+/* ============================================
+   MAPA DE AVENTURAS EN EL ÁLBUM
+   ============================================ */
+.aventuras-map-container {
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 217, 61, 0.35);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 25px rgba(255, 217, 61, 0.1);
+  background: #0f121e;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.aventuras-map {
+  width: 100%;
+  height: min(65vh, 580px);
+  min-height: 380px;
+  border-radius: 14px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.mapa-empty {
+  text-align: center;
+  color: var(--text);
+  padding: 1.2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  margin-top: 10px;
+}
+
+.mapa-empty.hidden {
+  display: none !important;
+}
+
+@media (max-width: 600px) {
+  .aventuras-map-container {
+    padding: 8px;
+    border-radius: 16px;
+  }
+  .aventuras-map {
+    height: 52vh;
+    min-height: 290px;
+  }
+}
 .album-slideshow-overlay {
   position: fixed !important;
   inset: 0 !important;

@@ -634,6 +634,10 @@
           <svg viewBox="0 0 24 24" width="14" height="14" fill="#f43f5e"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
           Favoritas
         </button>
+        <button type="button" id="btn-album-mapa-toggle" class="btn-secondary album-filter-chip" data-album-filter="mapa" style="display:inline-flex;align-items:center;gap:6px;padding:0.38rem 0.85rem;font-size:0.78rem;font-weight:600;border-radius:999px;border-color:rgba(52,211,153,0.45);color:#6ee7b7;">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#34d399;"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+          Mapa
+        </button>
         <button type="button" id="btn-album-slideshow" class="btn-primary" style="display:inline-flex;align-items:center;gap:6px;padding:0.38rem 0.95rem;font-size:0.78rem;font-weight:700;border-radius:999px;">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#78350f;"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
           Película de Recuerdos
@@ -646,12 +650,25 @@
     `;
     sec.insertBefore(bar, grid);
 
+    const mapContainer = $("aventuras-map-container");
+
     bar.querySelectorAll("[data-album-filter]").forEach(btn => {
       btn.addEventListener("click", () => {
         bar.querySelectorAll("[data-album-filter]").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
-        filtroFotoModo = btn.dataset.albumFilter || "todas";
-        aplicarFiltrosAlbumDOM();
+        const fModo = btn.dataset.albumFilter || "todas";
+        
+        if (fModo === "mapa") {
+          if (grid) grid.style.display = "none";
+          if (empty) empty.style.display = "none";
+          if (mapContainer) mapContainer.style.display = "block";
+          renderMapa();
+        } else {
+          if (mapContainer) mapContainer.style.display = "none";
+          if (grid) grid.style.display = "";
+          filtroFotoModo = fModo;
+          aplicarFiltrosAlbumDOM();
+        }
       });
     });
 
