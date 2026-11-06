@@ -21,8 +21,46 @@
   const KEY_PAREJA = () => `sunad_pareja_${getUserId()}`;
 
   // Estado reactivo de pareja
-  let parejaActual = null; // { id, username, avatar_url, fecha, sincronizado }
+  let parejaActual = null; // { id, username, avatar_url, fecha, fecha_inicio_relacion, sincronizado }
   let canalParejaRealtime = null;
+
+  function calcularTiempoPareja(fechaStr) {
+    if (!fechaStr) return null;
+    try {
+      const inicio = new Date(fechaStr);
+      if (isNaN(inicio.getTime())) return null;
+      const hoy = new Date();
+      
+      // Diferencia en días totales
+      const diffMs = hoy.getTime() - inicio.getTime();
+      const diasJuntos = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+      
+      // Próximo aniversario anual (mismo mes y día)
+      const añoActual = hoy.getFullYear();
+      let prox = new Date(añoActual, inicio.getMonth(), inicio.getDate());
+      if (prox < hoy) {
+        prox = new Date(añoActual + 1, inicio.getMonth(), inicio.getDate());
+      }
+      const diasParaAniversario = Math.max(0, Math.ceil((prox.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)));
+      
+      // Aniversario de meses (próximo día del mes)
+      let proxMes = new Date(añoActual, hoy.getMonth(), inicio.getDate());
+      if (proxMes < hoy) {
+        proxMes = new Date(añoActual, hoy.getMonth() + 1, inicio.getDate());
+      }
+      const diasParaCumpleMes = Math.max(0, Math.ceil((proxMes.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)));
+
+      return {
+        diasJuntos,
+        diasParaAniversario,
+        diasParaCumpleMes,
+        fechaInicioFormateada: inicio.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" }),
+        fechaValida: true
+      };
+    } catch {
+      return null;
+    }
+  }
 
   function cargarParejaLocal() {
     try {
@@ -409,6 +447,9 @@
         if (inp) inp.focus();
       });
     } else {
+      const infoTiempo = calcularTiempoPareja(parejaActual.fecha_inicio_relacion);
+      const fechaValInput = parejaActual.fecha_inicio_relacion ? parejaActual.fecha_inicio_relacion.slice(0, 10) : "";
+
       card.innerHTML = `
         <div class="pareja-status-card">
           <div class="pareja-header">
@@ -420,6 +461,33 @@
               Desvincular
             </button>
           </div>
+
+          <!-- CONTADOR DE DÍAS Y ANIVERSARIO -->
+          <div class="pareja-aniversario-banner" style="background:rgba(255,107,168,0.12);border:1px solid rgba(255,107,168,0.35);border-radius:14px;padding:0.9rem;text-align:center;">
+            ${infoTiempo ? `
+              <div style="font-size:0.85rem;color:#ff6ba8;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;margin-bottom:0.25rem;">
+                💕 Nuestra Historia de Amor
+              </div>
+              <div style="font-size:1.7rem;font-weight:900;color:#fff;line-height:1.2;margin-bottom:0.3rem;">
+                <span style="color:#ff6ba8;">${infoTiempo.diasJuntos}</span> Días Juntos
+              </div>
+              <div style="font-size:0.82rem;opacity:0.88;color:#ffd93d;margin-bottom:0.6rem;">
+                ✨ Próximo aniversario en <strong>${infoTiempo.diasParaAniversario} días</strong> (Iniciaron el ${infoTiempo.fechaInicioFormateada})
+              </div>
+            ` : `
+              <div style="font-size:0.88rem;color:#ff6ba8;font-weight:700;margin-bottom:0.25rem;">
+                📅 ¿Cuándo inició su relación?
+              </div>
+              <p style="font-size:0.78rem;opacity:0.8;margin:0 0 0.5rem;">Configura la fecha de su aniversario para activar el contador de días juntos.</p>
+            `}
+            <div style="display:flex;align-items:center;justify-content:center;gap:0.4rem;flex-wrap:wrap;">
+              <input type="date" id="pareja-input-aniversario" value="${fechaValInput}" style="padding:0.35rem 0.6rem;font-size:0.8rem;border-radius:8px;border:1px solid rgba(255,107,168,0.4);background:rgba(0,0,0,0.3);color:#fff;">
+              <button type="button" class="btn-pareja" id="btn-guardar-aniversario-pareja" style="padding:0.35rem 0.75rem;font-size:0.78rem;">
+                💾 Guardar fecha
+              </button>
+            </div>
+          </div>
+
           <div class="pareja-beneficios-grid">
             <div class="pareja-beneficio">☁️ Fotos y notas sincronizadas</div>
             <div class="pareja-beneficio">🐾 Mascota compartida</div>
@@ -437,6 +505,22 @@
         </div>
       `;
       $("btn-desvincular-pareja")?.addEventListener("click", desvincularPareja);
+      $("btn-guardar-aniversario-pareja")?.addEventListener("click", () => {
+        const val = $("pareja-input-aniversario")?.value;
+        if (!val) {
+          alertar({ title: "Fecha requerida", message: "Selecciona una fecha válida." });
+          return;
+        }
+        parejaActual.fecha_inicio_relacion = val;
+        guardarParejaLocal(parejaActual);
+        actualizarWidgetLobbyPareja();
+        alertar({
+          title: "💕 Fecha guardada",
+          message: "¡Contador de días juntos actualizado con éxito!",
+          variant: "success",
+          icon: "📅"
+        });
+      });
       $("btn-abrir-chat-pareja")?.addEventListener("click", () => {
         cerrarModalPareja();
         location.hash = "#chat";
@@ -449,6 +533,36 @@
         cerrarModalPareja();
         window._abrirMascotaModal?.();
       });
+    }
+  }
+
+  function actualizarWidgetLobbyPareja() {
+    const parejaCard = $("experiencia-card-pareja");
+    if (!parejaCard) return;
+
+    let subPill = parejaCard.querySelector(".pareja-dias-subpill");
+    if (!subPill) {
+      subPill = document.createElement("div");
+      subPill.className = "pareja-dias-subpill";
+      subPill.style.cssText = "font-size:0.75rem;color:#ff6ba8;font-weight:700;margin-top:4px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;";
+      const footer = parejaCard.querySelector(".bento-card-footer");
+      if (footer) footer.parentNode.insertBefore(subPill, footer);
+      else parejaCard.appendChild(subPill);
+    }
+
+    if (parejaActual && parejaActual.username) {
+      const info = calcularTiempoPareja(parejaActual.fecha_inicio_relacion);
+      if (info) {
+        subPill.innerHTML = `<span>💕 Con @${parejaActual.username}</span> · <strong style="color:#ffd93d;">${info.diasJuntos} días juntos</strong> <span style="opacity:0.8;">(Aniversario en ${info.diasParaAniversario}d)</span>`;
+      } else {
+        subPill.innerHTML = `<span>💕 En pareja con @${parejaActual.username}</span> · <span style="opacity:0.8;text-decoration:underline;cursor:pointer;" id="link-tocar-aniv">Fijar aniversario</span>`;
+        parejaCard.querySelector("#link-tocar-aniv")?.addEventListener("click", (e) => {
+          e.stopPropagation();
+          abrirModalPareja();
+        });
+      }
+    } else {
+      subPill.innerHTML = `<span style="opacity:0.75;font-weight:normal;">Toca para vincular a tu pareja</span>`;
     }
   }
 
@@ -573,6 +687,92 @@
     // Eliminar barra de reacciones si existiera previamente
     const prevQR = $("chat-quick-reactions");
     if (prevQR) prevQR.remove();
+
+    // Inyectar Selector de Stickers de Mascotas y Amor
+    inyectarSelectorStickersChat(chatSection);
+  }
+
+  function inyectarSelectorStickersChat(chatSection) {
+    const chatForm = $("chat-form", chatSection);
+    if (!chatForm || $("btn-chat-stickers-toggle")) return;
+
+    const STICKERS_COZY = [
+      { emoji: "🐱", texto: "¡Miau! Te quiero un montón 💕" },
+      { emoji: "🦝", texto: "¡Robando tu corazón! 🦝💖" },
+      { emoji: "🐥", texto: "¡Pío pío! Pasaba a abrazarte 🐥✨" },
+      { emoji: "🐰", texto: "¡Saltando de amor por ti! 🐰🌸" },
+      { emoji: "🐼", texto: "Abrazo de panda gigante 🐼🤍" },
+      { emoji: "💖", texto: "¡Lluvia de amor para ti! 💖✨" },
+      { emoji: "☕", texto: "¿Un cafecito juntos hoy? ☕🍰" },
+      { emoji: "🍿", texto: "¿Vemos una peli hoy? 🎬🍿" },
+      { emoji: "🍕", texto: "¿Pedimos algo rico de comer? 🍕😋" },
+      { emoji: "🌙", texto: "Buenas noches, sueña bonito 🌙⭐" },
+      { emoji: "✨", texto: "¡Eres mi persona favorita! 🌻💛" },
+      { emoji: "🥰", texto: "Me haces sonreír todo el día 🥰" }
+    ];
+
+    const btnStickers = document.createElement("button");
+    btnStickers.type = "button";
+    btnStickers.id = "btn-chat-stickers-toggle";
+    btnStickers.className = "chat-btn-attach";
+    btnStickers.style.cssText = "display:inline-flex;align-items:center;justify-content:center;background:rgba(255,107,168,0.12);border:1px solid rgba(255,107,168,0.3);color:#ff6ba8;border-radius:50%;width:38px;height:38px;cursor:pointer;flex-shrink:0;transition:transform 0.15s, background 0.15s;";
+    btnStickers.title = "Stickers de mascotas y amor";
+    btnStickers.innerHTML = `🐾`;
+
+    // Panel de Stickers Flotante
+    const panelStickers = document.createElement("div");
+    panelStickers.id = "chat-stickers-popover";
+    panelStickers.style.cssText = "display:none;position:absolute;bottom:70px;left:14px;right:14px;max-width:360px;background:rgba(20,24,35,0.96);border:1px solid rgba(255,107,168,0.4);border-radius:18px;padding:12px;box-shadow:0 12px 36px rgba(0,0,0,0.55);backdrop-filter:blur(14px);z-index:900;animation:popIn 0.18s ease;";
+    panelStickers.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:0.8rem;font-weight:800;color:#ff6ba8;">🐾 Stickers de Mascotas & Pareja</span>
+        <button type="button" id="btn-cerrar-stickers-chat" style="background:transparent;border:none;color:#aaa;cursor:pointer;font-size:0.9rem;padding:2px 6px;">✕</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:210px;overflow-y:auto;">
+        ${STICKERS_COZY.map((stk, idx) => `
+          <button type="button" class="sticker-chip-btn" data-stk-idx="${idx}" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:transform 0.15s, background 0.15s;">
+            <span style="font-size:1.6rem;line-height:1;">${stk.emoji}</span>
+            <span style="font-size:0.65rem;color:#ccc;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;">${stk.texto.slice(0, 14)}</span>
+          </button>
+        `).join("")}
+      </div>
+    `;
+
+    chatForm.style.position = "relative";
+    chatForm.insertBefore(btnStickers, chatForm.firstChild);
+    chatForm.appendChild(panelStickers);
+
+    btnStickers.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const visible = panelStickers.style.display === "block";
+      panelStickers.style.display = visible ? "none" : "block";
+    });
+
+    panelStickers.querySelector("#btn-cerrar-stickers-chat")?.addEventListener("click", () => {
+      panelStickers.style.display = "none";
+    });
+
+    panelStickers.querySelectorAll(".sticker-chip-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const idx = Number(btn.dataset.stkIdx);
+        const item = STICKERS_COZY[idx];
+        if (item) {
+          const inp = $("chat-input");
+          if (inp) {
+            inp.value = item.texto;
+            panelStickers.style.display = "none";
+            chatForm.requestSubmit();
+            try { window.ParejaSistema?.lluviaCorazones?.(10); } catch {}
+          }
+        }
+      });
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!panelStickers.contains(e.target) && e.target !== btnStickers) {
+        panelStickers.style.display = "none";
+      }
+    });
   }
 
   /* ------------------------------------------------------------
@@ -642,20 +842,26 @@
     // Sincronización automática de fotos/notas de pareja al arrancar o cambiar usuario/grupo
     parejaActual = cargarParejaLocal();
     actualizarUIPareja();
+    actualizarWidgetLobbyPareja();
     sincronizarNubePareja();
     suscribirCanalParejaRealtime();
 
     window.addEventListener("sunad:user-ready", () => {
       parejaActual = cargarParejaLocal();
       actualizarUIPareja();
+      actualizarWidgetLobbyPareja();
       sincronizarNubePareja();
       suscribirCanalParejaRealtime();
     });
     window.addEventListener("sunad:group-ready", () => {
       parejaActual = cargarParejaLocal();
       actualizarUIPareja();
+      actualizarWidgetLobbyPareja();
       sincronizarNubePareja();
       suscribirCanalParejaRealtime();
+    });
+    window.addEventListener("sunad:progress", () => {
+      actualizarWidgetLobbyPareja();
     });
   }
 
