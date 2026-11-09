@@ -3,7 +3,7 @@
    ============================================ */
 .minijuegos-menu {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1.1rem;
   padding: 1.6rem;
   background: linear-gradient(135deg, rgba(8,13,23,.86), rgba(9,12,19,.93)), url("img/biomas/gen-5480873c-7b50-45b8-a3c1-abc457a2f0fa.png") center/cover;
@@ -11,6 +11,7 @@
   border: 1px solid rgba(255,255,255,.08);
   max-width: 1260px;
   margin: 0 auto 2.5rem;
+  box-sizing: border-box;
 }
 body.light .minijuegos-menu {
   background: linear-gradient(135deg, rgba(255,251,239,.88), rgba(255,255,255,.9)), url("img/biomas/gen-df614595-485a-47f1-a074-7d4b4aa3d08e.png") center/cover;
@@ -63,6 +64,13 @@ body.light .minijuegos-menu {
   box-shadow: 0 6px 18px color-mix(in srgb, var(--game-accent) 18%, transparent), inset 0 1px rgba(255,255,255,.2);
 }
 .btn-minijuego-icon svg { width: 64%; height: 64%; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
+.btn-minijuego-icon img {
+  width: 65%;
+  height: 65%;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.35));
+}
 .btn-minijuego:hover .btn-minijuego-icon {
   transform: scale(1.15) rotate(-8deg);
   background: color-mix(in srgb, var(--game-accent) 28%, rgba(8,12,20,.7));
@@ -106,11 +114,70 @@ body.light .btn-minijuego-icon {
   --game-accent: #f3c978;
   --game-biome: url("img/biomas/gen-5510680d-7fe8-4834-b72d-04dd75fc60e2.png");
 }
+@media (max-width: 1024px) {
+  .minijuegos-menu {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .9rem;
+    padding: 1.2rem;
+  }
+}
+@media (max-width: 768px) {
+  .minijuegos-menu {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .8rem;
+    padding: 1rem;
+  }
+  .btn-minijuego {
+    min-height: 125px;
+    padding: .85rem .5rem;
+  }
+}
 @media (max-width: 600px) {
-  .minijuegos-menu { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; padding: .8rem; }
-  .btn-minijuego { min-height: 122px; padding: .75rem .45rem; border-radius: 14px; }
-  .btn-minijuego-icon { width: 2.7rem; height: 2.7rem; border-radius: 12px; }
-  .btn-minijuego-text { font-size: .78rem; }
+  .minijuegos-menu {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .65rem;
+    padding: .75rem;
+    border-radius: 16px;
+    margin-bottom: 1.75rem;
+  }
+  .btn-minijuego {
+    min-height: 116px;
+    padding: .75rem .4rem;
+    border-radius: 14px;
+    gap: .5rem;
+  }
+  .btn-minijuego-icon {
+    width: 2.65rem;
+    height: 2.65rem;
+    border-radius: 12px;
+  }
+  .btn-minijuego-icon svg,
+  .btn-minijuego-icon img {
+    width: 62%;
+    height: 62%;
+  }
+  .btn-minijuego-text {
+    font-size: .78rem;
+    font-weight: 800;
+  }
+}
+@media (max-width: 380px) {
+  .minijuegos-menu {
+    grid-template-columns: 1fr;
+    gap: .6rem;
+    padding: .65rem;
+  }
+  .btn-minijuego {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: .65rem .85rem;
+    min-height: 64px;
+    gap: .85rem;
+    text-align: left;
+  }
+  .btn-minijuego-text {
+    font-size: .88rem;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .btn-minijuego, .btn-minijuego-icon { transition: none; }

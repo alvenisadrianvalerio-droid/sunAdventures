@@ -176,19 +176,23 @@
     html:has(.lobby[data-view="inicio"].active) {
       overflow-y: hidden;
     }
+
     @media (max-width: 900px) {
       html:has(.lobby[data-view="inicio"].active) {
         overflow-y: auto;
       }
     }
+
     .lobby[data-view="inicio"].active {
       min-height: auto !important;
       padding-bottom: 0.5rem !important;
     }
+
     .cozy-bento-lobby {
       margin-bottom: 0 !important;
       padding-bottom: 0 !important;
     }
+
     html,
     body {
       overscroll-behavior-y: none;
@@ -352,26 +356,30 @@
       opacity: 0 !important;
     }
 
-      /* Optimización de renderizado y aislamiento de vistas SPA */
-      .view:not(.active) {
-        content-visibility: hidden;
-      }
-      .view.active {
-        contain: layout style;
-      }
-      .polaroid,
-      .nota-card,
-      .receta-card,
-      .rpg-zone-card,
-      .logro-card {
-        content-visibility: auto;
-        contain-intrinsic-size: auto 260px;
-      }
-      #user-menu-toggle {
-        touch-action: manipulation;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-      }
+    /* Optimización de renderizado y aislamiento de vistas SPA */
+    .view:not(.active) {
+      content-visibility: hidden;
+    }
+
+    .view.active {
+      contain: layout style;
+    }
+
+    .polaroid,
+    .nota-card,
+    .receta-card,
+    .rpg-zone-card,
+    .logro-card {
+      content-visibility: auto;
+      contain-intrinsic-size: auto 260px;
+    }
+
+    #user-menu-toggle {
+      touch-action: manipulation;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     /* Fallback crítico para el Modal de Rangos y Hub de Minijuegos */
     /* Fallback crítico completo para Modal de Rangos y Beneficios */
     .modal-rangos-content {
@@ -396,12 +404,14 @@
       overflow: visible !important;
       contain: none !important;
     }
+
     .user-info {
       position: relative !important;
       overflow: visible !important;
       contain: none !important;
       z-index: 10000 !important;
     }
+
     #user-dropdown {
       position: absolute !important;
       top: calc(100% + 8px) !important;
@@ -417,6 +427,7 @@
       min-width: 250px !important;
       padding: 0.6rem !important;
     }
+
     #user-dropdown.open {
       display: flex !important;
       flex-direction: column !important;
@@ -425,6 +436,7 @@
       pointer-events: auto !important;
       transform: translateY(0) scale(1) !important;
     }
+
     .user-info.open #user-dropdown {
       display: flex !important;
       flex-direction: column !important;
@@ -433,6 +445,7 @@
       pointer-events: auto !important;
       transform: translateY(0) scale(1) !important;
     }
+
     #user-dropdown .user-dropdown-item {
       color: #f8fafc !important;
       display: flex !important;
@@ -440,10 +453,12 @@
       visibility: visible !important;
       opacity: 1 !important;
     }
+
     #user-dropdown .user-dropdown-name {
       color: #f8fafc !important;
       font-weight: 700 !important;
     }
+
     #photo-modal {
       position: fixed !important;
       inset: 0 !important;
@@ -453,9 +468,11 @@
       justify-content: center !important;
       padding: 1rem !important;
     }
+
     #photo-modal.active {
       display: flex !important;
     }
+
     #photo-modal .modal-backdrop {
       position: fixed !important;
       inset: 0 !important;
@@ -464,12 +481,13 @@
       -webkit-backdrop-filter: blur(8px) !important;
       z-index: 1 !important;
     }
+
     #photo-modal .photo-modal-content {
       position: relative !important;
       z-index: 10 !important;
       background: #161928 !important;
       background-image: radial-gradient(circle at top right, rgba(255, 217, 61, 0.12), transparent 45%),
-                        radial-gradient(circle at bottom left, rgba(244, 114, 182, 0.08), transparent 50%) !important;
+        radial-gradient(circle at bottom left, rgba(244, 114, 182, 0.08), transparent 50%) !important;
       border: 1.5px solid rgba(255, 217, 61, 0.4) !important;
       border-radius: 24px !important;
       max-width: 780px !important;
@@ -483,6 +501,7 @@
       opacity: 1 !important;
       visibility: visible !important;
     }
+
     .modal-rangos-header {
       display: flex !important;
       align-items: center !important;
@@ -491,11 +510,13 @@
       padding-bottom: 0.95rem !important;
       margin-bottom: 0.95rem !important;
     }
+
     .modal-rangos-title-wrap {
       display: flex !important;
       align-items: center !important;
       gap: 0.85rem !important;
     }
+
     .modal-rangos-icon-badge {
       display: flex !important;
       align-items: center !important;
@@ -509,6 +530,7 @@
       box-shadow: 0 4px 14px rgba(255, 107, 168, 0.2) !important;
       flex-shrink: 0 !important;
     }
+
     .modal-rangos-title {
       margin: 0 !important;
       font-size: 1.22rem !important;
@@ -516,12 +538,14 @@
       color: #ffffff !important;
       letter-spacing: -0.015em !important;
     }
+
     .modal-rangos-sub {
       font-size: 0.8rem !important;
       color: #94a3b8 !important;
       display: block !important;
       margin-top: 0.15rem !important;
     }
+
     .modal-rangos-tabs {
       display: flex !important;
       gap: 0.5rem !important;
@@ -531,6 +555,7 @@
       border-radius: 14px !important;
       border: 1px solid rgba(255, 255, 255, 0.06) !important;
     }
+
     .modal-rangos-tab {
       flex: 1 !important;
       display: inline-flex !important;
@@ -547,12 +572,14 @@
       cursor: pointer !important;
       transition: all 0.2s ease !important;
     }
+
     .modal-rangos-tab.active {
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)) !important;
       border-color: rgba(255, 255, 255, 0.16) !important;
       color: #ffffff !important;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35) !important;
     }
+
     .modal-rangos-body {
       display: flex !important;
       flex-direction: column !important;
@@ -561,6 +588,7 @@
       padding-right: 0.35rem !important;
       max-height: 56vh !important;
     }
+
     .modal-rango-item {
       display: flex !important;
       align-items: center !important;
@@ -572,21 +600,25 @@
       position: relative !important;
       transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
     }
+
     .modal-rango-item:hover {
       transform: translateY(-2px) !important;
       border-color: rgba(255, 255, 255, 0.18) !important;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4) !important;
     }
+
     .modal-rango-item.rango-actual {
       border-color: rgba(255, 217, 61, 0.6) !important;
       background: linear-gradient(135deg, rgba(255, 217, 61, 0.12) 0%, rgba(24, 27, 40, 0.85) 100%) !important;
       box-shadow: 0 0 24px rgba(255, 217, 61, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
     }
+
     .modal-rango-item.item-pareja.rango-actual {
       border-color: rgba(255, 107, 168, 0.65) !important;
       background: linear-gradient(135deg, rgba(255, 107, 168, 0.15) 0%, rgba(24, 27, 40, 0.85) 100%) !important;
       box-shadow: 0 0 24px rgba(255, 107, 168, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
     }
+
     .modal-rango-icono-col {
       display: flex !important;
       flex-direction: column !important;
@@ -595,6 +627,7 @@
       width: 52px !important;
       flex-shrink: 0 !important;
     }
+
     .modal-rango-emblem-img {
       width: 48px !important;
       height: 48px !important;
@@ -602,6 +635,7 @@
       filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45)) !important;
       transition: transform 0.2s ease !important;
     }
+
     .modal-rango-actual-tag {
       font-size: 0.6rem !important;
       font-weight: 900 !important;
@@ -612,11 +646,13 @@
       color: #1a1306 !important;
       box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4) !important;
     }
+
     .modal-rango-actual-tag.tag-pink {
       background: linear-gradient(135deg, #ff6ba8, #ec4899) !important;
       color: #ffffff !important;
       box-shadow: 0 2px 6px rgba(236, 72, 153, 0.4) !important;
     }
+
     .modal-rango-info-col {
       display: flex !important;
       flex-direction: column !important;
@@ -624,17 +660,20 @@
       flex: 1 !important;
       min-width: 0 !important;
     }
+
     .modal-rango-top-row {
       display: flex !important;
       align-items: center !important;
       justify-content: space-between !important;
       gap: 0.5rem !important;
     }
+
     .modal-rango-nombre {
       font-size: 0.96rem !important;
       font-weight: 800 !important;
       color: #ffffff !important;
     }
+
     .modal-rango-req {
       font-size: 0.74rem !important;
       font-weight: 700 !important;
@@ -643,16 +682,19 @@
       padding: 0.15rem 0.45rem !important;
       border-radius: 6px !important;
     }
+
     .modal-rango-item.item-pareja .modal-rango-req {
       color: #ff6ba8 !important;
       background: rgba(255, 107, 168, 0.1) !important;
     }
+
     .modal-rango-beneficio {
       margin: 0.1rem 0 0.25rem !important;
       font-size: 0.8rem !important;
       color: #cbd5e1 !important;
       line-height: 1.35 !important;
     }
+
     .modal-rango-status-pill {
       align-self: flex-start !important;
       font-size: 0.68rem !important;
@@ -660,17 +702,21 @@
       padding: 0.15rem 0.5rem !important;
       border-radius: 999px !important;
     }
+
     .pill-ok {
       background: rgba(16, 185, 129, 0.15) !important;
       color: #34d399 !important;
       border: 1px solid rgba(16, 185, 129, 0.3) !important;
     }
+
     .pill-lock {
       background: rgba(255, 255, 255, 0.05) !important;
       color: #94a3b8 !important;
       border: 1px solid rgba(255, 255, 255, 0.08) !important;
     }
-    .modal-rangos-overlay, .modal-hub-overlay {
+
+    .modal-rangos-overlay,
+    .modal-hub-overlay {
       position: fixed;
       inset: 0;
       z-index: 10000;
@@ -683,9 +729,12 @@
       padding: 1rem;
       box-sizing: border-box;
     }
-    .modal-rangos-overlay.active, .modal-hub-overlay.active {
+
+    .modal-rangos-overlay.active,
+    .modal-hub-overlay.active {
       display: flex !important;
     }
+
     .modal-hub-content {
       background: #12141e !important;
       border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -701,6 +750,7 @@
       box-sizing: border-box !important;
       color: #f1f5f9 !important;
     }
+
     .modal-hub-header {
       display: flex !important;
       align-items: center !important;
@@ -709,11 +759,13 @@
       padding-bottom: 0.85rem !important;
       margin-bottom: 0.95rem !important;
     }
+
     .modal-hub-title-wrap {
       display: flex !important;
       align-items: center !important;
       gap: 0.75rem !important;
     }
+
     .modal-hub-icon-badge {
       display: flex !important;
       align-items: center !important;
@@ -726,18 +778,21 @@
       border: 1px solid rgba(255, 217, 61, 0.3) !important;
       flex-shrink: 0 !important;
     }
+
     .modal-hub-title {
       margin: 0 !important;
       font-size: 1.15rem !important;
       font-weight: 800 !important;
       color: #ffffff !important;
     }
+
     .modal-hub-sub {
       font-size: 0.78rem !important;
       color: #94a3b8 !important;
       display: block !important;
       margin-top: 0.15rem !important;
     }
+
     .minijuegos-hub-grid {
       display: flex !important;
       flex-direction: column !important;
@@ -745,6 +800,7 @@
       overflow-y: auto !important;
       padding-right: 0.2rem !important;
     }
+
     .minijuego-hub-card {
       display: flex !important;
       align-items: center !important;
@@ -761,11 +817,13 @@
       width: 100% !important;
       box-sizing: border-box !important;
     }
+
     .minijuego-hub-card:hover {
       background: #202336 !important;
       border-color: rgba(255, 217, 61, 0.4) !important;
       transform: translateX(4px) !important;
     }
+
     .minijuego-hub-icon-wrap {
       display: flex !important;
       align-items: center !important;
@@ -776,23 +834,27 @@
       background: rgba(255, 255, 255, 0.06) !important;
       flex-shrink: 0 !important;
     }
+
     .minijuego-hub-icon-wrap img {
       width: 32px !important;
       height: 32px !important;
       display: block !important;
       object-fit: contain !important;
     }
+
     .minijuego-hub-info {
       display: flex !important;
       flex-direction: column !important;
       flex: 1 !important;
       min-width: 0 !important;
     }
+
     .minijuego-hub-nombre {
       font-size: 0.92rem !important;
       font-weight: 800 !important;
       color: #f1f5f9 !important;
     }
+
     .minijuego-hub-desc {
       font-size: 0.74rem !important;
       color: #94a3b8 !important;
@@ -801,6 +863,7 @@
       overflow: hidden !important;
       text-overflow: ellipsis !important;
     }
+
     .minijuego-hub-arrow {
       font-size: 1.15rem !important;
       color: #64748b !important;
@@ -808,10 +871,12 @@
       margin-left: auto !important;
       transition: transform 0.2s ease, color 0.2s ease !important;
     }
+
     .minijuego-hub-card:hover .minijuego-hub-arrow {
       color: #ffd93d !important;
       transform: translateX(3px) !important;
     }
+
     .modal-rangos-close-btn {
       background: rgba(255, 255, 255, 0.06) !important;
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
@@ -826,13 +891,14 @@
       cursor: pointer !important;
       transition: all 0.2s ease !important;
     }
+
     .modal-rangos-close-btn:hover {
       background: rgba(239, 68, 68, 0.25) !important;
       border-color: rgba(239, 68, 68, 0.5) !important;
       color: #fca5a5 !important;
       transform: rotate(90deg) !important;
     }
-    </style>
+  </style>
   <script>
     /* Deteccion de APK nativa (Capacitor / WebView / Custom Scheme) */
     function esEntornoApk() {
@@ -958,8 +1024,8 @@
               src="img/items%20de%20aventura/corona.webp" alt="" width="18" height="18" decoding="async"></span><span
             class="btn-auth-text">Entrar</span></button>
         <div id="user-info" class="user-info" style="display:none">
-          <button id="user-menu-toggle" class="user-pill" type="button" aria-haspopup="true" aria-expanded="false"><span class="user-avatar"
-              data-icono="persona"></span><span id="user-email" class="user-email"></span><span
+          <button id="user-menu-toggle" class="user-pill" type="button" aria-haspopup="true" aria-expanded="false"><span
+              class="user-avatar" data-icono="persona"></span><span id="user-email" class="user-email"></span><span
               class="user-chevron">▾</span></button>
           <div id="user-dropdown" class="user-dropdown" aria-hidden="true">
             <div class="user-dropdown-header">
@@ -1203,8 +1269,7 @@
                 <span class="bento-tool-name">Falla Astral</span>
               </a>
 
-              <a href="#minijuegos" class="bento-tool-item" id="dash-btn-minijuegos"
-                aria-label="Minijuegos">
+              <a href="#minijuegos" class="bento-tool-item" id="dash-btn-minijuegos" aria-label="Minijuegos">
                 <div class="bento-tool-icon-wrap">
                   <img src="img/dashboard/card-minijuegos.svg" alt="Mando Minijuegos" class="bento-tool-img" width="160"
                     height="160" loading="lazy" decoding="async">
@@ -1275,7 +1340,12 @@
                 nivel</span>
             </div>
           </div>
-          <button type="button" class="modal-rangos-close-btn" id="btn-cerrar-modal-rangos" aria-label="Cerrar modal"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+          <button type="button" class="modal-rangos-close-btn" id="btn-cerrar-modal-rangos"
+            aria-label="Cerrar modal"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+              stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg></button>
         </div>
 
         <!-- Tabs para alternar entre Rango Individual y Pareja -->
@@ -1322,13 +1392,19 @@
               <span class="modal-hub-sub">Elige un minijuego, diviértete y completa tu reto diario</span>
             </div>
           </div>
-          <button type="button" class="modal-rangos-close-btn" id="btn-cerrar-modal-minijuegos" aria-label="Cerrar seleccin de minijuegos"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+          <button type="button" class="modal-rangos-close-btn" id="btn-cerrar-modal-minijuegos"
+            aria-label="Cerrar seleccin de minijuegos"><svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg></button>
         </div>
 
         <div class="minijuegos-hub-grid" id="minijuegos-hub-grid">
           <button type="button" class="minijuego-hub-card" data-launch-juego="girasol">
             <div class="minijuego-hub-icon-wrap icon-girasol">
-              <img src="img/juegos/girasol.svg" alt="Atrapa el Girasol" width="44" height="44" loading="lazy" decoding="async">
+              <img src="img/juegos/girasol.svg" alt="Atrapa el Girasol" width="44" height="44" loading="lazy"
+                decoding="async">
             </div>
             <div class="minijuego-hub-info">
               <strong class="minijuego-hub-nombre">Atrapa el Girasol</strong>
@@ -1339,7 +1415,8 @@
 
           <button type="button" class="minijuego-hub-card" data-launch-juego="memoria">
             <div class="minijuego-hub-icon-wrap icon-memoria">
-              <img src="img/juegos/memoria.svg" alt="Juego de Memoria" width="44" height="44" loading="lazy" decoding="async">
+              <img src="img/juegos/memoria.svg" alt="Juego de Memoria" width="44" height="44" loading="lazy"
+                decoding="async">
             </div>
             <div class="minijuego-hub-info">
               <strong class="minijuego-hub-nombre">Juego de Memoria</strong>
@@ -1350,7 +1427,8 @@
 
           <button type="button" class="minijuego-hub-card" data-launch-juego="adivina">
             <div class="minijuego-hub-icon-wrap icon-adivina">
-              <img src="img/juegos/adivina.svg" alt="Adivina la Mascota" width="44" height="44" loading="lazy" decoding="async">
+              <img src="img/juegos/adivina.svg" alt="Adivina la Mascota" width="44" height="44" loading="lazy"
+                decoding="async">
             </div>
             <div class="minijuego-hub-info">
               <strong class="minijuego-hub-nombre">Adivina la Mascota</strong>
@@ -1361,7 +1439,8 @@
 
           <button type="button" class="minijuego-hub-card" data-launch-juego="snake">
             <div class="minijuego-hub-icon-wrap icon-snake">
-              <img src="img/juegos/snake.svg" alt="Serpiente Clásica" width="44" height="44" loading="lazy" decoding="async">
+              <img src="img/juegos/snake.svg" alt="Serpiente Clásica" width="44" height="44" loading="lazy"
+                decoding="async">
             </div>
             <div class="minijuego-hub-info">
               <strong class="minijuego-hub-nombre">Serpiente</strong>
@@ -1619,7 +1698,8 @@
       <p class="album-subtitle">Cada foto guarda un momento que no queremos olvidar.</p>
     </div>
     <div class="album-actions">
-      <button id="btn-add-photo" class="btn-primary" type="button" onclick="window.sunAbrirModalFoto && window.sunAbrirModalFoto(event)"><span>+</span> Añadir un recuerdo</button>
+      <button id="btn-add-photo" class="btn-primary" type="button"
+        onclick="window.sunAbrirModalFoto && window.sunAbrirModalFoto(event)"><span>+</span> Añadir un recuerdo</button>
       <button id="btn-paste-photos" class="btn-secondary"
         title="Pega fotos del portapapeles o selecciona múltiples archivos para guardarlos como polaroids">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
@@ -1656,11 +1736,14 @@
       </div>
     </div>
     <div id="album-grid" class="album-grid"></div>
-    <div id="aventuras-map-container" class="aventuras-map-container" style="display:none;max-width:1100px;margin:0 auto 2rem;width:100%;position:relative;">
+    <div id="aventuras-map-container" class="aventuras-map-container"
+      style="display:none;max-width:1100px;margin:0 auto 2rem;width:100%;position:relative;">
       <div id="aventuras-map" class="aventuras-map"></div>
       <div id="mapa-empty" class="mapa-empty hidden">
-        <p style="font-size:1.1rem;font-weight:700;color:#ffd93d;margin-bottom:6px;">📍 Aún no hay recuerdos ubicados</p>
-        <p class="album-empty-hint">Al añadir un recuerdo, pulsa en "Usar mi ubicación" para que aparezca marcado en el mapa.</p>
+        <p style="font-size:1.1rem;font-weight:700;color:#ffd93d;margin-bottom:6px;">📍 Aún no hay recuerdos ubicados
+        </p>
+        <p class="album-empty-hint">Al añadir un recuerdo, pulsa en "Usar mi ubicación" para que aparezca marcado en el
+          mapa.</p>
       </div>
     </div>
     <div id="album-empty" class="album-empty">
@@ -1728,11 +1811,21 @@
       </div>
     </div>
     <div class="minijuegos-menu">
-      <button class="btn-minijuego" id="btn-juego-girasol" data-juego="girasol"><span class="btn-minijuego-icon"><img src="img/juegos/girasol.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="btn-minijuego-text">Atrapa el girasol</span></button>
-      <button class="btn-minijuego" id="btn-juego-memoria" data-juego="memoria"><span class="btn-minijuego-icon"><img src="img/juegos/memoria.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="btn-minijuego-text">Memoria</span></button>
-      <button class="btn-minijuego" id="btn-juego-adivina" data-juego="adivina"><span class="btn-minijuego-icon"><img src="img/juegos/adivina.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="btn-minijuego-text">Adivina la mascota</span></button>
-      <button class="btn-minijuego" id="btn-juego-snake" data-juego="snake"><span class="btn-minijuego-icon"><img src="img/juegos/snake.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="btn-minijuego-text">Serpiente</span></button>
-      <button class="btn-minijuego" id="btn-juego-dados" data-juego="dados"><span class="btn-minijuego-icon"><img src="img/juegos/dados.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="btn-minijuego-text">Dados locos</span></button>
+      <button class="btn-minijuego" id="btn-juego-girasol" data-juego="girasol"><span class="btn-minijuego-icon"><img
+            src="img/juegos/girasol.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span
+          class="btn-minijuego-text">Atrapa el girasol</span></button>
+      <button class="btn-minijuego" id="btn-juego-memoria" data-juego="memoria"><span class="btn-minijuego-icon"><img
+            src="img/juegos/memoria.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span
+          class="btn-minijuego-text">Memoria</span></button>
+      <button class="btn-minijuego" id="btn-juego-adivina" data-juego="adivina"><span class="btn-minijuego-icon"><img
+            src="img/juegos/adivina.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span
+          class="btn-minijuego-text">Adivina la mascota</span></button>
+      <button class="btn-minijuego" id="btn-juego-snake" data-juego="snake"><span class="btn-minijuego-icon"><img
+            src="img/juegos/snake.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span
+          class="btn-minijuego-text">Serpiente</span></button>
+      <button class="btn-minijuego" id="btn-juego-dados" data-juego="dados"><span class="btn-minijuego-icon"><img
+            src="img/juegos/dados.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span
+          class="btn-minijuego-text">Dados locos</span></button>
     </div>
     <section class="desafio-diario" id="desafio-minijuegos" aria-live="polite">
       <div class="desafio-diario-cabecera"><span class="desafio-diario-icono" data-icono="calendario"></span>
@@ -2368,16 +2461,31 @@
       <!-- Leyenda Rápida de Categorías en Escritorio -->
       <div class="cal-categorias-chips" aria-label="Filtro rápido de planes">
         <button type="button" class="cal-chip active" data-cat-filter="all">Todos</button>
-        <button type="button" class="cal-chip cat-cita" data-cat-filter="cita"><img src="img/calendario/cita.svg" alt="" width="16" height="16" style="vertical-align:-3px;margin-right:3px;"> Cita</button>
-        <button type="button" class="cal-chip cat-viaje" data-cat-filter="viaje"><img src="img/calendario/viaje.svg" alt="" width="16" height="16" style="vertical-align:-3px;margin-right:3px;"> Viaje</button>
-        <button type="button" class="cal-chip cat-comida" data-cat-filter="comida"><img src="img/calendario/comida.svg" alt="" width="16" height="16" style="vertical-align:-3px;margin-right:3px;"> Comida</button>
-        <button type="button" class="cal-chip cat-aniversario" data-cat-filter="aniversario"><img src="img/calendario/aniversario.svg" alt="" width="16" height="16" style="vertical-align:-3px;margin-right:3px;"> Especial</button>
-        <button type="button" class="cal-chip cat-nota" data-cat-filter="nota"><img src="img/calendario/nota.svg" alt="" width="16" height="16" style="vertical-align:-3px;margin-right:3px;"> Nota</button>
+        <button type="button" class="cal-chip cat-cita" data-cat-filter="cita"><img src="img/calendario/cita.svg" alt=""
+            width="16" height="16" style="vertical-align:-3px;margin-right:3px;"> Cita</button>
+        <button type="button" class="cal-chip cat-viaje" data-cat-filter="viaje"><img src="img/calendario/viaje.svg"
+            alt="" width="16" height="16" style="vertical-align:-3px;margin-right:3px;"> Viaje</button>
+        <button type="button" class="cal-chip cat-comida" data-cat-filter="comida"><img src="img/calendario/comida.svg"
+            alt="" width="16" height="16" style="vertical-align:-3px;margin-right:3px;"> Comida</button>
+        <button type="button" class="cal-chip cat-aniversario" data-cat-filter="aniversario"><img
+            src="img/calendario/aniversario.svg" alt="" width="16" height="16"
+            style="vertical-align:-3px;margin-right:3px;"> Especial</button>
+        <button type="button" class="cal-chip cat-nota" data-cat-filter="nota"><img src="img/calendario/nota.svg" alt=""
+            width="16" height="16" style="vertical-align:-3px;margin-right:3px;"> Nota</button>
       </div>
 
       <div class="calendario-actions-right">
-        <button id="btn-ruleta-cita" class="btn-secondary" type="button" title="Sugerir una cita romántica al azar" style="display:inline-flex;align-items:center;gap:6px;border-color:rgba(244,114,182,0.45);background:rgba(244,114,182,0.12);color:#fbcfe8;">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="16" cy="8" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="8" cy="16" r="1.2" fill="currentColor"/><circle cx="16" cy="16" r="1.2" fill="currentColor"/></svg>
+        <button id="btn-ruleta-cita" class="btn-secondary" type="button" title="Sugerir una cita romántica al azar"
+          style="display:inline-flex;align-items:center;gap:6px;border-color:rgba(244,114,182,0.45);background:rgba(244,114,182,0.12);color:#fbcfe8;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+            <rect x="3" y="3" width="18" height="18" rx="4" />
+            <circle cx="8" cy="8" r="1.2" fill="currentColor" />
+            <circle cx="16" cy="8" r="1.2" fill="currentColor" />
+            <circle cx="12" cy="12" r="1.2" fill="currentColor" />
+            <circle cx="8" cy="16" r="1.2" fill="currentColor" />
+            <circle cx="16" cy="16" r="1.2" fill="currentColor" />
+          </svg>
           <span>Cita Sorpresa</span>
         </button>
         <button id="btn-add-evento" class="btn-primary btn-add-plan-primary" type="button">
@@ -2522,7 +2630,9 @@
 
   <!-- VISTA RPG (Modo Aventura) -->
   <section id="rpg" class="rpg-section view" data-view="rpg">
-    <div class="rpg-header"><p class="rpg-subtitle">Aventura RPG</p></div>
+    <div class="rpg-header">
+      <p class="rpg-subtitle">Aventura RPG</p>
+    </div>
     <div id="rpg-content"></div>
   </section>
 
@@ -2585,7 +2695,8 @@
               <span class="cat-card-name">Comida Receta</span>
             </button>
             <button type="button" class="cat-card" data-categoria="aniversario" data-color="dorado">
-              <span class="cat-card-icon"><img src="img/calendario/aniversario.svg" alt="" width="28" height="28"></span>
+              <span class="cat-card-icon"><img src="img/calendario/aniversario.svg" alt="" width="28"
+                  height="28"></span>
               <span class="cat-card-name">Aniversario Hito</span>
             </button>
             <button type="button" class="cat-card" data-categoria="nota" data-color="cielo">
@@ -2985,7 +3096,9 @@
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="5"></circle>
-              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+              <path
+                d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42">
+              </path>
             </svg>
           </div>
           <div class="settings-card-content">
