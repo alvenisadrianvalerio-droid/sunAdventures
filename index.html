@@ -958,7 +958,7 @@
               src="img/items%20de%20aventura/corona.webp" alt="" width="18" height="18" decoding="async"></span><span
             class="btn-auth-text">Entrar</span></button>
         <div id="user-info" class="user-info" style="display:none">
-          <button id="user-menu-toggle" class="user-pill" type="button" aria-haspopup="true" onclick="window.sunToggleUserDropdown && window.sunToggleUserDropdown(event)"><span class="user-avatar"
+          <button id="user-menu-toggle" class="user-pill" type="button" aria-haspopup="true" aria-expanded="false"><span class="user-avatar"
               data-icono="persona"></span><span id="user-email" class="user-email"></span><span
               class="user-chevron">▾</span></button>
           <div id="user-dropdown" class="user-dropdown" aria-hidden="true">
@@ -3684,7 +3684,6 @@
             }
           };
           pill.addEventListener("click", onPillToggle);
-          pill.addEventListener("touchend", onPillToggle, { passive: false });
         }
       }
 
@@ -4028,47 +4027,59 @@
   </script>
 
   <script>
-    /* Toggle universal autónomo para el menú de perfil de usuario */
-    window.sunToggleUserDropdown = function (ev) {
-      try {
-        if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+    /* Toggle universal autónomo para el menú de perfil de usuario (anti-rebote touch/click) */
+    (function () {
+      var lastToggleTs = 0;
+      window.sunToggleUserDropdown = function (ev) {
+        try {
+          var now = Date.now();
+          if (now - lastToggleTs < 280) {
+            if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+            return;
+          }
+          lastToggleTs = now;
+          if (ev) {
+            ev.stopPropagation();
+            if (ev.cancelable && ev.type !== "click") ev.preventDefault();
+          }
+          var dd = document.getElementById("user-dropdown");
+          var toggle = document.getElementById("user-menu-toggle");
+          var info = document.getElementById("user-info");
+          if (!dd) return;
+          var estaAbierto = dd.classList.contains("open") || dd.style.display === "flex";
+          if (estaAbierto) {
+            dd.classList.remove("open");
+            dd.setAttribute("aria-hidden", "true");
+            dd.style.setProperty("display", "none", "important");
+            dd.style.setProperty("opacity", "0", "important");
+            dd.style.setProperty("pointer-events", "none", "important");
+            toggle?.setAttribute("aria-expanded", "false");
+            info?.classList.remove("open");
+          } else {
+            dd.classList.add("open");
+            dd.setAttribute("aria-hidden", "false");
+            dd.style.setProperty("display", "flex", "important");
+            dd.style.setProperty("flex-direction", "column", "important");
+            dd.style.setProperty("opacity", "1", "important");
+            dd.style.setProperty("visibility", "visible", "important");
+            dd.style.setProperty("pointer-events", "auto", "important");
+            dd.style.setProperty("z-index", "10001", "important");
+            toggle?.setAttribute("aria-expanded", "true");
+            info?.classList.add("open");
+          }
+        } catch (err) {
+          console.error("[sunToggleUserDropdown]", err);
+        }
+      };
+
+      document.addEventListener("click", function (e) {
         var dd = document.getElementById("user-dropdown");
         var toggle = document.getElementById("user-menu-toggle");
-        var info = document.getElementById("user-info");
-        if (!dd) return;
-        var estaAbierto = dd.classList.contains("open") || dd.style.display === "flex";
-        if (estaAbierto) {
-          dd.classList.remove("open");
-          dd.setAttribute("aria-hidden", "true");
-          dd.style.setProperty("display", "none", "important");
-          dd.style.setProperty("opacity", "0", "important");
-          dd.style.setProperty("pointer-events", "none", "important");
-          toggle?.setAttribute("aria-expanded", "false");
-          info?.classList.remove("open");
-        } else {
-          dd.classList.add("open");
-          dd.setAttribute("aria-hidden", "false");
-          dd.style.setProperty("display", "flex", "important");
-          dd.style.setProperty("flex-direction", "column", "important");
-          dd.style.setProperty("opacity", "1", "important");
-          dd.style.setProperty("visibility", "visible", "important");
-          dd.style.setProperty("pointer-events", "auto", "important");
-          dd.style.setProperty("z-index", "10001", "important");
-          toggle?.setAttribute("aria-expanded", "true");
-          info?.classList.add("open");
-        }
-      } catch (err) {
-        console.error("[sunToggleUserDropdown]", err);
-      }
-    };
-
-    document.addEventListener("click", function (e) {
-      var dd = document.getElementById("user-dropdown");
-      var toggle = document.getElementById("user-menu-toggle");
-      if (!dd || !dd.classList.contains("open")) return;
-      if (dd.contains(e.target) || (toggle && toggle.contains(e.target))) return;
-      window.sunToggleUserDropdown();
-    });
+        if (!dd || !dd.classList.contains("open")) return;
+        if (dd.contains(e.target) || (toggle && toggle.contains(e.target))) return;
+        window.sunToggleUserDropdown();
+      });
+    })();
 
     /* Apertura autosuficiente del modal de foto (no depende de CSS/JS externos) */
     window.sunAbrirModalFoto = function (ev) {

@@ -896,6 +896,11 @@ body.light .theme-toggle:hover {
   font-size: .85rem;
   font-weight: bold;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  min-height: 38px;
+  box-sizing: border-box;
   transition: background .2s, border-color .2s, transform .2s
 }
 
@@ -4686,9 +4691,10 @@ canvas {
   }
 
   .user-pill {
-    padding: .3rem .5rem .3rem .3rem;
-    gap: .3rem;
-    max-width: 120px;
+    padding: .3rem .55rem .3rem .35rem;
+    gap: .35rem;
+    max-width: 145px;
+    min-height: 40px;
   }
 
   .user-email {

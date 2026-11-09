@@ -273,12 +273,23 @@
   };
   const cerrarMenuPerfil = () => {
     if (!userDropdown || !userMenuToggle) return;
-    userDropdown.classList.remove("open"); userDropdown.setAttribute("aria-hidden", "true");
-    userMenuToggle.setAttribute("aria-expanded", "false"); userInfo?.classList.remove("open");
+    userDropdown.classList.remove("open");
+    userDropdown.setAttribute("aria-hidden", "true");
+    userDropdown.style.setProperty("display", "none", "important");
+    userDropdown.style.setProperty("opacity", "0", "important");
+    userDropdown.style.setProperty("pointer-events", "none", "important");
+    userMenuToggle.setAttribute("aria-expanded", "false");
+    userInfo?.classList.remove("open");
   };
   // Toggle único y robusto sin colisiones ni condiciones de carrera
-  userMenuToggle?.addEventListener("click", e => window.sunToggleUserDropdown(e));
-  userMenuToggle?.addEventListener("touchend", e => window.sunToggleUserDropdown(e), { passive: false });
+  if (userMenuToggle && !userMenuToggle.dataset.authToggleBound) {
+    userMenuToggle.dataset.authToggleBound = "true";
+    userMenuToggle.addEventListener("click", e => {
+      if (typeof window.sunToggleUserDropdown === "function") {
+        window.sunToggleUserDropdown(e);
+      }
+    });
+  }
 
   // Cerrar menú al tocar fuera
   const cerrarSiTocaFuera = e => {
@@ -349,25 +360,7 @@
     }
   });
 
-  window.sunToggleUserDropdown = function(ev) {
-    if (ev) { ev.preventDefault(); ev.stopPropagation(); }
-    const dd = document.getElementById("user-dropdown");
-    const toggle = document.getElementById("user-menu-toggle");
-    const info = document.getElementById("user-info");
-    if (!dd) return;
-    const estaAbierto = dd.classList.contains("open");
-    if (estaAbierto) {
-      dd.classList.remove("open");
-      dd.setAttribute("aria-hidden", "true");
-      toggle?.setAttribute("aria-expanded", "false");
-      info?.classList.remove("open");
-    } else {
-      dd.classList.add("open");
-      dd.setAttribute("aria-hidden", "false");
-      toggle?.setAttribute("aria-expanded", "true");
-      info?.classList.add("open");
-    }
-  };
+  // window.sunToggleUserDropdown se mantiene unificado y autónomo con protección anti-rebote (definido centralmente)
   window.AlbumApp.modules.auth = {
     updateAuthUI,
     abrirAuthModal,
