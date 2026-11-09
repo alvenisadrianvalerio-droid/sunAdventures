@@ -625,15 +625,16 @@
     o._tk = intervalo;
   }
 
-  // Inyectar botón "Snake" en el menú de minijuegos
+  // Inyectar botón "Snake" en el menú de minijuegos si no existiera estáticamente
   function inyectarBotonSnake() {
     const menu = document.querySelector(".minijuegos-menu");
     if (!menu || menu.querySelector('[data-juego="snake"]')) return;
     const b = document.createElement("button");
     b.type = "button";
+    b.id = "btn-juego-snake";
     b.className = "btn-minijuego";
     b.dataset.juego = "snake";
-    b.innerHTML = `<span class="btn-minijuego-icon">${window.ICONO?.serpiente || ""}</span><span class="btn-minijuego-text">Serpiente</span>`;
+    b.innerHTML = `<span class="btn-minijuego-icon"><img src="img/juegos/snake.svg" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="btn-minijuego-text">Serpiente</span>`;
     b.addEventListener("click", juegoSnake);
     menu.appendChild(b);
   }
@@ -664,14 +665,18 @@
   function clean(menu) {
     if (!menu) return false;
     const vistos = new Set();
+    const PERMITIDOS = new Set(["girasol", "memoria", "adivina", "snake"]);
     let cambio = false;
     [...menu.querySelectorAll(".btn-minijuego")].forEach(b => {
+      const jId = (b.dataset.juego || "").trim().toLowerCase();
       const t = (b.textContent || "").trim().toLowerCase();
-      // 1) Bloquear "Poción mágica" (y similares)
-      if (BLOCK.some(r => r.test(t))) { b.remove(); cambio = true; return; }
-      // 2) Bloquear duplicados (primer botón con ese texto gana)
-      if (vistos.has(t)) { b.remove(); cambio = true; return; }
-      vistos.add(t);
+      // Eliminar cualquier minijuego no permitido
+      if (jId && !PERMITIDOS.has(jId)) { b.remove(); cambio = true; return; }
+      if (!jId && !/girasol|memoria|adivina|serpiente|snake/i.test(t)) { b.remove(); cambio = true; return; }
+      // Bloquear duplicados
+      const clave = jId || t;
+      if (vistos.has(clave)) { b.remove(); cambio = true; return; }
+      vistos.add(clave);
     });
     return cambio;
   }

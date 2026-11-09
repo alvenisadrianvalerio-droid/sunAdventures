@@ -1800,48 +1800,10 @@ function programarIntervalo(overlay, fn, delay) {
   const JUEGOS_FILTRADOS = JUEGOS.filter(j => j.id !== "adivina");
 
   function inyectarBotones() {
-    const menu = qs(".minijuegos-menu");
-    if (menu && menu.dataset.extras !== "1") {
-      menu.dataset.extras = "1";
-      JUEGOS_FILTRADOS.forEach(j => {
-        const b = document.createElement("button");
-        b.type = "button"; b.className = "btn-minijuego"; b.dataset.juegoExtra = j.id; b.dataset.juego = j.id;
-        b.innerHTML = `<span class="btn-minijuego-icon"><img src="${j.svg}" alt="" width="28" height="28" loading="lazy" decoding="async"></span><span class="btn-minijuego-text">${j.nombre}</span>`;
-        b.addEventListener("click", () => j.fn());
-        menu.appendChild(b);
-      });
-    }
-
-    const hubGrid = $("minijuegos-hub-grid") || qs(".minijuegos-hub-grid");
-    if (hubGrid && hubGrid.dataset.extrasHub !== "1") {
-      hubGrid.dataset.extrasHub = "1";
-      JUEGOS.forEach(j => {
-        if (hubGrid.querySelector(`[data-launch-juego="${j.id}"]`)) return;
-        const card = document.createElement("button");
-        card.type = "button";
-        card.className = "minijuego-hub-card";
-        card.dataset.launchJuego = j.id;
-        card.innerHTML = `
-          <div class="minijuego-hub-icon-wrap icon-${j.id}">
-            <img src="${j.svg}" alt="${j.nombre}" width="44" height="44" loading="lazy" decoding="async">
-          </div>
-          <div class="minijuego-hub-info">
-            <strong class="minijuego-hub-nombre">${j.nombre}</strong>
-            <span class="minijuego-hub-desc">${j.desc}</span>
-          </div>
-          <span class="minijuego-hub-arrow">→</span>
-        `;
-        card.addEventListener("click", () => {
-          $("modal-minijuegos-hub")?.classList.remove("active");
-          try { snd("pop"); } catch {}
-          j.fn();
-        });
-        hubGrid.appendChild(card);
-      });
-    }
+    // Menú limitado exclusivamente a los 4 minijuegos solicitados:
+    // Atrapa el girasol, Memoria, Adivina la mascota y Serpiente.
+    // No se inyectan minijuegos adicionales ni en el menú ni en el hub.
   }
-  setTimeout(inyectarBotones, 800);
-  window.addEventListener("hashchange", () => setTimeout(inyectarBotones, 300));
   window.JUEGO_FNS = Object.fromEntries(JUEGOS.map(j => [j.id, j.fn]));
 
   console.log("✅ juegos.js cargado —", JUEGOS_FILTRADOS.length, "juegos activos");

@@ -1736,6 +1736,10 @@ sprite.style.opacity = "0.25";
   $("btn-juego-girasol")?.addEventListener("click", juegoGirasol);
   $("btn-juego-memoria")?.addEventListener("click", juegoMemoria);
   $("btn-juego-adivina")?.addEventListener("click", juegoAdivina);
+  $("btn-juego-snake")?.addEventListener("click", () => {
+    if (typeof window.abrirSnake === "function") window.abrirSnake();
+    else if (typeof window.juegoSnake === "function") window.juegoSnake();
+  });
   setTimeout(renderGrid, 600);
   window.addEventListener("sunad:progress", renderGrid);
   window.addEventListener("sunad:user-ready", () => setTimeout(renderGrid, 400));
@@ -2492,10 +2496,9 @@ sprite.style.opacity = "0.25";
           window.juegoMemoria();
         } else if (juego === "adivina" && typeof window.juegoAdivina === "function") {
           window.juegoAdivina();
-        } else if (juego === "dados" && typeof window.JUEGO_FNS?.dados === "function") {
-          window.JUEGO_FNS.dados();
-        } else if (juego === "snake" && typeof window.juegoSnake === "function") {
-          window.juegoSnake();
+        } else if (juego === "snake" && (typeof window.abrirSnake === "function" || typeof window.juegoSnake === "function")) {
+          if (typeof window.abrirSnake === "function") window.abrirSnake();
+          else window.juegoSnake();
         } else {
           // Fallback al botón de la vista de minijuegos si existe
           const btn = document.querySelector(`.btn-minijuego[data-juego="${juego}"]`);
