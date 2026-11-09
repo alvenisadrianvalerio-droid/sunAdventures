@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    SCRIPT.JS — SunAd · v5 compacto
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
@@ -1740,6 +1740,9 @@ sprite.style.opacity = "0.25";
     if (typeof window.abrirSnake === "function") window.abrirSnake();
     else if (typeof window.juegoSnake === "function") window.juegoSnake();
   });
+  $("btn-juego-dados")?.addEventListener("click", () => {
+    if (typeof window.JUEGO_FNS?.dados === "function") window.JUEGO_FNS.dados();
+  });
   setTimeout(renderGrid, 600);
   window.addEventListener("sunad:progress", renderGrid);
   window.addEventListener("sunad:user-ready", () => setTimeout(renderGrid, 400));
@@ -2499,6 +2502,8 @@ sprite.style.opacity = "0.25";
         } else if (juego === "snake" && (typeof window.abrirSnake === "function" || typeof window.juegoSnake === "function")) {
           if (typeof window.abrirSnake === "function") window.abrirSnake();
           else window.juegoSnake();
+        } else if (juego === "dados" && typeof window.JUEGO_FNS?.dados === "function") {
+          window.JUEGO_FNS.dados();
         } else {
           // Fallback al botón de la vista de minijuegos si existe
           const btn = document.querySelector(`.btn-minijuego[data-juego="${juego}"]`);

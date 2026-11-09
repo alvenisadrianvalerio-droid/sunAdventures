@@ -665,14 +665,14 @@
   function clean(menu) {
     if (!menu) return false;
     const vistos = new Set();
-    const PERMITIDOS = new Set(["girasol", "memoria", "adivina", "snake"]);
+    const PERMITIDOS = new Set(["girasol", "memoria", "adivina", "snake", "dados"]);
     let cambio = false;
     [...menu.querySelectorAll(".btn-minijuego")].forEach(b => {
       const jId = (b.dataset.juego || "").trim().toLowerCase();
       const t = (b.textContent || "").trim().toLowerCase();
       // Eliminar cualquier minijuego no permitido
       if (jId && !PERMITIDOS.has(jId)) { b.remove(); cambio = true; return; }
-      if (!jId && !/girasol|memoria|adivina|serpiente|snake/i.test(t)) { b.remove(); cambio = true; return; }
+      if (!jId && !/girasol|memoria|adivina|serpiente|snake|dados/i.test(t)) { b.remove(); cambio = true; return; }
       // Bloquear duplicados
       const clave = jId || t;
       if (vistos.has(clave)) { b.remove(); cambio = true; return; }
